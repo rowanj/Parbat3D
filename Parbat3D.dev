@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=23
+UnitCount=24
 Type=0
 Ver=1
 ObjFiles=
@@ -299,6 +299,16 @@ BuildCmd=
 FileName=windowFunctions.cpp
 CompileCpp=1
 Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit24]
+FileName=config.h
+CompileCpp=1
+Folder=Parbat3D
 Compile=1
 Link=1
 Priority=1000
