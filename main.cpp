@@ -1,20 +1,15 @@
-/*
-modifications as of 1/5/06 7:00PM:
-    fixed tab control
-    other minor things
-modifications 1/5/06:
-    fixed snapped windows, but a bug still exists
-    changed tool & image windows to be a child of main window (changed where they appear when minimized)
-    disabled mimimizing/restoring tool & image windows on main window minimize/resize (now done automatically due to line above)
-    put function declartions in main.h & moved functions into seperate sections in same file
-    changed tool window style
-    add tab control & test tab containers - tab change notification not working
-*/
-
 #include <Windows.h>
 #include <Commctrl.h>
 #include <iostream>
 #include "main.h"
+
+#include "config.h"
+
+#if TMP_USE_IMAGE_MANIPULATION
+#include "ImageHandler.h"
+ImageHandler::ImageHandler* image_handler;	// Instance handle
+int	image_handler_status;
+#endif
 
 using namespace std;
 
@@ -65,7 +60,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     
     // create & show main window
     hMainWindow=setupMainWindow(hThisInstance);
-   
+  
     /* Run the messageloop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))
     {
@@ -694,7 +689,7 @@ void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
 
 /* main functions */
 /* ------------------------------------------------------------------------------------------------------------------------ */
-
+// !! why does this need a window handle argument? - Rowan
 void loadFile(HWND hwnd)
 {
      OPENFILENAME ofn;
@@ -722,6 +717,16 @@ void loadFile(HWND hwnd)
         if (!hToolWindow)
             hToolWindow=setupToolWindow(hThisInstance);
         ShowWindow(hToolWindow,SW_SHOW);
+        
+        #if TMP_USE_IMAGE_MANIPULATION
+    	// !! These NULL args need to be replaced with the HWNDs of the GL drawable areas
+    	//	of the overview window and main window respectively.
+	    image_handler = new ImageHandler::ImageHandler(NULL, NULL, ofn.lpstrFile, &image_handler_status);
+	    if (image_handler_status != 0) {
+			// An error occurred initializing the image handler class.
+			// Print image_handler_status for `useful' debug info.
+		}
+		#endif
     }
 }
 
