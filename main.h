@@ -1,3 +1,6 @@
+#ifndef _PARBAT_MAIN_H
+#define _PARBAT_MAIN_H
+
 #define ID_MENU 501
 
 #define IDM_FILEOPEN        201
@@ -35,3 +38,4 @@ void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RE
 int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset);
 void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset);
 
+#endif

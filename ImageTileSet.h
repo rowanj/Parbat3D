@@ -1,4 +1,7 @@
-#include <Windows.h"
+#ifndef _IMAGE_TILE_SET_H
+#define _IMAGE_TILE_SET_H
+
+#include <Windows.h>
 
 #include "ImageFile"
 
@@ -13,3 +16,5 @@ private:
 	int LOD;
 	RECT current_region;
 }
+
+#endif

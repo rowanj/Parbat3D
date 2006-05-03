@@ -1,3 +1,6 @@
+#ifndef _IMAGE_GL_VIEW_H
+#define _IMAGE_GL_VIEW_H
+
 class ImageGLView
 {
 public:
@@ -9,3 +12,5 @@ private:
 	HDC device_context;
 	HGLRC rendering_context;
 }
+
+#endif
