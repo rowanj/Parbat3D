@@ -13,21 +13,23 @@ int	image_handler_status;
 
 using namespace std;
 
-/* Make the classname into a global variable */
+/* Unique class names for our main windows */
 char szMainWindowClassName[] = "Parabat3D Main Window";
 char szImageWindowClassName[] = "Parabat3D Image Window";
 char szToolWindowClassName[] = "Parabat3D Tool Window";
-char szLabelClassName[] = "Tool Window channels";
+/* pre-defined class names for controls */
+char szStaticControl[] = "static";  /* static text control */
 
+/* a handle that identifies our process */
 HINSTANCE hThisInstance;
 
-/* Create global variables for Window handles */
+/* global variables to store handles to our windows */
 HWND hMainWindow;
 HWND hImageWindow;
 HWND hToolWindow;
 HWND hDesktop;
 
-/* create global variables for window controls */
+/* global variables to store handles to our window controls */
 HWND hToolWindowTabControl;
 HWND hToolWindowDisplayTabContainer;
 HWND hToolWindowQueryTabContainer;
@@ -36,26 +38,23 @@ HWND hToolWindowQueryTabContainer;
 int imageWindowIsSnapped=false;
 int toolWindowIsSnapped=false;
 
+/* Define id numbers for the tab's in the tool window */
+const enum {DISPLAY_TAB_ID,QUERY_TAB_ID);
+
+
+/* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 
 {
     MSG messages;            /* Here messages to the application is saved */
-
-    /* open console for debugging messages (doesn't work - cout messages don't appear) */
-    /*HANDLE hConsole;
-    AllocConsole();
-    hConsole=CreateConsoleScreenBuffer(GENERIC_WRITE+GENERIC_READ,FILE_SHARE_READ,NULL,CONSOLE_TEXTMODE_BUFFER,NULL);
-    SetStdHandle(STD_OUTPUT_HANDLE,hConsole);
-    SetConsoleActiveScreenBuffer(hConsole);
-    cout << "test";*/
-    
-    /* load window classes for controls */
+   
+    /* load window classes for common controls */
     InitCommonControls();
     
-    // store (this program's) instance handle
+    // store this process's instance handle
     hThisInstance=hInstance;
     
-    // get desktop window
+    // get desktop window handle
     hDesktop=GetDesktopWindow();
     
     // create & show main window
@@ -74,6 +73,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Main Window Functions */
+
 HWND setupMainWindow(HINSTANCE hThisInstance)
 {
     HMENU menu;              /* Handle of the menu */
@@ -99,7 +99,7 @@ HWND setupMainWindow(HINSTANCE hThisInstance)
     /* Register the window class, if fail quit the program */
     if(!RegisterClassEx(&wincl)) return 0;
     
-    /* The class is registered, lets create the program*/
+    /* The class is registered, lets create a window based on it*/
     hMainWindow = CreateWindowEx(
            0,                   /* Extended possibilites for variation */
            szMainWindowClassName,         /* Classname */
@@ -124,89 +124,109 @@ HWND setupMainWindow(HINSTANCE hThisInstance)
     return hMainWindow;
 }
 
-/* This function is called by the Windowsfunction DispatchMessage( ) */
+/* This function is called by the Windows function DispatchMessage( ) */
+/* All messages/events related to the main window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static POINT snapMouseOffset;
-    static RECT prevMainWindowRect;
-    static RECT prevImageWindowRect;
-    static RECT prevToolWindowRect;
-    static int toolWindowIsMovingToo;
-    static int imageWindowIsMovingToo;    
+    /* static variables used for snapping windows */
+    static POINT snapMouseOffset;           /* mouse co-ords relative to position of window */
+    static RECT prevMainWindowRect;         /* main window position before it was moved */
+    static RECT prevImageWindowRect;        /* image window position before it was moved */
+    static RECT prevToolWindowRect;         /* tool window position before it was moved */
+    static int toolWindowIsMovingToo;       /* whether or not the tool window should be moved with the main window */
+    static int imageWindowIsMovingToo;      /* whether or not the image window should be moved with the main window */
         
     switch (message)                  /* handle the messages */
     {
-       case WM_CREATE:
+        /* WM_CREATE: window has been created */
+        case WM_CREATE:                
             hImageWindow=NULL;
             hToolWindow=NULL;
             break;
-       case WM_COMMAND:
-           switch( wParam )
-           {
-             case IDM_FILEOPEN:
-                  loadFile(hwnd);
-                  return 0;
+
+        /* WM_COMMAND: some command has been preformed by user, eg. menu item clicked */            
+        case WM_COMMAND:
+            /* if menu item clicked, wParam==resource id number of menu item (defined in rsrc.rc) */
+            switch( wParam )
+            {
+                case IDM_FILEOPEN:
+                    loadFile(hwnd);
+                    return 0;
                   
-             case IDM_FILESAVE:
-             case IDM_FILESAVEAS:
+                case IDM_FILESAVE:
+                case IDM_FILESAVEAS:
              
-             case IDM_TOOL:
-                  MessageBox( hwnd, (LPSTR) "Function Not Yet Implemented.",
+                case IDM_TOOL:
+                    MessageBox( hwnd, (LPSTR) "Function Not Yet Implemented.",
                               (LPSTR) szMainWindowClassName,
                               MB_ICONINFORMATION | MB_OK );
-                  return 0;
+                    return 0;
 
-             case IDM_HELPCONTENTS:
-                  WinHelp( hwnd, (LPSTR) "HELPFILE.HLP",
+                case IDM_HELPCONTENTS:
+                    WinHelp( hwnd, (LPSTR) "HELPFILE.HLP",
                            HELP_CONTENTS, 0L );
-                  return 0;
+                    return 0;
 
-             case IDM_FILEEXIT:
-                  SendMessage( hwnd, WM_CLOSE, 0, 0L );
-                  return 0;
+                case IDM_FILEEXIT:
+                    SendMessage( hwnd, WM_CLOSE, 0, 0L );
+                    return 0;
 
-             case IDM_HELPABOUT:
-                  MessageBox (NULL, "Created by Team Imagery 2006" , "Parbat3D", 0);
-                  return 0;
-
+                case IDM_HELPABOUT:
+                    MessageBox (NULL, "Created by Team Imagery 2006" , "Parbat3D", 0);
+                    return 0;
            }
            break;
 
-      case WM_NCLBUTTONDOWN:
-           if(wParam == HTCAPTION)  
-           {
-               getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
+        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */
+        case WM_NCLBUTTONDOWN:
+            /* wParam=the area of the window where the mouse button was pressed */
+
+            /* HTCAPTION: mouse button was pressed down on the window title bar
+                         (occurs when user starts to move the window)              */
+            if(wParam == HTCAPTION)
+            {
+                /* record mouse position relative to window position */
+                getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
                      
-               /* record current window positions before moving */
-               GetWindowRect(hwnd,&prevMainWindowRect);  
-               GetWindowRect(hImageWindow,&prevImageWindowRect); 
-               GetWindowRect(hToolWindow,&prevToolWindowRect);
+                /* record current window positions */
+                GetWindowRect(hwnd,&prevMainWindowRect);  
+                GetWindowRect(hImageWindow,&prevImageWindowRect); 
+                GetWindowRect(hToolWindow,&prevToolWindowRect);
                
-               /* move the currently snapped windows with this one */
-               imageWindowIsMovingToo=imageWindowIsSnapped;
-               toolWindowIsMovingToo=toolWindowIsSnapped;                  
+                /* record which windows are currently snapped (which ones should move with the main window) */
+                imageWindowIsMovingToo=imageWindowIsSnapped;
+                toolWindowIsMovingToo=toolWindowIsSnapped;                  
            }
            return DefWindowProc(hwnd, message, wParam, lParam); 
 
-      case WM_MOVING:
-           /* snap to windows and/or move snapped windows as the main window is moved */
-           snapWindow(hDesktop,(RECT*)lParam,&snapMouseOffset);           
+        /* WM_MOVING: the window is about to be moved to a new location */
+        case WM_MOVING:
+            /* lParam=the new position, which can be modified before the window is moved */
+            
+            /* snap main window to edge of desktop */
+            snapWindow(hDesktop,(RECT*)lParam,&snapMouseOffset);           
 
-           /* bug: when calling snapWindow the second time the main window does not visually snap to the tool window, but snapWindow still returns true */
-           if (!imageWindowIsMovingToo)
-              imageWindowIsSnapped=snapWindow(hImageWindow,(RECT*)lParam,&snapMouseOffset); 
+            /* bug: when calling snapWindow the second time the main window does not visually snap to the tool window, but snapWindow still returns true */
+            /* snap main window to image window, if near it, if it's not already snapped */
+            if (!imageWindowIsMovingToo)
+                imageWindowIsSnapped=snapWindow(hImageWindow,(RECT*)lParam,&snapMouseOffset); 
 
-           if ((!toolWindowIsMovingToo))
-              toolWindowIsSnapped=snapWindow(hToolWindow,(RECT*)lParam,&snapMouseOffset);
-              
-           moveSnappedWindows((RECT*)lParam,&prevMainWindowRect,&prevImageWindowRect,&prevToolWindowRect,imageWindowIsMovingToo,toolWindowIsMovingToo);
-           break;
-      
-      case WM_SIZE:
-           WINDOWPLACEMENT wp;
-           switch(wParam)
-           {
-              case SIZE_MINIMIZED:
+            /* snap main window to tool window, if near it, if it's not already snapped */
+            if ((!toolWindowIsMovingToo))
+                toolWindowIsSnapped=snapWindow(hToolWindow,(RECT*)lParam,&snapMouseOffset);
+            
+            /* move the snapped windows relative to main window's new position */
+            /* only moves the windows that were already snapped to the main window */
+            moveSnappedWindows((RECT*)lParam,&prevMainWindowRect,&prevImageWindowRect,&prevToolWindowRect,imageWindowIsMovingToo,toolWindowIsMovingToo);
+            break;
+
+        /* WM_SIZE: the window has been re-sized, minimized, maximised or restored */
+        case WM_SIZE:
+            WINDOWPLACEMENT wp;
+            /* wParam=how the window size has changed */
+            switch(wParam)
+            {
+                case SIZE_MINIMIZED:
                    /* hide other windows when main window is minized */
                    /*  (now done automatically)
                    if ((hImageWindow)&&(hToolWindow))
@@ -219,8 +239,8 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                        wp.showCmd=SW_MINIMIZE;
                        SetWindowPlacement(hToolWindow,&wp);
                    }*/
-                   break;
-              case SIZE_RESTORED:
+                    break;
+                case SIZE_RESTORED:
                    /* restore other windows when main window is restored */
                    /* (now done automatically)
                    if ((hImageWindow)&&(hToolWindow))
@@ -241,34 +261,42 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                    
                    }
                    */
-                   break;
-           }
-           break;            
-      case WM_CLOSE:
-           DestroyWindow( hwnd );
-           return 0;
+                    break;
+            }
+            break;   
+                     
+        /* WM_CLOSE: system or user has requested to close the window/application */
+        case WM_CLOSE:
+            /* destroy this window */
+            DestroyWindow( hwnd );
+            return 0;
 
-      case WM_DESTROY:
-           PostQuitMessage (0);
-           return 0;
-
-      break;
-      default:                   /* for messages that we don't deal with */
-      return DefWindowProc(hwnd, message, wParam, lParam);
-   }
-  return 0;
+        /* WM_DESTROY: window is being destroyed */
+        case WM_DESTROY:
+            /* post a message that will cause WinMain to exit from the message loop */
+            PostQuitMessage (0);
+            break;
+        
+        default:                   /* for messages that we don't deal with */
+            /* let windows peform the default operation based on the message */
+            return DefWindowProc(hwnd, message, wParam, lParam);
+    }
+    /* return 0 to indicate that we have processed the message */    
+    return 0; 
 }
 
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Image Window Functions */
+
+/* create the image window */
 HWND setupImageWindow(HINSTANCE hThisInstance)
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
 
     /* The Window structure */
-    wincl.hInstance = hThisInstance;
-    wincl.lpszClassName = szImageWindowClassName;
+    wincl.hInstance = hThisInstance;                /* process's instance handle */
+    wincl.lpszClassName = szImageWindowClassName;   /* our unique name for this class */
     wincl.lpfnWndProc = ImageWindowProcedure;      /* This function is called by windows */
     wincl.style = CS_DBLCLKS;                 /* Ctach double-clicks */
     wincl.cbSize = sizeof(WNDCLASSEX);
@@ -290,7 +318,7 @@ HWND setupImageWindow(HINSTANCE hThisInstance)
     RECT rect;
     GetWindowRect(hMainWindow, &rect);
     
-    /* The class is registered, lets create the program*/
+    /* Create a window based on the class we just registered */
     hImageWindow =CreateWindowEx(
            0,                   /* Extended possibilites for variation */
            szImageWindowClassName,         /* Classname */
@@ -312,53 +340,61 @@ HWND setupImageWindow(HINSTANCE hThisInstance)
 }
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
+/* All messages/events related to the image window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static POINT snapMouseOffset;     // mouse offset relative to window, used for snapping
+    static POINT snapMouseOffset;     /* mouse offset relative to window, used for snapping */
     
     switch (message)                  /* handle the messages */
     {
-       case WM_CREATE:
+        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
+        case WM_NCLBUTTONDOWN:
+            /* wParam=the area of the window where the mouse button was pressed */
+
+            /* HTCAPTION: mouse button was pressed down on the window title bar
+                         (occurs when user starts to move the window)              */            
+            if(wParam == HTCAPTION)
+            {
+                /* get the mouse co-ords relative to the window */
+                getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
+            }    
+
+            /* also let windows handle this event */
+            return DefWindowProc(hwnd, message, wParam, lParam); 
+        
+            
+        /* WM_MOVING: the window is about to be moved to a new location */
+        case WM_MOVING:
+            /* lParam=the new position, which can be modified before the window is moved */
+
+            /* snap the window to the edge of the desktop (if near it) */
+            snapWindow(hDesktop,(RECT*)lParam,&snapMouseOffset);      
+            
+            /* snap the window the main window (if near it) */
+            imageWindowIsSnapped=snapWindow(hMainWindow,(RECT*)lParam,&snapMouseOffset);
             break;
-            
-       case WM_COMMAND:
-           switch( wParam )
-           {
 
-           }
-           break;
 
-      case WM_NCLBUTTONDOWN:
-           if(wParam == HTCAPTION)  /* user has clicked down mouse button on title bar of window */
-           {              
-               getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
-           }
-           /* also let windows perform default operation (or it stuffs up) */
-           return DefWindowProc(hwnd, message, wParam, lParam); 
-            
-      case WM_MOVING:  /* window is being dragged by user */
-           snapWindow(hDesktop,(RECT*)lParam,&snapMouseOffset);      
-           imageWindowIsSnapped=snapWindow(hMainWindow,(RECT*)lParam,&snapMouseOffset);
-           break;
+        /* WM_CLOSE: system or user has requested to close the window/application */             
+        case WM_CLOSE:
+            /* don't destroy this window, but make it invisible */
+            ShowWindow(hwnd,SW_HIDE);
+            //DestroyWindow(hwnd);
+            //hImageWindow=NULL;
+            return 0;
 
-      case WM_MOVE:    /* window has been moved */
-           break;
-                             
-      case WM_CLOSE:   /* user/software requests to close window */
-           ShowWindow(hwnd,SW_HIDE);
-           //DestroyWindow(hwnd);
-           //hImageWindow=NULL;
-           return 0;
+        /* WM_DESTORY: system is destroying our window */
+        case WM_DESTROY:
+            /* send a message that will cause WinMain to exit the message loop */
+            PostQuitMessage (0);
+            return 0;
 
-      case WM_DESTROY:
-           PostQuitMessage (0);
-           return 0;
-
-      break;
-      default:                   /* for messages that we don't deal with */
-      return DefWindowProc(hwnd, message, wParam, lParam);
-   }
-  return 0;
+        default:
+            /* let windows handle any unknown messages */
+            return DefWindowProc(hwnd, message, wParam, lParam);
+    }
+    /* return 0 to indicate that we have processed the message */       
+    return 0;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
@@ -394,9 +430,9 @@ HWND setupToolWindow(HINSTANCE hThisInstance)
     
     /* The class is registered, lets create the program*/
     hToolWindow =CreateWindowEx(
-           WS_EX_TOOLWINDOW,                   /* Extended possibilites for variation */
+           WS_EX_TOOLWINDOW,              /* Extended styles */
            szToolWindowClassName,         /* Classname */
-           "Tools",             /* Title Text */
+           "Tools",                         /* Title Text */
            WS_OVERLAPPEDWINDOW+WS_VSCROLL, /* defaultwindow */
            rect.left,       /* Windows decides the position */
            rect.bottom,       /* where the window end up on the screen */
@@ -411,75 +447,77 @@ HWND setupToolWindow(HINSTANCE hThisInstance)
     /* indicate tool window as snapped to the main window */
     toolWindowIsSnapped=true;
 
-    /* get position & size based on parent window */
+    /* get width & height of tool window's client area (ie. inside window's border) */
     GetClientRect(hToolWindow,&rect);
 
     /* create tab control */
     hToolWindowTabControl =CreateWindowEx(
-           0,                   /* Extended possibilites for variation */
-           WC_TABCONTROL,         /* Classname */
-           "Tools",             /* Title Text */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* defaultwindow */
-           rect.left,       /* Windows decides the position */
-           rect.top,       /* where the window end up on the screen */
-           rect.right,                 /* The programs width */
-           rect.bottom,                 /* and height in pixels */
-           hToolWindow,        /* The window is a childwindow to main window */
-           NULL,                /* No menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
+           0,                       /* Extended possibilites for variation */
+           WC_TABCONTROL,           /* Classname */
+           "Tools",                 /* Title Text */
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
+           0,                       /* Top co-ord relative to tool window */
+           0,                       /* Left co-ord relative to tool window */
+           rect.right,              /* Set width to tool window's client area width */
+           rect.bottom,             /* Set height to tool window's client area height */
+           hToolWindow,             /* The window is a childwindow to tool window */
+           NULL,                    /* No menu */
+           hThisInstance,           /* Process's Instance handle */
+           NULL                     /* No Window Creation data */
            );
 
-    /* add tabs */
+    /* add tabs to tab-control */
     tie.mask=TCIF_TEXT;
     tie.pszText="Display";
-    TabCtrl_InsertItem(hToolWindowTabControl, 0, &tie);
+    TabCtrl_InsertItem(hToolWindowTabControl, DISPLAY_TAB_ID, &tie);
     tie.mask=TCIF_TEXT;
     tie.pszText="Query";
-    TabCtrl_InsertItem(hToolWindowTabControl, 1, &tie);
+    TabCtrl_InsertItem(hToolWindowTabControl, QUERY_TAB_ID, &tie);
 
-    /* get position & size based on parent window */
-    const int SPACING_FOR_TAB_HEIGHT=30;
-    const int SPACING_FOR_BOARDER=5;
+    /* get size of tab control's client area (the area inside the tab control) */
     GetClientRect(hToolWindowTabControl,&rect);   
+
+    /* calculate the width & height for our tab container windows */
+    const int SPACING_FOR_TAB_HEIGHT=30;    /* the height of the tabs + a bit of spacing */
+    const int SPACING_FOR_BOARDER=5;        /* left & right margain + spacing for tab control's borders */
     rect.bottom-=SPACING_FOR_TAB_HEIGHT+SPACING_FOR_BOARDER;
     rect.right-=SPACING_FOR_BOARDER+SPACING_FOR_BOARDER;
     
-    /* create tab containers */
+    /* create tab containers for each tab (a window that will be shown/hidden when user clicks on a tab) */
     hToolWindowDisplayTabContainer =CreateWindowEx(
-           0,                   /* Extended possibilites for variation */
-           "static",         /* Classname */
-           "Display tab container",        /* Title Text */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* defaultwindow */
-           SPACING_FOR_BOARDER,       /* Windows decides the position */
-           SPACING_FOR_TAB_HEIGHT,       /* where the window end up on the screen */
-           rect.right,                 /* The programs width */
-           rect.bottom,                 /* and height in pixels */
-           hToolWindowTabControl,        /* The window is a childwindow to main window */
-           NULL,                /* No menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
+           0,                               /* Extended styles */
+           szStaticControl,                 /* pre-defined static text control classname */
+           "Display tab container",         /* text to be displayed */
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* window styles */
+           SPACING_FOR_BOARDER,             /* left position relative to tab control */
+           SPACING_FOR_TAB_HEIGHT,          /* top position relative to tab control */
+           rect.right,                      /* the width of the container */
+           rect.bottom,                     /* the height of the container */
+           hToolWindowTabControl,           /* The window is a childwindow of the tab control */
+           NULL,                            /* No menu */
+           hThisInstance,                   /* Program's Instance handle */
+           NULL                             /* No Window Creation data */
            ); 
            
     hToolWindowQueryTabContainer =CreateWindowEx(
-           0,                   /* Extended possibilites for variation */
-           "static",         /* Classname */
-           "Query tab container",        /* Title Text */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* defaultwindow */
-           SPACING_FOR_BOARDER,       /* Windows decides the position */
-           SPACING_FOR_TAB_HEIGHT,       /* where the window end up on the screen */
-           rect.right,                 /* The programs width */
-           rect.bottom,                 /* and height in pixels */
-           hToolWindowTabControl,        /* The window is a childwindow to main window */
-           NULL,                /* No menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
+           0,                                /* Extended styles */
+           szStaticControl,                  /* pre-defined classname for static text control */
+           "Query tab container",            /* text to display */
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* styles */
+           SPACING_FOR_BOARDER,             /* left position relative to tab control */
+           SPACING_FOR_TAB_HEIGHT,          /* top position relative to tab control */
+           rect.right,                      /* the width of the container */
+           rect.bottom,                     /* the height of the container */
+           hToolWindowTabControl,           /* The window is a childwindow of the tab control */
+           NULL,                            /* No menu */
+           hThisInstance,                   /* Program Instance handler */
+           NULL                             /* No Window Creation data */
            ); 
            
      /* create test control inside a container (remove later) */
      CreateWindowEx(
            0,                   /* Extended possibilites for variation */
-           "static",         /* Classname */
+           szStaticControl,         /* Classname */
            "Test control inside query container",        /* Title Text */
            WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* defaultwindow */
            50,       /* Windows decides the position */
@@ -502,22 +540,26 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
     NMHDR *nmhdr;                     /* structure used for WM_NOTIFY events */
             
     switch (message)                  /* handle the messages */
-    {
-          
+    {    
         
+        /* WM_NOTIFY: notification of certain events related to controls */
         case WM_NOTIFY:
             nmhdr=(NMHDR*)lParam;
+            /* nmhdr->code=the type of event that occured */
             switch(nmhdr->code)
             {
-                case TCN_SELCHANGE: /* check if tab selection has changed */
-                    /* display container associated with tab selection */
+                /* TCN_SELCHANGE: the user has selected a tab within a tab control */
+                case TCN_SELCHANGE:
+                    
+                    /* display the container that is associated with the selected tab
+                       and hide the remaining tab containers */
                     switch(TabCtrl_GetCurSel(hToolWindowTabControl))
                     {
-                        case 0:
+                        case DISPLAY_TAB_ID:
                             ShowWindow(hToolWindowDisplayTabContainer,SW_SHOW);
                             ShowWindow(hToolWindowQueryTabContainer,SW_HIDE);                            
                             break;
-                        case 1:
+                        case QUERY_TAB_ID:
                             ShowWindow(hToolWindowDisplayTabContainer,SW_HIDE);
                             ShowWindow(hToolWindowQueryTabContainer,SW_SHOW);                                                        
                             break;
@@ -526,34 +568,51 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             }    
             break;
 
-      case WM_NCLBUTTONDOWN:
-           if(wParam == HTCAPTION)    /* check if user has clicked down mouse button on title bar of window */
-           {
-               getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
-           }
-           //also let windows perform default operation (or it stuffs up)
-           return DefWindowProc(hwnd, message, wParam, lParam); 
-            
-      case WM_MOVING:  /* window is being dragged by user */
-           snapWindow(hDesktop,(RECT*)lParam,&snapMouseOffset);      
-           toolWindowIsSnapped=snapWindow(hMainWindow,(RECT*)lParam,&snapMouseOffset);
-           break;
-            
-      case WM_CLOSE:   /* user/software requests to close window */
-           ShowWindow(hwnd,SW_HIDE);
-           //DestroyWindow(hwnd);
-           //hToolWindow=NULL;           
-           return 0;
+        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
+        case WM_NCLBUTTONDOWN:
+            /* wParam=the area of the window where the mouse button was pressed */
 
-      case WM_DESTROY:
-           PostQuitMessage (0);
-           return 0;
+            /* HTCAPTION: mouse button was pressed down on the window title bar
+                         (occurs when user starts to move the window)              */            
+            if(wParam == HTCAPTION)
+            {
+               /* get the mouse co-ords relative to the window */
+                getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
+            }
+            /* also let windows handle this message */
+            return DefWindowProc(hwnd, message, wParam, lParam); 
+            
+        /* WM_MOVING: the window is about to be moved to a new location */
+        case WM_MOVING:
+            /* lParam=the new position, which can be modified before the window is moved */
 
-      break;
-      default:                   /* for messages that we don't deal with */
-      return DefWindowProc(hwnd, message, wParam, lParam);
-   }
-  return 0;
+            /* if new position is near desktop edge, snap to it */
+            snapWindow(hDesktop,(RECT*)lParam,&snapMouseOffset);  
+            
+            /* if new position is near main window, snap to it */    
+            toolWindowIsSnapped=snapWindow(hMainWindow,(RECT*)lParam,&snapMouseOffset);
+            break;
+      
+        /* WM_CLOSE: system or user has requested to close the window/application */              
+        case WM_CLOSE:
+            /* don't destory this window, but make it invisible */            
+            ShowWindow(hwnd,SW_HIDE);
+            //DestroyWindow(hwnd);
+            //hToolWindow=NULL;           
+            return 0;
+
+        /* WM_DESTORY: system is destroying our window */                
+        case WM_DESTROY:
+            /* send a message that will cause WinMain to exit the message loop */            
+            PostQuitMessage (0);
+            return 0;
+
+        default: 
+            /* let windows handle any unknown messages */            
+            return DefWindowProc(hwnd, message, wParam, lParam);
+    }
+    /* return 0 to indicate that we have processed the message */          
+    return 0;
 }
 
 
@@ -564,7 +623,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 /* move a window by a certain amount of pixels */
 inline void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset)
 {
-     MoveWindow(hwnd,rect->left+leftOffset,rect->top+topOffset,rect->right-rect->left,rect->bottom-rect->top,true);
+    MoveWindow(hwnd,rect->left+leftOffset,rect->top+topOffset,rect->right-rect->left,rect->bottom-rect->top,true);
 }
 
 /* move snapped windows with the main window */
@@ -574,13 +633,13 @@ inline void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindow
     int moveTopOffset=newRect->top-oldRect->top;
 
     if (moveImageWindow)
-       moveWindowByOffset(hImageWindow,prevImageWindowRect,moveLeftOffset,moveTopOffset);
+        moveWindowByOffset(hImageWindow,prevImageWindowRect,moveLeftOffset,moveTopOffset);
     if (moveToolWindow)
-       moveWindowByOffset(hToolWindow,prevToolWindowRect,moveLeftOffset,moveTopOffset);
+        moveWindowByOffset(hToolWindow,prevToolWindowRect,moveLeftOffset,moveTopOffset);
        
 }
 
-// snap a window to another window while it is being moved
+// snap a window to another window if it is range
 // returns: true if window has been snapped, false if not
 int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset)
 {
@@ -690,14 +749,16 @@ void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
 /* main functions */
 /* ------------------------------------------------------------------------------------------------------------------------ */
 // !! why does this need a window handle argument? - Rowan
+//      answer: to make the main window modal when file dialog box opens. But it should probably 
+//              just use the global variable instead. - Shane
 void loadFile(HWND hwnd)
 {
-     OPENFILENAME ofn;
+    OPENFILENAME ofn;
     char szFileName[MAX_PATH] = "";
 
     ZeroMemory(&ofn, sizeof(ofn));
 
-    ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW
+    ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW - which note?
     ofn.hwndOwner = hwnd;
     ofn.lpstrFilter = "JPG Files (*.jpg)\0*.jpg\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile = szFileName;
@@ -720,7 +781,10 @@ void loadFile(HWND hwnd)
         
         #if TMP_USE_IMAGE_MANIPULATION
     	// !! These NULL args need to be replaced with the HWNDs of the GL drawable areas
-    	//	of the overview window and main window respectively.
+    	//	of the overview window and main window respectively. 
+        //      - Replace with hMainWindow and hImageWindow. - Shane
+        //          Will GL draw over entire window surface? Or can you give it co-ords? If it draws over entire surface,
+        //          we may need to give it child windows instead or it will draw over the menus, etc. - Shane
 	    image_handler = new ImageHandler::ImageHandler(NULL, NULL, ofn.lpstrFile, &image_handler_status);
 	    if (image_handler_status != 0) {
 			// An error occurred initializing the image handler class.
