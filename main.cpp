@@ -39,7 +39,7 @@ int imageWindowIsSnapped=false;
 int toolWindowIsSnapped=false;
 
 /* Define id numbers for the tab's in the tool window */
-const enum {DISPLAY_TAB_ID,QUERY_TAB_ID);
+enum {DISPLAY_TAB_ID,QUERY_TAB_ID};
 
 
 /* program entry point */
