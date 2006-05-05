@@ -13,29 +13,25 @@
 #define IDM_HELPCONTENTS    215
 #define IDM_HELPABOUT       218
 
-/* Make the classname into a global variable */
 
+/* function declarations */
 
-void loadFile(HWND hwnd);
+void loadFile();
 
-/* Declare WindowsProcedure */
 LRESULT CALLBACK MainWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ImageWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ToolWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 
-/* imageWindow.h declarations */
-HWND setupImageWindow(HINSTANCE hThisInstance);
+int setupImageWindow();
 
-/* mainWindow.h declarations */
-HWND setupMainWindow(HINSTANCE hThisInstance);
+int setupMainWindow();
 
-/* toolWindow.h declarations */
-HWND setupToolWindow(HINSTANCE hThisInstance);
+int setupToolWindow();
 
-/* windowFunctions.h declarations */
 void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset);
 void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RECT *prevToolWindowRect,int moveImageWindow,int moveToolWindow);
-int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset);
+int snapWindow(HWND snapToWin,RECT *rect);
 void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset);
+void setNewWindowPosition(RECT* newPos,POINT *mouseOffset);
 
 #endif

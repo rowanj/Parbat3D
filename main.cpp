@@ -2,7 +2,6 @@
 #include <Commctrl.h>
 #include <iostream>
 #include "main.h"
-
 #include "config.h"
 
 #if TMP_USE_IMAGE_MANIPULATION
@@ -41,13 +40,12 @@ int toolWindowIsSnapped=false;
 /* Define id numbers for the tab's in the tool window */
 enum {DISPLAY_TAB_ID,QUERY_TAB_ID};
 
-
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 
 {
     MSG messages;            /* Here messages to the application is saved */
-   
+ 
     /* load window classes for common controls */
     InitCommonControls();
     
@@ -58,7 +56,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     hDesktop=GetDesktopWindow();
     
     // create & show main window
-    hMainWindow=setupMainWindow(hThisInstance);
+    if (!setupMainWindow())
+        return 0;
   
     /* Run the messageloop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))
@@ -74,7 +73,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Main Window Functions */
 
-HWND setupMainWindow(HINSTANCE hThisInstance)
+int setupMainWindow()
 {
     HMENU menu;              /* Handle of the menu */
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
@@ -96,8 +95,8 @@ HWND setupMainWindow(HINSTANCE hThisInstance)
     /* Use lightgray as the background of the window */
     wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
 
-    /* Register the window class, if fail quit the program */
-    if(!RegisterClassEx(&wincl)) return 0;
+    /* Register the window class, if fails return false */
+    if(!RegisterClassEx(&wincl)) return false;
     
     /* The class is registered, lets create a window based on it*/
     hMainWindow = CreateWindowEx(
@@ -114,6 +113,8 @@ HWND setupMainWindow(HINSTANCE hThisInstance)
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
            );
+    if (!hMainWindow)
+        return false;           
 
     menu = LoadMenu(hThisInstance, MAKEINTRESOURCE(ID_MENU));
     SetMenu(hMainWindow, menu);    
@@ -121,7 +122,7 @@ HWND setupMainWindow(HINSTANCE hThisInstance)
     /* Make the window visible on the screen */
     ShowWindow(hMainWindow, SW_SHOW);
     
-    return hMainWindow;
+    return true;
 }
 
 /* This function is called by the Windows function DispatchMessage( ) */
@@ -150,7 +151,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             switch( wParam )
             {
                 case IDM_FILEOPEN:
-                    loadFile(hwnd);
+                    loadFile();
                     return 0;
                   
                 case IDM_FILESAVE:
@@ -202,18 +203,21 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         /* WM_MOVING: the window is about to be moved to a new location */
         case WM_MOVING:
             /* lParam=the new position, which can be modified before the window is moved */
+
+            /* set new window position based on position of mouse */
+            setNewWindowPosition((RECT*)lParam,&snapMouseOffset);            
             
-            /* snap main window to edge of desktop */
-            snapWindow(hDesktop,(RECT*)lParam,&snapMouseOffset);           
+            /* snap main window to edge of desktop */           
+            snapWindow(hDesktop,(RECT*)lParam);
 
             /* bug: when calling snapWindow the second time the main window does not visually snap to the tool window, but snapWindow still returns true */
             /* snap main window to image window, if near it, if it's not already snapped */
             if (!imageWindowIsMovingToo)
-                imageWindowIsSnapped=snapWindow(hImageWindow,(RECT*)lParam,&snapMouseOffset); 
+                imageWindowIsSnapped=snapWindow(hImageWindow,(RECT*)lParam); 
 
             /* snap main window to tool window, if near it, if it's not already snapped */
-            if ((!toolWindowIsMovingToo))
-                toolWindowIsSnapped=snapWindow(hToolWindow,(RECT*)lParam,&snapMouseOffset);
+            if (!toolWindowIsMovingToo)
+                toolWindowIsSnapped=snapWindow(hToolWindow,(RECT*)lParam);
             
             /* move the snapped windows relative to main window's new position */
             /* only moves the windows that were already snapped to the main window */
@@ -290,7 +294,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 /* Image Window Functions */
 
 /* create the image window */
-HWND setupImageWindow(HINSTANCE hThisInstance)
+int setupImageWindow()
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
 
@@ -311,8 +315,8 @@ HWND setupImageWindow(HINSTANCE hThisInstance)
     /* Use lightgray as the background of the window */
     wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
 
-    /* Register the window class, if fail quit the program */
-    if(!RegisterClassEx(&wincl)) return 0;
+    /* Register the window class, if fails return false */
+    if(!RegisterClassEx(&wincl)) return false;
     
     /* Get Main Window coords for Image Window alignment*/
     RECT rect;
@@ -334,9 +338,12 @@ HWND setupImageWindow(HINSTANCE hThisInstance)
            NULL                 /* No Window Creation data */
            );
 
+    if (hImageWindow==NULL)
+        return false;
+
     imageWindowIsSnapped=true;
 
-    return hImageWindow;
+    return true;
 }
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
@@ -367,11 +374,14 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
         case WM_MOVING:
             /* lParam=the new position, which can be modified before the window is moved */
 
+            /* set new window position based on position of mouse */
+            setNewWindowPosition((RECT*)lParam,&snapMouseOffset);
+
             /* snap the window to the edge of the desktop (if near it) */
-            snapWindow(hDesktop,(RECT*)lParam,&snapMouseOffset);      
+            snapWindow(hDesktop,(RECT*)lParam);      
             
             /* snap the window the main window (if near it) */
-            imageWindowIsSnapped=snapWindow(hMainWindow,(RECT*)lParam,&snapMouseOffset);
+            imageWindowIsSnapped=snapWindow(hMainWindow,(RECT*)lParam);
             break;
 
 
@@ -399,7 +409,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Tools Window Functions */
-HWND setupToolWindow(HINSTANCE hThisInstance)
+int setupToolWindow()
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
     TCITEM tie;             /* datastructure for tabs */
@@ -422,8 +432,8 @@ HWND setupToolWindow(HINSTANCE hThisInstance)
     /* Use lightgray as the background of the window */
     wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
 
-    /* Register the window class, if fail quit the program */
-    if(!RegisterClassEx(&wincl)) return 0;
+    /* Register the window class, if it fails return false */
+    if(!RegisterClassEx(&wincl)) return false;
     
     /* Get Main Window Location for image window alignment*/
     GetWindowRect(hMainWindow,&rect);
@@ -443,6 +453,9 @@ HWND setupToolWindow(HINSTANCE hThisInstance)
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
            );
+
+    if (hToolWindow==NULL)
+        return false;
     
     /* indicate tool window as snapped to the main window */
     toolWindowIsSnapped=true;
@@ -530,7 +543,7 @@ HWND setupToolWindow(HINSTANCE hThisInstance)
            NULL                 /* No Window Creation data */
            );            
                
-    return hToolWindow;
+    return true;
 }
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
@@ -586,11 +599,14 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         case WM_MOVING:
             /* lParam=the new position, which can be modified before the window is moved */
 
+            /* set new window position based on position of mouse */
+            setNewWindowPosition((RECT*)lParam,&snapMouseOffset);
+
             /* if new position is near desktop edge, snap to it */
-            snapWindow(hDesktop,(RECT*)lParam,&snapMouseOffset);  
+            snapWindow(hDesktop,(RECT*)lParam);  
             
             /* if new position is near main window, snap to it */    
-            toolWindowIsSnapped=snapWindow(hMainWindow,(RECT*)lParam,&snapMouseOffset);
+            toolWindowIsSnapped=snapWindow(hMainWindow,(RECT*)lParam);
             break;
       
         /* WM_CLOSE: system or user has requested to close the window/application */              
@@ -618,7 +634,25 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* general window functions */
- 
+
+/* calculates window's new position based on the location of the mouse cursor */
+inline void setNewWindowPosition(RECT* newPos,POINT *mouseOffset)
+{
+    POINT mouse;    /* mouse co-ords */
+    
+    /* get current mouse co-ords */
+    GetCursorPos(&mouse);
+
+    /* get width & height of window */
+    newPos->bottom-=newPos->top;
+    newPos->right-=newPos->left;
+    
+    /* set window position based on the cursor position */
+    newPos->top=mouse.y-mouseOffset->y;
+    newPos->left=mouse.x-mouseOffset->x;
+    newPos->bottom+=newPos->top;
+    newPos->right+=newPos->left;      
+}    
 
 /* move a window by a certain amount of pixels */
 inline void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset)
@@ -641,35 +675,30 @@ inline void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindow
 
 // snap a window to another window if it is range
 // returns: true if window has been snapped, false if not
-int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset)
+int snapWindow(HWND snapToWin,RECT *rect)
 {
     const int SNAP_PIXEL_RANGE=10;
     RECT snapToRect;
-    SIZE winsize={rect->right-rect->left, rect->bottom-rect->top};
-    POINT mouse;
+    SIZE winsize={rect->right-rect->left,rect->bottom-rect->top};
     int difference;
     int isSnapped=false;
-    
-    GetCursorPos(&mouse);        
-    GetWindowRect(snapToWin,&snapToRect);
-    rect->top=mouse.y-mouseOffset->y;
-    rect->left=mouse.x-mouseOffset->x;
-    rect->bottom=rect->top+winsize.cy;
-    rect->right=rect->left+winsize.cx;   
 
-    //check if window is too far away to snap to
+    // get position of the window that we may snap to
+    GetWindowRect(snapToWin,&snapToRect);
+    
+    //check if window is close enough to snap to
     if ( (rect->left+winsize.cx<(snapToRect.left-SNAP_PIXEL_RANGE)) || (rect->left>(snapToRect.right+SNAP_PIXEL_RANGE)) )
         return false;
 
     if ( (rect->top+winsize.cy<(snapToRect.top-SNAP_PIXEL_RANGE)) || (rect->top>(snapToRect.bottom+SNAP_PIXEL_RANGE)) )
         return false;
 
-
     //snap (top) to bottom
     difference=(rect->top-(snapToRect.bottom));
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
     {
        rect->top=snapToRect.bottom;
+       rect->bottom=rect->top+winsize.cy;
        isSnapped=true;
     }
     
@@ -678,6 +707,7 @@ int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset)
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
     {
        rect->top=snapToRect.bottom-winsize.cy;
+       rect->bottom=rect->top+winsize.cy;
        isSnapped=true;
     }    
     
@@ -686,6 +716,7 @@ int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset)
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
     {
        rect->left=snapToRect.left;
+       rect->right=rect->left+winsize.cx;
        isSnapped=true;
     }
     
@@ -694,6 +725,7 @@ int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset)
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
     {
        rect->left=snapToRect.left-winsize.cx;
+       rect->right=rect->left+winsize.cx;       
        isSnapped=true;       
     }    
     
@@ -702,6 +734,7 @@ int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset)
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
     {
        rect->left=snapToRect.right-winsize.cx;
+       rect->right=rect->left+winsize.cx;       
        isSnapped=true;       
     }    
     
@@ -710,6 +743,7 @@ int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset)
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
     {
        rect->left=snapToRect.right;
+       rect->right=rect->left+winsize.cx;       
        isSnapped=true;       
     }        
 
@@ -718,6 +752,7 @@ int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset)
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
     {
        rect->top=snapToRect.top;
+       rect->bottom=rect->top+winsize.cy;
        isSnapped=true;       
     }      
 
@@ -726,12 +761,10 @@ int snapWindow(HWND snapToWin,RECT *rect,POINT *mouseOffset)
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
     {
        rect->top=snapToRect.top-winsize.cy;
+       rect->bottom=rect->top+winsize.cy;
        isSnapped=true;
     }      
     
-    // restore width & height
-    rect->bottom=rect->top+winsize.cy;
-    rect->right=rect->left+winsize.cx;   
     return isSnapped;
 }
 
@@ -749,9 +782,9 @@ void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
 /* main functions */
 /* ------------------------------------------------------------------------------------------------------------------------ */
 // !! why does this need a window handle argument? - Rowan
-//      answer: to make the main window modal when file dialog box opens. But it should probably 
-//              just use the global variable instead. - Shane
-void loadFile(HWND hwnd)
+//      answer: to make the main window modal when file dialog box opens. I have changed it 
+//              to use the global variable instead. - Shane
+void loadFile()
 {
     OPENFILENAME ofn;
     char szFileName[MAX_PATH] = "";
@@ -759,7 +792,7 @@ void loadFile(HWND hwnd)
     ZeroMemory(&ofn, sizeof(ofn));
 
     ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW - which note?
-    ofn.hwndOwner = hwnd;
+    ofn.hwndOwner = hMainWindow;
     ofn.lpstrFilter = "JPG Files (*.jpg)\0*.jpg\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile = szFileName;
     ofn.nMaxFile = MAX_PATH;
@@ -771,12 +804,12 @@ void loadFile(HWND hwnd)
         // Do something usefull with the filename stored in szFileName 
         // create image window and display
         if (!hImageWindow)
-            hImageWindow=setupImageWindow(hThisInstance);
+            setupImageWindow();
         ShowWindow(hImageWindow,SW_SHOW);
         
         // create tool window and display
         if (!hToolWindow)
-            hToolWindow=setupToolWindow(hThisInstance);
+            setupToolWindow();
         ShowWindow(hToolWindow,SW_SHOW);
         
         #if TMP_USE_IMAGE_MANIPULATION
