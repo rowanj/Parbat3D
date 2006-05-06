@@ -208,16 +208,16 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             setNewWindowPosition((RECT*)lParam,&snapMouseOffset);            
             
             /* snap main window to edge of desktop */           
-            snapWindow(hDesktop,(RECT*)lParam);
+            snapWindowByMoving(hDesktop,(RECT*)lParam);
 
             /* bug: when calling snapWindow the second time the main window does not visually snap to the tool window, but snapWindow still returns true */
             /* snap main window to image window, if near it, if it's not already snapped */
             if (!imageWindowIsMovingToo)
-                imageWindowIsSnapped=snapWindow(hImageWindow,(RECT*)lParam); 
+                imageWindowIsSnapped=snapWindowByMoving(hImageWindow,(RECT*)lParam); 
 
             /* snap main window to tool window, if near it, if it's not already snapped */
             if (!toolWindowIsMovingToo)
-                toolWindowIsSnapped=snapWindow(hToolWindow,(RECT*)lParam);
+                toolWindowIsSnapped=snapWindowByMoving(hToolWindow,(RECT*)lParam);
             
             /* move the snapped windows relative to main window's new position */
             /* only moves the windows that were already snapped to the main window */
@@ -350,7 +350,9 @@ int setupImageWindow()
 /* All messages/events related to the image window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static POINT snapMouseOffset;     /* mouse offset relative to window, used for snapping */
+    static POINT moveMouseOffset;     /* mouse offset relative to window, used for snapping */
+    static POINT sizeMousePosition;   /* mouse position, used for sizing window */
+    static RECT  sizeWindowPosition;   /* window position, used for sizing window */
     
     switch (message)                  /* handle the messages */
     {
@@ -358,13 +360,19 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
         case WM_NCLBUTTONDOWN:
             /* wParam=the area of the window where the mouse button was pressed */
 
-            /* HTCAPTION: mouse button was pressed down on the window title bar
-                         (occurs when user starts to move the window)              */            
-            if(wParam == HTCAPTION)
+            /* HTCAPTION: mouse button was pressed down on the window title bar */            
+            /* HTSIZE: mouse button was pressed down on the sizing border of window */                                    
+            if ((wParam == HTCAPTION))
             {
                 /* get the mouse co-ords relative to the window */
-                getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
+                getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&moveMouseOffset);               
             }    
+            else if (wParam == HTSIZE)
+            {
+                GetWindowRect(hwnd,&sizeWindowPosition);
+                sizeMousePosition.x=(int)(short)LOWORD(lParam);
+                sizeMousePosition.y=(int)(short)HIWORD(lParam);                
+            }
 
             /* also let windows handle this event */
             return DefWindowProc(hwnd, message, wParam, lParam); 
@@ -372,18 +380,29 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             
         /* WM_MOVING: the window is about to be moved to a new location */
         case WM_MOVING:
-            /* lParam=the new position, which can be modified before the window is moved */
 
             /* set new window position based on position of mouse */
-            setNewWindowPosition((RECT*)lParam,&snapMouseOffset);
+            setNewWindowPosition((RECT*)lParam,&moveMouseOffset);
 
             /* snap the window to the edge of the desktop (if near it) */
-            snapWindow(hDesktop,(RECT*)lParam);      
+            snapWindowByMoving(hDesktop,(RECT*)lParam);      
             
             /* snap the window the main window (if near it) */
-            imageWindowIsSnapped=snapWindow(hMainWindow,(RECT*)lParam);
+            imageWindowIsSnapped=snapWindowByMoving(hMainWindow,(RECT*)lParam);
             break;
+    
+        /* WM_SIZING: the window size is about to change */
+        case WM_SIZING:
 
+            /* set new window size based on position of mouse */
+            //setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
+
+            /* snap the window to the edge of the desktop (if near it) */
+            //snapWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
+                        
+            /* snap the window the main window (if near it) */
+            //imageWindowIsSnapped=snapWindowBySizing(hMainWindow,(RECT*)lParam,(int)wParam);           
+            break;
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
@@ -603,10 +622,10 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             setNewWindowPosition((RECT*)lParam,&snapMouseOffset);
 
             /* if new position is near desktop edge, snap to it */
-            snapWindow(hDesktop,(RECT*)lParam);  
+            snapWindowByMoving(hDesktop,(RECT*)lParam);  
             
             /* if new position is near main window, snap to it */    
-            toolWindowIsSnapped=snapWindow(hMainWindow,(RECT*)lParam);
+            toolWindowIsSnapped=snapWindowByMoving(hMainWindow,(RECT*)lParam);
             break;
       
         /* WM_CLOSE: system or user has requested to close the window/application */              
@@ -636,7 +655,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 /* general window functions */
 
 /* calculates window's new position based on the location of the mouse cursor */
-inline void setNewWindowPosition(RECT* newPos,POINT *mouseOffset)
+void setNewWindowPosition(RECT* newPos,POINT *mouseOffset)
 {
     POINT mouse;    /* mouse co-ords */
     
@@ -651,7 +670,55 @@ inline void setNewWindowPosition(RECT* newPos,POINT *mouseOffset)
     newPos->top=mouse.y-mouseOffset->y;
     newPos->left=mouse.x-mouseOffset->x;
     newPos->bottom+=newPos->top;
-    newPos->right+=newPos->left;      
+    newPos->right+=newPos->left;                
+}
+
+/* calculates window's new size based on location of the mouse cursor */
+void setNewWindowSize(RECT* newPos,RECT* oldPos,POINT* oldMouse,int whichDirection)
+{
+    POINT newMouse;    /* mouse co-ords */
+    SIZE size;
+    
+    /* get current mouse co-ords */
+    GetCursorPos(&newMouse);
+
+    /* calculate how much mouse has moved */
+    int my=newMouse.y-oldMouse->y;
+    int mx=newMouse.x-oldMouse->x;
+
+    /* set window position based on the cursor position & which border is being dragged */
+    switch (whichDirection)
+    {
+        case WMSZ_BOTTOM:
+            newPos->bottom=oldPos->bottom;
+            break;
+        case WMSZ_TOP:
+            newPos->top=oldPos->top;
+            break;
+        case WMSZ_LEFT:
+            newPos->left=oldPos->left;
+            break;
+        case WMSZ_RIGHT:
+            newPos->right=oldPos->right;
+            break;
+        case WMSZ_TOPLEFT:
+            newPos->top=my;
+            newPos->left=mx;
+            break;
+        case WMSZ_TOPRIGHT:
+            newPos->top=my;
+            newPos->right=mx;
+            break;
+        case WMSZ_BOTTOMLEFT:
+            newPos->bottom=my;
+            newPos->left=mx;
+            break;
+        case WMSZ_BOTTOMRIGHT:
+            newPos->bottom=my;
+            newPos->right=mx;
+            break;                        
+
+    }   
 }    
 
 /* move a window by a certain amount of pixels */
@@ -673,9 +740,10 @@ inline void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindow
        
 }
 
-// snap a window to another window if it is range
-// returns: true if window has been snapped, false if not
-int snapWindow(HWND snapToWin,RECT *rect)
+/* snap a window to another window (by moving it) if it is range */
+/*  snapToWin=handle of window to snap to, rect=cords of window to be moved */
+/* returns: true if window has been snapped, false if not */
+int snapWindowByMoving(HWND snapToWin,RECT *rect)
 {
     const int SNAP_PIXEL_RANGE=10;
     RECT snapToRect;
@@ -768,12 +836,115 @@ int snapWindow(HWND snapToWin,RECT *rect)
     return isSnapped;
 }
 
+/* snap a window to another window (by resizing it) if it is range */
+/*  snapToWin=handle of window to snap to, rect=cords of window to be resized */
+/* returns: true if window has been snapped, false if not */
+int snapWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
+{
+    const int SNAP_PIXEL_RANGE=10;
+    RECT snapToRect;
+    int difference;
+    int isSnapped=false;
+
+    // get position of the window that we may snap to
+    GetWindowRect(snapToWin,&snapToRect);
+    
+    //check if window is close enough to snap to
+    if ( (rect->right<(snapToRect.left-SNAP_PIXEL_RANGE)) || (rect->left>(snapToRect.right+SNAP_PIXEL_RANGE)) )
+        return false;
+
+    if ( (rect->bottom<(snapToRect.top-SNAP_PIXEL_RANGE)) || (rect->top>(snapToRect.bottom+SNAP_PIXEL_RANGE)) )
+        return false;
+        
+
+    if ((whichDirection==WMSZ_TOP) || (whichDirection==WMSZ_TOPLEFT) || (whichDirection==WMSZ_TOPRIGHT))
+    {
+        //snap (top) to bottom
+        difference=(rect->top-(snapToRect.bottom));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->top=snapToRect.bottom;
+           isSnapped=true;
+        }
+        
+        // snap (top) to top
+        difference=(rect->top-(snapToRect.top));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->top=snapToRect.top;
+           isSnapped=true;       
+        }           
+    }
+    
+    if ((whichDirection==WMSZ_BOTTOM) || (whichDirection==WMSZ_BOTTOMLEFT) || (whichDirection==WMSZ_BOTTOMRIGHT))
+    {    
+        // snap (bottom) to bottom
+        difference=((rect->bottom)-(snapToRect.bottom));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->bottom=snapToRect.bottom;
+           isSnapped=true;
+        }    
+
+        // snap (bottom) to top
+        difference=((rect->bottom)-(snapToRect.top));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->bottom=snapToRect.top;
+           isSnapped=true;
+        }          
+    }
+    
+    if ((whichDirection==WMSZ_LEFT) || (whichDirection==WMSZ_BOTTOMLEFT) || (whichDirection==WMSZ_TOPLEFT))
+    {    
+        // snap (left) to left
+        difference=(rect->left-(snapToRect.left));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->left=snapToRect.left;
+           isSnapped=true;
+        }
+
+        // snap (left) to right
+        difference=(rect->left-(snapToRect.right));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->left=snapToRect.right;
+           isSnapped=true;       
+        }           
+    }
+    
+
+    if ((whichDirection==WMSZ_RIGHT) || (whichDirection==WMSZ_BOTTOMRIGHT) || (whichDirection==WMSZ_TOPRIGHT))
+    { 
+    
+        // snap (right) to left
+        difference=((rect->right)-(snapToRect.left));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->right=snapToRect.left;       
+           isSnapped=true;       
+        }    
+    
+        // snap (right) to right
+        difference=(rect->right-(snapToRect.right));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->right=snapToRect.right;       
+           isSnapped=true;       
+        }    
+    }
+    
+    return isSnapped;
+}
+
+
+
 //calculate mouse co-ords relative to position of window
-void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
+inline void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
 {
     RECT win;
     GetWindowRect(hwnd,&win);
-    int a=mx-win.left;
     mouseOffset->x=mx-win.left;
     mouseOffset->y=my-win.top;
 }
