@@ -32,6 +32,7 @@ HWND hDesktop;
 HWND hToolWindowTabControl;
 HWND hToolWindowDisplayTabContainer;
 HWND hToolWindowQueryTabContainer;
+HWND hButton1, hButton2;
 
 /* Variables to record when the windows have snapped to main wndow */
 int imageWindowIsSnapped=false;
@@ -561,7 +562,38 @@ int setupToolWindow()
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
            );            
-               
+    
+    /* Create Radio button group inside tab */
+     hButton1 = CreateWindowEx(
+	    	0,
+			"BUTTON",
+			"Channel 1",
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
+			30, //int x,
+			20, //int y, CW_USEDEFAULT
+			150, //int nWidth,
+			100, //int nHeight
+			hToolWindowDisplayTabContainer, //parent window
+			NULL, //no menu
+			hThisInstance, //HINSTANCE hInstance,
+			NULL //pointer not needed
+		);
+		
+		hButton2 = CreateWindowEx(
+	    	0,
+			"BUTTON",
+			"Channel 2",
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
+			30, //int x,
+			50, //int y,
+			150, //int nWidth,
+			100, //int nHeight
+			hToolWindowDisplayTabContainer, //parent window
+			NULL, //no menu
+			hThisInstance, //HINSTANCE hInstance,
+			NULL //pointer not needed
+		);
+    
     return true;
 }
 

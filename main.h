@@ -13,6 +13,8 @@
 #define IDM_HELPCONTENTS    215
 #define IDM_HELPABOUT       218
 
+#define IDC_RADIO_BUTTON_1 10001
+
 
 /* function declarations */
 
