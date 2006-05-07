@@ -104,7 +104,7 @@ int setupMainWindow()
            0,                   /* Extended possibilites for variation */
            szMainWindowClassName,         /* Classname */
            "Parbat3D",         /* Title Text */
-           WS_OVERLAPPEDWINDOW, /* defaultwindow */
+           WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, /* window styles */
            50, //CW_USEDEFAULT,       /* x position */
            50, //CW_USEDEFAULT,       /* y position */
            250,                 /* The programs width */
@@ -361,18 +361,28 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
         case WM_NCLBUTTONDOWN:
             /* wParam=the area of the window where the mouse button was pressed */
 
-            /* HTCAPTION: mouse button was pressed down on the window title bar */            
-            /* HTSIZE: mouse button was pressed down on the sizing border of window */                                    
-            if ((wParam == HTCAPTION))
+            switch(wParam)
             {
-                /* get the mouse co-ords relative to the window */
-                getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&moveMouseOffset);               
-            }    
-            else if (wParam == HTSIZE)
-            {
-                GetWindowRect(hwnd,&sizeWindowPosition);
-                sizeMousePosition.x=(int)(short)LOWORD(lParam);
-                sizeMousePosition.y=(int)(short)HIWORD(lParam);                
+                /* HTCAPTION: mouse button was pressed down on the window title bar */                            
+                case HTCAPTION:
+                    /* get the mouse co-ords relative to the window */
+                    getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&moveMouseOffset);               
+                    break;
+
+                /* HTLEFT...HTBOTTOMRIGHT: mouse button was pressed down on the sizing border of window */  
+                case HTLEFT:
+                case HTRIGHT:
+                case HTTOP:
+                case HTBOTTOM:
+                case HTTOPLEFT:
+                case HTTOPRIGHT:
+                case HTBOTTOMLEFT:
+                case HTBOTTOMRIGHT:
+                    /* record current window & mouse positions */
+                    GetWindowRect(hwnd,&sizeWindowPosition);
+                    sizeMousePosition.x=(int)(short)LOWORD(lParam);
+                    sizeMousePosition.y=(int)(short)HIWORD(lParam);                   
+                    break;                   
             }
 
             /* also let windows handle this event */
@@ -396,13 +406,13 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
         case WM_SIZING:
 
             /* set new window size based on position of mouse */
-            //setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
+            setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
 
             /* snap the window to the edge of the desktop (if near it) */
-            //snapWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
+            snapWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
                         
             /* snap the window the main window (if near it) */
-            //imageWindowIsSnapped=snapWindowBySizing(hMainWindow,(RECT*)lParam,(int)wParam);           
+            imageWindowIsSnapped=snapWindowBySizing(hMainWindow,(RECT*)lParam,(int)wParam);           
             break;
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
@@ -460,10 +470,10 @@ int setupToolWindow()
     
     /* The class is registered, lets create the program*/
     hToolWindow =CreateWindowEx(
-           WS_EX_TOOLWINDOW,              /* Extended styles */
+           0,              /* Extended styles */
            szToolWindowClassName,         /* Classname */
            "Tools",                         /* Title Text */
-           WS_OVERLAPPEDWINDOW+WS_VSCROLL, /* defaultwindow */
+           WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_VSCROLL, /* defaultwindow */
            rect.left,       /* Windows decides the position */
            rect.bottom,       /* where the window end up on the screen */
            250,                 /* The programs width */
@@ -572,8 +582,8 @@ int setupToolWindow()
 			30, //int x,
 			20, //int y, CW_USEDEFAULT
 			150, //int nWidth,
-			100, //int nHeight
-			hToolWindowDisplayTabContainer, //parent window
+			20, //int nHeight
+			hToolWindowDisplayTabContainer, //parent window     
 			NULL, //no menu
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
@@ -587,7 +597,7 @@ int setupToolWindow()
 			30, //int x,
 			50, //int y,
 			150, //int nWidth,
-			100, //int nHeight
+			20, //int nHeight
 			hToolWindowDisplayTabContainer, //parent window
 			NULL, //no menu
 			hThisInstance, //HINSTANCE hInstance,
@@ -722,32 +732,32 @@ void setNewWindowSize(RECT* newPos,RECT* oldPos,POINT* oldMouse,int whichDirecti
     switch (whichDirection)
     {
         case WMSZ_BOTTOM:
-            newPos->bottom=oldPos->bottom;
+            newPos->bottom=oldPos->bottom+my;
             break;
         case WMSZ_TOP:
-            newPos->top=oldPos->top;
+            newPos->top=oldPos->top+my;
             break;
         case WMSZ_LEFT:
-            newPos->left=oldPos->left;
+            newPos->left=oldPos->left+mx;
             break;
         case WMSZ_RIGHT:
-            newPos->right=oldPos->right;
+            newPos->right=oldPos->right+mx;
             break;
         case WMSZ_TOPLEFT:
-            newPos->top=my;
-            newPos->left=mx;
+            newPos->top=oldPos->top+my;
+            newPos->left=oldPos->left+mx;
             break;
         case WMSZ_TOPRIGHT:
-            newPos->top=my;
-            newPos->right=mx;
+            newPos->top=oldPos->top+my;
+            newPos->right=oldPos->right+mx;
             break;
         case WMSZ_BOTTOMLEFT:
-            newPos->bottom=my;
-            newPos->left=mx;
+            newPos->bottom=oldPos->bottom+my;
+            newPos->left=oldPos->left+mx;
             break;
         case WMSZ_BOTTOMRIGHT:
-            newPos->bottom=my;
-            newPos->right=mx;
+            newPos->bottom=oldPos->bottom+my;
+            newPos->right=oldPos->right+mx;
             break;                        
 
     }   
