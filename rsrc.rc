@@ -13,9 +13,10 @@ BEGIN
 		MENUITEM "E&xit", IDM_FILEEXIT
 	END
 
-	POPUP "&Tools"
+	POPUP "&Windows"
 	BEGIN
-		MENUITEM "&hmm", IDM_TOOL
+		MENUITEM "Image Window", IDM_IMAGEWINDOW
+		MENUITEM "Tools Window", IDM_TOOLSWINDOW
 	END
 
 	POPUP "&Help"

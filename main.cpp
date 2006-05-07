@@ -32,7 +32,9 @@ HWND hDesktop;
 HWND hToolWindowTabControl;
 HWND hToolWindowDisplayTabContainer;
 HWND hToolWindowQueryTabContainer;
-HWND hButton1, hButton2;
+HWND hRedRadioButton1, hRedRadioButton2;
+HWND hGreenRadioButton1, hGreenRadioButton2;
+HWND hBlueRadioButton1, hBlueRadioButton2;
 
 /* Variables to record when the windows have snapped to main wndow */
 int imageWindowIsSnapped=false;
@@ -157,9 +159,19 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                   
                 case IDM_FILESAVE:
                 case IDM_FILESAVEAS:
+					MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will say \"Where the #$%@ do you want to store such a big file?\"",
+                              (LPSTR) szMainWindowClassName,
+                              MB_ICONINFORMATION | MB_OK );
+                    return 0;
+                          
+             	case IDM_IMAGEWINDOW:
+                    MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will reopen image window",
+                              (LPSTR) szMainWindowClassName,
+                              MB_ICONINFORMATION | MB_OK );
+                    return 0;
              
-                case IDM_TOOL:
-                    MessageBox( hwnd, (LPSTR) "Function Not Yet Implemented.",
+                case IDM_TOOLSWINDOW:
+                    MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will reopen image window",
                               (LPSTR) szMainWindowClassName,
                               MB_ICONINFORMATION | MB_OK );
                     return 0;
@@ -174,7 +186,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                     return 0;
 
                 case IDM_HELPABOUT:
-                    MessageBox (NULL, "Created by Team Imagery 2006" , "Parbat3D", 0);
+                    MessageBox (NULL, "Created by Team Imagery 2006/n Code" , "Parbat3D", 0);
                     return 0;
            }
            break;
@@ -530,7 +542,7 @@ int setupToolWindow()
     hToolWindowDisplayTabContainer =CreateWindowEx(
            0,                               /* Extended styles */
            szStaticControl,                 /* pre-defined static text control classname */
-           "Display tab container",         /* text to be displayed */
+           "Channel Selection",         /* text to be displayed */
            WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* window styles */
            SPACING_FOR_BOARDER,             /* left position relative to tab control */
            SPACING_FOR_TAB_HEIGHT,          /* top position relative to tab control */
@@ -557,31 +569,46 @@ int setupToolWindow()
            NULL                             /* No Window Creation data */
            ); 
            
-     /* create test control inside a container (remove later) */
+     /* Temporary text display of channel names */
      CreateWindowEx(
            0,                   /* Extended possibilites for variation */
            szStaticControl,         /* Classname */
-           "Test control inside query container",        /* Title Text */
+           "R   G   B",        /* Title Text */
            WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* defaultwindow */
-           50,       /* Windows decides the position */
-           50,       /* where the window end up on the screen */
+           130,       /* Windows decides the position */
+           20,       /* where the window end up on the screen */
            100,                 /* The programs width */
-           100,                 /* and height in pixels */
-           hToolWindowQueryTabContainer,        /* The window is a childwindow to main window */
+           20,                 /* and height in pixels */
+           hToolWindowDisplayTabContainer,        /* The window is a childwindow to main window */
            NULL,                /* No menu */
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
-           );            
+           );
+		   
+	CreateWindowEx(
+           0,                   /* Extended possibilites for variation */
+           szStaticControl,         /* Classname */
+           "Channel 1\nChannel 2",        /* Title Text */
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* defaultwindow */
+           20,       /* Windows decides the position */
+           40,       /* where the window end up on the screen */
+           100,                 /* The programs width */
+           100,                 /* and height in pixels */
+           hToolWindowDisplayTabContainer,        /* The window is a childwindow to main window */
+           NULL,                /* No menu */
+           hThisInstance,       /* Program Instance handler */
+           NULL                 /* No Window Creation data */
+           );     
     
     /* Create Radio button group inside tab */
-     hButton1 = CreateWindowEx(
+     hRedRadioButton1 = CreateWindowEx(
 	    	0,
 			"BUTTON",
-			"Channel 1",
+			NULL, //title
 			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
-			30, //int x,
-			20, //int y, CW_USEDEFAULT
-			150, //int nWidth,
+			130, //int x,
+			40, //int y, CW_USEDEFAULT
+			20, //int nWidth,
 			20, //int nHeight
 			hToolWindowDisplayTabContainer, //parent window     
 			NULL, //no menu
@@ -589,16 +616,76 @@ int setupToolWindow()
 			NULL //pointer not needed
 		);
 		
-		hButton2 = CreateWindowEx(
+	hRedRadioButton2 = CreateWindowEx(
 	    	0,
 			"BUTTON",
-			"Channel 2",
+			NULL, //title
 			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
-			30, //int x,
-			50, //int y,
-			150, //int nWidth,
+			130, //int x,
+			60, //int y, CW_USEDEFAULT
+			20, //int nWidth,
+			20, //int nHeight
+			hToolWindowDisplayTabContainer, //parent window     
+			NULL, //no menu
+			hThisInstance, //HINSTANCE hInstance,
+			NULL //pointer not needed
+		);
+		
+		hGreenRadioButton1 = CreateWindowEx(
+	    	0,
+			"BUTTON",
+			NULL, // title
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
+			150, //int x,
+			40, //int y,
+			20, //int nWidth,
 			20, //int nHeight
 			hToolWindowDisplayTabContainer, //parent window
+			NULL, //no menu
+			hThisInstance, //HINSTANCE hInstance,
+			NULL //pointer not needed
+		);
+		
+	hGreenRadioButton2 = CreateWindowEx(
+	    	0,
+			"BUTTON",
+			NULL, // title
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
+			150, //int x,
+			60, //int y,
+			20, //int nWidth,
+			20, //int nHeight
+			hToolWindowDisplayTabContainer, //parent window
+			NULL, //no menu
+			hThisInstance, //HINSTANCE hInstance,
+			NULL //pointer not needed
+		);
+		
+		hBlueRadioButton1 = CreateWindowEx(
+	    	0,
+			"BUTTON",
+			NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
+			170, //int x,
+			40, //int y, CW_USEDEFAULT
+			20, //int nWidth,
+			20, //int nHeight
+			hToolWindowDisplayTabContainer, //parent window     
+			NULL, //no menu
+			hThisInstance, //HINSTANCE hInstance,
+			NULL //pointer not needed
+		);
+		
+		hBlueRadioButton2 = CreateWindowEx(
+	    	0,
+			"BUTTON",
+			NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
+			170, //int x,
+			60, //int y, CW_USEDEFAULT
+			20, //int nWidth,
+			20, //int nHeight
+			hToolWindowDisplayTabContainer, //parent window     
 			NULL, //no menu
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
