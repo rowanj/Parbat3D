@@ -7,7 +7,6 @@
 #if TMP_USE_IMAGE_MANIPULATION
 #include "ImageHandler.h"
 ImageHandler::ImageHandler* image_handler;	// Instance handle
-int	image_handler_status;
 #endif
 
 using namespace std;
@@ -109,7 +108,7 @@ int setupMainWindow()
            WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, /* window styles */
            50, //CW_USEDEFAULT,       /* x position */
            50, //CW_USEDEFAULT,       /* y position */
-           250,                 /* The programs width */
+           250,                 /* The program's width */
            300,                 /* and height in pixels */
            hMainWindow,        /* The window is a childwindow to desktop */
            NULL,                /* No menu */
@@ -186,7 +185,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                     return 0;
 
                 case IDM_HELPABOUT:
-                    MessageBox (NULL, "Created by Team Imagery 2006/n Code" , "Parbat3D", 0);
+                    MessageBox (NULL, "Created by Team Imagery, 2006" , "Parbat3D", 0);
                     return 0;
            }
            break;
@@ -284,6 +283,10 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                      
         /* WM_CLOSE: system or user has requested to close the window/application */
         case WM_CLOSE:
+			// Shut down the image file and OpenGL
+			if (image_handler) { // Was instantiated
+				delete image_handler;
+			}
             /* destroy this window */
             DestroyWindow( hwnd );
             return 0;
@@ -291,6 +294,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         /* WM_DESTROY: window is being destroyed */
         case WM_DESTROY:
             /* post a message that will cause WinMain to exit from the message loop */
+            // !! Shutdown image file and OpenGL
             PostQuitMessage (0);
             break;
         
@@ -437,7 +441,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
 
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
-            /* send a message that will cause WinMain to exit the message loop */
+			/* send a message that will cause WinMain to exit the message loop */
             PostQuitMessage (0);
             return 0;
 
@@ -1118,12 +1122,16 @@ void loadFile()
         //      - Replace with hMainWindow and hImageWindow. - Shane
         //          Will GL draw over entire window surface? Or can you give it co-ords? If it draws over entire surface,
         //          we may need to give it child windows instead or it will draw over the menus, etc. - Shane
-	    image_handler = new ImageHandler::ImageHandler(NULL, NULL, ofn.lpstrFile, &image_handler_status);
-	    if (image_handler_status != 0) {
+        //		- Child windows the best solution, that way the GL code, etc. doesn't need to know about
+		//			the windowing system.  Have used hMainWindow and hImageWindow for interim testing.. - Rowan
+	    image_handler = new ImageHandler::ImageHandler(hMainWindow, hImageWindow, ofn.lpstrFile);
+	    if (image_handler->status != 0) {
 			// An error occurred initializing the image handler class.
-			// Print image_handler_status for `useful' debug info.
-		}
-		#endif
+			MessageBox (NULL, image_handler->error_text , "Parbat3D :: ImageHandler", 0);
+		}	
+		image_handler->resize_window();
+
+		#endif	// TMP_USE_IMAGE_MANIPULATION
     }
 }
 
