@@ -1,24 +1,71 @@
-
+#include "config.h"
 #include "ImageHandler.h"
 
-ImageHandler::ImageHandler(HWND overview_hwnd, HWND main_hwnd, char* filename, int* status_enum)
+ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 {
-	int tmp_status;
+	status = 0; // No error
+	error_text = "No error.";
 	
 	// Check for lazily unspecified (NULL argument) parameters
-	if (!overview_hwnd) tmp_status += 1;
-	if (!main_hwnd) tmp_status += 2;
-	if (!filename) tmp_status += 4;
-	
-	// If &status is NULL then parent doesn't want notification
-	if (status_enum != NULL) {
-		*status_enum = tmp_status;
+	if (!overview_hwnd) {
+		status = 1;
+		error_text = "No handle for overview window.";
 	}
+	if (!image_hwnd) {
+		status = 2;
+		error_text = "No handle for main window.";
+	}
+	if (!filename) {
+		status = 3;
+		error_text = "No filename given.";
+	}
+	
+	// Validate handles to objects
+	// !! ToDo
+	
+	hOverview = overview_hwnd;
+	hImage = image_hwnd;
+	
+	// Initialize image file (could be threaded)
+#if TMP_USE_IMAGE_FILE
+	image_file = new ImageFile(filename);
+#else
+	error_text = "Not using ImageFile.";
+#endif	
+	
+	// Initialize OpenGL (could be threaded)
+	if (gl_overview = new ImageGLView(hOverview)) { // Instantiated successfully
+		if (gl_overview->status) {
+			status = 4;
+			error_text = gl_overview->error_text;
+		}
+	} else {
+		status = 5;
+		error_text = "Could not create ImageGLView for overview.";
+	}
+	
+	if (gl_image = new ImageGLView(hOverview)) {
+		if (gl_image->status) {
+			status = 6;
+			error_text = gl_overview->error_text;
+		}
+	} else {
+		status = 7;
+		error_text = "Could not create ImageGLView for image window.";
+	}
+
 }
 
 ImageHandler::~ImageHandler(void)
 {
-	;
+#if DEBUG
+	MessageBox (NULL, "Shutting down image handler.", "Parbat3D :: ImageHandler", 0);
+#endif
+	delete gl_overview;
+	delete gl_image;
+#if TMP_USE_IMAGE_FILE
+	delete image_file;
+#endif
 }
 
 void ImageHandler::redraw(void)
@@ -35,7 +82,19 @@ ImageProperties* ImageHandler::get_image_properties(void)
 
 void ImageHandler::resize_window(void)
 {
-	;
+	LPRECT window_rect;
+	GetWindowRect(hOverview,window_rect);
+	gl_overview->make_current();
+	glViewport(0,0,window_rect->right - window_rect->left,
+				window_rect->bottom - window_rect->top);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// ?? Do we have to free() window_rect - Rowan
+	GetWindowRect(hImage,window_rect);
+	gl_image->make_current();
+	glViewport(0,0,window_rect->right - window_rect->left,
+				window_rect->bottom - window_rect->top);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// ?? Do we have to free() window_rect - Rowan
 }
 
 PRECT ImageHandler::get_viewport(void)
