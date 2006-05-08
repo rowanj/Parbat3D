@@ -6,13 +6,15 @@
 using namespace std;
 
 class iniFile {
-        bool fileIsOpen;
-        fstream filePtr;
+        bool gotFileName;
         string fileName;
+        
+        string getKeyFromLine (string);
+        string getDataFromLine (string);
         
     public:
         void open (string);
-        void close (string);
+        void close ();
 
         bool parse (string);        
         string read (string);
