@@ -9,11 +9,11 @@ class settings {
         iniFile openFile;
         
     public:
-        settings (string fn) { openFile.open(fn); }
+        settings (string filename) { openFile.open(filename); }
         ~settings () { openFile.close(); }
         
-        void setSetting (string, string);
-        string getSetting (string);
+        void setSetting (string key, string data);
+        string getSetting (string key);
 };
 
 #endif
