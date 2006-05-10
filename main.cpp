@@ -176,7 +176,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                     return 0;
 
                 case IDM_HELPCONTENTS:
-                    WinHelp( hwnd, (LPSTR) "HELPFILE.HLP",
+                    WinHelp( hwnd, (LPSTR) "PARBAT3D.HLP",
                            HELP_CONTENTS, 0L );
                     return 0;
 
