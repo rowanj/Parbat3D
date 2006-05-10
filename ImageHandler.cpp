@@ -29,6 +29,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	// Initialize image file (could be threaded)
 #if TMP_USE_IMAGE_FILE
 	image_file = new ImageFile(filename);
+	image_file->printInfo();
 #else
 	error_text = "Not using ImageFile.";
 #endif	

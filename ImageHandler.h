@@ -8,8 +8,8 @@
 #endif
 
 #if TMP_USE_IMAGE_FILE
+#include "ImageFile.h"
 #include "ImageProperties.h"
-#include "ImageFileh."
 #endif
 #include "ImageGLView.h"
 
