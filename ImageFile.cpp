@@ -1,4 +1,6 @@
+#if TMP_USE_IMG_FILE
 #include "ImageFile.h"
+
 
 ImageFile::ImageFile(char* filename)
 {
@@ -39,4 +41,4 @@ void ImageFile::printInfo(void)
 	MessageBox (NULL, description, "Parbat3D :: ImageFile", 0);
 	MessageBox (NULL, longname, "Parbat3D :: ImageFile", 0);
 }
-
+#endif

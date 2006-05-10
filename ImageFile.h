@@ -1,6 +1,7 @@
 #ifndef _IMAGE_FILE_H
 #define _IMAGE_FILE_H
 
+#if TMP_USE_IMAGE_FILE
 #include <iosfwd>
 #include <cstdio>
 #include <cstring>
@@ -27,4 +28,5 @@ private:
 	double adfGeoTransform[6];
 };
 
+#endif
 #endif
