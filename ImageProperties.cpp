@@ -1,7 +1,8 @@
 #include "config.h"
+#if TMP_USE_IMG_FILE
 #include "ImageProperties.h"
 
-#if TMP_USE_IMG_FILE
+
 ImageProperties::ImageProperties(void)
 {
 	;
