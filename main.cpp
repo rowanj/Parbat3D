@@ -28,6 +28,7 @@ HWND hToolWindow;
 HWND hDesktop;
 
 /* global variables to store handles to our window controls */
+HMENU hMainMenu;
 HWND hToolWindowTabControl;
 HWND hToolWindowDisplayTabContainer;
 HWND hToolWindowQueryTabContainer;
@@ -77,7 +78,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 
 int setupMainWindow()
 {
-    HMENU menu;              /* Handle of the menu */
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
 
     /* The Window structure */
@@ -118,14 +118,19 @@ int setupMainWindow()
     if (!hMainWindow)
         return false;           
 
-    menu = LoadMenu(hThisInstance, MAKEINTRESOURCE(ID_MENU));
-    SetMenu(hMainWindow, menu);    
-
+    hMainMenu = LoadMenu(hThisInstance, MAKEINTRESOURCE(ID_MENU));
+    SetMenu(hMainWindow, hMainMenu);    
+    
+    /* Disable Window menu items */
+    EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,true);     /* note: true appears to disable & false enables */
+    EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
+    
     /* Make the window visible on the screen */
     ShowWindow(hMainWindow, SW_SHOW);
     
     return true;
 }
+
 
 /* This function is called by the Windows function DispatchMessage( ) */
 /* All messages/events related to the main window (or it's controls) are sent to this procedure */
@@ -164,15 +169,19 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                     return 0;
                           
              	case IDM_IMAGEWINDOW:
-                    MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will reopen image window",
+                    ShowWindow(hImageWindow,SW_SHOW);
+
+                    /*MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will reopen image window",
                               (LPSTR) szMainWindowClassName,
-                              MB_ICONINFORMATION | MB_OK );
+                              MB_ICONINFORMATION | MB_OK );*/
                     return 0;
              
                 case IDM_TOOLSWINDOW:
-                    MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will reopen image window",
+                     ShowWindow(hToolWindow,SW_SHOW);
+                    
+                    /*MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will reopen image window",
                               (LPSTR) szMainWindowClassName,
-                              MB_ICONINFORMATION | MB_OK );
+                              MB_ICONINFORMATION | MB_OK );*/
                     return 0;
 
                 case IDM_HELPCONTENTS:
@@ -455,6 +464,8 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Tools Window Functions */
+
+/* create tool window */
 int setupToolWindow()
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
@@ -1115,6 +1126,10 @@ void loadFile()
         if (!hToolWindow)
             setupToolWindow();
         ShowWindow(hToolWindow,SW_SHOW);
+        
+        // enable Window menu items
+        EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,false);
+        EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,false);        
         
         #if TMP_USE_IMAGE_MANIPULATION
     	// !! These NULL args need to be replaced with the HWNDs of the GL drawable areas
