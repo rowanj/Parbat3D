@@ -35,6 +35,8 @@ HWND hToolWindowQueryTabContainer;
 HWND hRedRadioButton1, hRedRadioButton2;
 HWND hGreenRadioButton1, hGreenRadioButton2;
 HWND hBlueRadioButton1, hBlueRadioButton2;
+HWND hImageWindowDisplay;
+HWND hMainWindowDisplay;
 
 /* Variables to record when the windows have snapped to main wndow */
 int imageWindowIsSnapped=false;
@@ -79,6 +81,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 int setupMainWindow()
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
+    RECT rect;
 
     /* The Window structure */
     wincl.hInstance = hThisInstance;
@@ -116,7 +119,7 @@ int setupMainWindow()
            NULL                 /* No Window Creation data */
            );
     if (!hMainWindow)
-        return false;           
+        return false;                            
 
     hMainMenu = LoadMenu(hThisInstance, MAKEINTRESOURCE(ID_MENU));
     SetMenu(hMainWindow, hMainMenu);    
@@ -124,6 +127,26 @@ int setupMainWindow()
     /* Disable Window menu items */
     EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,true);     /* note: true appears to disable & false enables */
     EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
+
+    /* get client area of image window */
+    GetClientRect(hMainWindow,&rect);
+
+    /* create a child window that will be used by OpenGL */
+    hMainWindowDisplay=CreateWindowEx(
+           0,                   /* Extended possibilites for variation */
+           szStaticControl,         /* Classname */
+           NULL,         /* Title Text */
+           WS_CHILD+WS_VISIBLE, /* styles */
+           rect.left,       /* x position based on parent window */
+           rect.top,         /* y position based on parent window */
+           rect.right,                 /* The programs width */
+           rect.bottom,                 /* and height in pixels */
+           hMainWindow,        /* The window's parent window */
+           NULL,                /* No menu */
+           hThisInstance,       /* Program Instance handler */
+           NULL                 /* No Window Creation data */
+           );
+
     
     /* Make the window visible on the screen */
     ShowWindow(hMainWindow, SW_SHOW);
@@ -364,6 +387,25 @@ int setupImageWindow()
            NULL                 /* No Window Creation data */
            );
 
+    /* get client area of image window */
+    GetClientRect(hImageWindow,&rect);
+
+    /* create a child window that will be used by OpenGL */
+    hImageWindowDisplay=CreateWindowEx(
+           0,                   /* Extended possibilites for variation */
+           szStaticControl,         /* Classname */
+           NULL,         /* Title Text */
+           WS_CHILD+WS_VISIBLE, /* styles */
+           rect.left,       /* x position based on parent window */
+           rect.top,         /* y position based on parent window */
+           rect.right,                 /* The programs width */
+           rect.bottom,                 /* and height in pixels */
+           hImageWindow,        /* The window's parent window */
+           NULL,                /* No menu */
+           hThisInstance,       /* Program Instance handler */
+           NULL                 /* No Window Creation data */
+           );
+
     if (hImageWindow==NULL)
         return false;
 
@@ -497,7 +539,8 @@ int setupToolWindow()
     
     /* The class is registered, lets create the program*/
     hToolWindow =CreateWindowEx(
-           0,              /* Extended styles */
+           // WS_EX_TOOLWINDOW? -shane
+           0,                              /* Extended styles */
            szToolWindowClassName,         /* Classname */
            "Tools",                         /* Title Text */
            WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_VSCROLL, /* defaultwindow */
@@ -1139,7 +1182,8 @@ void loadFile()
         //          we may need to give it child windows instead or it will draw over the menus, etc. - Shane
         //		- Child windows the best solution, that way the GL code, etc. doesn't need to know about
 		//			the windowing system.  Have used hMainWindow and hImageWindow for interim testing.. - Rowan
-	    image_handler = new ImageHandler::ImageHandler(hMainWindow, hImageWindow, ofn.lpstrFile);
+		//      - Have changed to child windows - Shane
+	    image_handler = new ImageHandler::ImageHandler(hMainWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
 	    if (image_handler->status != 0) {
 			// An error occurred initializing the image handler class.
 			MessageBox (NULL, image_handler->error_text , "Parbat3D :: ImageHandler", 0);
