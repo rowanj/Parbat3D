@@ -3,15 +3,30 @@
 using namespace std;
 
 
+string settings::getSetting (string key) {
+    string data = "";
+    
+    try {
+        if (openFile.parse(key))
+            data = openFile.read(key);
+    } catch (...) {}
+    
+    return data;
+}
+
+
 void settings::setSetting (string key, string data) {
     openFile.update(key, data);
 }
 
 
-string settings::getSetting (string key) {
-    string data;
+void settings::setSetting (string key, int data) {
+    string d;
+    stringstream ss;
     
-    data = openFile.read(key);
+    ss << data;
+    ss >> d;
     
-    return data;
+    openFile.update(key, d);
 }
+

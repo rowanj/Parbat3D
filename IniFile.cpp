@@ -1,4 +1,4 @@
-#include "iniFile.h"
+#include "IniFile.h"
 
 using namespace std;
 
@@ -22,45 +22,49 @@ bool iniFile::parse (string key) {
     bool keyInFile = false;			// shows if key has been found in the file
     string line, linekey;			// temp storage for each line input from file
     
-    ifstream filePtr (fileName.c_str());	// open the file for reading
-    
     if (gotFileName) {
-        while (!filePtr.eof()) {		// loop through the entire file
-            getline (filePtr, line);		// read in each line of the file
-            linekey = getKeyFromLine(line);	// get the key from the line
-            
-            if (linekey == key) {		// check if the key matches
-                keyInFile = true;		// show that the key has been found
-                break;
+        ifstream filePtr (fileName.c_str());	// open the file for reading
+        
+        if (filePtr.is_open()) {
+            while (!filePtr.eof()) {		// loop through the entire file
+                getline (filePtr, line);		// read in each line of the file
+                linekey = getKeyFromLine(line);	// get the key from the line
+                
+                if (linekey == key) {		// check if the key matches
+                    keyInFile = true;		// show that the key has been found
+                    break;
+                }
             }
+            
+            filePtr.close();				// close the file
         }
     }
-    
-    filePtr.close();				// close the file
     
     return keyInFile;				// return whether the key exists in the file
 }
 
 
 string iniFile::read (string key) {
-    string data;				// stores the data that corresponds to the key
+    string data = "";				// stores the data that corresponds to the key
     string line, linekey;			// temp storage for each line input from file
     
-    ifstream filePtr (fileName.c_str());	// open the file for reading
-    
     if (gotFileName) {
-        while (!filePtr.eof()) {		// loop through the entire file
-            getline (filePtr, line);		// read in each line of the file
-            linekey = getKeyFromLine(line);	// get the key from the line
-            
-            if (linekey == key) {		// check if the key matches
-                data = getDataFromLine(line);	// store the data from the key
-                break;
+        ifstream filePtr (fileName.c_str());	// open the file for reading
+        
+        if (filePtr.is_open()) {
+            while (!filePtr.eof()) {		// loop through the entire file
+                getline (filePtr, line);		// read in each line of the file
+                linekey = getKeyFromLine(line);	// get the key from the line
+                
+                if (linekey == key) {		// check if the key matches
+                    data = getDataFromLine(line);	// store the data from the key
+                    break;
+                }
             }
+
+            filePtr.close();				// close the file
         }
     }
-    
-    filePtr.close();				// close the file
     
     return data;				// return the data value
 }
@@ -78,30 +82,35 @@ void iniFile::update (string key, string data) {
             // read in contents of file, updating the data when necessary
             ifstream filePtrI (fileName.c_str());	// open the file for reading
             
-            while (!filePtrI.eof()) {			// loop through the entire file
-                getline (filePtrI, line);		// read in each line of the file
-                linekey = getKeyFromLine(line);		// get the key from the line
-                
-                if (linekey == key)			// check if the key matches
-                    temp = key + '=' + data + '\n';	// update the key's data
-                else
-                    temp = line + '\n';			// use original data
-                
-                if (temp != "\n")			// make sure last line is not duplicated
-                    updated += temp;			// add the line to the contents
+            if (filePtrI.is_open()) {
+		        while (!filePtrI.eof()) {			// loop through the entire file
+			        getline (filePtrI, line);		// read in each line of the file
+			        linekey = getKeyFromLine(line);		// get the key from the line
+                    
+			        if (linekey == key)			// check if the key matches
+				        temp = key + '=' + data + '\n';	// update the key's data
+			        else
+				        temp = line + '\n';			// use original data
+                    
+			        if (temp != "\n")			// make sure last line is not duplicated
+				        updated += temp;			// add the line to the contents
+		        }
+
+                filePtrI.close();				// close the file
+            
+                // write contents back to file
+                ofstream filePtrO (fileName.c_str(), ios::trunc);	// open the file, erasing all of its contents
+                if (filePtrO.is_open()) {
+                    filePtrO << updated;				// add the updated contents to the file
+                    filePtrO.close();					// close the file
+                }
             }
-            
-            filePtrI.close();				// close the file
-            
-            
-            // write contents back to file
-            ofstream filePtrO (fileName.c_str(), ios::trunc);	// open the file, erasing all of its contents
-            filePtrO << updated;				// add the updated contents to the file
-            filePtrO.close();					// close the file
         } else {
             ofstream filePtr (fileName.c_str(), ios::app);	// open the file, positioning the write pointer at the end
-            filePtr << key << '=' << data << '\n';		// add the new data to the file
-            filePtr.close();					// close the file
+            if (filePtr.is_open()) {
+                filePtr << key << '=' << data << '\n';		// add the new data to the file
+                filePtr.close();					// close the file
+            }
         }
     }
 }

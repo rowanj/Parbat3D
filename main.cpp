@@ -3,6 +3,7 @@
 #include <iostream>
 #include "main.h"
 #include "config.h"
+#include "Settings.h"
 
 #if TMP_USE_IMAGE_MANIPULATION
 #include "ImageHandler.h"
@@ -12,9 +13,9 @@ ImageHandler::ImageHandler* image_handler;	// Instance handle
 using namespace std;
 
 /* Unique class names for our main windows */
-char szMainWindowClassName[] = "Parabat3D Main Window";
-char szImageWindowClassName[] = "Parabat3D Image Window";
-char szToolWindowClassName[] = "Parabat3D Tool Window";
+char szMainWindowClassName[] = "Parbat3D Main Window";
+char szImageWindowClassName[] = "Parbat3D Image Window";
+char szToolWindowClassName[] = "Parbat3D Tool Window";
 /* pre-defined class names for controls */
 char szStaticControl[] = "static";  /* static text control */
 
@@ -44,6 +45,10 @@ int toolWindowIsSnapped=false;
 
 /* Define id numbers for the tab's in the tool window */
 enum {DISPLAY_TAB_ID,QUERY_TAB_ID};
+
+/* Used for loading and saving window position and sizes */
+settings winPos ("settings.ini");
+
 
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
@@ -103,17 +108,23 @@ int setupMainWindow()
     /* Register the window class, if fails return false */
     if(!RegisterClassEx(&wincl)) return false;
     
+    /* Get the stored window position or use defaults if there's a problem */
+    int mx = atoi(winPos.getSetting("OverviewX").c_str());
+	int my = atoi(winPos.getSetting("OverviewY").c_str());
+	if (mx <= 0) mx = CW_USEDEFAULT;
+	if (my <= 0) my = CW_USEDEFAULT;
+    
     /* The class is registered, lets create a window based on it*/
     hMainWindow = CreateWindowEx(
            0,                   /* Extended possibilites for variation */
            szMainWindowClassName,         /* Classname */
-           "Parbat3D",         /* Title Text */
+           "Parbat3D",          /* Title Text */
            WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, /* window styles */
-           50, //CW_USEDEFAULT,       /* x position */
-           50, //CW_USEDEFAULT,       /* y position */
+           mx,                  /* x position */
+           my,                  /* y position */
            250,                 /* The program's width */
            300,                 /* and height in pixels */
-           hMainWindow,        /* The window is a childwindow to desktop */
+           hMainWindow,         /* The window is a childwindow to desktop */
            NULL,                /* No menu */
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
@@ -325,6 +336,12 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
         /* WM_DESTROY: window is being destroyed */
         case WM_DESTROY:
+            /* Save the window location */
+            RECT r;
+            GetWindowRect(hwnd,&r);
+            winPos.setSetting("OverviewX", r.left);
+            winPos.setSetting("OverviewY", r.top);
+            
             /* post a message that will cause WinMain to exit from the message loop */
             // !! Shutdown image file and OpenGL
             PostQuitMessage (0);

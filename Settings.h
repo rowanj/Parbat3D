@@ -1,6 +1,8 @@
 #ifndef _SETTINGS_H
 #define _SETTINGS_H
 
+#include <sstream>
+
 #include "IniFile.h"
 
 using namespace std;
@@ -12,8 +14,9 @@ class settings {
         settings (string filename) { openFile.open(filename); }
         ~settings () { openFile.close(); }
         
-        void setSetting (string key, string data);
-        string getSetting (string key);
+        string getSetting (string);
+        void setSetting (string, string);
+        void setSetting (string, int);
 };
 
 #endif
