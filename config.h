@@ -8,7 +8,7 @@
 
 // Declare some packages as optional during initial implementation.
 //  This is to allow other packages to build for testing.
-#undef TMP_USE_IMAGE_FILE
+#define TMP_USE_IMAGE_FILE 1
 #define TMP_USE_IMAGE_MANIPULATION 1
 #undef TMP_USE_SETTINGS
 

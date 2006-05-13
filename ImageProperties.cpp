@@ -1,5 +1,5 @@
 #include "config.h"
-#if TMP_USE_IMG_FILE
+#if TMP_USE_IMAGE_FILE
 #include "ImageProperties.h"
 
 
@@ -8,8 +8,8 @@ ImageProperties::ImageProperties(void)
 	;
 }
 
-ImageFile::~ImageFile(void)
+ImageProperties::~ImageProperties(void)
 {
-	;	
+	return;	
 }
 #endif
