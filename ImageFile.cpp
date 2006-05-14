@@ -3,7 +3,7 @@
 #include "ImageFile.h"
 
 
-/*Constructor for ImageFile. Takes a filename, and instanciates a new
+/*Constructor for ImageFile. Takes a filename, and instantiates a new
 GDALDataset. Also registers all GDAL drivers, and gets info about
 the new dataset*/
 ImageFile::ImageFile(char* theFilename)
@@ -15,6 +15,8 @@ ImageFile::ImageFile(char* theFilename)
 	ifDataset = (GDALDataset *) GDALOpen(filename , GA_ReadOnly);
 	
 	properties = new ImageProperties(ifDataset);
+	
+	coordInfo = new CoordinateInfo(ifDataset);
 }
 
 /*Closes the handles to our dataset.*/
@@ -29,6 +31,7 @@ ImageFile::~ImageFile(void)
 	}
 	
 	delete properties;
+	delete coordInfo;
 }
 
 /*Prints some basic info about the dataset: driver, driver long name, x size, y size

@@ -18,6 +18,7 @@
 
 
 #include "ImageProperties.h"
+#include "CoordinateInfo.h"
 #include "StringUtils.h"
 #include <string>
 #if PLATFORM_W32
@@ -36,6 +37,7 @@ private:
 	GDALDataset* ifDataset;
 	char* filename;
 	ImageProperties* properties;
+	CoordinateInfo* coordInfo;
 };
 
 #endif
