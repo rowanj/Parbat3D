@@ -19,8 +19,20 @@
 class ImageProperties
 {
 	public:
-		ImageProperties(void);
+		ImageProperties(GDALDataset* dataset);
+		int getWidth(void);
+		int getHeight(void);
+		int getNumBands(void);
+		const char* getDriverName(void);
+		const char* getDriverLongName(void);
 		virtual ~ImageProperties(void);
+		
+	private:
+		int width;
+		int height;
+		int numBands;
+		const char* driverName;
+		const char* driverLongName;
 };
 #endif
 

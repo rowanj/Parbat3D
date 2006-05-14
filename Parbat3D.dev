@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=24
+UnitCount=26
 Type=0
 Ver=1
 ObjFiles=
@@ -20,7 +20,7 @@ ObjectOutput=build
 OverrideOutput=0
 OverrideOutputName=Parbat3D.exe
 HostApplication=
-Folders=Image_File_PKG,Image_Manipulation_PKG,Settings_PKG,View_PKG
+Folders=Image_File_PKG,Image_Manipulation_PKG,Settings_PKG,Utils,View_PKG
 CommandLine=
 UseCustomMakefile=0
 CustomMakefile=
@@ -286,9 +286,9 @@ FileName=windowFunctions.h
 FileName=imageWindow.cpp
 
 [Unit25]
-FileName=toolWindow.cpp
+FileName=StringUtils.cpp
 CompileCpp=1
-Folder=View_PKG
+Folder=Utils
 Compile=1
 Link=1
 Priority=1000
@@ -296,9 +296,9 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit26]
-FileName=windowFunctions.cpp
+FileName=StringUtils.h
 CompileCpp=1
-Folder=View_PKG
+Folder=Utils
 Compile=1
 Link=1
 Priority=1000
@@ -308,7 +308,7 @@ BuildCmd=
 [Unit24]
 FileName=config.h
 CompileCpp=1
-Folder=Parbat3D
+Folder=
 Compile=1
 Link=1
 Priority=1000

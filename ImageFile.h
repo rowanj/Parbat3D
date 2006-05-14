@@ -5,6 +5,9 @@
 #include <iosfwd>
 #include <cstdio>
 #include <cstring>
+#include <sstream>
+#include <string>
+#include <iostream>
 #include <math.h>
 
 #define CPL_STDCALL __stdcall
@@ -12,6 +15,8 @@
 #include <gdal_priv.h>
 
 #include "config.h"
+#include "ImageProperties.h"
+#include "StringUtils.h"
 #include <string>
 #if PLATFORM_W32
 #include <windows.h>
@@ -21,13 +26,14 @@
 class ImageFile
 {
 public:
-	ImageFile(char* filename);
+	ImageFile(char* theFilename);
 	virtual ~ImageFile(void);
 	void printInfo(void);
 	
 private:
-	GDALDataset *ifDataset;
-	double adfGeoTransform[6];
+	GDALDataset* ifDataset;
+	char* filename;
+	ImageProperties* properties;
 };
 
 //#endif
