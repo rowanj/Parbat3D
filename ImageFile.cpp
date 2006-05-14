@@ -22,7 +22,9 @@ ImageFile::~ImageFile(void)
 {
 	if (ifDataset != NULL)
 	{
+		#if DEBUG_IMAGE_FILE
 		MessageBox (NULL, "Closing image file.", "Parbat3D :: ImageFile", 0);
+		#endif
 		GDALClose(ifDataset);
 	}
 	
@@ -36,6 +38,7 @@ void ImageFile::printInfo(void)
 	const char* message;
 	string leader;
 	
+	#if DEBUG_IMAGE_PROPERTIES
 	if (ifDataset != NULL)
 	{
 		leader = "Driver: ";
@@ -62,5 +65,6 @@ void ImageFile::printInfo(void)
 	{
 		MessageBox (NULL, "Cannot get info; dataset was not loaded!", "Parbat3D :: ImageFile", 0);
 	}
+	#endif // DEBUG_IMAGE_PROPERTIES
 }
 #endif

@@ -78,15 +78,15 @@ void ImageHandler::resize_window(void)
 
 void ImageHandler::post_init( void )
 {
-#if DEBUG_IMAGE_HANDLER
-	MessageBox (NULL, "post_init() - non-OO version.", "Parbat3D :: ImageHandler", 0);
-#endif
 	this->init_GL();
 }
 
 void ImageHandler::init_GL( void )
 {
 #if TMP_USE_OO_OPENGL
+#if DEBUG_IMAGE_HANDLER
+	MessageBox (NULL, "post_init() - OO version.", "Parbat3D :: ImageHandler", 0);
+#endif
 	if (gl_overview = new ImageGLView(hOverview)) { // Instantiated successfully
 		if (gl_overview->status) {
 			status = 4;
@@ -112,6 +112,9 @@ void ImageHandler::init_GL( void )
 		error_text = "Could not create ImageGLView for image window.";
 	}
 #else
+#if DEBUG_IMAGE_HANDLER
+	MessageBox (NULL, "post_init() - non-OO version.", "Parbat3D :: ImageHandler", 0);
+#endif
 #endif	
 }
 

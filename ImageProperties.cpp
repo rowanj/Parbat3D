@@ -7,7 +7,9 @@ ImageProperties::ImageProperties(GDALDataset* dataset)
 {
 	if(dataset == NULL)
 	{
+		#if DEBUG_IMAGE_PROPERTIES
 		MessageBox (NULL, "Dataset did not load!", "Parbat3D :: ImageProperties", 0);
+		#endif
 		driverName = NULL;
 		driverLongName = NULL;
 		width = 0;
@@ -16,7 +18,9 @@ ImageProperties::ImageProperties(GDALDataset* dataset)
 	}
 	else
 	{
+		#if DEBUG_IMAGE_PROPERTIES
 		MessageBox (NULL, "Dataset loaded", "Parbat3D :: ImageProperties", 0);
+		#endif
 		driverName = (char *) GDALGetDescription(GDALGetDatasetDriver(dataset));
 		driverLongName = (char *) GDALGetMetadataItem(GDALGetDatasetDriver(dataset),
 														GDAL_DMD_LONGNAME,0);
