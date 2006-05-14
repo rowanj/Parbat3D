@@ -40,6 +40,12 @@ HWND hBlueRadioButton1, hBlueRadioButton2;
 HWND hImageWindowDisplay;
 HWND hMainWindowDisplay;
 
+/* radio button globals */
+int bands = 6;
+HWND *redRadiobuttons;
+HWND *greenRadiobuttons;
+HWND *blueRadiobuttons;
+
 /* Variables to record when the windows have snapped to main wndow */
 int imageWindowIsSnapped=false;
 int toolWindowIsSnapped=false;
@@ -50,12 +56,11 @@ enum {DISPLAY_TAB_ID,QUERY_TAB_ID};
 /* Used for loading and saving window position and sizes */
 settings winPos ("settings.ini");
 
-
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 
 {
-    MSG messages;            /* Here messages to the application is saved */
+ 	MSG messages;            /* Here messages to the application is saved */
  
     /* load window classes for common controls */
     InitCommonControls();
@@ -644,23 +649,8 @@ int setupToolWindow()
            hThisInstance,                   /* Program Instance handler */
            NULL                             /* No Window Creation data */
            ); 
-           	   
-	CreateWindowEx(
-           0,                   /* Extended possibilites for variation */
-           szStaticControl,         /* Classname */
-           "Channel 1\nChannel 2",        /* Title Text */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* defaultwindow */
-           20,       /* Windows decides the position */
-           40,       /* where the window end up on the screen */
-           100,                 /* The programs width */
-           100,                 /* and height in pixels */
-           hToolWindowDisplayTabContainer,        /* The window is a childwindow to main window */
-           NULL,                /* No menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
-           );     
     
-    /* Create group for RED radio buttons */
+    /* Create group for RED radio buttons based on band number */
     hRed = CreateWindowEx(
 	    	0,
 			"BUTTON",
@@ -669,14 +659,14 @@ int setupToolWindow()
 			138, //int x,
 			25, //int y, CW_USEDEFAULT
 			26, //int nWidth,
-			60, //int nHeight
+			20 + (20 * bands), //int nHeight
 			hToolWindowDisplayTabContainer, //parent window     
 			NULL, //no menu
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
 			);
 		
-	/* Create group for GREEN radio buttons */
+	/* Create group for GREEN radio buttons based on band number */
     hGreen = CreateWindowEx(
 	    	0,
 			"BUTTON",
@@ -685,14 +675,14 @@ int setupToolWindow()
 			164, //int x,
 			25, //int y, CW_USEDEFAULT
 			26, //int nWidth,
-			60, //int nHeight
+			20 + (20 * bands), //int nHeight
 			hToolWindowDisplayTabContainer, //parent window     
 			NULL, //no menu
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
 			);
 		
-	/* Create group for BLUE radio buttons */
+	/* Create group for BLUE radio buttons based on band number */
     hBlue = CreateWindowEx(
 	    	0,
 			"BUTTON",
@@ -701,22 +691,28 @@ int setupToolWindow()
 			190, //int x,
 			25, //int y, CW_USEDEFAULT
 			26, //int nWidth,
-			60, //int nHeight
+			20 + (20 * bands), //int nHeight
 			hToolWindowDisplayTabContainer, //parent window     
 			NULL, //no menu
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
 			);
 
-    
-    /* Create Radio button group inside tab */
-     hRedRadioButton1 = CreateWindowEx(
+
+	/* Dynamically add Radio buttons */
+	redRadiobuttons=new HWND[bands];
+	greenRadiobuttons=new HWND[bands];
+	blueRadiobuttons=new HWND[bands];
+	
+    for (int i=0; i<bands; i++)
+    {
+		redRadiobuttons[i] = CreateWindowEx(
 	    	0,
 			"BUTTON",
 			NULL, //title
 			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
 			5, //int x,
-			15, //int y, CW_USEDEFAULT
+			15 + (20 * i), //int y, CW_USEDEFAULT
 			18, //int nWidth,
 			18, //int nHeight
 			hRed, //parent window     
@@ -724,59 +720,29 @@ int setupToolWindow()
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
 			);
-		
-	hRedRadioButton2 = CreateWindowEx(
+			
+		greenRadiobuttons[i] = CreateWindowEx(
 	    	0,
 			"BUTTON",
 			NULL, //title
 			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
 			5, //int x,
-			35, //int y, CW_USEDEFAULT
+			15 + (20 * i), //int y, CW_USEDEFAULT
 			18, //int nWidth,
 			18, //int nHeight
-			hRed, //parent window     
+			hGreen, //parent window     
 			NULL, //no menu
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
 			);
-		
-	hGreenRadioButton1 = CreateWindowEx(
+			
+		blueRadiobuttons[i] = CreateWindowEx(
 	    	0,
 			"BUTTON",
-			NULL, // title
+			NULL, //title
 			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
 			5, //int x,
-			15, //int y,
-			18, //int nWidth,
-			18, //int nHeight
-			hGreen, //parent window
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
-		
-	hGreenRadioButton2 = CreateWindowEx(
-	    	0,
-			"BUTTON",
-			NULL, // title
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
-			5, //int x,
-			35, //int y,
-			18, //int nWidth,
-			18, //int nHeight
-			hGreen, //parent window
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
-		
-		hBlueRadioButton1 = CreateWindowEx(
-	    	0,
-			"BUTTON",
-			NULL,
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
-			5, //int x,
-			15, //int y, CW_USEDEFAULT
+			15 + (20 * i), //int y, CW_USEDEFAULT
 			18, //int nWidth,
 			18, //int nHeight
 			hBlue, //parent window     
@@ -784,21 +750,26 @@ int setupToolWindow()
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
 			);
+			
+			/* temporary label */ 
+			char name[100] = "Channel";
+			
+		CreateWindowEx(
+           0,                   /* Extended possibilites for variation */
+           szStaticControl,     /* Classname */
+           name,        		/* Title Text */
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* defaultwindow */
+           20,       			/* Windows decides the position */
+           40 + (20 * i),       /* where the window end up on the screen */
+           100,                 /* The programs width */
+           18,                  /* and height in pixels */
+           hToolWindowDisplayTabContainer,        /* The window is a childwindow to main window */
+           NULL,                /* No menu */
+           hThisInstance,       /* Program Instance handler */
+           NULL                 /* No Window Creation data */
+           );     
 		
-		hBlueRadioButton2 = CreateWindowEx(
-	    	0,
-			"BUTTON",
-			NULL,
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
-			5, //int x,
-			35, //int y, CW_USEDEFAULT
-			18, //int nWidth,
-			18, //int nHeight
-			hBlue, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
+	}
     
     return true;
 }
