@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include <gl/gl.h>
+#include <gl/glu.h>
 
 class ImageGLView
 {
@@ -10,6 +11,8 @@ public:
 	ImageGLView(HWND hWindow);
 	virtual ~ImageGLView(void);
 	void make_current(void);
+	void GLinit(void);
+	void GLresize(void);
 	
 	int status;
 	const char* error_text;

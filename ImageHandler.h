@@ -11,7 +11,9 @@
 #include "ImageFile.h"
 #include "ImageProperties.h"
 #endif
+#if TMP_USE_OO_OPENGL
 #include "ImageGLView.h"
+#endif
 
 typedef struct pixel_values_t {
 	char number_bands;
@@ -30,6 +32,7 @@ class ImageHandler
 {
 public:
 	ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename);
+	void post_init(void); // We may need to do some initialization after object creation
 	virtual ~ImageHandler(void);
 	void redraw(void);
 #if TMP_USE_IMAGE_FILE
@@ -45,8 +48,12 @@ public:
 	const char* error_text;
 
 private:
+
+#if TMP_USE_OO_OPENGL
 	ImageGLView* gl_overview;
 	ImageGLView* gl_image;
+#endif
+	void init_GL(void);
 	HWND hOverview, hImage;
 #if TMP_USE_IMAGE_FILE
 	ImageFile* image_file;

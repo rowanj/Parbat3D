@@ -62,8 +62,7 @@ ImageGLView::ImageGLView(HWND hWindow)
 		status = 6;
 		error_text = "Could not make rendering context current.";
 	}
-	glClearColor(0.0f, 0.0f, 0.8f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 }
 
 ImageGLView::~ImageGLView()
@@ -73,7 +72,38 @@ ImageGLView::~ImageGLView()
 	ReleaseDC(window_handle, device_context);
 }
 
+void ImageGLView::GLinit(void)
+{
+	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
+	glClearColor(0.0f, 0.0f, 0.0f, 0.5f);				// Black Background
+	glClearDepth(1.0f);									// Depth Buffer Setup
+	glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
+	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
+}
+
+void ImageGLView::GLresize(void)
+{
+	GLuint width, height;
+	LPRECT window_rect;
+	window_rect = (tagRECT*) malloc(sizeof(RECT));
+	GetWindowRect(window_handle, window_rect);
+	width = window_rect->right - window_rect->left;
+	height = window_rect->bottom - window_rect->top;
+	if (height == 0) height = 1; // prevent div 0
+	glViewport(0,0,width,height);
+	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
+	glLoadIdentity();									// Reset The Projection Matrix
+	// Calculate The Aspect Ratio Of The Window
+	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,100.0f);
+	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
+	glLoadIdentity();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	free(window_rect);
+}
+
 void ImageGLView::make_current()
 {
 	wglMakeCurrent(device_context, rendering_context);
 }
+

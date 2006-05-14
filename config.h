@@ -4,6 +4,7 @@
 
 // Enable global debug/trace mode
 #define DEBUG 1
+#define DEBUG_IMAGE_HANDLER 1
 //#undef DEBUG
 
 // Declare some packages as optional during initial implementation.
@@ -11,6 +12,7 @@
 #define TMP_USE_IMAGE_FILE 1
 #define TMP_USE_IMAGE_MANIPULATION 1
 #undef TMP_USE_SETTINGS
+#undef TMP_USE_OO_OPENGL
 
 // Platform-specific portions of code should test for the relevant PLATFORM_ define
 #ifdef WIN32

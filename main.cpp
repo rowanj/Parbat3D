@@ -1235,11 +1235,17 @@ void loadFile()
 		//			the windowing system.  Have used hMainWindow and hImageWindow for interim testing.. - Rowan
 		//      - Have changed to child windows - Shane
 	    image_handler = new ImageHandler::ImageHandler(hMainWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
-	    if (image_handler->status != 0) {
-			// An error occurred initializing the image handler class.
-			MessageBox (NULL, image_handler->error_text , "Parbat3D :: ImageHandler", 0);
-		}	
-		image_handler->resize_window();
+	    if (image_handler) {
+			if (image_handler->status != 0) {
+				// An error occurred instantiaing the image handler class.
+				MessageBox (NULL, image_handler->error_text , "Parbat3D :: ImageHandler", 0);
+			} else {
+				// Continue initialization
+				image_handler->post_init();
+			}
+		} else { // Object wasn't created - this is probably terminal
+			MessageBox (NULL, "Could not instantiate ImageHandler." , "Parbat3D :: ImageHandler", 0);
+		}
 
 		#endif	// TMP_USE_IMAGE_MANIPULATION
     }

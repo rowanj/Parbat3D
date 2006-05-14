@@ -34,36 +34,23 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 //	error_text = "Not using ImageFile.";
 #endif	
 	
-	// Initialize OpenGL (could be threaded)
-	if (gl_overview = new ImageGLView(hOverview)) { // Instantiated successfully
-		if (gl_overview->status) {
-			status = 4;
-			error_text = gl_overview->error_text;
-		}
-	} else {
-		status = 5;
-		error_text = "Could not create ImageGLView for overview.";
-	}
-	
-	if (gl_image = new ImageGLView(hOverview)) {
-		if (gl_image->status) {
-			status = 6;
-			error_text = gl_overview->error_text;
-		}
-	} else {
-		status = 7;
-		error_text = "Could not create ImageGLView for image window.";
-	}
+	/* Initialize OpenGL*/
+	/* OO version */
+#if TMP_USE_OO_OPENGL
+#else // Use OO_OPENGL
+#endif // Use OO_OPENGL
 
 }
 
 ImageHandler::~ImageHandler(void)
 {
-#if DEBUG
+#if DEBUG_IMAGE_HANDLER
 	MessageBox (NULL, "Shutting down image handler.", "Parbat3D :: ImageHandler", 0);
 #endif
+#if TMP_USE_OO_OPENGL
 	delete gl_overview;
 	delete gl_image;
+#endif
 #if TMP_USE_IMAGE_FILE
 	delete image_file;
 #endif
@@ -83,19 +70,49 @@ ImageProperties* ImageHandler::get_image_properties(void)
 
 void ImageHandler::resize_window(void)
 {
-	LPRECT window_rect;
-	GetWindowRect(hOverview,window_rect);
-	gl_overview->make_current();
-	glViewport(0,0,window_rect->right - window_rect->left,
-				window_rect->bottom - window_rect->top);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	// ?? Do we have to free() window_rect - Rowan
-	GetWindowRect(hImage,window_rect);
-	gl_image->make_current();
-	glViewport(0,0,window_rect->right - window_rect->left,
-				window_rect->bottom - window_rect->top);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	// ?? Do we have to free() window_rect - Rowan
+#if TMP_USE_OO_OPENGL
+	gl_overview->GLresize();
+	gl_image->GLresize();
+#endif
+}
+
+void ImageHandler::post_init( void )
+{
+#if DEBUG_IMAGE_HANDLER
+	MessageBox (NULL, "post_init() - non-OO version.", "Parbat3D :: ImageHandler", 0);
+#endif
+	this->init_GL();
+}
+
+void ImageHandler::init_GL( void )
+{
+#if TMP_USE_OO_OPENGL
+	if (gl_overview = new ImageGLView(hOverview)) { // Instantiated successfully
+		if (gl_overview->status) {
+			status = 4;
+			error_text = gl_overview->error_text;
+		} else {
+			gl_overview->GLresize();
+			gl_overview->GLinit();
+		}
+	} else {
+		status = 5;
+		error_text = "Could not create ImageGLView for overview.";
+	}
+	
+	if (gl_image = new ImageGLView(hOverview)) {
+		if (gl_image->status) {
+			status = 6;
+			error_text = gl_overview->error_text;
+		} else {
+			gl_overview->GLinit();
+		}
+	} else {
+		status = 7;
+		error_text = "Could not create ImageGLView for image window.";
+	}
+#else
+#endif	
 }
 
 PRECT ImageHandler::get_viewport(void)

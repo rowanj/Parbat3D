@@ -1,7 +1,8 @@
 #ifndef _IMAGE_FILE_H
 #define _IMAGE_FILE_H
 
-//#if TMP_USE_IMAGE_FILE
+#include "config.h"
+
 #include <iosfwd>
 #include <cstdio>
 #include <cstring>
@@ -12,9 +13,10 @@
 
 #define CPL_STDCALL __stdcall
 #define CPL_DISABLE_STDCALL 1
+
 #include <gdal_priv.h>
 
-#include "config.h"
+
 #include "ImageProperties.h"
 #include "StringUtils.h"
 #include <string>
@@ -36,5 +38,4 @@ private:
 	ImageProperties* properties;
 };
 
-//#endif
 #endif
