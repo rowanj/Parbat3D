@@ -1356,6 +1356,8 @@ void loadFile()
         EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,false);
         EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,false);        
 
+		// Clean up any previous instance
+		if (image_handler) delete image_handler;
 	    image_handler = new ImageHandler::ImageHandler(hMainWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
 	    if (image_handler) {
 			if (image_handler->status > 0) {
