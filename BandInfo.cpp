@@ -82,7 +82,7 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 	leader = "Max value: ";
 	message = makeMessage(leader, adfMinMax[1]);
 	MessageBox (NULL, message, "Parbat3D :: BandInfo", 0);
-	#endif //DEBUG_BANDS	
+	#endif //DEBUG_BANDS
 }
 
 const char* BandInfo::getRasterDataType(void)
