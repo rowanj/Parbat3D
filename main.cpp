@@ -56,10 +56,11 @@ enum {DISPLAY_TAB_ID,QUERY_TAB_ID};
 /* Used for loading and saving window position and sizes */
 settings winPos ("settings.ini");
 
+/* objects used for drawing tab's & static controls */
 HFONT hTabSelectedFont,hTabNonSelectedFont;
 HPEN hTabPen;
 HBRUSH hTabBrush;
-WNDPROC oldTabControlProc;
+WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc;
 
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
@@ -659,6 +660,12 @@ int setupToolWindow()
            NULL                             /* No Window Creation data */
            ); 
     
+
+    /* modify tab containers' window procedure address 
+        note: assumming proc addr is the same for all three */
+    oldDisplayTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowDisplayTabContainer,GWL_WNDPROC,(long)&ToolWindowDisplayTabContainerProcedure);
+    oldQueryTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowQueryTabContainer,GWL_WNDPROC,(long)&ToolWindowQueryTabContainerProcedure);
+
     /* Create group for RED radio buttons based on band number */
     hRed = CreateWindowEx(
 	    	0,
@@ -674,6 +681,8 @@ int setupToolWindow()
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
 			);
+
+
 		
 	/* Create group for GREEN radio buttons based on band number */
     hGreen = CreateWindowEx(
@@ -783,7 +792,7 @@ int setupToolWindow()
     return true;
 }
 
-
+/* draw static text on the screen */
 inline void drawStatic(DRAWITEMSTRUCT *dis)
 {   
     char str[255]; //[255]="text to draw";
@@ -793,19 +802,12 @@ inline void drawStatic(DRAWITEMSTRUCT *dis)
     GetWindowText(dis->hwndItem,(LPSTR)str,(int)255);
     len=strlen(str);
     SelectObject(dis->hDC,hTabPen);
-//    if (dis->itemState==ODS_SELECTED)
-        SelectObject(dis->hDC,hTabSelectedFont);
-//    else
-//        SelectObject(dis->hDC,hTabNonSelectedFont);
+    SelectObject(dis->hDC,hTabNonSelectedFont);
     SetTextColor(dis->hDC,0);
     SelectObject(dis->hDC,hTabBrush);
     GetTextExtentPoint32(dis->hDC,str,len,&size);
-//    x=dis->rcItem.left+(dis->rcItem.right-dis->rcItem.left)/2-size.cx/2;
-//    y=dis->rcItem.top+(dis->rcItem.bottom-dis->rcItem.top)/2-size.cy/2;
-    x=dis->rcItem.left;
-    y=dis->rcItem.top;
     Rectangle(dis->hDC,dis->rcItem.left,dis->rcItem.top,dis->rcItem.right,dis->rcItem.bottom);
-    TextOut(dis->hDC,10,10,(char*)str,len);
+    TextOut(dis->hDC,dis->rcItem.left,dis->rcItem.top,(char*)str,len);
 }
 
 /* draw a tab on the screen */
@@ -877,6 +879,42 @@ LRESULT CALLBACK ToolWindowTabControlProcedure(HWND hwnd, UINT message, WPARAM w
     }        
     return CallWindowProc(oldTabControlProc,hwnd,message,wParam,lParam);
 }
+
+
+/* This function is called by the Windowsfunction DispatchMessage( ) */
+LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)                  /* handle the messages */
+    {
+        /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
+        case WM_DRAWITEM:
+            if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
+                drawStatic((DRAWITEMSTRUCT*)lParam);
+            break; 
+                        
+        default:
+            break;
+    }        
+    return CallWindowProc(oldDisplayTabContainerProc,hwnd,message,wParam,lParam);
+}
+
+/* This function is called by the Windowsfunction DispatchMessage( ) */
+LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)                  /* handle the messages */
+    {
+        /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
+        case WM_DRAWITEM:
+            if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
+                drawStatic((DRAWITEMSTRUCT*)lParam);
+            break; 
+                        
+        default:
+            break;
+    }        
+    return CallWindowProc(oldQueryTabContainerProc,hwnd,message,wParam,lParam);
+}
+
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
