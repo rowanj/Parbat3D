@@ -4,11 +4,8 @@
 #include "main.h"
 #include "config.h"
 #include "Settings.h"
-
-#if TMP_USE_IMAGE_MANIPULATION
 #include "ImageHandler.h"
 ImageHandler::ImageHandler* image_handler;	// Instance handle
-#endif
 
 using namespace std;
 
@@ -84,8 +81,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Run the messageloop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))
     {
-           /* Send message to associated WindowProcedure */
-           DispatchMessage(&messages);
+        /* Send message to associated WindowProcedure */
+        DispatchMessage(&messages);
+        // Ensure OpenGL viewport is fully drawn
+        // !! This *does* slow the program down, would be a good idea to
+        //		trigger it on expose events instead; but couln't figure that
+        //		one out myself - under X11 would be WM_REDRAW message.
+		if (image_handler) image_handler->redraw();
     }
 
     /* The program returvalue is 0 - The value that PostQuitMessage( ) gave */
@@ -159,7 +161,7 @@ int setupMainWindow()
            0,                   /* Extended possibilites for variation */
            szStaticControl,         /* Classname */
            NULL,         /* Title Text */
-           WS_CHILD+WS_VISIBLE, /* styles */
+           WS_CHILD|WS_VISIBLE, /* styles */
            rect.left,       /* x position based on parent window */
            rect.top,         /* y position based on parent window */
            rect.right,                 /* The programs width */
@@ -189,7 +191,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
     static RECT prevToolWindowRect;         /* tool window position before it was moved */
     static int toolWindowIsMovingToo;       /* whether or not the tool window should be moved with the main window */
     static int imageWindowIsMovingToo;      /* whether or not the image window should be moved with the main window */
-        
+    
     switch (message)                  /* handle the messages */
     {
         /* WM_CREATE: window has been created */
@@ -355,7 +357,6 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             winPos.setSetting("OverviewY", r.top);
             
             /* post a message that will cause WinMain to exit from the message loop */
-            // !! Shutdown image file and OpenGL
             PostQuitMessage (0);
             break;
         
@@ -1354,30 +1355,21 @@ void loadFile()
         // enable Window menu items
         EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,false);
         EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,false);        
-        
-        #if TMP_USE_IMAGE_MANIPULATION
-    	// !! These NULL args need to be replaced with the HWNDs of the GL drawable areas
-    	//	of the overview window and main window respectively. 
-        //      - Replace with hMainWindow and hImageWindow. - Shane
-        //          Will GL draw over entire window surface? Or can you give it co-ords? If it draws over entire surface,
-        //          we may need to give it child windows instead or it will draw over the menus, etc. - Shane
-        //		- Child windows the best solution, that way the GL code, etc. doesn't need to know about
-		//			the windowing system.  Have used hMainWindow and hImageWindow for interim testing.. - Rowan
-		//      - Have changed to child windows - Shane
+
 	    image_handler = new ImageHandler::ImageHandler(hMainWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
 	    if (image_handler) {
-			if (image_handler->status != 0) {
+			if (image_handler->status > 0) {
 				// An error occurred instantiaing the image handler class.
-				MessageBox (NULL, image_handler->error_text , "Parbat3D :: ImageHandler", 0);
+				MessageBox (NULL, image_handler->error_text , "[error] Parbat3D :: ImageHandler", 0);
 			} else {
-				// Continue initialization
-				image_handler->post_init();
+				if (image_handler->status < 0) { // Error occurred, but was non-fatal
+					MessageBox (NULL, image_handler->error_text , "[warning] Parbat3D :: ImageHandler", 0);
+				}
 			}
 		} else { // Object wasn't created - this is probably terminal
-			MessageBox (NULL, "Could not instantiate ImageHandler." , "Parbat3D :: ImageHandler", 0);
+			MessageBox (NULL, "[error] Could not instantiate ImageHandler." , "Parbat3D :: ImageHandler", 0);
+			// !! Should probably die gracefully at this point - Rowan
 		}
-
-		#endif	// TMP_USE_IMAGE_MANIPULATION
     }
 }
 

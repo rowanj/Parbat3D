@@ -1,5 +1,7 @@
 #include "config.h"
 #include "ImageHandler.h"
+#include <gl/gl.h>
+#include <gl/glu.h>
 
 ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 {
@@ -30,27 +32,39 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 #if TMP_USE_IMAGE_FILE
 	image_file = new ImageFile(filename);
 	image_file->printInfo();
-//#else
-//	error_text = "Not using ImageFile.";
+#else
+	status = -1; // negative should be treated as non-fatal
+	error_text = "Not using ImageFile.";
 #endif	
 	
 	/* Initialize OpenGL*/
-	/* OO version */
-#if TMP_USE_OO_OPENGL
-#else // Use OO_OPENGL
-#endif // Use OO_OPENGL
-
+	gl_overview = new ImageGLView(hOverview);
+	if (!gl_overview) {
+		status = 4;
+		error_text = "Could not create ImageGLView for overview window.";
+	}
+	#if DEBUG_IMAGE_HANDLER
+	else {
+		MessageBox (NULL, "Successfully created ImageGLView for overview window.", "Parbat3D :: ImageHandler", 0);
+	}
+	#endif
+	
+	gl_image = new ImageGLView(hImage);
+	if (!gl_image) {
+		status = 4;
+		error_text = "Could not create ImageGLView for image window.";
+	}
+	#if DEBUG_IMAGE_HANDLER
+	else {
+		MessageBox (NULL, "Successfully created ImageGLView for image window.", "Parbat3D :: ImageHandler", 0);
+	}
+	#endif
 }
 
 ImageHandler::~ImageHandler(void)
 {
-#if DEBUG_IMAGE_HANDLER
-	MessageBox (NULL, "Shutting down image handler.", "Parbat3D :: ImageHandler", 0);
-#endif
-#if TMP_USE_OO_OPENGL
 	delete gl_overview;
 	delete gl_image;
-#endif
 #if TMP_USE_IMAGE_FILE
 	delete image_file;
 #endif
@@ -58,7 +72,14 @@ ImageHandler::~ImageHandler(void)
 
 void ImageHandler::redraw(void)
 {
-	;
+	gl_overview->make_current();
+	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	gl_overview->GLswap();
+	gl_image->make_current();
+	glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	gl_image->GLswap();
 }
 
 #if TMP_USE_IMAGE_FILE
@@ -70,52 +91,9 @@ ImageProperties* ImageHandler::get_image_properties(void)
 
 void ImageHandler::resize_window(void)
 {
-#if TMP_USE_OO_OPENGL
 	gl_overview->GLresize();
 	gl_image->GLresize();
-#endif
-}
-
-void ImageHandler::post_init( void )
-{
-	this->init_GL();
-}
-
-void ImageHandler::init_GL( void )
-{
-#if TMP_USE_OO_OPENGL
-#if DEBUG_IMAGE_HANDLER
-	MessageBox (NULL, "post_init() - OO version.", "Parbat3D :: ImageHandler", 0);
-#endif
-	if (gl_overview = new ImageGLView(hOverview)) { // Instantiated successfully
-		if (gl_overview->status) {
-			status = 4;
-			error_text = gl_overview->error_text;
-		} else {
-			gl_overview->GLresize();
-			gl_overview->GLinit();
-		}
-	} else {
-		status = 5;
-		error_text = "Could not create ImageGLView for overview.";
-	}
-	
-	if (gl_image = new ImageGLView(hOverview)) {
-		if (gl_image->status) {
-			status = 6;
-			error_text = gl_overview->error_text;
-		} else {
-			gl_overview->GLinit();
-		}
-	} else {
-		status = 7;
-		error_text = "Could not create ImageGLView for image window.";
-	}
-#else
-#if DEBUG_IMAGE_HANDLER
-	MessageBox (NULL, "post_init() - non-OO version.", "Parbat3D :: ImageHandler", 0);
-#endif
-#endif	
+	this->redraw();
 }
 
 PRECT ImageHandler::get_viewport(void)

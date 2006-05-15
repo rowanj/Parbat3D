@@ -11,8 +11,8 @@ public:
 	ImageGLView(HWND hWindow);
 	virtual ~ImageGLView(void);
 	void make_current(void);
-	void GLinit(void);
 	void GLresize(void);
+	void GLswap(void);
 	
 	int status;
 	const char* error_text;

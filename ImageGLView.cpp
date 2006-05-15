@@ -1,14 +1,8 @@
+#include "config.h"
 #include "ImageGLView.h"
 
-ImageGLView::ImageGLView(HWND hWindow)
-{
-	// !! ToDo - Add error checking at various stages
-	status = 0; // No error
-	error_text = "No error.";
-	GLuint pixel_format_index;
-	
-	// pfd structure aproximated from public domain code at nehe.gamedev.net
-	static	PIXELFORMATDESCRIPTOR pfd={	// pfd Tells Windows How We Want Things To Be
+// pfd structure aproximated from public domain code at nehe.gamedev.net
+static	PIXELFORMATDESCRIPTOR gl_pfd={	// pfd Tells Windows How We Want Things To Be
 		sizeof(PIXELFORMATDESCRIPTOR),	// Size Of This Pixel Format Descriptor
 		1,								// Version Number
 		PFD_DRAW_TO_WINDOW |			// Format Must Support Window
@@ -27,7 +21,14 @@ ImageGLView::ImageGLView(HWND hWindow)
 		PFD_MAIN_PLANE,					// Main Drawing Layer
 		0,								// Reserved
 		0, 0, 0							// Layer Masks Ignored
-	};
+};
+
+ImageGLView::ImageGLView(HWND hWindow)
+{
+	status = 0; // No error
+	error_text = "No error.";
+	GLuint pixel_format_index;
+	
 	
 	if (hWindow != NULL) {
 		window_handle = hWindow;
@@ -44,11 +45,11 @@ ImageGLView::ImageGLView(HWND hWindow)
 	
 	
 	// Find and set the pixel format
-	if(!(pixel_format_index = ChoosePixelFormat(device_context, &pfd))) {
+	if(!(pixel_format_index = ChoosePixelFormat(device_context, &gl_pfd))) {
 		status = 3;
 		error_text = "Could not find suitable pixel format.";
 	}
-	if(!SetPixelFormat(device_context, pixel_format_index, &pfd)) {
+	if(!SetPixelFormat(device_context, pixel_format_index, &gl_pfd)) {
 		status = 4;
 		error_text = "Could not set pixel format.";
 	}
@@ -62,24 +63,16 @@ ImageGLView::ImageGLView(HWND hWindow)
 		status = 6;
 		error_text = "Could not make rendering context current.";
 	}
-
 }
 
 ImageGLView::~ImageGLView()
 {
+	#if DEBUG_IMAGE_HANDLER
+	MessageBox (NULL, "Destroying ImageGLView.", "Parbat3D :: ImageHandler", 0);
+	#endif
 	wglMakeCurrent(NULL, NULL);
 	wglDeleteContext(rendering_context);
 	ReleaseDC(window_handle, device_context);
-}
-
-void ImageGLView::GLinit(void)
-{
-	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
-	glClearColor(0.0f, 0.0f, 0.0f, 0.5f);				// Black Background
-	glClearDepth(1.0f);									// Depth Buffer Setup
-	glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
-	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 }
 
 void ImageGLView::GLresize(void)
@@ -95,7 +88,7 @@ void ImageGLView::GLresize(void)
 	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
 	glLoadIdentity();									// Reset The Projection Matrix
 	// Calculate The Aspect Ratio Of The Window
-	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,100.0f);
+	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.5f,100.0f);
 	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
 	glLoadIdentity();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -105,5 +98,10 @@ void ImageGLView::GLresize(void)
 void ImageGLView::make_current()
 {
 	wglMakeCurrent(device_context, rendering_context);
+}
+
+void ImageGLView::GLswap()
+{
+	SwapBuffers(device_context);
 }
 
