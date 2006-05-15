@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <vector>
 #include <math.h>
 
 #define CPL_STDCALL __stdcall
@@ -19,12 +20,14 @@
 
 #include "ImageProperties.h"
 #include "CoordinateInfo.h"
+#include "BandInfo.h"
 #include "StringUtils.h"
 #include <string>
 #if PLATFORM_W32
 #include <windows.h>
 #endif
 
+using std::vector;
 
 class ImageFile
 {
@@ -38,6 +41,7 @@ private:
 	char* filename;
 	ImageProperties* properties;
 	CoordinateInfo* coordInfo;
+	vector<BandInfo*> theBands; 
 };
 
 #endif

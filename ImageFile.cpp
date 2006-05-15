@@ -8,6 +8,10 @@ GDALDataset. Also registers all GDAL drivers, and gets info about
 the new dataset*/
 ImageFile::ImageFile(char* theFilename)
 {
+	int i;
+	string leader;
+	const char* message;
+	
 	filename = theFilename;
 	
 	GDALAllRegister();
@@ -15,13 +19,18 @@ ImageFile::ImageFile(char* theFilename)
 	ifDataset = (GDALDataset *) GDALOpen(filename , GA_ReadOnly);
 	
 	properties = new ImageProperties(ifDataset);
-	
 	coordInfo = new CoordinateInfo(ifDataset);
+	
+	for (i=0;i<properties->getNumBands();i++)
+	{
+		theBands.push_back(new BandInfo( (GDALRasterBand*) GDALGetRasterBand(ifDataset, i+1)));
+	}
 }
 
 /*Closes the handles to our dataset.*/
 ImageFile::~ImageFile(void)
 {
+	int i;
 	if (ifDataset != NULL)
 	{
 		#if DEBUG_IMAGE_FILE
@@ -32,6 +41,10 @@ ImageFile::~ImageFile(void)
 	
 	delete properties;
 	delete coordInfo;
+	for (i=0;i<properties->getNumBands();i++)
+	{
+		delete theBands[i];
+	}
 }
 
 /*Prints some basic info about the dataset: driver, driver long name, x size, y size
