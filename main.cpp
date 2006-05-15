@@ -59,6 +59,7 @@ settings winPos ("settings.ini");
 HFONT hTabSelectedFont,hTabNonSelectedFont;
 HPEN hTabPen;
 HBRUSH hTabBrush;
+WNDPROC oldTabControlProc;
 
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
@@ -566,8 +567,7 @@ int setupToolWindow()
     
     /* The class is registered, lets create the program*/
     hToolWindow =CreateWindowEx(
-           // WS_EX_TOOLWINDOW? -shane
-           0,                              /* Extended styles */
+           WS_EX_TOOLWINDOW,                              /* Extended styles */
            szToolWindowClassName,         /* Classname */
            "Tools",                         /* Title Text */
            WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_VSCROLL, /* defaultwindow */
@@ -606,6 +606,9 @@ int setupToolWindow()
            NULL                     /* No Window Creation data */
            );
 
+    /* modify tab control's window procedure address */
+    oldTabControlProc=(WNDPROC)SetWindowLong(hToolWindowTabControl,GWL_WNDPROC,(long)&ToolWindowTabControlProcedure);
+
     /* add tabs to tab-control */
     tie.mask=TCIF_TEXT+TCIF_PARAM;;
     tie.pszText="Display";
@@ -630,7 +633,7 @@ int setupToolWindow()
            0,                               /* Extended styles */
            szStaticControl,                 /* pre-defined static text control classname */
            "Channel Selection",         /* text to be displayed */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* window styles */
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, /* window styles */
            SPACING_FOR_BOARDER,             /* left position relative to tab control */
            SPACING_FOR_TAB_HEIGHT,          /* top position relative to tab control */
            rect.right,                      /* the width of the container */
@@ -645,7 +648,7 @@ int setupToolWindow()
            0,                                /* Extended styles */
            szStaticControl,                  /* pre-defined classname for static text control */
            "Query tab container",            /* text to display */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* styles */
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, /* styles */
            SPACING_FOR_BOARDER,             /* left position relative to tab control */
            SPACING_FOR_TAB_HEIGHT,          /* top position relative to tab control */
            rect.right,                      /* the width of the container */
@@ -764,7 +767,7 @@ int setupToolWindow()
            0,                   /* Extended possibilites for variation */
            szStaticControl,     /* Classname */
            name,        		/* Title Text */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, /* defaultwindow */
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, /* defaultwindow */
            20,       			/* Windows decides the position */
            40 + (20 * i),       /* where the window end up on the screen */
            100,                 /* The programs width */
@@ -778,6 +781,31 @@ int setupToolWindow()
 	}
     
     return true;
+}
+
+
+inline void drawStatic(DRAWITEMSTRUCT *dis)
+{   
+    char str[255]; //[255]="text to draw";
+    int len,x,y;
+    SIZE size;  
+
+    GetWindowText(dis->hwndItem,(LPSTR)str,(int)255);
+    len=strlen(str);
+    SelectObject(dis->hDC,hTabPen);
+//    if (dis->itemState==ODS_SELECTED)
+        SelectObject(dis->hDC,hTabSelectedFont);
+//    else
+//        SelectObject(dis->hDC,hTabNonSelectedFont);
+    SetTextColor(dis->hDC,0);
+    SelectObject(dis->hDC,hTabBrush);
+    GetTextExtentPoint32(dis->hDC,str,len,&size);
+//    x=dis->rcItem.left+(dis->rcItem.right-dis->rcItem.left)/2-size.cx/2;
+//    y=dis->rcItem.top+(dis->rcItem.bottom-dis->rcItem.top)/2-size.cy/2;
+    x=dis->rcItem.left;
+    y=dis->rcItem.top;
+    Rectangle(dis->hDC,dis->rcItem.left,dis->rcItem.top,dis->rcItem.right,dis->rcItem.bottom);
+    TextOut(dis->hDC,10,10,(char*)str,len);
 }
 
 /* draw a tab on the screen */
@@ -817,6 +845,7 @@ inline void measureTab(MEASUREITEMSTRUCT *mis)
     mis->itemHeight=size.cy+2*TEXT_MARGIN;                                   /* set height of tab */
 }
 
+
 /* setup up tool window's fonts & brushes for drawing */
 inline void setupDrawingObjects(HWND hwnd)
 {
@@ -831,6 +860,23 @@ inline void setupDrawingObjects(HWND hwnd)
     hTabBrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
     ReleaseDC(hToolWindowTabControl,hdc);            
 }    
+
+/* This function is called by the Windowsfunction DispatchMessage( ) */
+LRESULT CALLBACK ToolWindowTabControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)                  /* handle the messages */
+    {
+        /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
+        case WM_DRAWITEM:
+            if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
+                drawStatic((DRAWITEMSTRUCT*)lParam);
+            break; 
+                        
+        default:
+            break;
+    }        
+    return CallWindowProc(oldTabControlProc,hwnd,message,wParam,lParam);
+}
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -898,12 +944,18 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             toolWindowIsSnapped=snapWindowByMoving(hMainWindow,(RECT*)lParam);
             break;
 
-       case WM_DRAWITEM:
-            drawTab((DRAWITEMSTRUCT*)lParam);
+        /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
+        case WM_DRAWITEM:
+            if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_TAB)
+                drawTab((DRAWITEMSTRUCT*)lParam);
+            else
+                drawStatic((DRAWITEMSTRUCT*)lParam);
             break;           
-        
+
+        /* WM_MEASUREITEM: an ownerdraw control needs to be measured */        
         case WM_MEASUREITEM:
-            measureTab((MEASUREITEMSTRUCT*)lParam);
+            if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_TAB)
+                measureTab((MEASUREITEMSTRUCT*)lParam);
             break;
       
         /* WM_CLOSE: system or user has requested to close the window/application */              

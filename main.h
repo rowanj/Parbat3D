@@ -24,6 +24,7 @@ void loadFile();
 LRESULT CALLBACK MainWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ImageWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ToolWindowProcedure(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK ToolWindowTabControlProcedure(HWND, UINT, WPARAM, LPARAM);
 
 int setupImageWindow();
 
