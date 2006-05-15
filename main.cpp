@@ -56,6 +56,10 @@ enum {DISPLAY_TAB_ID,QUERY_TAB_ID};
 /* Used for loading and saving window position and sizes */
 settings winPos ("settings.ini");
 
+HFONT hTabSelectedFont,hTabNonSelectedFont;
+HPEN hTabPen;
+HBRUSH hTabBrush;
+
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 
@@ -591,7 +595,7 @@ int setupToolWindow()
            0,                       /* Extended possibilites for variation */
            WC_TABCONTROL,           /* Classname */
            "Tools",                 /* Title Text */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | TCS_OWNERDRAWFIXED,
            0,                       /* Top co-ord relative to tool window */
            0,                       /* Left co-ord relative to tool window */
            rect.right,              /* Set width to tool window's client area width */
@@ -603,11 +607,13 @@ int setupToolWindow()
            );
 
     /* add tabs to tab-control */
-    tie.mask=TCIF_TEXT;
+    tie.mask=TCIF_TEXT+TCIF_PARAM;;
     tie.pszText="Display";
+    tie.lParam=(DWORD)tie.pszText;
     TabCtrl_InsertItem(hToolWindowTabControl, DISPLAY_TAB_ID, &tie);
-    tie.mask=TCIF_TEXT;
+    tie.mask=TCIF_TEXT+TCIF_PARAM;;   
     tie.pszText="Query";
+    tie.lParam=(DWORD)tie.pszText;    
     TabCtrl_InsertItem(hToolWindowTabControl, QUERY_TAB_ID, &tie);
 
     /* get size of tab control's client area (the area inside the tab control) */
@@ -774,6 +780,58 @@ int setupToolWindow()
     return true;
 }
 
+/* draw a tab on the screen */
+inline void drawTab(DRAWITEMSTRUCT *dis)
+{   
+    char *str;
+    int len,x,y;
+    SIZE size;  
+    //GetWindowTextA(dis->hwndItem,(LPSTR)str,(int)255);
+
+    str=(char*)dis->itemData;
+    len=strlen(str);
+    SelectObject(dis->hDC,hTabPen);
+    if (dis->itemState==ODS_SELECTED)
+        SelectObject(dis->hDC,hTabSelectedFont);
+    else
+        SelectObject(dis->hDC,hTabNonSelectedFont);
+    SelectObject(dis->hDC,hTabBrush);
+    GetTextExtentPoint32(dis->hDC,str,len,&size); 
+    x=dis->rcItem.left+(dis->rcItem.right-dis->rcItem.left)/2-size.cx/2;
+    y=dis->rcItem.top+(dis->rcItem.bottom-dis->rcItem.top)/2-size.cy/2;
+    Rectangle(dis->hDC,dis->rcItem.left,dis->rcItem.top,dis->rcItem.right,dis->rcItem.bottom);
+    TextOut(dis->hDC,x,y,(char*)str,len);
+}
+
+/* calculate the size of a tab */
+inline void measureTab(MEASUREITEMSTRUCT *mis)
+{
+    const int TEXT_MARGIN=5;
+    SIZE size;
+    HDC hdc=GetDC(hToolWindow);                                              /* get device context (drawing) object */
+    SelectObject(hdc,hTabSelectedFont);                                                 /* set font that will be used for drawing text */    
+    GetTextExtentPoint32(hdc,(char*)mis->itemData,strlen((char*)mis->itemData),&size);     /* get width of string in pixels */   
+    ReleaseDC(hToolWindow,hdc);                                              /* free device context handle */
+    
+    mis->itemWidth=size.cx+2*TEXT_MARGIN;                                    /* set width of tab */
+    mis->itemHeight=size.cy+2*TEXT_MARGIN;                                   /* set height of tab */
+}
+
+/* setup up tool window's fonts & brushes for drawing */
+inline void setupDrawingObjects(HWND hwnd)
+{
+    HDC hdc;
+    
+    hdc=GetDC(hwnd);      
+    hTabNonSelectedFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
+    hTabSelectedFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
+    hTabPen=CreatePen(PS_SOLID,1,GetSysColor(COLOR_3DFACE));          
+    ReleaseDC(hwnd,hdc);
+    hdc=GetDC(hToolWindowTabControl);             
+    hTabBrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
+    ReleaseDC(hToolWindowTabControl,hdc);            
+}    
+
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -781,7 +839,10 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
     NMHDR *nmhdr;                     /* structure used for WM_NOTIFY events */
             
     switch (message)                  /* handle the messages */
-    {    
+    {
+        case WM_CREATE:
+            setupDrawingObjects(hwnd);    /* setup fonts, brushes, etc */
+            break;                
         
         /* WM_NOTIFY: notification of certain events related to controls */
         case WM_NOTIFY:
@@ -835,6 +896,14 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             
             /* if new position is near main window, snap to it */    
             toolWindowIsSnapped=snapWindowByMoving(hMainWindow,(RECT*)lParam);
+            break;
+
+       case WM_DRAWITEM:
+            drawTab((DRAWITEMSTRUCT*)lParam);
+            break;           
+        
+        case WM_MEASUREITEM:
+            measureTab((MEASUREITEMSTRUCT*)lParam);
             break;
       
         /* WM_CLOSE: system or user has requested to close the window/application */              
