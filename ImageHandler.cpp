@@ -63,9 +63,7 @@ ImageHandler::~ImageHandler(void)
 {
 	delete gl_overview;
 	delete gl_image;
-#if TMP_USE_IMAGE_FILE
 	delete image_file;
-#endif
 }
 
 void ImageHandler::redraw(void)
@@ -107,12 +105,15 @@ void ImageHandler::redraw(void)
 	gl_image->GLswap();
 }
 
-#if TMP_USE_IMAGE_FILE
 ImageProperties* ImageHandler::get_image_properties(void)
 {
-	;
+	return image_file->getImageProperties();
 }
-#endif
+
+BandInfo* ImageHandler::get_band_info(int band_number)
+{
+	return image_file->getBandInfo(band_number);
+}
 
 void ImageHandler::resize_window(void)
 {

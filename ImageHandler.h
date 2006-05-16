@@ -33,6 +33,7 @@ public:
 	virtual ~ImageHandler(void);
 	void redraw(void);
 	ImageProperties* get_image_properties(void);
+	BandInfo* get_band_info(int band_number);
 	void resize_window(void);
 	PRECT get_viewport(void);
 	PRECT set_viewport(void);
