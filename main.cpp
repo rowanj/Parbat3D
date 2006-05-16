@@ -407,12 +407,18 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 /* All messages/events related to one of the display windows are sent to this procedure */
 LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    PAINTSTRUCT ps;
+    static int npaints=0;
     
     switch (message)                  /* handle the messages */
     {
 		/* Re-draw OpenGL stuff */
 		case WM_PAINT:
+            BeginPaint(hwnd,&ps);
 			if (image_handler) image_handler->redraw();
+			EndPaint(hwnd,&ps);
+			npaints++;
+			SetWindowText(hMainWindow,makeMessage("npaints",npaints));
 			break;
 
     default:                   /* for messages that we don't deal with */
@@ -581,9 +587,6 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             PostQuitMessage (0);
             return 0;
             
-        case WM_PAINT:
-			if (image_handler) image_handler->redraw();
-			break;
             
         // Re-size OpenGL
 		case WM_SIZE:
