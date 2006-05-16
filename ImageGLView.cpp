@@ -69,9 +69,6 @@ ImageGLView::ImageGLView(HWND hWindow)
 
 ImageGLView::~ImageGLView()
 {
-	#if DEBUG_IMAGE_HANDLER
-	MessageBox (NULL, "Destroying ImageGLView.", "Parbat3D :: ImageHandler", 0);
-	#endif
 	wglMakeCurrent(NULL, NULL);
 	wglDeleteContext(rendering_context);
 	ReleaseDC(window_handle, device_context);
