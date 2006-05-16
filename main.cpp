@@ -716,7 +716,22 @@ int setupToolWindow()
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
 			);
-
+	
+	/* Create container for band values */
+	HWND queryValueContainer = CreateWindowEx(
+	    	0,
+			"BUTTON",
+			"Values", //title
+			WS_CHILD | BS_GROUPBOX | WS_VISIBLE,
+			138, //int x,
+			25, //int y, CW_USEDEFAULT
+			66, //int nWidth,
+			20 + (20 * bands), //int nHeight
+			hToolWindowQueryTabContainer, //parent window     
+			NULL, //no menu
+			hThisInstance, //HINSTANCE hInstance,
+			NULL //pointer not needed
+			);
 
 	/* Dynamically add Radio buttons */
 	redRadiobuttons=new HWND[bands];
@@ -786,8 +801,40 @@ int setupToolWindow()
            NULL,                /* No menu */
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
-           );     
-		
+           );
+           
+           /* add channel names under the query tab */
+        CreateWindowEx(
+	    	0,
+			szStaticControl,
+			name, //title
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, /* defaultwindow */
+			20, //int x,
+			40 + (20 * i), //int y, CW_USEDEFAULT
+			100, //int nWidth,
+			18, //int nHeight
+			hToolWindowQueryTabContainer, //parent window     
+			NULL, //no menu
+			hThisInstance, //HINSTANCE hInstance,
+			NULL //pointer not needed
+			);
+			
+			/* add the band values to the value container under the query tab */
+        char tempBandValue[4] = "128"; // temporary storage for the band value
+        CreateWindowEx(
+	    	0,
+			szStaticControl,
+			tempBandValue, //title
+			WS_CHILD | WS_VISIBLE,
+			5, //int x,
+			15 + (20 * i), //int y, CW_USEDEFAULT
+			50, //int nWidth,
+			18, //int nHeight
+			queryValueContainer, //parent window     
+			NULL, //no menu
+			hThisInstance, //HINSTANCE hInstance,
+			NULL //pointer not needed
+			);
 	}
     
     return true;
