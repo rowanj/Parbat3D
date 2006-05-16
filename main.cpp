@@ -1480,7 +1480,14 @@ void loadFile()
 				if (image_handler->status < 0) { // Error occurred, but was non-fatal
 					MessageBox (NULL, image_handler->error_text , "[warning] Parbat3D :: ImageHandler", 0);
 				}
+    			else
+    			{
+                    // Image loaded succesfully, so update opengl displays
+                    RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
+                    RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
+                }				
 			}
+
 		} else { // Object wasn't created - this is probably terminal
 			MessageBox (NULL, "[error] Could not instantiate ImageHandler." , "Parbat3D :: ImageHandler", 0);
 			// !! Should probably die gracefully at this point - Rowan
