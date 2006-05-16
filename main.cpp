@@ -57,8 +57,8 @@ enum {DISPLAY_TAB_ID,QUERY_TAB_ID};
 /* Used for loading and saving window position and sizes */
 settings winPos ("settings.ini");
 
-/* objects used for drawing tab's & static controls */
-HFONT hTabSelectedFont,hTabNonSelectedFont;
+/* objects used for painting/drawing */
+HFONT hBoldFont,hNormalFont;
 HPEN hTabPen;
 HBRUSH hTabBrush;
 WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc;
@@ -173,6 +173,12 @@ int setupMainWindow()
     /* get client area of image window */
     GetClientRect(hMainWindow,&rect);
 
+    /* setup font objects */
+    HDC hdc=GetDC(hMainWindow);      
+    hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
+    hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
+    ReleaseDC(hMainWindow,hdc);    
+
     /* create a child window that will be used by OpenGL */
     hMainWindowDisplay=CreateWindowEx(
            0,                   /* Extended possibilites for variation */
@@ -188,6 +194,7 @@ int setupMainWindow()
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
            );
+   
     
     /* Make the window visible on the screen */
     ShowWindow(hMainWindow, SW_SHOW);
@@ -355,31 +362,51 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
     static HDC hdc;
     static RECT rect;
     static HBRUSH hbrush;
+    static SIZE textSize;
+    static POINT textPos;
+    static char text[]="No Image Loaded";
+    const int textLen=16;
     
     switch (message)                  /* handle the messages */
     {
         case WM_CREATE:
-//            hbrush=CreateSolidBrush(0);
+            /* init variables used for painting "No Image Loaded" message */
+            hbrush=CreateSolidBrush(0);
+            hdc=GetDC(hwnd);                                                                      /* get device context (drawing) object */
+            SelectObject(hdc,hNormalFont);                                                   /* set font that will be used for drawing text */    
+            GetTextExtentPoint32(hdc,text,textLen,&textSize);     /* get width & height of string in pixels */   
+            ReleaseDC(hwnd,hdc);
+            
             break;            
         case WM_SIZE:           
-            /* Re-size OpenGL stuff */
-            if (image_handler) image_handler->resize_window();
-
-//            GetClientRect(hwnd,&rect);
+            if (image_handler) 
+            {
+                /* Re-size OpenGL stuff */
+                image_handler->resize_window();
+            }    
+            else
+            {
+                /* re-position message */
+                GetClientRect(hwnd,&rect);
+                textPos.x=(rect.right-rect.left)/2 - textSize.cx/2;
+                textPos.y=(rect.bottom-rect.top)/2 - textSize.cy/2;            
+            }    
             break;
             
-		/* Re-draw OpenGL stuff */
 		case WM_PAINT:
             hdc=BeginPaint(hwnd,&ps);
 			if (image_handler)
+    			/* Re-draw OpenGL stuff */
                 image_handler->redraw();
             else
             {
-//                SelectObject(hdc,hbrush);
-//                Rectangle(hdc,0,0,rect.right,rect.bottom);
-//                SetTextColor(hdc,RGB(255,255,255));
-//                SetBkColor(hdc,0);
-//                TextOut(hdc,10,10,"No Image Loaded",16);
+                /* Display "No Image Loaded" on black background */
+                SelectObject(hdc,hbrush);
+                Rectangle(hdc,0,0,rect.right,rect.bottom);
+                SelectObject(hdc,hNormalFont);
+                SetTextColor(hdc,RGB(255,255,255));
+                SetBkColor(hdc,0);
+                TextOut(hdc,textPos.x,textPos.y,text,textLen);
             }
 			EndPaint(hwnd,&ps);
 			break;
@@ -890,22 +917,23 @@ int setupToolWindow()
     return true;
 }
 
-/* draw static text on the screen */
+/* draw a static text control on the screen */
 inline void drawStatic(DRAWITEMSTRUCT *dis)
 {   
-    char str[255]; //[255]="text to draw";
+    char str[255];
     int len,x,y;
     SIZE size;  
 
     GetWindowText(dis->hwndItem,(LPSTR)str,(int)255);
     len=strlen(str);
-    SelectObject(dis->hDC,hTabPen);
-    SelectObject(dis->hDC,hTabNonSelectedFont);
-    SetTextColor(dis->hDC,0);
-    SelectObject(dis->hDC,hTabBrush);
-    GetTextExtentPoint32(dis->hDC,str,len,&size);
-    Rectangle(dis->hDC,dis->rcItem.left,dis->rcItem.top,dis->rcItem.right,dis->rcItem.bottom);
-    TextOut(dis->hDC,dis->rcItem.left,dis->rcItem.top,(char*)str,len);
+    
+    SelectObject(dis->hDC,hTabPen);                                                             // set border
+    SelectObject(dis->hDC,hNormalFont);                                                         // set font
+    SetTextColor(dis->hDC,0);                                                                   // set text colour to black
+    SelectObject(dis->hDC,hTabBrush);                                                           // set background fill
+    GetTextExtentPoint32(dis->hDC,str,len,&size);                                               // get size of string
+    Rectangle(dis->hDC,dis->rcItem.left,dis->rcItem.top,dis->rcItem.right,dis->rcItem.bottom);  // display background rectangle
+    TextOut(dis->hDC,dis->rcItem.left,dis->rcItem.top,(char*)str,len);                          // display text
 }
 
 /* draw a tab on the screen */
@@ -918,15 +946,22 @@ inline void drawTab(DRAWITEMSTRUCT *dis)
 
     str=(char*)dis->itemData;
     len=strlen(str);
-    SelectObject(dis->hDC,hTabPen);
+   
+    /* set font (based on whether the tab is selected) */
     if (dis->itemState==ODS_SELECTED)
-        SelectObject(dis->hDC,hTabSelectedFont);
+        SelectObject(dis->hDC,hBoldFont);
     else
-        SelectObject(dis->hDC,hTabNonSelectedFont);
-    SelectObject(dis->hDC,hTabBrush);
+        SelectObject(dis->hDC,hNormalFont);
+
+    SelectObject(dis->hDC,hTabPen);                                     /* set border style/colour */   
+    SelectObject(dis->hDC,hTabBrush);                                   /* set background fill brush */    
+    
+    /* calculate position based on size of string in pixels */
     GetTextExtentPoint32(dis->hDC,str,len,&size); 
     x=dis->rcItem.left+(dis->rcItem.right-dis->rcItem.left)/2-size.cx/2;
     y=dis->rcItem.top+(dis->rcItem.bottom-dis->rcItem.top)/2-size.cy/2;
+
+    /* display background rectangle & text on screen */
     Rectangle(dis->hDC,dis->rcItem.left,dis->rcItem.top,dis->rcItem.right,dis->rcItem.bottom);
     TextOut(dis->hDC,x,y,(char*)str,len);
 }
@@ -937,7 +972,7 @@ inline void measureTab(MEASUREITEMSTRUCT *mis)
     const int TEXT_MARGIN=5;
     SIZE size;
     HDC hdc=GetDC(hToolWindow);                                              /* get device context (drawing) object */
-    SelectObject(hdc,hTabSelectedFont);                                                 /* set font that will be used for drawing text */    
+    SelectObject(hdc,hBoldFont);                                                 /* set font that will be used for drawing text */    
     GetTextExtentPoint32(hdc,(char*)mis->itemData,strlen((char*)mis->itemData),&size);     /* get width of string in pixels */   
     ReleaseDC(hToolWindow,hdc);                                              /* free device context handle */
     
@@ -951,11 +986,7 @@ inline void setupDrawingObjects(HWND hwnd)
 {
     HDC hdc;
     
-    hdc=GetDC(hwnd);      
-    hTabNonSelectedFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
-    hTabSelectedFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
     hTabPen=CreatePen(PS_SOLID,1,GetSysColor(COLOR_3DFACE));          
-    ReleaseDC(hwnd,hdc);
     hdc=GetDC(hToolWindowTabControl);             
     hTabBrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
     ReleaseDC(hToolWindowTabControl,hdc);            
