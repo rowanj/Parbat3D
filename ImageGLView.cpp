@@ -63,6 +63,8 @@ ImageGLView::ImageGLView(HWND hWindow)
 		status = 6;
 		error_text = "Could not make rendering context current.";
 	}
+	
+	this->GLresize();
 }
 
 ImageGLView::~ImageGLView()
@@ -83,16 +85,14 @@ void ImageGLView::GLresize(void)
 	GetWindowRect(window_handle, window_rect);
 	width = window_rect->right - window_rect->left;
 	height = window_rect->bottom - window_rect->top;
+	free(window_rect); 
+	
 	if (height == 0) height = 1; // prevent div 0
+	window_height = height;
+	window_width = width;
+	
+	this->make_current();
 	glViewport(0,0,width,height);
-	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
-	glLoadIdentity();									// Reset The Projection Matrix
-	// Calculate The Aspect Ratio Of The Window
-	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.5f,100.0f);
-	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
-	glLoadIdentity();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	free(window_rect);
 }
 
 void ImageGLView::make_current()
@@ -103,5 +103,15 @@ void ImageGLView::make_current()
 void ImageGLView::GLswap()
 {
 	SwapBuffers(device_context);
+}
+
+int ImageGLView::height()
+{
+	return window_height;
+}
+
+int ImageGLView::width()
+{
+	return window_width;
 }
 

@@ -14,10 +14,14 @@ public:
 	void GLresize(void);
 	void GLswap(void);
 	
+	int width(void);
+	int height(void);
+	
 	int status;
 	const char* error_text;
 
 private:
+	int window_height, window_width;
 	HWND window_handle;
 	HDC device_context;
 	HGLRC rendering_context;

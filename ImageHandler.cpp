@@ -28,16 +28,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	
 	hOverview = overview_hwnd;
 	hImage = image_hwnd;
-	
-	// Initialize image file (could be threaded)
-#if TMP_USE_IMAGE_FILE
-	image_file = new ImageFile(filename);
-	image_file->printInfo();
-#else
-	status = -1; // negative should be treated as non-fatal
-	error_text = "Not using ImageFile.";
-#endif	
-	
+		
 	/* Initialize OpenGL*/
 	gl_overview = new ImageGLView(hOverview);
 	if (!gl_overview) {
@@ -60,6 +51,15 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		MessageBox (NULL, "Successfully created ImageGLView for image window.", "Parbat3D :: ImageHandler", 0);
 	}
 	#endif
+	
+		// Initialize image file (could be threaded)
+#if TMP_USE_IMAGE_FILE
+	image_file = new ImageFile(filename);
+	image_file->printInfo();
+#else
+	status = -1; // negative should be treated as non-fatal
+	error_text = "Not using ImageFile.";
+#endif	
 }
 
 ImageHandler::~ImageHandler(void)
@@ -76,7 +76,7 @@ void ImageHandler::redraw(void)
 	// Overview window
 	gl_overview->make_current();
 	glClearColor(0.1f, 0.3f, 0.1f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 #if DEBUG_IMAGE_REDRAW
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -87,8 +87,6 @@ void ImageHandler::redraw(void)
 		glColor3f(1.0,1,0);
 		glVertex3i(0,0,0);
 		glVertex3i(0,1,0);
-//		glVertex3i(1,1,0);
-//		glVertex3i(1,0,0);
 	glEnd();
 #endif
 	gl_overview->GLswap();
