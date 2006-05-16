@@ -53,6 +53,10 @@ private:
 #if TMP_USE_IMAGE_FILE
 	ImageFile* image_file;
 #endif
+#if DEBUG_IMAGE_REDRAW
+	float redraw_rotz;
+#endif
+
 };
 
 #endif

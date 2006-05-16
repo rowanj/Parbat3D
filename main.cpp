@@ -83,11 +83,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     {
         /* Send message to associated WindowProcedure */
         DispatchMessage(&messages);
-        // Ensure OpenGL viewport is fully drawn
-        // !! This *does* slow the program down, would be a good idea to
-        //		trigger it on expose events instead; but couln't figure that
-        //		one out myself - under X11 would be WM_REDRAW message.
-		if (image_handler) image_handler->redraw();
     }
 
     /* The program returvalue is 0 - The value that PostQuitMessage( ) gave */
@@ -194,6 +189,11 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
     
     switch (message)                  /* handle the messages */
     {
+		/* Re-draw OpenGL stuff */
+		case WM_PAINT:
+			if (image_handler) image_handler->redraw();
+			break;
+			
         /* WM_CREATE: window has been created */
         case WM_CREATE:                
             hImageWindow=NULL;
@@ -336,6 +336,8 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                    */
                     break;
             }
+            /* Re-size OpenGL stuff */
+			if (image_handler) image_handler->resize_window();
             break;   
                      
         /* WM_CLOSE: system or user has requested to close the window/application */
@@ -525,6 +527,14 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
 			/* send a message that will cause WinMain to exit the message loop */
             PostQuitMessage (0);
             return 0;
+            
+        case WM_PAINT:
+			if (image_handler) image_handler->redraw();
+			break;
+            
+        // Re-size OpenGL
+		case WM_SIZE:
+			if (image_handler) image_handler->resize_window();
 
         default:
             /* let windows handle any unknown messages */

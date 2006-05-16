@@ -3,6 +3,7 @@
 #include <gl/gl.h>
 #include <gl/glu.h>
 
+
 ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 {
 	status = 0; // No error
@@ -72,12 +73,28 @@ ImageHandler::~ImageHandler(void)
 
 void ImageHandler::redraw(void)
 {
+	// Overview window
 	gl_overview->make_current();
-	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.1f, 0.3f, 0.1f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);;
+#if DEBUG_IMAGE_REDRAW
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glRotatef(redraw_rotz, 0.0,0.0,1.0);
+	redraw_rotz-=1.0;
+	if(redraw_rotz < -360.0) redraw_rotz+=360.0;
+	glBegin(GL_LINES);
+		glColor3f(1.0,1,0);
+		glVertex3i(0,0,0);
+		glVertex3i(0,1,0);
+//		glVertex3i(1,1,0);
+//		glVertex3i(1,0,0);
+	glEnd();
+#endif
 	gl_overview->GLswap();
+	// Main image window
 	gl_image->make_current();
-	glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.3f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	gl_image->GLswap();
 }
