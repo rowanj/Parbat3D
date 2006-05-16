@@ -1,6 +1,5 @@
 #ifndef _IMAGE_PROPERTIES_H
 #define _IMAGE_PROPERTIES_H
-#if TMP_USE_IMAGE_FILE
 #include <iosfwd>
 #include <cstdio>
 #include <math.h>
@@ -34,7 +33,4 @@ class ImageProperties
 		const char* driverName;
 		const char* driverLongName;
 };
-#endif
-
-
 #endif
