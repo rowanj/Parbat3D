@@ -188,21 +188,6 @@ int setupMainWindow()
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
            );
-//    hMainWindowDisplay=CreateWindowEx(
-////           0,                   /* Extended possibilites for variation */
-  //         szStatic...        /* Classname */
-    //       NULL,         /* Title Text */
-      //     WS_CHILD|WS_VISIBLE, /* styles */
-        //   rect.left,       /* x position based on parent window */
-          // rect.top,         /* y position based on parent window */
-//           rect.right,                 /* The programs width */
-//           rect.bottom,                 /* and height in pixels */
-//           hMainWindow,        /* The window's parent window */
-//           NULL,                /* No menu */
-//           hThisInstance,       /* Program Instance handler */
-//           NULL                 /* No Window Creation data */
-//           );
-
     
     /* Make the window visible on the screen */
     ShowWindow(hMainWindow, SW_SHOW);
@@ -221,14 +206,10 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
     static RECT prevToolWindowRect;         /* tool window position before it was moved */
     static int toolWindowIsMovingToo;       /* whether or not the tool window should be moved with the main window */
     static int imageWindowIsMovingToo;      /* whether or not the image window should be moved with the main window */
+    static RECT rect;                       /* for general use */
     
     switch (message)                  /* handle the messages */
     {
-		/* Re-draw OpenGL stuff 
-            note: know done in display control's own window procedure */
-		//case WM_PAINT:
-		//	if (image_handler) image_handler->redraw();
-		//	break;
 			
         /* WM_CREATE: window has been created */
         case WM_CREATE:                
@@ -331,49 +312,9 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
         /* WM_SIZE: the window has been re-sized, minimized, maximised or restored */
         case WM_SIZE:
-            WINDOWPLACEMENT wp;
-            /* wParam=how the window size has changed */
-            switch(wParam)
-            {
-                case SIZE_MINIMIZED:
-                   /* hide other windows when main window is minized */
-                   /*  (now done automatically)
-                   if ((hImageWindow)&&(hToolWindow))
-                   {
-                       GetWindowPlacement(hImageWindow,&wp);
-                       wp.showCmd=SW_MINIMIZE;
-                       SetWindowPlacement(hImageWindow,&wp);
-                       
-                       GetWindowPlacement(hToolWindow,&wp);
-                       wp.showCmd=SW_MINIMIZE;
-                       SetWindowPlacement(hToolWindow,&wp);
-                   }*/
-                    break;
-                case SIZE_RESTORED:
-                   /* restore other windows when main window is restored */
-                   /* (now done automatically)
-                   if ((hImageWindow)&&(hToolWindow))
-                   {
-                   
-                       GetWindowPlacement(hImageWindow,&wp);
-                       if ((wp.showCmd==SW_MINIMIZE)||(wp.showCmd==SW_SHOWMINIMIZED))
-                       {
-                          wp.showCmd=SW_RESTORE;
-                          SetWindowPlacement(hImageWindow,&wp);                                                                                     
-                       }
-                       GetWindowPlacement(hToolWindow,&wp);
-                       if ((wp.showCmd==SW_MINIMIZE)||(wp.showCmd==SW_SHOWMINIMIZED))
-                       {
-                          wp.showCmd=SW_RESTORE;
-                          SetWindowPlacement(hToolWindow,&wp);                                                                                                                                                                          
-                       }
-                   
-                   }
-                   */
-                    break;
-            }
-            /* Re-size OpenGL stuff */
-			if (image_handler) image_handler->resize_window();
+            /* resize display/opengl window to fit new size */
+            GetClientRect(hMainWindow,&rect);
+            MoveWindow(hMainWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
             break;   
                      
         /* WM_CLOSE: system or user has requested to close the window/application */
@@ -420,7 +361,10 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
         case WM_CREATE:
 //            hbrush=CreateSolidBrush(0);
             break;            
-        case WM_SIZE:
+        case WM_SIZE:           
+            /* Re-size OpenGL stuff */
+            if (image_handler) image_handler->resize_window();
+
 //            GetClientRect(hwnd,&rect);
             break;
             
@@ -531,6 +475,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
     static POINT moveMouseOffset;     /* mouse offset relative to window, used for snapping */
     static POINT sizeMousePosition;   /* mouse position, used for sizing window */
     static RECT  sizeWindowPosition;   /* window position, used for sizing window */
+    static RECT rect;                   /* for general use */
     
     switch (message)                  /* handle the messages */
     {
@@ -594,8 +539,10 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
         
         /* WM_SIZE: called when the window has been resized */
         case WM_SIZE:
-            if (image_handler)
-                image_handler->resize_window();
+
+            /* resize display/opengl window to fit new size */            
+            GetClientRect(hImageWindow,&rect);
+            MoveWindow(hImageWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
             break;
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
