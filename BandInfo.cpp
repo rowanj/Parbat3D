@@ -1,6 +1,5 @@
 #include "config.h"
 
-#if TMP_USE_IMAGE_FILE
 #include "BandInfo.h"
 
 BandInfo::BandInfo(GDALRasterBand* theBand)
@@ -134,5 +133,3 @@ BandInfo::~BandInfo(void)
 {
 	return;
 }
-		
-#endif //TMP_USE_IMAGE_FILE

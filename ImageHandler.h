@@ -7,10 +7,8 @@
 #include <windows.h>
 #endif
 
-#if TMP_USE_IMAGE_FILE
 #include "ImageFile.h"
 #include "ImageProperties.h"
-#endif
 #include "ImageGLView.h"
 
 
@@ -34,9 +32,7 @@ public:
 	void post_init(void); // We may need to do some initialization after object creation
 	virtual ~ImageHandler(void);
 	void redraw(void);
-#if TMP_USE_IMAGE_FILE
 	ImageProperties* get_image_properties(void);
-#endif
 	void resize_window(void);
 	PRECT get_viewport(void);
 	PRECT set_viewport(void);
@@ -50,9 +46,7 @@ private:
 	ImageGLView* gl_overview;
 	ImageGLView* gl_image;
 	HWND hOverview, hImage;
-#if TMP_USE_IMAGE_FILE
 	ImageFile* image_file;
-#endif
 #if DEBUG_IMAGE_REDRAW
 	float redraw_rotz;
 #endif

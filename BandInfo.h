@@ -1,7 +1,6 @@
 #ifndef _BAND_INFO_H
 #define _BAND_INFO_H
 
-#if TMP_USE_IMAGE_FILE
 #include <iosfwd>
 #include <cstdio>
 #include <math.h>
@@ -45,7 +44,5 @@ class BandInfo
 		double adfMinMax[2];
 		GDALRasterBand* band;
 };
-#endif //TMP_USE_IMAGE_FILE
-
 #endif //_BAND_INFO_H
 

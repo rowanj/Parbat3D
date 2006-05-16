@@ -1,5 +1,4 @@
 #include "config.h"
-#if TMP_USE_IMAGE_FILE
 #include "ImageFile.h"
 
 
@@ -99,4 +98,3 @@ void ImageFile::printInfo(void)
 		MessageBox (NULL, "Cannot get info; dataset was not loaded!", "Parbat3D :: ImageFile", 0);
 	}
 }
-#endif

@@ -12,7 +12,6 @@
 
 // Declare some packages as optional during initial implementation.
 //  This is to allow other packages to build for testing.
-#define TMP_USE_IMAGE_FILE 1 // !! will be deprecating this shortly - Rowan
 #define TMP_USE_SETTINGS 0
 
 // Platform-specific portions of code should test for the relevant PLATFORM_ define

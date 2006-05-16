@@ -53,12 +53,9 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	#endif
 	
 		// Initialize image file (could be threaded)
-#if TMP_USE_IMAGE_FILE
 	image_file = new ImageFile(filename);
+#if DEBUG_IMAGE_PROPERTIES
 	image_file->printInfo();
-#else
-	status = -1; // negative should be treated as non-fatal
-	error_text = "Not using ImageFile.";
 #endif	
 }
 

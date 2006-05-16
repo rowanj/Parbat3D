@@ -1,7 +1,6 @@
 #ifndef _COORDINATE_INFO_H
 #define _COORDINATE_INFO_H
 
-#if TMP_USE_IMAGE_FILE
 #include <iosfwd>
 #include <cstdio>
 #include <math.h>
@@ -25,7 +24,5 @@ class CoordinateInfo
 	private:
 		double geoTransform[6];
 };
-#endif
-
 #endif
 
