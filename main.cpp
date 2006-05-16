@@ -13,6 +13,7 @@ using namespace std;
 char szMainWindowClassName[] = "Parbat3D Main Window";
 char szImageWindowClassName[] = "Parbat3D Image Window";
 char szToolWindowClassName[] = "Parbat3D Tool Window";
+char szDisplayClassName[] = "Parbat3D Display Window";
 /* pre-defined class names for controls */
 char szStaticControl[] = "static";  /* static text control */
 
@@ -117,6 +118,24 @@ int setupMainWindow()
     /* Register the window class, if fails return false */
     if(!RegisterClassEx(&wincl)) return false;
     
+    
+    /* Create window class for the display control windows */
+    wincl.hInstance = hThisInstance;
+    wincl.lpszClassName = szDisplayClassName;
+    wincl.lpfnWndProc = DisplayWindowProcedure;      /* This function is called by windows */
+    wincl.style = CS_DBLCLKS;                 /* Ctach double-clicks */
+    wincl.cbSize = sizeof(WNDCLASSEX);
+    /* Use default icon and mousepointer */
+    wincl.hIcon = NULL;
+    wincl.hIconSm = NULL;
+    wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wincl.lpszMenuName = NULL; /* No menu */
+    wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
+    wincl.cbWndExtra = 0;                      /* structure or the window instance */
+    wincl.hbrBackground = NULL;
+    /* Register the window class, if fails return false */
+    if(!RegisterClassEx(&wincl)) return false;    
+    
     /* Get the stored window position or use defaults if there's a problem */
     int mx = atoi(winPos.getSetting("OverviewX").c_str());
 	int my = atoi(winPos.getSetting("OverviewY").c_str());
@@ -154,7 +173,7 @@ int setupMainWindow()
     /* create a child window that will be used by OpenGL */
     hMainWindowDisplay=CreateWindowEx(
            0,                   /* Extended possibilites for variation */
-           szStaticControl,         /* Classname */
+           szDisplayClassName,         /* Classname */
            NULL,         /* Title Text */
            WS_CHILD|WS_VISIBLE, /* styles */
            rect.left,       /* x position based on parent window */
@@ -166,6 +185,20 @@ int setupMainWindow()
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
            );
+//    hMainWindowDisplay=CreateWindowEx(
+////           0,                   /* Extended possibilites for variation */
+  //         szStatic...        /* Classname */
+    //       NULL,         /* Title Text */
+      //     WS_CHILD|WS_VISIBLE, /* styles */
+        //   rect.left,       /* x position based on parent window */
+          // rect.top,         /* y position based on parent window */
+//           rect.right,                 /* The programs width */
+//           rect.bottom,                 /* and height in pixels */
+//           hMainWindow,        /* The window's parent window */
+//           NULL,                /* No menu */
+//           hThisInstance,       /* Program Instance handler */
+//           NULL                 /* No Window Creation data */
+//           );
 
     
     /* Make the window visible on the screen */
@@ -173,7 +206,6 @@ int setupMainWindow()
     
     return true;
 }
-
 
 /* This function is called by the Windows function DispatchMessage( ) */
 /* All messages/events related to the main window (or it's controls) are sent to this procedure */
@@ -189,10 +221,11 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
     
     switch (message)                  /* handle the messages */
     {
-		/* Re-draw OpenGL stuff */
-		case WM_PAINT:
-			if (image_handler) image_handler->redraw();
-			break;
+		/* Re-draw OpenGL stuff 
+            note: know done in display control's own window procedure */
+		//case WM_PAINT:
+		//	if (image_handler) image_handler->redraw();
+		//	break;
 			
         /* WM_CREATE: window has been created */
         case WM_CREATE:                
@@ -366,7 +399,27 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             /* let windows peform the default operation based on the message */
             return DefWindowProc(hwnd, message, wParam, lParam);
     }
-    /* return 0 to indicate that we have processed the message */    
+    /* return true to indicate that we have processed the message */    
+    return 0; 
+}
+
+/* This function is called by the Windows function DispatchMessage( ) */
+/* All messages/events related to one of the display windows are sent to this procedure */
+LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    
+    switch (message)                  /* handle the messages */
+    {
+		/* Re-draw OpenGL stuff */
+		case WM_PAINT:
+			if (image_handler) image_handler->redraw();
+			break;
+
+    default:                   /* for messages that we don't deal with */
+            /* let windows peform the default operation based on the message */
+            return DefWindowProc(hwnd, message, wParam, lParam);
+    }			
+    /* return true to indicate that we have processed the message */    
     return 0; 
 }
 
@@ -425,7 +478,7 @@ int setupImageWindow()
     /* create a child window that will be used by OpenGL */
     hImageWindowDisplay=CreateWindowEx(
            0,                   /* Extended possibilites for variation */
-           szStaticControl,         /* Classname */
+           szDisplayClassName,         /* Classname */
            NULL,         /* Title Text */
            WS_CHILD+WS_VISIBLE, /* styles */
            rect.left,       /* x position based on parent window */
