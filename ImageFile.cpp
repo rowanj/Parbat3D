@@ -47,6 +47,24 @@ ImageFile::~ImageFile(void)
 	}
 }
 
+ImageProperties* ImageFile::getImageProperties(void)
+{
+	return properties;
+}
+
+BandInfo* ImageFile::getBandInfo(int bandNumber)
+{
+	if ((bandNumber <= properties->getNumBands()) && (bandNumber > 0))
+	{
+		return theBands[bandNumber-1];
+	}
+	else
+	{
+		MessageBox (NULL, "Band could not be retrieved: index out of range!", "Parbat3D :: ImageFile", 0);
+		return NULL;
+	}
+}
+
 /*Prints some basic info about the dataset: driver, driver long name, x size, y size
 and the number of raster bands.*/
 void ImageFile::printInfo(void)
@@ -54,7 +72,6 @@ void ImageFile::printInfo(void)
 	const char* message;
 	string leader;
 	
-	#if DEBUG_IMAGE_PROPERTIES
 	if (ifDataset != NULL)
 	{
 		leader = "Driver: ";
@@ -81,6 +98,5 @@ void ImageFile::printInfo(void)
 	{
 		MessageBox (NULL, "Cannot get info; dataset was not loaded!", "Parbat3D :: ImageFile", 0);
 	}
-	#endif // DEBUG_IMAGE_PROPERTIES
 }
 #endif

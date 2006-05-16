@@ -34,6 +34,8 @@ class ImageFile
 public:
 	ImageFile(char* theFilename);
 	virtual ~ImageFile(void);
+	ImageProperties* getImageProperties(void);
+	BandInfo* getBandInfo(int bandNumber);
 	void printInfo(void);
 	
 private:

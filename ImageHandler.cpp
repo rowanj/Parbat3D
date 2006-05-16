@@ -77,9 +77,21 @@ void ImageHandler::redraw(void)
 	gl_overview->make_current();
 	glClearColor(0.1f, 0.3f, 0.1f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#if DEBUG_IMAGE_REDRAW
+	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+//	gluLookAt(0.0, -2.0, -2.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0);
+
+//	glPushMatrix();
+	glBegin(GL_QUADS);
+		glColor3f(0.5, 0.5, 0.5);
+		glVertex3i(-1, 1, 0);
+		glVertex3i( 1, 1, 0);
+		glVertex3i( 1,-1, 0);
+		glVertex3i(-1,-1, 0);
+	glEnd();
+	
+#if DEBUG_IMAGE_REDRAW
 	glRotatef(redraw_rotz, 0.0,0.0,1.0);
 	redraw_rotz-=1.0;
 	if(redraw_rotz < -360.0) redraw_rotz+=360.0;
@@ -89,6 +101,7 @@ void ImageHandler::redraw(void)
 		glVertex3i(0,1,0);
 	glEnd();
 #endif
+//	glPopMatrix();
 	gl_overview->GLswap();
 	// Main image window
 	gl_image->make_current();

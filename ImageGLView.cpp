@@ -9,7 +9,7 @@ static	PIXELFORMATDESCRIPTOR gl_pfd={	// pfd Tells Windows How We Want Things To
 		PFD_SUPPORT_OPENGL |			// Format Must Support OpenGL
 		PFD_DOUBLEBUFFER,				// Must Support Double Buffering
 		PFD_TYPE_RGBA,					// Request An RGBA Format
-		24,								// Select Our Color Depth
+		16,								// Select Our Color Depth
 		0, 0, 0, 0, 0, 0,				// Color Bits Ignored
 		0,								// No Alpha Buffer
 		0,								// Shift Bit Ignored
@@ -102,6 +102,7 @@ void ImageGLView::make_current()
 
 void ImageGLView::GLswap()
 {
+	this->make_current();
 	SwapBuffers(device_context);
 }
 

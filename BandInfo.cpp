@@ -20,7 +20,7 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 	MessageBox (NULL, message, "Parbat3D :: BandInfo", 0);
 	#endif //DEBUG_BANDS
 	
-	rasterDataType = GDALGetDataTypeName(GDALGetRasterDataType(theBand));
+	rasterDataType = GDALGetDataTypeName(GDALGetRasterDataType(band));
 	#if DEBUG_BANDS
 	if (rasterDataType != NULL)
 	{
@@ -35,7 +35,7 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 	#endif //DEBUG_BANDS
 	
 	//theColourInterpretation = band->GetColorInterpretation(); //this is not working
-	theColourInterpretation = GDALGetRasterColorInterpretation(theBand);
+	theColourInterpretation = GDALGetRasterColorInterpretation(band);
 	
 
 	if (theColourInterpretation > -1)
@@ -60,21 +60,21 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 	}
 	#endif //DEBUG_BANDS
 		
-	overviewCount = GDALGetOverviewCount(theBand);
+	overviewCount = GDALGetOverviewCount(band);
 	#if DEBUG_BANDS
 	leader = "Overviews: ";
 	message = makeMessage(leader, overviewCount);
 	MessageBox (NULL, message, "Parbat3D :: BandInfo", 0);
 	#endif //DEBUG_BANDS
 		
-	GDALGetBlockSize(theBand, &blockXSize, &blockYSize); 
+	GDALGetBlockSize(band, &blockXSize, &blockYSize); 
 	adfMinMax[0] = GDALGetRasterMinimum(theBand, &bGotMin);
 	adfMinMax[1] = GDALGetRasterMaximum(theBand, &bGotMax);
 	
-	if( !(bGotMin && bGotMax) )
+	/*if( !(bGotMin && bGotMax) )
 	{
-		GDALComputeRasterMinMax(theBand, TRUE, adfMinMax);
-	}
+		GDALComputeRasterMinMax(band, TRUE, adfMinMax);
+	}*/
 	#if DEBUG_BANDS
 	leader = "Min value: ";
 	message = makeMessage(leader, adfMinMax[0]);
@@ -123,6 +123,11 @@ int BandInfo::getOverviewCount(void)
 int BandInfo::getBandNumber(void)
 {
 	return bandNumber;
+}
+
+GDALRasterBand* BandInfo::getBand(void)
+{
+	return band;	
 }
 
 BandInfo::~BandInfo(void)

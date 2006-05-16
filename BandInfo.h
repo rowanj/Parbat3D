@@ -30,6 +30,7 @@ class BandInfo
 		int getBlockYSize(void);
 		int getOverviewCount(void);
 		int getBandNumber(void);
+		GDALRasterBand* getBand(void);
 		virtual ~BandInfo(void);
 		
 	private:
