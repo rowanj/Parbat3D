@@ -51,7 +51,13 @@ private:
 #if DEBUG_IMAGE_REDRAW
 	float redraw_rotz;
 #endif
-
 };
+
+#if TMP_USE_TEXTURES
+static GLubyte checkImage[64][64][4];
+static GLuint texName;
+void makeCheckImage(void);
+#endif
+
 
 #endif

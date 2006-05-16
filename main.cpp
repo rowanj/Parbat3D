@@ -1467,6 +1467,7 @@ void loadFile()
     			else
     			{
                     // Image loaded succesfully, so update opengl displays
+//                    image_handler->resize_window();
                     RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
                     RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
                 }				

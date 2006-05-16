@@ -5,14 +5,15 @@
 // Enable global debug/trace mode
 #define DEBUG 1
 #define DEBUG_IMAGE_FILE 0
-#define DEBUG_IMAGE_HANDLER 1
+#define DEBUG_IMAGE_HANDLER 0
 #define DEBUG_IMAGE_PROPERTIES 0
-#define DEBUG_IMAGE_REDRAW 1
-#define DEBUG_BANDS 1
+#define DEBUG_IMAGE_REDRAW 0
+#define DEBUG_BANDS 0
 
 // Declare some packages as optional during initial implementation.
 //  This is to allow other packages to build for testing.
 #define TMP_USE_SETTINGS 0
+#define TMP_USE_TEXTURES 1
 
 // Platform-specific portions of code should test for the relevant PLATFORM_ define
 #ifdef WIN32 // !! may not be defined by all compilers - Rowan
