@@ -44,6 +44,9 @@ HWND *redRadiobuttons;
 HWND *greenRadiobuttons;
 HWND *blueRadiobuttons;
 
+/* update button global */
+HWND hupdate;
+
 /* Variables to record when the windows have snapped to main wndow */
 int imageWindowIsSnapped=false;
 int toolWindowIsSnapped=false;
@@ -870,9 +873,9 @@ int setupToolWindow()
 			NULL //pointer not needed
 			);
 			
-			/* temporary label */ 
-			char name[100] = "Channel";
-			
+		/* temporary label */ 
+		char name[100] = "Channel";
+		/* add band names */
 		CreateWindowEx(
            0,                   /* Extended possibilites for variation */
            szStaticControl,     /* Classname */
@@ -888,7 +891,7 @@ int setupToolWindow()
            NULL                 /* No Window Creation data */
            );
            
-           /* add channel names under the query tab */
+        /* add channel names under the query tab */
         CreateWindowEx(
 	    	0,
 			szStaticControl,
@@ -904,7 +907,23 @@ int setupToolWindow()
 			NULL //pointer not needed
 			);
 			
-			/* add the band values to the value container under the query tab */
+			
+		/* Insert 'Update' button under radio buttons. Location based on band number */
+		hupdate =  CreateWindowEx(
+			0,
+			"BUTTON",
+			"Update",
+			WS_CHILD | WS_VISIBLE,
+			136,50 + (20 * bands), // x y location
+			80,25, // x y dimensions
+			hToolWindowDisplayTabContainer, //parent window     
+			NULL, //no menu
+			hThisInstance, //HINSTANCE hInstance,
+			NULL //pointer not needed
+			);     
+
+			
+		/* add the band values to the value container under the query tab */
         char tempBandValue[4] = "128"; // temporary storage for the band value
         CreateWindowEx(
 	    	0,
