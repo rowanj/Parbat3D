@@ -411,7 +411,6 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static PAINTSTRUCT ps;
-    static int npaints=0;
     static HDC hdc;
     static RECT rect;
     static HBRUSH hbrush;
@@ -419,10 +418,11 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
     switch (message)                  /* handle the messages */
     {
         case WM_CREATE:
-            hbrush=CreateSolidBrush(0);
-            
+//            hbrush=CreateSolidBrush(0);
+            break;            
         case WM_SIZE:
-            GetClientRect(hwnd,&rect);
+//            GetClientRect(hwnd,&rect);
+            break;
             
 		/* Re-draw OpenGL stuff */
 		case WM_PAINT:
@@ -431,15 +431,13 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
                 image_handler->redraw();
             else
             {
-                SelectObject(hdc,hbrush);
-                Rectangle(hdc,0,0,rect.right,rect.bottom);
-                SetTextColor(hdc,RGB(255,255,255));
-                SetBkColor(hdc,0);
-                TextOut(hdc,10,10,"No Image Loaded",16);
+//                SelectObject(hdc,hbrush);
+//                Rectangle(hdc,0,0,rect.right,rect.bottom);
+//                SetTextColor(hdc,RGB(255,255,255));
+//                SetBkColor(hdc,0);
+//                TextOut(hdc,10,10,"No Image Loaded",16);
             }
 			EndPaint(hwnd,&ps);
-			npaints++;
-			SetWindowText(hMainWindow,makeMessage("npaints",npaints));
 			break;
 
     default:                   /* for messages that we don't deal with */
@@ -598,6 +596,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
         case WM_SIZE:
             if (image_handler)
                 image_handler->resize_window();
+            break;
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
