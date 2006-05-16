@@ -44,10 +44,12 @@ public:
 	const char* error_text;
 
 private:
+	ImageProperties* image_properties;
 	ImageGLView* gl_overview;
 	ImageGLView* gl_image;
 	HWND hOverview, hImage;
 	ImageFile* image_file;
+	int image_width, image_height;
 #if DEBUG_IMAGE_REDRAW
 	float redraw_rotz;
 #endif

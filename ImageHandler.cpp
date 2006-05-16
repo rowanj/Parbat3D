@@ -2,7 +2,8 @@
 #include "ImageHandler.h"
 #include <gl/gl.h>
 #include <gl/glu.h>
-
+#include <math.h>
+#define PI 3.14159265
 
 ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 {
@@ -54,6 +55,14 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	
 		// Initialize image file (could be threaded)
 	image_file = new ImageFile(filename);
+	if (!image_file) {
+		status = 5;
+		error_text = "Could not create ImageFile object.";
+	} else {
+		image_properties = image_file->getImageProperties();
+		image_height = image_properties->getHeight();
+		image_width = image_properties->getWidth();
+	}
 #if DEBUG_IMAGE_PROPERTIES
 	image_file->printInfo();
 #endif
@@ -93,24 +102,31 @@ void ImageHandler::redraw(void)
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glBindTexture(GL_TEXTURE_2D, texName);
-	errorcode = glGetError();
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(0.0,0.0,10.0,0.0,0.0,0.0,0.0,1.0,0.0);
-	errorcode = glGetError();
+	// !! Vertical eye offset will need to be a great deal more complex to deal with
+	//	portrait-oriented imagery
+	gluLookAt(0.0,0.0,(0.5/tan(PI/6.0)),0.0,0.0,0.0,0.0,1.0,0.0);
+
+	// Set up aspect transform
+	if (image_width >= image_height) {
+		glScalef(1.0, (GLfloat)image_height/(GLfloat)image_width, 1.0);
+	} else {
+		glScalef((GLfloat)image_width/(GLfloat)image_height, 1.0, 1.0);
+	}
 #if TMP_USE_TEXTURES
 	glBegin(GL_QUADS);
-		glTexCoord2f(1.0, 0.0);
-		glVertex3f(-2.0, 2.0, 0.0);
-		glTexCoord2f(1.0, 1.0);
-		glVertex3f( 2.0, 2.0, 0.0);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f( 2.0,-2.0, 0.0);
 		glTexCoord2f(0.0, 0.0);
-		glVertex3f(-2.0,-2.0, 0.0);
+		glVertex3f(-0.5, 0.5, 0.0);
+		glTexCoord2f(1.0, 0.0);
+		glVertex3f( 0.5, 0.5, 0.0);
+		glTexCoord2f(1.0, 1.0);
+		glVertex3f( 0.5,-0.5, 0.0);
+		glTexCoord2f(0.0, 1.0);
+		glVertex3f(-0.5,-0.5, 0.0);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
-	errorcode = glGetError();
 #else
 	glBegin(GL_QUADS);
 		glColor3f(0.5, 0.5, 0.5);
@@ -142,7 +158,7 @@ void ImageHandler::redraw(void)
 
 ImageProperties* ImageHandler::get_image_properties(void)
 {
-	return image_file->getImageProperties();
+	return image_properties;
 }
 
 BandInfo* ImageHandler::get_band_info(int band_number)
@@ -155,7 +171,9 @@ void ImageHandler::resize_window(void)
 	gl_overview->GLresize();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, (GLfloat) gl_overview->width()/(GLfloat) gl_overview->height(), 1.0, 30.0);
+	// !! Does this deal with files smaller than 10px wide?
+	// !! Will need to compensate for portrait-oriented images
+	gluPerspective(60.0, (GLfloat) gl_overview->width()/(GLfloat) gl_overview->height(), 0.1, 2.0);
 	
 	gl_image->GLresize();
 	this->redraw();
