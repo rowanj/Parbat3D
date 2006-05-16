@@ -407,15 +407,33 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 /* All messages/events related to one of the display windows are sent to this procedure */
 LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    PAINTSTRUCT ps;
+    static PAINTSTRUCT ps;
     static int npaints=0;
+    static HDC hdc;
+    static RECT rect;
+    static HBRUSH hbrush;
     
     switch (message)                  /* handle the messages */
     {
+        case WM_CREATE:
+            hbrush=CreateSolidBrush(0);
+            
+        case WM_SIZE:
+            GetClientRect(hwnd,&rect);
+            
 		/* Re-draw OpenGL stuff */
 		case WM_PAINT:
-            BeginPaint(hwnd,&ps);
-			if (image_handler) image_handler->redraw();
+            hdc=BeginPaint(hwnd,&ps);
+			if (image_handler)
+                image_handler->redraw();
+            else
+            {
+                SelectObject(hdc,hbrush);
+                Rectangle(hdc,0,0,rect.right,rect.bottom);
+                SetTextColor(hdc,RGB(255,255,255));
+                SetBkColor(hdc,0);
+                TextOut(hdc,10,10,"No Image Loaded",16);
+            }
 			EndPaint(hwnd,&ps);
 			npaints++;
 			SetWindowText(hMainWindow,makeMessage("npaints",npaints));
@@ -572,6 +590,11 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             /* snap the window the main window (if near it) */
             imageWindowIsSnapped=snapWindowBySizing(hMainWindow,(RECT*)lParam,(int)wParam);           
             break;
+        
+        /* WM_SIZE: called when the window has been resized */
+        case WM_SIZE:
+            if (image_handler)
+                image_handler->resize_window();
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
@@ -588,10 +611,6 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             return 0;
             
             
-        // Re-size OpenGL
-		case WM_SIZE:
-			if (image_handler) image_handler->resize_window();
-
         default:
             /* let windows handle any unknown messages */
             return DefWindowProc(hwnd, message, wParam, lParam);
