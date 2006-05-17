@@ -36,7 +36,7 @@ public:
 	virtual ~ImageFile(void);
 	ImageProperties* getImageProperties(void);
 	BandInfo* getBandInfo(int bandNumber);
-	void printInfo(void);
+	const char* getInfoString(void);
 	
 private:
 	GDALDataset* ifDataset;

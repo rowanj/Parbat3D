@@ -66,35 +66,41 @@ BandInfo* ImageFile::getBandInfo(int bandNumber)
 
 /*Prints some basic info about the dataset: driver, driver long name, x size, y size
 and the number of raster bands.*/
-void ImageFile::printInfo(void)
+const char* ImageFile::getInfoString(void)
 {
-	const char* message;
+	const char* message1;
+	const char* message2;
 	string leader;
 	
 	if (ifDataset != NULL)
 	{
-		leader = "Driver: ";
+		/*leader = "Driver: ";
 		message = makeMessage(leader, (char*) properties->getDriverName());
-		MessageBox (NULL, message, "Parbat3D :: ImageFile", 0);
+		MessageBox (NULL, message, "Parbat3D :: ImageFile", 0);*/
 		
-		leader = "Driver (long name): ";
-		message = makeMessage(leader, (char*) properties->getDriverLongName());
-		MessageBox (NULL, message, "Parbat3D :: ImageFile", 0);
+		leader = "Type: ";
+		message1 = makeMessage(leader, (char*) properties->getDriverLongName());
 		
-		leader = "X size: ";
-		message = makeMessage(leader, properties->getWidth());
-		MessageBox (NULL, message, "Parbat3D :: ImageFile", 0);
+		leader = ", X: ";
+		message2 = makeMessage(leader, properties->getWidth());
 		
-		leader = "Y size: ";
-		message = makeMessage(leader, properties->getHeight());
-		MessageBox (NULL, message, "Parbat3D :: ImageFile", 0);
+		message1 = catcstrings((char*) message1, (char*) message2);
 		
-		leader = "Raster bands count: ";
-		message = makeMessage(leader, properties->getNumBands());
-		MessageBox (NULL, message, "Parbat3D :: ImageFile", 0);
+		leader = ", Y: ";
+		message2 = makeMessage(leader, properties->getHeight());
+		
+		message1 = catcstrings((char*) message1, (char*) message2);
+		
+		leader = ", Bands: ";
+		message2 = makeMessage(leader, properties->getNumBands());
+		
+		message1 = catcstrings((char*) message1, (char*) message2);
+		
+		return message1;
 	}
 	else
 	{
 		MessageBox (NULL, "Cannot get info; dataset was not loaded!", "Parbat3D :: ImageFile", 0);
+		return NULL;
 	}
 }

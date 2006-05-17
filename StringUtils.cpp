@@ -33,3 +33,14 @@ const char* makeMessage(std::string leader, char* input)
 	buffer = leader + sinput;
 	return buffer.c_str();
 }
+
+const char* catcstrings(char* input1, char* input2)
+{
+	std::string sinput1, sinput2;
+	std::string buffer;
+	
+	sinput1 = input1;
+	sinput2 = input2;
+	buffer = sinput1 + sinput2;
+	return buffer.c_str();
+}    
