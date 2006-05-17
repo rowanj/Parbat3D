@@ -109,13 +109,9 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 {
     CPLErr myErr;
     
-    //myErr = GDALDatasetRasterIO(ifDataset, GF_Read, xpos, ypos, width, height, buffer, outWidth, outHeight, GDT_Byte,
-   // 					3, NULL, 3, 3*outWidth, 1);
-    myErr = GDALDatasetRasterIO(ifDataset, GF_Read,
-    							xpos, ypos, width, height,
-    							buffer, outWidth, outHeight,
-    							GDT_Byte, 3, NULL,
-    							0, 0, 0);
+    myErr = GDALDatasetRasterIO(ifDataset, GF_Read, xpos, ypos, width, height, buffer, outWidth, outHeight, GDT_Byte,
+    					3, NULL, 3, 3*outWidth, 1);
+
 	if (myErr == CE_Failure)
 	{
 	    MessageBox (NULL, "RasterIO failed!!", "Parbat3D :: ImageFile", 0);
