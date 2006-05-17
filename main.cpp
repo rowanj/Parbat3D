@@ -1480,7 +1480,7 @@ void loadFile()
 
     ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW - which note?
     ofn.hwndOwner = hMainWindow;
-    ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tiff\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPG Files (*.jpg)\0*.jpg\0TIFF / GeoTIFF (*.tiff)\0*.tiff\0All Files (*.*)\0*.*\0";
+    ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tif\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPG Files (*.jpg)\0*.jpg\0TIFF / GeoTIFF (*.tif)\0*.tif\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile = szFileName;
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;

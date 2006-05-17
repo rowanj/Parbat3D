@@ -43,4 +43,15 @@ const char* catcstrings(char* input1, char* input2)
 	sinput2 = input2;
 	buffer = sinput1 + sinput2;
 	return buffer.c_str();
-}    
+}
+
+const char* inttocstring(int input)
+{
+    std::string sinput;
+	std::stringstream s;
+	
+	s << input;
+	s >> sinput;
+	return sinput.c_str();
+}
+    

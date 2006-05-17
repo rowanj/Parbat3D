@@ -30,5 +30,6 @@ const char* makeMessage(std::string leader, int input);
 const char* makeMessage(std::string leader, double input);
 const char* makeMessage(std::string leader, char* input);
 const char* catcstrings(char* input1, char* input2);
+const char* inttocstring(int input);
 
 #endif
