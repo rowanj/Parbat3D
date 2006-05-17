@@ -5,6 +5,9 @@
 #include "config.h"
 #include "Settings.h"
 #include "ImageHandler.h"
+#include "ImageProperties.h"
+#include "BandInfo.h"
+
 ImageHandler::ImageHandler* image_handler;	// Instance handle
 
 using namespace std;
@@ -728,6 +731,9 @@ int setupToolWindow()
     oldDisplayTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowDisplayTabContainer,GWL_WNDPROC,(long)&ToolWindowDisplayTabContainerProcedure);
     oldQueryTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowQueryTabContainer,GWL_WNDPROC,(long)&ToolWindowQueryTabContainerProcedure);
 
+
+    bands = image_handler->get_image_properties()->getNumBands();
+    
     /* Create group for RED radio buttons based on band number */
     hRed = CreateWindowEx(
 	    	0,
@@ -847,7 +853,11 @@ int setupToolWindow()
 			);
 			
 		/* temporary label */ 
-		char name[100] = "Channel";
+		//char name[100] = "Channel";
+		
+		const char *name = image_handler->get_band_info(i+1)->getColourInterpretationName();
+		
+		
 		/* add band names */
 		CreateWindowEx(
            0,                   /* Extended possibilites for variation */
@@ -1475,10 +1485,7 @@ void loadFile()
             setupImageWindow();
         ShowWindow(hImageWindow,SW_SHOW);
         
-        // create tool window and display
-        if (!hToolWindow)
-            setupToolWindow();
-        ShowWindow(hToolWindow,SW_SHOW);
+        
         
         // enable Window menu items
         EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,false);
@@ -1509,6 +1516,10 @@ void loadFile()
 			// !! Should probably die gracefully at this point - Rowan
 		}
     }
+    // create tool window and display
+        if (!hToolWindow)
+            setupToolWindow();
+        ShowWindow(hToolWindow,SW_SHOW);
 }
 
 
