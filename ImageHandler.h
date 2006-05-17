@@ -44,6 +44,7 @@ public:
 	const char* error_text;
 
 private:
+    int max_texture_size;
 	ImageProperties* image_properties;
 	ImageGLView* gl_overview;
 	ImageGLView* gl_image;
@@ -55,11 +56,9 @@ private:
 #endif
 };
 
-#if TMP_USE_TEXTURES
-static GLubyte checkImage[64][64][4];
+/* Temporary texture */
+static GLubyte checkImage[64][64][3];
 static GLuint texName;
 void makeCheckImage(void);
-#endif
-
 
 #endif

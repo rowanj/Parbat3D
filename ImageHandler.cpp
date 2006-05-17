@@ -66,10 +66,12 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 #if DEBUG_IMAGE_PROPERTIES
 	image_file->printInfo();
 #endif
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
+
 	gl_overview->make_current();
 	glShadeModel(GL_FLAT);
 	glDisable(GL_DEPTH_TEST);
-#if TMP_USE_TEXTURES
+	/* generate temp texture */
 	makeCheckImage();
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &texName);
@@ -79,7 +81,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
-#endif
+
 
 	this->resize_window();
 }
@@ -115,7 +117,7 @@ void ImageHandler::redraw(void)
 	} else {
 		glScalef((GLfloat)image_width/(GLfloat)image_height, 1.0, 1.0);
 	}
-#if TMP_USE_TEXTURES
+
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0, 0.0);
 		glVertex3f(-0.5, 0.5, 0.0);
@@ -127,15 +129,6 @@ void ImageHandler::redraw(void)
 		glVertex3f(-0.5,-0.5, 0.0);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
-#else
-	glBegin(GL_QUADS);
-		glColor3f(0.5, 0.5, 0.5);
-		glVertex3i(-1, 1, 0);
-		glVertex3i( 1, 1, 0);
-		glVertex3i( 1,-1, 0);
-		glVertex3i(-1,-1, 0);
-	glEnd();
-#endif
 	
 #if DEBUG_IMAGE_REDRAW
 	glRotatef(redraw_rotz, 0.0,0.0,1.0);
@@ -199,7 +192,6 @@ void ImageHandler::get_geo_pos(geo_coords_ptr pos)
 	;
 }
 
-#if TMP_USE_TEXTURES
 void makeCheckImage(void)
 {
 	int i, j, c;
@@ -210,8 +202,8 @@ void makeCheckImage(void)
 			checkImage[i][j][0] = (GLubyte) c;
 			checkImage[i][j][1] = (GLubyte) c;
 			checkImage[i][j][2] = (GLubyte) c;
-			checkImage[i][j][3] = (GLubyte) 255;
+//			checkImage[i][j][3] = (GLubyte) 255;
 		}
 	}
 }
-#endif
+
