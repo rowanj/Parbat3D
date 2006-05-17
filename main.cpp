@@ -154,7 +154,7 @@ int setupMainWindow()
            mx,                  /* x position */
            my,                  /* y position */
            250,                 /* The program's width */
-           300,                 /* and height in pixels */
+           296,                 /* and height in pixels */
            hMainWindow,         /* The window is a childwindow to desktop */
            NULL,                /* No menu */
            hThisInstance,       /* Program Instance handler */
