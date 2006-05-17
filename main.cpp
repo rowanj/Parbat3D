@@ -851,14 +851,14 @@ int setupToolWindow()
 			hThisInstance, //HINSTANCE hInstance,
 			NULL //pointer not needed
 			);
-			
-		/* temporary label */ 
-		//char name[100] = "Channel";
 		
+		/* add band names to radio buttons*/
 		const char *name = image_handler->get_band_info(i+1)->getColourInterpretationName();
+		if (strcmp(name, "Unknown")==0)
+		{
+          
+        }
 		
-		
-		/* add band names */
 		CreateWindowEx(
            0,                   /* Extended possibilites for variation */
            szStaticControl,     /* Classname */
@@ -1030,7 +1030,16 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 drawStatic((DRAWITEMSTRUCT*)lParam);
             break; 
-                        
+        case WM_COMMAND:
+            //if(hupdate==(HWND)lParam)
+            {
+            MessageBox( hwnd, (LPSTR) "Updating Image",
+            (LPSTR) szMainWindowClassName,
+            MB_ICONINFORMATION | MB_OK );
+            }                
+            break;
+        
+                     
         default:
             break;
     }        
@@ -1515,11 +1524,12 @@ void loadFile()
 			MessageBox (NULL, "[error] Could not instantiate ImageHandler." , "Parbat3D :: ImageHandler", 0);
 			// !! Should probably die gracefully at this point - Rowan
 		}
-    }
-    // create tool window and display
+		
+		// create tool window and display
         if (!hToolWindow)
             setupToolWindow();
         ShowWindow(hToolWindow,SW_SHOW);
+    }
 }
 
 
