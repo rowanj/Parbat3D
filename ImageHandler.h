@@ -55,7 +55,7 @@ private:
     int max_texture_size;
     /* Temporary texture */
 	char checkImage[64][64][3];
-	char texName;
+	unsigned int texName;
 	/* Overview window texture */
 	unsigned int tex_overview_id;
 	char *tex_overview;

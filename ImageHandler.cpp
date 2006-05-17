@@ -72,8 +72,6 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
     tex_overview = (char*) malloc(256*256*3);
 	this->make_textures();
 
-	
-
 	this->resize_window();
 }
 
@@ -95,7 +93,7 @@ void ImageHandler::redraw(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-//	glBindTexture(GL_TEXTURE_2D, texName);
+//	glBindTexture(GL_TEXTURE_2D, (GLuint) texName);
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -212,15 +210,21 @@ void ImageHandler::make_textures(void)
 	glShadeModel(GL_FLAT);
 	glDisable(GL_DEPTH_TEST);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, (GLuint*) &texName);
-	glBindTexture(GL_TEXTURE_2D, texName);
+	glGenTextures(1, (GLuint*) &texName);	
+	glBindTexture(GL_TEXTURE_2D, (GLuint) texName);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 64, 64, 0, GL_RGB, GL_UNSIGNED_BYTE, checkImage);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,  64,  64, 0, GL_RGB, GL_UNSIGNED_BYTE, checkImage);
+	
 	
 	glGenTextures(1, (GLuint*) &tex_overview_id);
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
+	/* */
 }
