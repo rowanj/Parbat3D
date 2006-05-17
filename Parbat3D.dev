@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=24
+UnitCount=26
 Type=0
 Ver=1
 ObjFiles=
@@ -287,7 +287,7 @@ FileName=windowFunctions.h
 FileName=imageWindow.cpp
 
 [Unit25]
-FileName=StringUtils.cpp
+FileName=TestUtils.h
 CompileCpp=1
 Folder=Utils
 Compile=1
@@ -297,7 +297,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit26]
-FileName=StringUtils.h
+FileName=TestUtils.cpp
 CompileCpp=1
 Folder=Utils
 Compile=1

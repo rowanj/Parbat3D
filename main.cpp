@@ -37,6 +37,7 @@ HMENU hMainMenu;
 HWND hToolWindowTabControl;
 HWND hToolWindowDisplayTabContainer;
 HWND hToolWindowQueryTabContainer;
+HWND hToolWindowImageTabContainer;
 HWND hRedRadioButton1, hRedRadioButton2;
 HWND hGreenRadioButton1, hGreenRadioButton2;
 HWND hBlueRadioButton1, hBlueRadioButton2;
@@ -57,7 +58,7 @@ int imageWindowIsSnapped=false;
 int toolWindowIsSnapped=false;
 
 /* Define id numbers for the tab's in the tool window */
-enum {DISPLAY_TAB_ID,QUERY_TAB_ID};
+enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID};
 
 /* Used for loading and saving window position and sizes */
 settings winPos ("settings.ini");
@@ -66,11 +67,11 @@ settings winPos ("settings.ini");
 HFONT hBoldFont,hNormalFont;
 HPEN hTabPen;
 HBRUSH hTabBrush;
-WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc;
+WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc;
+
 
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
-
 {
  	MSG messages;            /* Here messages to the application is saved */
  
@@ -607,7 +608,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
 
 int registerToolWindow()
 {
-    WNDCLASSEX wincl;        /* Datastructure for the windowclass */
+    WNDCLASSEX wincl;       /* Datastructure for the windowclass */
     
     /* The Window structure */
     wincl.hInstance = hThisInstance;
@@ -688,10 +689,16 @@ int setupToolWindow()
     tie.pszText="Display";
     tie.lParam=(DWORD)tie.pszText;
     TabCtrl_InsertItem(hToolWindowTabControl, DISPLAY_TAB_ID, &tie);
+    
     tie.mask=TCIF_TEXT+TCIF_PARAM;;   
     tie.pszText="Query";
     tie.lParam=(DWORD)tie.pszText;    
     TabCtrl_InsertItem(hToolWindowTabControl, QUERY_TAB_ID, &tie);
+    
+    tie.mask=TCIF_TEXT+TCIF_PARAM;;   
+    tie.pszText="Image";
+    tie.lParam=(DWORD)tie.pszText;    
+    TabCtrl_InsertItem(hToolWindowTabControl, IMAGE_TAB_ID, &tie);
 
     /* get size of tab control's client area (the area inside the tab control) */
     GetClientRect(hToolWindowTabControl,&rect);   
@@ -719,9 +726,24 @@ int setupToolWindow()
            ); 
            
     hToolWindowQueryTabContainer =CreateWindowEx(
-           0,                                /* Extended styles */
-           szStaticControl,                  /* pre-defined classname for static text control */
-           "Query tab container",            /* text to display */
+           0,                               /* Extended styles */
+           szStaticControl,                 /* pre-defined classname for static text control */
+           "Band Values",                   /* text to display */
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, /* styles */
+           SPACING_FOR_BOARDER,             /* left position relative to tab control */
+           SPACING_FOR_TAB_HEIGHT,          /* top position relative to tab control */
+           rect.right,                      /* the width of the container */
+           rect.bottom,                     /* the height of the container */
+           hToolWindowTabControl,           /* The window is a childwindow of the tab control */
+           NULL,                            /* No menu */
+           hThisInstance,                   /* Program Instance handler */
+           NULL                             /* No Window Creation data */
+           );
+           
+    hToolWindowImageTabContainer =CreateWindowEx(
+           0,                               /* Extended styles */
+           szStaticControl,                 /* pre-defined classname for static text control */
+           "Image Properties",              /* text to display */
            WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, /* styles */
            SPACING_FOR_BOARDER,             /* left position relative to tab control */
            SPACING_FOR_TAB_HEIGHT,          /* top position relative to tab control */
@@ -738,6 +760,7 @@ int setupToolWindow()
         note: assumming proc addr is the same for all three */
     oldDisplayTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowDisplayTabContainer,GWL_WNDPROC,(long)&ToolWindowDisplayTabContainerProcedure);
     oldQueryTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowQueryTabContainer,GWL_WNDPROC,(long)&ToolWindowQueryTabContainerProcedure);
+    oldImageTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowImageTabContainer,GWL_WNDPROC,(long)&ToolWindowImageTabContainerProcedure);
 
 
     bands = image_handler->get_image_properties()->getNumBands();
@@ -1077,6 +1100,23 @@ LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, W
     return CallWindowProc(oldQueryTabContainerProc,hwnd,message,wParam,lParam);
 }
 
+/* This function is called by the Windowsfunction DispatchMessage( ) */
+LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)                  /* handle the messages */
+    {
+        /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
+        case WM_DRAWITEM:
+            if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
+                drawStatic((DRAWITEMSTRUCT*)lParam);
+            break; 
+                        
+        default:
+            break;
+    }        
+    return CallWindowProc(oldImageTabContainerProc,hwnd,message,wParam,lParam);
+}
+
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -1106,10 +1146,17 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                         case DISPLAY_TAB_ID:
                             ShowWindow(hToolWindowDisplayTabContainer,SW_SHOW);
                             ShowWindow(hToolWindowQueryTabContainer,SW_HIDE);                            
+                            ShowWindow(hToolWindowImageTabContainer,SW_HIDE);
                             break;
                         case QUERY_TAB_ID:
                             ShowWindow(hToolWindowDisplayTabContainer,SW_HIDE);
-                            ShowWindow(hToolWindowQueryTabContainer,SW_SHOW);                                                        
+                            ShowWindow(hToolWindowQueryTabContainer,SW_SHOW);
+                            ShowWindow(hToolWindowImageTabContainer,SW_HIDE);                                                        
+                            break;
+                        case IMAGE_TAB_ID:
+                            ShowWindow(hToolWindowDisplayTabContainer,SW_HIDE);
+                            ShowWindow(hToolWindowQueryTabContainer,SW_HIDE);
+                            ShowWindow(hToolWindowImageTabContainer,SW_SHOW);
                             break;
                     }    
                     break;

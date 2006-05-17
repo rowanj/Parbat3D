@@ -1,7 +1,7 @@
 #ifndef _PARBAT_MAIN_H
 #define _PARBAT_MAIN_H
 
-#define ID_MENU 501
+#define ID_MENU             501
 
 #define IDM_FILEOPEN        201
 #define IDM_FILESAVE        202
@@ -9,7 +9,7 @@
 #define IDM_FILEEXIT        207
 
 #define IDM_IMAGEWINDOW     210
-#define IDM_TOOLSWINDOW      211
+#define IDM_TOOLSWINDOW     211
 
 #define IDM_HELPCONTENTS    215
 #define IDM_HELPABOUT       218
@@ -28,6 +28,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ToolWindowTabControlProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
 
 int setupImageWindow();
 int registerToolWindow();
