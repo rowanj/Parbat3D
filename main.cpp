@@ -892,7 +892,7 @@ int setupToolWindow()
           name = altName;
             
         /* Add band number to band name */
-        name = catcstrings( (char*) "). ", (char*) name);
+        name = catcstrings( (char*) ". ", (char*) name);
         name = catcstrings( (char*) inttocstring(i+1), (char*) name);
 		
         /* Display band name in tool windo */

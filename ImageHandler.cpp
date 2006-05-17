@@ -56,10 +56,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	
 		// Initialize image file (could be threaded)
 	image_file = new ImageFile(filename);
-	
-	//test of the rasteriser -- remove when required
-	attemptRasterCall(image_file);
-	
+		
 	if (!image_file) {
 		status = 5;
 		error_text = "Could not create ImageFile object.";
@@ -72,12 +69,11 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	image_file->printInfo();
 #endif
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
+	this->make_textures();
 
 	gl_overview->make_current();
 	glShadeModel(GL_FLAT);
 	glDisable(GL_DEPTH_TEST);
-	/* generate temp texture */
-	makeCheckImage();
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &texName);
 	glBindTexture(GL_TEXTURE_2D, texName);
@@ -202,19 +198,23 @@ const char* ImageHandler::get_info_string(void)
     return image_file->getInfoString();
 }    
 
-
-void makeCheckImage(void)
+void ImageHandler::make_textures(void)
 {
-	int i, j, c;
+	// Make textures
+		int i, j, c;
 	
+	// 64*64 Checkerboard for debug
 	for (i = 0; i < 64; i++) {
 		for (j = 0; j < 64; j++) {
 			c = ((((i&0x8)==0) ^ ((j&0x8))==0))*255;
-			checkImage[i][j][0] = (GLubyte) c;
+			checkImage[i][j][0] = (GLubyte) 255;
 			checkImage[i][j][1] = (GLubyte) c;
 			checkImage[i][j][2] = (GLubyte) c;
-//			checkImage[i][j][3] = (GLubyte) 255;
 		}
 	}
+	
+	//test of the rasteriser -- remove when required
+	
 }
+
 

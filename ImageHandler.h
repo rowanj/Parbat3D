@@ -44,21 +44,24 @@ public:
 	const char* error_text;
 
 private:
-    int max_texture_size;
+	void make_textures(void);
+
 	ImageProperties* image_properties;
 	ImageGLView* gl_overview;
 	ImageGLView* gl_image;
 	HWND hOverview, hImage;
 	ImageFile* image_file;
 	int image_width, image_height;
+
+    int max_texture_size;
+    /* Temporary texture */
+	static GLubyte checkImage[64][64][3];
+	static GLuint texName;
+	GLuint tex_overview_id;
+	static GLubyte tex_overview[256][256][3];
 #if DEBUG_IMAGE_REDRAW
 	float redraw_rotz;
 #endif
 };
-
-/* Temporary texture */
-static GLubyte checkImage[64][64][3];
-static GLuint texName;
-void makeCheckImage(void);
 
 #endif
