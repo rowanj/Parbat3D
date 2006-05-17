@@ -37,6 +37,7 @@ public:
 	ImageProperties* getImageProperties(void);
 	BandInfo* getBandInfo(int bandNumber);
 	const char* getInfoString(void);
+	void getRasterData(int width, int height, int xpos, int ypos, char* buffer, int outWidth, int outHeight);
 	
 private:
 	GDALDataset* ifDataset;

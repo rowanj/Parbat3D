@@ -1,5 +1,6 @@
 #include "config.h"
 #include "ImageHandler.h"
+#include "TestUtils.h"
 #include <gl/gl.h>
 #include <gl/glu.h>
 #include <math.h>
@@ -55,6 +56,10 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	
 		// Initialize image file (could be threaded)
 	image_file = new ImageFile(filename);
+	
+	//test of the rasteriser -- remove when required
+	attemptRasterCall(image_file);
+	
 	if (!image_file) {
 		status = 5;
 		error_text = "Could not create ImageFile object.";
@@ -191,6 +196,12 @@ void ImageHandler::get_geo_pos(geo_coords_ptr pos)
 {
 	;
 }
+
+const char* ImageHandler::get_info_string(void)
+{
+    return image_file->getInfoString();
+}    
+
 
 void makeCheckImage(void)
 {

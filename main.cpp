@@ -80,6 +80,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     // store this process's instance handle
     hThisInstance=hInstance;
     
+    registerToolWindow();
+    
     // get desktop window handle
     hDesktop=GetDesktopWindow();
     
@@ -603,12 +605,9 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Tools Window Functions */
 
-/* create tool window */
-int setupToolWindow()
+int registerToolWindow()
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
-    TCITEM tie;             /* datastructure for tabs */
-    RECT rect;
     
     /* The Window structure */
     wincl.hInstance = hThisInstance;
@@ -628,7 +627,14 @@ int setupToolWindow()
     wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
 
     /* Register the window class, if it fails return false */
-    if(!RegisterClassEx(&wincl)) return false;
+    if(!RegisterClassEx(&wincl)) return false;    
+}    
+
+/* create tool window */
+int setupToolWindow()
+{
+    TCITEM tie;             /* datastructure for tabs */
+    RECT rect;
     
     /* Get Main Window Location for image window alignment*/
     GetWindowRect(hMainWindow,&rect);
@@ -1163,7 +1169,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         /* WM_DESTORY: system is destroying our window */                
         case WM_DESTROY:
             /* send a message that will cause WinMain to exit the message loop */            
-            PostQuitMessage (0);
+            //PostQuitMessage (0);
             return 0;
 
         default: 
@@ -1497,12 +1503,11 @@ void loadFile()
     if(GetOpenFileName(&ofn))
     {
         // Do something usefull with the filename stored in szFileName 
-        // create image window and display
-        if (!hImageWindow)
-            setupImageWindow();
-        ShowWindow(hImageWindow,SW_SHOW);
-        
-        
+
+        			// create image window and display
+    				if (!hImageWindow)
+            			setupImageWindow();
+    				ShowWindow(hImageWindow,SW_SHOW);    
         
         // enable Window menu items
         EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,false);
@@ -1521,6 +1526,9 @@ void loadFile()
 				}
     			else
     			{
+       
+        			SetWindowText(hImageWindow,image_handler->get_info_string());
+        			
                     // Image loaded succesfully, so update opengl displays
                     RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
                     RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                

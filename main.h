@@ -30,6 +30,7 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND, UINT, WPARAM, LPAR
 LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
 
 int setupImageWindow();
+int registerToolWindow();
 
 int setupMainWindow();
 

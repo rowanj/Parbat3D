@@ -39,7 +39,7 @@ public:
 	PRECT set_viewport(void);
 	pixel_values_ptr get_pixel_values(unsigned int x, unsigned int y);
 	void get_geo_pos(geo_coords_ptr pos);
-       
+	const char* get_info_string(void);   
 	int status;
 	const char* error_text;
 
