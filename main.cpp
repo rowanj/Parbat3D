@@ -7,6 +7,8 @@
 #include "ImageHandler.h"
 #include "ImageProperties.h"
 #include "BandInfo.h"
+#include "StringUtils.h"
+
 
 ImageHandler::ImageHandler* image_handler;	// Instance handle
 
@@ -854,11 +856,17 @@ int setupToolWindow()
 		
 		/* add band names to radio buttons*/
 		const char *name = image_handler->get_band_info(i+1)->getColourInterpretationName();
-		if (strcmp(name, "Unknown")==0)
-		{
-          
-        }
 		
+		/* If Colour name unknown change band name*/
+		const char *altName ="No colour name";
+		if (strcmp(name, "Unknown")==0)
+          name = altName;
+            
+        /* Add band number to band name */
+        name = catcstrings( (char*) "). ", (char*) name);
+        name = catcstrings( (char*) inttocstring(i+1), (char*) name);
+		
+        /* Display band name in tool windo */
 		CreateWindowEx(
            0,                   /* Extended possibilites for variation */
            szStaticControl,     /* Classname */
