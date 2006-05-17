@@ -11,7 +11,6 @@
 #include "ImageProperties.h"
 #include "ImageGLView.h"
 
-
 typedef struct pixel_values_t {
 	char number_bands;
 	int* value;
@@ -55,10 +54,12 @@ private:
 
     int max_texture_size;
     /* Temporary texture */
-	static GLubyte checkImage[64][64][3];
-	static GLuint texName;
-	GLuint tex_overview_id;
-	static GLubyte tex_overview[256][256][3];
+	char checkImage[64][64][3];
+	char texName;
+	/* Overview window texture */
+	unsigned int tex_overview_id;
+	char *tex_overview;
+	/* */
 #if DEBUG_IMAGE_REDRAW
 	float redraw_rotz;
 #endif
