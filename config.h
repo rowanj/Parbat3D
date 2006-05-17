@@ -9,6 +9,7 @@
 #define DEBUG_IMAGE_PROPERTIES 0
 #define DEBUG_IMAGE_REDRAW 0
 #define DEBUG_BANDS 0
+#define DEBUG_IMAGE_DATA 1
 
 // Declare some packages as optional during initial implementation.
 //  This is to allow other packages to build for testing.
