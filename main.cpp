@@ -1332,10 +1332,10 @@ int snapWindowByMoving(HWND snapToWin,RECT *rect)
     GetWindowRect(snapToWin,&snapToRect);
     
     //check if window is close enough to snap to
-    if ( (rect->left+winsize.cx<(snapToRect.left-SNAP_PIXEL_RANGE)) || (rect->left>(snapToRect.right+SNAP_PIXEL_RANGE)) )
+    if ( (rect->left+winsize.cx<=(snapToRect.left-SNAP_PIXEL_RANGE)) || (rect->left>=(snapToRect.right+SNAP_PIXEL_RANGE)) )
         return false;
 
-    if ( (rect->top+winsize.cy<(snapToRect.top-SNAP_PIXEL_RANGE)) || (rect->top>(snapToRect.bottom+SNAP_PIXEL_RANGE)) )
+    if ( (rect->top+winsize.cy<=(snapToRect.top-SNAP_PIXEL_RANGE)) || (rect->top>=(snapToRect.bottom+SNAP_PIXEL_RANGE)) )
         return false;
 
     //snap (top) to bottom
