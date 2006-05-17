@@ -1480,7 +1480,7 @@ void loadFile()
 
     ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW - which note?
     ofn.hwndOwner = hMainWindow;
-    ofn.lpstrFilter = "JPG Files (*.jpg)\0*.jpg\0All Files (*.*)\0*.*\0";
+    ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tiff\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPG Files (*.jpg)\0*.jpg\0TIFF / GeoTIFF (*.tiff)\0*.tiff\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile = szFileName;
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
@@ -1514,7 +1514,6 @@ void loadFile()
     			else
     			{
                     // Image loaded succesfully, so update opengl displays
-//                    image_handler->resize_window();
                     RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
                     RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
                 }				
@@ -1524,12 +1523,16 @@ void loadFile()
 			MessageBox (NULL, "[error] Could not instantiate ImageHandler." , "Parbat3D :: ImageHandler", 0);
 			// !! Should probably die gracefully at this point - Rowan
 		}
-		
-		// create tool window and display
-        if (!hToolWindow)
-            setupToolWindow();
-        ShowWindow(hToolWindow,SW_SHOW);
     }
+    // create tool window and display
+        
+        if (hToolWindow)
+        {
+            DestroyWindow(hToolWindow);
+            hToolWindow=NULL;
+        }    
+        setupToolWindow();
+        ShowWindow(hToolWindow,SW_SHOW);
 }
 
 
