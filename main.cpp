@@ -169,7 +169,7 @@ int setupMainWindow()
            NULL                 /* No Window Creation data */
            );
     if (!hMainWindow)
-        return false;                            
+        return false;                        
 
     hMainMenu = LoadMenu(hThisInstance, MAKEINTRESOURCE(ID_MENU));
     SetMenu(hMainWindow, hMainMenu);    
@@ -296,8 +296,8 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                 GetWindowRect(hToolWindow,&prevToolWindowRect);
                
                 /* record which windows are currently snapped (which ones should move with the main window) */
-                imageWindowIsMovingToo=imageWindowIsSnapped;
-                toolWindowIsMovingToo=toolWindowIsSnapped;                  
+                imageWindowIsMovingToo=((imageWindowIsSnapped)&&(isWindowInNormalState(hImageWindow)));
+                toolWindowIsMovingToo=((toolWindowIsSnapped)&&(isWindowInNormalState(hToolWindow)));  
            }
            return DefWindowProc(hwnd, message, wParam, lParam); 
 
@@ -462,15 +462,15 @@ int setupImageWindow()
     
     /* Create a window based on the class we just registered */
     hImageWindow =CreateWindowEx(
-           0,                   /* Extended possibilites for variation */
+           WS_EX_OVERLAPPEDWINDOW,                   /* Extended possibilites for variation */
            szImageWindowClassName,         /* Classname */
            "Image Window",         /* Title Text */
-           WS_OVERLAPPEDWINDOW+WS_VSCROLL+WS_HSCROLL, /* defaultwindow */
+           WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MINIMIZEBOX+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL, /* defaultwindow */
            rect.right,       /* x position based on main window */
            rect.top,         /* y position based on main window */
            700,                 /* The programs width */
            600,                 /* and height in pixels */
-           hMainWindow,        /* The window is a childwindow to main window */
+           0,        /* The window is a childwindow to main window */
            NULL,                /* No menu */
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
@@ -571,10 +571,16 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             /* snap the window the main window (if near it) */
             imageWindowIsSnapped=snapWindowBySizing(hMainWindow,(RECT*)lParam,(int)wParam);           
             break;
-        
-        /* WM_SIZE: called when the window has been resized */
-        case WM_SIZE:
 
+        /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            
+        case WM_SIZE:
+            if (imageWindowIsSnapped)
+            {
+                // re-snap window in case the main window has now moved away
+                GetWindowRect(hwnd,&rect);
+                imageWindowIsSnapped=snapWindowByMoving(hwnd,&rect);
+            }    
+           
             /* resize display/opengl window to fit new size */            
             GetClientRect(hImageWindow,&rect);
             MoveWindow(hImageWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
@@ -642,15 +648,15 @@ int setupToolWindow()
     
     /* The class is registered, lets create the program*/
     hToolWindow =CreateWindowEx(
-           WS_EX_TOOLWINDOW,                              /* Extended styles */
+           WS_EX_TOOLWINDOW+WS_EX_TOPMOST,                              /* Extended styles */
            szToolWindowClassName,         /* Classname */
            "Tools",                         /* Title Text */
-           WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_VSCROLL, /* defaultwindow */
+           WS_POPUP+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_VSCROLL, /* defaultwindow */
            rect.left,       /* Windows decides the position */
            rect.bottom,       /* where the window end up on the screen */
            250,                 /* The programs width */
            300,                 /* and height in pixels */
-           hMainWindow,        /* The window is a childwindow to main window */
+           hImageWindow,        /* The window is a childwindow to main window */
            NULL,                /* No menu */
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
@@ -892,7 +898,7 @@ int setupToolWindow()
           name = altName;
             
         /* Add band number to band name */
-        name = catcstrings( (char*) ". ", (char*) name);
+        name = catcstrings( (char*) "). ", (char*) name);
         name = catcstrings( (char*) inttocstring(i+1), (char*) name);
 		
         /* Display band name in tool windo */
@@ -1003,7 +1009,7 @@ int setupToolWindow()
 			hThisInstance,                 //HINSTANCE hInstance,
 			NULL                           //pointer not needed
 			);
-    }
+    }	
     
     return true;
 }
@@ -1167,6 +1173,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 {
     static POINT snapMouseOffset;     /* mouse offset relative to window, used for snapping */
     NMHDR *nmhdr;                     /* structure used for WM_NOTIFY events */
+    RECT rect;
             
     switch (message)                  /* handle the messages */
     {
@@ -1234,7 +1241,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             /* if new position is near main window, snap to it */    
             toolWindowIsSnapped=snapWindowByMoving(hMainWindow,(RECT*)lParam);
             break;
-
+        
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_TAB)
@@ -1248,19 +1255,25 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_TAB)
                 measureTab((MEASUREITEMSTRUCT*)lParam);
             break;
+
+        /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            
+        case WM_SIZE:
+            if (toolWindowIsSnapped)
+            {
+                // re-snap window in case the main window has now moved away
+                GetWindowRect(hwnd,&rect);
+                toolWindowIsSnapped=snapWindowByMoving(hMainWindow,&rect);
+            }    
+            break;
       
         /* WM_CLOSE: system or user has requested to close the window/application */              
         case WM_CLOSE:
             /* don't destory this window, but make it invisible */            
             ShowWindow(hwnd,SW_HIDE);
-            //DestroyWindow(hwnd);
-            //hToolWindow=NULL;           
             return 0;
 
         /* WM_DESTORY: system is destroying our window */                
         case WM_DESTROY:
-            /* send a message that will cause WinMain to exit the message loop */            
-            //PostQuitMessage (0);
             return 0;
 
         default: 
@@ -1361,16 +1374,40 @@ inline void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindow
        
 }
 
+
+/* returns whether window is in normal position (ie. not minimized or maximised) */
+int isWindowInNormalState(HWND hwnd)
+{
+    WINDOWPLACEMENT wp;
+    RECT rect;
+    wp.length=sizeof(WINDOWPLACEMENT);
+
+    GetWindowPlacement(hwnd,&wp);
+    GetWindowRect(hwnd,&rect);
+    if (wp.rcNormalPosition.top!=rect.top)
+        return false;
+    if (wp.rcNormalPosition.left!=rect.left)
+        return false;
+    if (wp.rcNormalPosition.right!=rect.right)
+        return false;
+    if (wp.rcNormalPosition.bottom!=rect.bottom)
+        return false;
+    if (wp.showCmd==SW_HIDE)
+        return false;
+    return true;
+}    
+
 /* snap a window to another window (by moving it) if it is range */
 /*  snapToWin=handle of window to snap to, rect=cords of window to be moved */
 /* returns: true if window has been snapped, false if not */
 int snapWindowByMoving(HWND snapToWin,RECT *rect)
-{
+{   
     const int SNAP_PIXEL_RANGE=10;
     RECT snapToRect;
     SIZE winsize={rect->right-rect->left,rect->bottom-rect->top};
     int difference;
     int isSnapped=false;
+    int winState;
 
     // get position of the window that we may snap to
     GetWindowRect(snapToWin,&snapToRect);
@@ -1560,7 +1597,6 @@ int snapWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
 }
 
 
-
 //calculate mouse co-ords relative to position of window
 inline void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
 {
@@ -1570,12 +1606,16 @@ inline void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
     mouseOffset->y=my-win.top;
 }
 
+void orderTheWindows()
+{
+    SetWindowPos(hMainWindow,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);
+    SetWindowPos(hToolWindow,hMainWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE); 
+    SetWindowPos(hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);    
+}    
+
 
 /* main functions */
 /* ------------------------------------------------------------------------------------------------------------------------ */
-// !! why does this need a window handle argument? - Rowan
-//      answer: to make the main window modal when file dialog box opens. I have changed it 
-//              to use the global variable instead. - Shane
 void loadFile()
 {
     OPENFILENAME ofn;
@@ -1640,6 +1680,8 @@ void loadFile()
         }    
         setupToolWindow();
         ShowWindow(hToolWindow,SW_SHOW);
+        
+        orderTheWindows();
 }
 
 
