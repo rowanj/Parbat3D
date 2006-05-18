@@ -1,13 +1,21 @@
-#include "config.h"
 #include "ImageHandler.h"
 #include "TestUtils.h"
 #include <gl/gl.h>
 #include <gl/glu.h>
 #include <math.h>
+
 #define PI 3.14159265
+
+#include "config.h"
+
+#if DEBUG_IMAGE_REDRAW
+float redraw_rotz;
+float dirty_rotz;
+#endif
 
 ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 {
+	ImageProperties* image_properties;
 	status = 0; // No error
 	error_text = "No error.";
 	
@@ -27,12 +35,9 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	
 	// Validate handles to objects
 	// !! ToDo
-	
-	hOverview = overview_hwnd;
-	hImage = image_hwnd;
-		
+			
 	/* Initialize OpenGL*/
-	gl_overview = new ImageGLView(hOverview);
+	gl_overview = new ImageGLView(overview_hwnd);
 	if (!gl_overview) {
 		status = 4;
 		error_text = "Could not create ImageGLView for overview window.";
@@ -43,7 +48,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	}
 	#endif
 	
-	gl_image = new ImageGLView(hImage);
+	gl_image = new ImageGLView(image_hwnd);
 	if (!gl_image) {
 		status = 4;
 		error_text = "Could not create ImageGLView for image window.";
@@ -65,12 +70,18 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		image_height = image_properties->getHeight();
 		image_width = image_properties->getWidth();
 	}
-#if DEBUG_IMAGE_PROPERTIES
-	image_file->printInfo();
-#endif
+
+	/* Find maximum supported texture size */
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
+    
+    /* Initialize OpenGL machine */
+    gl_overview->make_current();
+    glShadeModel(GL_FLAT);
+    glDisable(GL_DEPTH_TEST);
+    
+    /* Get texture for overview window */
     tex_overview = (char*) malloc(256*256*3);
-	this->make_textures();
+	this->make_overview_texture();
 
 	this->resize_window();
 }
@@ -142,7 +153,7 @@ void ImageHandler::redraw(void)
 
 ImageProperties* ImageHandler::get_image_properties(void)
 {
-	return image_properties;
+	return image_file->getImageProperties();
 }
 
 BandInfo* ImageHandler::get_band_info(int band_number)
@@ -188,37 +199,14 @@ const char* ImageHandler::get_info_string(void)
     return image_file->getInfoString();
 }    
 
-void ImageHandler::make_textures(void)
+void ImageHandler::make_overview_texture(void)
 {
-	// Make textures
-		int i, j, c;
-	
-	// 64*64 Checkerboard for debug
-	for (i = 0; i < 64; i++) {
-		for (j = 0; j < 64; j++) {
-			c = ((((i&0x8)==0) ^ ((j&0x8))==0))*255;
-			checkImage[i][j][0] = (GLubyte) 255;
-			checkImage[i][j][1] = (GLubyte) c;
-			checkImage[i][j][2] = (GLubyte) c;
-		}
-	}
-	
-	// Make texture for overview
+	// Get texture data
 	image_file->getRasterData(image_width, image_height, 0, 0, (char*)tex_overview, 256, 256);
-	
+
+	/* Make texture from data */
 	gl_overview->make_current();
-	glShadeModel(GL_FLAT);
-	glDisable(GL_DEPTH_TEST);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, (GLuint*) &texName);	
-	glBindTexture(GL_TEXTURE_2D, (GLuint) texName);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,  64,  64, 0, GL_RGB, GL_UNSIGNED_BYTE, checkImage);
-	
-	
 	glGenTextures(1, (GLuint*) &tex_overview_id);
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

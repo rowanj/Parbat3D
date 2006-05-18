@@ -117,4 +117,3 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 	    MessageBox (NULL, "RasterIO failed!!", "Parbat3D :: ImageFile", 0);
 	}
 }
-

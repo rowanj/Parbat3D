@@ -1,7 +1,6 @@
 #ifndef _IMAGE_HANDLER_H
 #define _IMAGE_HANDLER_H
 
-#include "config.h"
 #include <string>
 #if PLATFORM_W32
 #include <windows.h>
@@ -27,42 +26,45 @@ typedef struct geo_coords_t {
 class ImageHandler
 {
 public:
+	/* Class Operators */
 	ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename);
-	void post_init(void); // We may need to do some initialization after object creation
 	virtual ~ImageHandler(void);
-	void redraw(void);
+	
+	/* Data Operators */
 	ImageProperties* get_image_properties(void);
 	BandInfo* get_band_info(int band_number);
-	void resize_window(void);
-	PRECT get_viewport(void);
-	PRECT set_viewport(void);
 	pixel_values_ptr get_pixel_values(unsigned int x, unsigned int y);
 	void get_geo_pos(geo_coords_ptr pos);
 	const char* get_info_string(void);   
+	
+	/* Viewport Operators */
+	void redraw(void);
+	void resize_window(void);
+	PRECT get_viewport(void);
+	PRECT set_viewport(void);
+	
+	/* State Variables */
 	int status;
 	const char* error_text;
 
 private:
-	void make_textures(void);
+	/* Sub-objects */
+	ImageFile* image_file;
 
-	ImageProperties* image_properties;
 	ImageGLView* gl_overview;
 	ImageGLView* gl_image;
-	HWND hOverview, hImage;
-	ImageFile* image_file;
-	int image_width, image_height;
 
+	/* Internal Functions */
+	void make_overview_texture(void);
+
+	/* State variables */
+	int image_width, image_height;
     int max_texture_size;
-    /* Temporary texture */
-	char checkImage[64][64][3];
-	unsigned int texName;
-	/* Overview window texture */
+    bool dirty;
+    
+    /* Overview window texture */
 	unsigned int tex_overview_id;
 	char *tex_overview;
-	/* */
-#if DEBUG_IMAGE_REDRAW
-	float redraw_rotz;
-#endif
 };
 
 #endif

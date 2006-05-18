@@ -1,17 +1,18 @@
 #ifndef _IMAGE_TILE_SET_H
 #define _IMAGE_TILE_SET_H
 
-#include <Windows.h>
-
-#include "ImageFile"
+#include "ImageFile.h"
 
 class ImageTileSet
 {
 public:
-	ImageTileSet(int LOD, ImageFile* file, int tile_size);
+	ImageTileSet(int LOD, ImageFile* file, int tex_size);
 	virtual ~ImageTileSet(void);
-	void set_region(PRECT region);
+	void set_region(int x, int y, int width, int width);
 	char* get_tile(int x, int y);
+	char* get_value(
+	void free_tiles();
+	
 private:
 	int LOD;
 	RECT current_region;
