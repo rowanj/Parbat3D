@@ -960,6 +960,50 @@ int setupToolWindow()
 			NULL //pointer not needed
 			);
 	}
+	
+	/* add the image property information under the image tab */
+	ImageProperties* ip=image_handler->get_image_properties();
+	string leader;
+	int ipItems=5;
+	string n[ipItems];
+	string v[ipItems];
+	n[0]="File Name"; v[0]="Unknown";
+	n[1]="File Type"; v[1]=makeMessage(leader, (char*) ip->getDriverLongName());
+	n[2]="Width"; v[2]=makeMessage(leader, ip->getWidth());
+	n[3]="Height"; v[3]=makeMessage(leader, ip->getHeight());
+	n[4]="Bands"; v[4]=makeMessage(leader, ip->getNumBands());
+	
+	for (int i=0; i<ipItems; i++) {
+		CreateWindowEx(
+	    	0,
+			szStaticControl,
+			(char*) n[i].c_str(),          //title
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, /* defaultwindow */
+			20,                             //int x,
+			40+(i*20),                     //int y, CW_USEDEFAULT
+			100,                           //int nWidth,
+			18,                            //int nHeight
+			hToolWindowImageTabContainer,  //parent window     
+			NULL,                          //no menu
+			hThisInstance,                 //HINSTANCE hInstance,
+			NULL                           //pointer not needed
+			);
+		
+		CreateWindowEx(
+	    	0,
+			szStaticControl,
+			(char*) v[i].c_str(),          //title
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, /* defaultwindow */
+			138,                           //int x,
+			40+(i*20),                     //int y, CW_USEDEFAULT
+			100,                           //int nWidth,
+			18,                            //int nHeight
+			hToolWindowImageTabContainer,  //parent window     
+			NULL,                          //no menu
+			hThisInstance,                 //HINSTANCE hInstance,
+			NULL                           //pointer not needed
+			);
+    }
     
     return true;
 }
