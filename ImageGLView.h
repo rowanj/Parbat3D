@@ -8,20 +8,31 @@
 class ImageGLView
 {
 public:
-	ImageGLView(HWND hWindow);
-	virtual ~ImageGLView(void);
-	void make_current(void);
-	void GLresize(void);
-	void GLswap(void);
+	ImageGLView(HWND hWindow);		/* Creates OpenGL rendering context */
+	virtual ~ImageGLView(void);		/* Deletes OpenGL rendering context
+										and frees up resources */
+	void make_current(void);		/* Selects this rendering context for
+										use.  Only necessary if multiple
+										instances of this class are used. */
+	void GLresize(void);			/* Re-sizes OpenGL viewport to fit
+										current size of the window */
+	void GLswap(void);				/* Calls platform-dependant function
+										to swap OpenGL buffers */
 	
-	int width(void);
-	int height(void);
+	int width(void);				/* Gets current width of viewport */
+	int height(void);				/* Gets current height of viewport */
 	
-	int status;
-	const char* error_text;
+	int status;						/* Contains failure code if an error
+										occurred on instantiation. If no
+										error, value 0 is used */
+	const char* error_text;			/* Pointer to textual description of
+										any error, or "No error." */
 
 private:
+	/* State variables */
 	int window_height, window_width;
+	
+	/* OpenGL handles */
 	HWND window_handle;
 	HDC device_context;
 	HGLRC rendering_context;
