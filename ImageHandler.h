@@ -7,6 +7,7 @@
 #endif
 
 #include "ImageFile.h"
+#include "ImageTileSet.h"
 #include "ImageProperties.h"
 #include "ImageGLView.h"
 
@@ -42,6 +43,7 @@ public:
 	void resize_window(void);
 	PRECT get_viewport(void);
 	PRECT set_viewport(void);
+	void set_bands(int band_R, int band_G, int band_B);
 	
 	/* State Variables */
 	int status;
@@ -60,7 +62,7 @@ private:
 	/* State variables */
 	int image_width, image_height;
     int max_texture_size;
-    bool dirty;
+    int band_red, band_green, band_blue;
     
     /* Overview window texture */
 	unsigned int tex_overview_id;

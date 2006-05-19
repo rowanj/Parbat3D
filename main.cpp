@@ -1121,6 +1121,8 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
             //if(hupdate==(HWND)lParam)
             {
             MessageBox( hwnd, (LPSTR) "Updating Image",
+            // !! Insert band numbers (bands start at 1, not 0) here. - Rowan
+            if (image_handler) image_handler->set_bands(1,2,3);
             (LPSTR) szMainWindowClassName,
             MB_ICONINFORMATION | MB_OK );
             }                
@@ -1662,7 +1664,6 @@ void loadFile()
 					SetWindowText(hImageWindow,
 								(char *) makeMessage(leader,
 								(char *) image_handler->get_image_properties()->getFileName()));
-        			
                     // Image loaded succesfully, so update opengl displays
                     RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
                     RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                

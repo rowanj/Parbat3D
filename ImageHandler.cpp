@@ -1,5 +1,5 @@
 #include "ImageHandler.h"
-#include "TestUtils.h"
+//#include "TestUtils.h"
 #include <gl/gl.h>
 #include <gl/glu.h>
 #include <math.h>
@@ -18,6 +18,11 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	ImageProperties* image_properties;
 	status = 0; // No error
 	error_text = "No error.";
+	
+	/* Default initial bands to display */
+	band_red = 1;
+	band_green = 2;
+	band_blue = 3;
 	
 	// Check for lazily unspecified (NULL argument) parameters
 	if (!overview_hwnd) {
@@ -81,11 +86,15 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
     gl_overview->make_current();
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
+    gl_image->make_current();
+    glShadeModel(GL_FLAT);
+    glDisable(GL_DEPTH_TEST);
     
     /* Get texture for overview window */
     tex_overview = (char*) malloc(256*256*3);
 	this->make_overview_texture();
 
+	/* Initialize viewports */
 	this->resize_window();
 }
 
@@ -107,16 +116,15 @@ void ImageHandler::redraw(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-//	glBindTexture(GL_TEXTURE_2D, (GLuint) texName);
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	// !! Vertical eye offset will need to be a great deal more complex to deal with
-	//	portrait-oriented imagery
+	/* Set up view transform */
 	gluLookAt(0.0,0.0,(0.5/tan(PI/6.0)),0.0,0.0,0.0,0.0,1.0,0.0);
 
-	// Set up aspect transform
+	/* Set up aspect transform */
+	glPushMatrix(); // Use matrix copy so we only squash the overview polygon
 	if (image_width >= image_height) {
 		glScalef(1.0, (GLfloat)image_height/(GLfloat)image_width, 1.0);
 	} else {
@@ -133,21 +141,23 @@ void ImageHandler::redraw(void)
 		glTexCoord2f(0.0, 1.0);
 		glVertex3f(-0.5,-0.5, 0.0);
 	glEnd();
+	glPopMatrix(); // Restore model transform
 	glDisable(GL_TEXTURE_2D);
 	
 #if DEBUG_IMAGE_REDRAW
+	/* draw rotating line to visualize redraw frequency */
 	glRotatef(redraw_rotz, 0.0,0.0,1.0);
 	redraw_rotz-=1.0;
 	if(redraw_rotz < -360.0) redraw_rotz+=360.0;
 	glBegin(GL_LINES);
 		glColor3f(1.0,1,0);
-		glVertex3i(0,0,0);
-		glVertex3i(0,1,0);
+		glVertex3f(0.0,0.0,0.0);
+		glVertex3f(0.0,0.25,0.0);
 	glEnd();
 #endif
 	gl_overview->GLswap();
 	
-	// Main image window
+	/* On to the main window */
 	gl_image->make_current();
 	glClearColor(0.3f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
