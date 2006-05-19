@@ -1658,7 +1658,10 @@ void loadFile()
     			else
     			{
                     /* Display the file name at the top of the image window */
-        			SetWindowText(hImageWindow,image_handler->get_image_properties()->getFileName());
+                    string leader = "Parbat3D - ";
+					SetWindowText(hImageWindow,
+								(char *) makeMessage(leader,
+								(char *) image_handler->get_image_properties()->getFileName()));
         			
                     // Image loaded succesfully, so update opengl displays
                     RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
