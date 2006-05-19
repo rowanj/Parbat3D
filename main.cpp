@@ -973,7 +973,7 @@ int setupToolWindow()
 	int ipItems=5;
 	string n[ipItems];
 	string v[ipItems];
-	n[0]="File Name"; v[0]="Unknown";
+	n[0]="File Name"; v[0]=makeMessage(leader, (char*) ip->getFileName());
 	n[1]="File Type"; v[1]=makeMessage(leader, (char*) ip->getDriverLongName());
 	n[2]="Width"; v[2]=makeMessage(leader, ip->getWidth());
 	n[3]="Height"; v[3]=makeMessage(leader, ip->getHeight());
@@ -1657,8 +1657,8 @@ void loadFile()
 				}
     			else
     			{
-       
-        			SetWindowText(hImageWindow,image_handler->get_info_string());
+                    /* Display the file name at the top of the image window */
+        			SetWindowText(hImageWindow,image_handler->get_image_properties()->getFileName());
         			
                     // Image loaded succesfully, so update opengl displays
                     RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);

@@ -70,6 +70,9 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		image_height = image_properties->getHeight();
 		image_width = image_properties->getWidth();
 	}
+	
+	/* Set the filename to the image properties */
+	image_properties->setFileName(filename);
 
 	/* Find maximum supported texture size */
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);

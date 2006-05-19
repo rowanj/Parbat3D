@@ -58,3 +58,14 @@ ImageProperties::~ImageProperties(void)
 {
 	return;	
 }
+
+const char* ImageProperties::getFileName(void)
+{
+    return imageFileName;
+}    
+
+void ImageProperties::setFileName(char* n)
+{
+    imageFileName = n;
+}    
+

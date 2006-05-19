@@ -26,11 +26,15 @@ class ImageProperties
 		const char* getDriverLongName(void);
 		virtual ~ImageProperties(void);
 		
+		const char* getFileName(void);
+		void setFileName(char*);
+		
 	private:
 		int width;
 		int height;
 		int numBands;
 		const char* driverName;
 		const char* driverLongName;
+		const char* imageFileName;
 };
 #endif
