@@ -2,7 +2,7 @@
 #include "ImageProperties.h"
 
 
-ImageProperties::ImageProperties(GDALDataset* dataset)
+ImageProperties::ImageProperties(GDALDataset* dataset, char* filename)
 {
 	if(dataset == NULL)
 	{
@@ -11,6 +11,7 @@ ImageProperties::ImageProperties(GDALDataset* dataset)
 		#endif
 		driverName = NULL;
 		driverLongName = NULL;
+		imageFileName = NULL;
 		width = 0;
 		height = 0;
 		numBands = 0;
@@ -23,6 +24,7 @@ ImageProperties::ImageProperties(GDALDataset* dataset)
 		driverName = (char *) GDALGetDescription(GDALGetDatasetDriver(dataset));
 		driverLongName = (char *) GDALGetMetadataItem(GDALGetDatasetDriver(dataset),
 														GDAL_DMD_LONGNAME,0);
+		imageFileName = filename;
 		width = GDALGetRasterXSize(dataset);
 		height = GDALGetRasterYSize(dataset);
 		numBands = GDALGetRasterCount(dataset);
@@ -59,13 +61,21 @@ ImageProperties::~ImageProperties(void)
 	return;	
 }
 
+/* Returns a string containing the file name, without path */
+
 const char* ImageProperties::getFileName(void)
 {
-    return imageFileName;
+	string::size_type position;
+	string name;
+	string truncName;
+	const char * finalName;
+	
+	name = imageFileName;
+	position = name.find_last_of("\\");
+	truncName = name.substr(position + 1, name.length() - position);
+	finalName = truncName.c_str();
+	
+    return finalName;
 }    
 
-void ImageProperties::setFileName(char* n)
-{
-    imageFileName = n;
-}    
 

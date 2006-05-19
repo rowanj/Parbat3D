@@ -10,6 +10,7 @@
 
 #include "config.h"
 #include <string>
+#include <iostream>
 #if PLATFORM_W32
 #include <windows.h>
 #endif
@@ -18,16 +19,14 @@
 class ImageProperties
 {
 	public:
-		ImageProperties(GDALDataset* dataset);
+		ImageProperties(GDALDataset* dataset, char* filename);
 		int getWidth(void);
 		int getHeight(void);
 		int getNumBands(void);
 		const char* getDriverName(void);
 		const char* getDriverLongName(void);
 		virtual ~ImageProperties(void);
-		
 		const char* getFileName(void);
-		void setFileName(char*);
 		
 	private:
 		int width;

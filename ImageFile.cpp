@@ -17,7 +17,7 @@ ImageFile::ImageFile(char* theFilename)
 	
 	ifDataset = (GDALDataset *) GDALOpen(filename , GA_ReadOnly);
 	
-	properties = new ImageProperties(ifDataset);
+	properties = new ImageProperties(ifDataset, filename);
 	coordInfo = new CoordinateInfo(ifDataset);
 	
 	for (i=0;i<properties->getNumBands();i++)
