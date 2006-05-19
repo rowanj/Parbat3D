@@ -109,8 +109,12 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 {
     CPLErr myErr;
     
+    int bands;
+	
+	bands = properties->getNumBands();
+    
     myErr = GDALDatasetRasterIO(ifDataset, GF_Read, xpos, ypos, width, height, buffer, outWidth, outHeight, GDT_Byte,
-    					3, NULL, 3, 3*outWidth, 1);
+    					bands, NULL, bands, bands*outWidth, 1);
 
 	if (myErr == CE_Failure)
 	{
