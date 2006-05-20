@@ -979,7 +979,16 @@ int setupToolWindow()
 	int ipItems=5;
 	string n[ipItems];
 	string v[ipItems];
-	n[0]="File Name"; v[0]=makeMessage(leader, (char*) ip->getFileName());
+	/* If the filename is too long to be displayed, truncate it.
+	Later on, a roll-over tooltip should be implemented to bring
+	up the full name.*/
+	string fname = ip->getFileName();
+	if (fname.length() > 26)
+	{
+		fname = fname.substr(0, 23);
+		fname = fname + "...";
+	}
+	n[0]="File Name"; v[0]=makeMessage(leader, (char*) fname.c_str());
 	n[1]="File Type"; v[1]=makeMessage(leader, (char*) ip->getDriverLongName());
 	n[2]="Width"; v[2]=makeMessage(leader, ip->getWidth());
 	n[3]="Height"; v[3]=makeMessage(leader, ip->getHeight());
@@ -990,10 +999,10 @@ int setupToolWindow()
 	    	0,
 			szStaticControl,
 			(char*) n[i].c_str(),          //title
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, /* defaultwindow */
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW | SS_RIGHTJUST, /* defaultwindow */
 			20,                             //int x,
 			40+(i*20),                     //int y, CW_USEDEFAULT
-			100,                           //int nWidth,
+			50,                           //int nWidth,
 			18,                            //int nHeight
 			hToolWindowImageTabContainer,  //parent window     
 			NULL,                          //no menu
@@ -1006,9 +1015,9 @@ int setupToolWindow()
 			szStaticControl,
 			(char*) v[i].c_str(),          //title
 			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, /* defaultwindow */
-			138,                           //int x,
+			78,                           //int x,
 			40+(i*20),                     //int y, CW_USEDEFAULT
-			100,                           //int nWidth,
+			160,                           //int nWidth,
 			18,                            //int nHeight
 			hToolWindowImageTabContainer,  //parent window     
 			NULL,                          //no menu
