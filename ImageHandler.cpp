@@ -64,7 +64,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	}
 	#endif
 	
-		// Initialize image file (could be threaded)
+	// Initialize image file (could be threaded)
 	image_file = new ImageFile(filename);
 		
 	if (!image_file) {
@@ -228,4 +228,11 @@ void ImageHandler::make_overview_texture(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
 	/* */
+}
+
+void ImageHandler::set_bands(int band_R, int band_G, int band_B)
+{
+	band_red = band_R;
+	band_green = band_G;
+	band_blue = band_B;
 }

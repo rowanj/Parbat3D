@@ -1121,10 +1121,10 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
             //if(hupdate==(HWND)lParam)
             {
             MessageBox( hwnd, (LPSTR) "Updating Image",
+                        (LPSTR) szMainWindowClassName,
+            			MB_ICONINFORMATION | MB_OK );
             // !! Insert band numbers (bands start at 1, not 0) here. - Rowan
             if (image_handler) image_handler->set_bands(1,2,3);
-            (LPSTR) szMainWindowClassName,
-            MB_ICONINFORMATION | MB_OK );
             }                
             break;
         
