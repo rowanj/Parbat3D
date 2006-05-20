@@ -900,8 +900,9 @@ int setupToolWindow()
               name = altName;
                 
             /* Add band number to band name */
-            name = catcstrings( (char*) "). ", (char*) name);
+            name = catcstrings( (char*) " - ", (char*) name);
             name = catcstrings( (char*) inttocstring(i+1), (char*) name);
+            name = catcstrings( (char*) "Band ", (char*) name);
         } else
                name = "NONE";
 		
