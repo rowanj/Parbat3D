@@ -769,7 +769,7 @@ int setupToolWindow()
     oldImageTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowImageTabContainer,GWL_WNDPROC,(long)&ToolWindowImageTabContainerProcedure);
 
 
-    bands = image_handler->get_image_properties()->getNumBands();
+    bands = image_handler->get_image_properties()->getNumBands() + 1;
     
     /* Create group for RED radio buttons based on band number */
     hRed = CreateWindowEx(
@@ -889,17 +889,22 @@ int setupToolWindow()
 			NULL //pointer not needed
 			);
 		
-		/* add band names to radio buttons*/
-		const char *name = image_handler->get_band_info(i+1)->getColourInterpretationName();
+		const char* name;
+		if (i<(bands-1)) {
+    		/* add band names to radio buttons*/
+    		name = image_handler->get_band_info(i+1)->getColourInterpretationName();
+    		
+    		/* If Colour name unknown change band name*/
+    		const char *altName ="No colour name";
+    		if (strcmp(name, "Unknown")==0)
+              name = altName;
+                
+            /* Add band number to band name */
+            name = catcstrings( (char*) "). ", (char*) name);
+            name = catcstrings( (char*) inttocstring(i+1), (char*) name);
+        } else
+               name = "NONE";
 		
-		/* If Colour name unknown change band name*/
-		const char *altName ="No colour name";
-		if (strcmp(name, "Unknown")==0)
-          name = altName;
-            
-        /* Add band number to band name */
-        name = catcstrings( (char*) "). ", (char*) name);
-        name = catcstrings( (char*) inttocstring(i+1), (char*) name);
 		
         /* Display band name in tool windo */
 		CreateWindowEx(
