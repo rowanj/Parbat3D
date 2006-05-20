@@ -10,7 +10,7 @@
 #include "StringUtils.h"
 
 
-ImageHandler::ImageHandler* image_handler;	// Instance handle
+ImageHandler::ImageHandler* image_handler;	// Instance handle ptr
 
 using namespace std;
 
