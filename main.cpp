@@ -373,7 +373,7 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
     static SIZE textSize;
     static POINT textPos;
     static char text[]="No Image Loaded";
-    const int textLen=16;
+    const int textLen=15;
     
     switch (message)                  /* handle the messages */
     {
