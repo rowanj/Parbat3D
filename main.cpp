@@ -1,18 +1,18 @@
 #include <Windows.h>
 #include <Commctrl.h>
 #include <iostream>
-#include "main.h"
 #include "config.h"
 #include "Settings.h"
 #include "ImageHandler.h"
 #include "ImageProperties.h"
 #include "BandInfo.h"
 #include "StringUtils.h"
+#include "main.h"
 
-
-ImageHandler::ImageHandler* image_handler;	// Instance handle ptr
 
 using namespace std;
+
+ImageHandler::ImageHandler* image_handler;	// Instance handle ptr
 
 /* Unique class names for our main windows */
 char szMainWindowClassName[] = "Parbat3D Main Window";
@@ -1667,11 +1667,11 @@ inline void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
     mouseOffset->y=my-win.top;
 }
 
-void orderTheWindows()
+void orderWindows()
 {
     SetWindowPos(hMainWindow,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);
     SetWindowPos(hToolWindow,hMainWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE); 
-    SetWindowPos(hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);    
+    //SetWindowPos(hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);    
 }    
 
 
@@ -1686,7 +1686,7 @@ void loadFile()
 
     ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW - which note?
     ofn.hwndOwner = hMainWindow;
-    ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tif\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPG Files (*.jpg)\0*.jpg\0TIFF / GeoTIFF (*.tif)\0*.tif\0All Files (*.*)\0*.*\0";
+    ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tif\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPEG / JPEG 2000 (*.jpg)\0*.jpg\0TIFF / GeoTIFF (*.tif)\0*.tif\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile = szFileName;
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
@@ -1728,10 +1728,11 @@ void loadFile()
 
                     // re-create tool window
                     setupToolWindow();
-                    
+
                     // show tool & image windows
                     ShowWindow(hToolWindow,SW_SHOW);
                     ShowWindow(hImageWindow,SW_SHOW);    
+                    orderWindows();                    
 
                     // enable window menu items
                     EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,false);
@@ -1772,6 +1773,7 @@ void closeFile()
     EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);    
     
     InvalidateRect(hMainWindowDisplay,0,true);  /* repaint main window */		
+    UpdateWindow(hMainWindowDisplay);
 }
 
 
