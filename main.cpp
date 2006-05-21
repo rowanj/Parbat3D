@@ -69,6 +69,7 @@ HPEN hTabPen;
 HBRUSH hTabBrush;
 WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc;
 
+int fileIsOpen=false;   /* indicates if an image file is currently loaded */
 
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
@@ -78,10 +79,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* load window classes for common controls */
     InitCommonControls();
     
-    // store this process's instance handle
+    /* store this process's instance handle */
     hThisInstance=hInstance;
     
-    registerToolWindow();
+    /* register window classes */
+    if ((!registerToolWindow())||(!registerImageWindow()))
+        return 0;
     
     // get desktop window handle
     hDesktop=GetDesktopWindow();
@@ -177,6 +180,7 @@ int setupMainWindow()
     /* Disable Window menu items */
     EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,true);     /* note: true appears to disable & false enables */
     EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
+    EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);    
 
     /* get client area of image window */
     GetClientRect(hMainWindow,&rect);
@@ -234,7 +238,6 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
         /* WM_COMMAND: some command has been preformed by user, eg. menu item clicked */            
         case WM_COMMAND:
-            /* if menu item clicked, wParam==resource id number of menu item (defined in rsrc.rc) */
             switch( wParam )
             {
                 case IDM_FILEOPEN:
@@ -247,21 +250,23 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                               (LPSTR) szMainWindowClassName,
                               MB_ICONINFORMATION | MB_OK );
                     return 0;
+                
+                case IDM_FILECLOSE:
+                    closeFile();
+                    return 0;                    
                           
              	case IDM_IMAGEWINDOW:
-                    ShowWindow(hImageWindow,SW_SHOW);
-
-                    /*MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will reopen image window",
-                              (LPSTR) szMainWindowClassName,
-                              MB_ICONINFORMATION | MB_OK );*/
+                    if (toogleMenuItemTick(hMainMenu,IDM_IMAGEWINDOW))
+                        ShowWindow(hImageWindow,SW_SHOW);                        
+                    else
+                        ShowWindow(hImageWindow,SW_HIDE);
                     return 0;
              
                 case IDM_TOOLSWINDOW:
-                     ShowWindow(hToolWindow,SW_SHOW);
-                    
-                    /*MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will reopen image window",
-                              (LPSTR) szMainWindowClassName,
-                              MB_ICONINFORMATION | MB_OK );*/
+                    if (toogleMenuItemTick(hMainMenu,IDM_TOOLSWINDOW))
+                        ShowWindow(hToolWindow,SW_SHOW);                        
+                    else
+                        ShowWindow(hToolWindow,SW_HIDE);
                     return 0;
 
                 case IDM_HELPCONTENTS:
@@ -281,7 +286,6 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
         /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */
         case WM_NCLBUTTONDOWN:
-            /* wParam=the area of the window where the mouse button was pressed */
 
             /* HTCAPTION: mouse button was pressed down on the window title bar
                          (occurs when user starts to move the window)              */
@@ -311,8 +315,6 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             /* snap main window to edge of desktop */           
             snapWindowByMoving(hDesktop,(RECT*)lParam);
 
-            /* bug: when calling snapWindow the second time the main window does not visually snap to the tool window, but snapWindow still returns true */
-            /* snap main window to image window, if near it, if it's not already snapped */
             if (!imageWindowIsMovingToo)
                 imageWindowIsSnapped=snapWindowByMoving(hImageWindow,(RECT*)lParam); 
 
@@ -431,8 +433,8 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Image Window Functions */
 
-/* create the image window */
-int setupImageWindow()
+/* register image window class */
+int inline registerImageWindow()
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
 
@@ -454,7 +456,13 @@ int setupImageWindow()
     wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
 
     /* Register the window class, if fails return false */
-    if(!RegisterClassEx(&wincl)) return false;
+    return RegisterClassEx(&wincl);
+}
+
+
+/* create the image window */
+int setupImageWindow()
+{
     
     /* Get Main Window coords for Image Window alignment*/
     RECT rect;
@@ -516,7 +524,6 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
     {
         /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
         case WM_NCLBUTTONDOWN:
-            /* wParam=the area of the window where the mouse button was pressed */
 
             switch(wParam)
             {
@@ -576,7 +583,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
         case WM_SIZE:
             if (imageWindowIsSnapped)
             {
-                // re-snap window in case the main window has now moved away
+                /* re-snap window in case the main window has now moved away */
                 GetWindowRect(hwnd,&rect);
                 imageWindowIsSnapped=snapWindowByMoving(hwnd,&rect);
             }    
@@ -584,20 +591,25 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             /* resize display/opengl window to fit new size */            
             GetClientRect(hImageWindow,&rect);
             MoveWindow(hImageWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
-            break;
+            return 0;
+           
+        case WM_SHOWWINDOW:
+            /* update window menu item depending on whether window is shown or hidden */
+            if (wParam)
+                CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_CHECKED|MF_BYCOMMAND);            
+            else
+                CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
+            return 0;
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
             /* don't destroy this window, but make it invisible */
             ShowWindow(hwnd,SW_HIDE);
-            //DestroyWindow(hwnd);
-            //hImageWindow=NULL;
             return 0;
 
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
-			/* send a message that will cause WinMain to exit the message loop */
-            PostQuitMessage (0);
+            CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             return 0;
             
             
@@ -612,7 +624,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Tools Window Functions */
 
-int registerToolWindow()
+int inline registerToolWindow()
 {
     WNDCLASSEX wincl;       /* Datastructure for the windowclass */
     
@@ -648,7 +660,7 @@ int setupToolWindow()
     
     /* The class is registered, lets create the program*/
     hToolWindow =CreateWindowEx(
-           WS_EX_TOOLWINDOW+WS_EX_TOPMOST,                              /* Extended styles */
+           WS_EX_TOPMOST,                              /* Extended styles */
            szToolWindowClassName,         /* Classname */
            "Tools",                         /* Title Text */
            WS_POPUP+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_VSCROLL, /* defaultwindow */
@@ -656,7 +668,7 @@ int setupToolWindow()
            rect.bottom,       /* where the window end up on the screen */
            250,                 /* The programs width */
            300,                 /* and height in pixels */
-           hImageWindow,        /* The window is a childwindow to main window */
+           NULL,        /* The window is a childwindow to main window */
            NULL,                /* No menu */
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
@@ -1251,8 +1263,6 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             
         /* WM_MOVING: the window is about to be moved to a new location */
         case WM_MOVING:
-            /* lParam=the new position, which can be modified before the window is moved */
-
             /* set new window position based on position of mouse */
             setNewWindowPosition((RECT*)lParam,&snapMouseOffset);
 
@@ -1286,6 +1296,14 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                 toolWindowIsSnapped=snapWindowByMoving(hMainWindow,&rect);
             }    
             break;
+
+        case WM_SHOWWINDOW:
+            /* update window menu item depending on whether window is shown or hidden */
+            if (wParam)
+                CheckMenuItem(hMainMenu,IDM_TOOLSWINDOW,MF_CHECKED|MF_BYCOMMAND);            
+            else
+                CheckMenuItem(hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
+            return 0;
       
         /* WM_CLOSE: system or user has requested to close the window/application */              
         case WM_CLOSE:
@@ -1295,6 +1313,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
         /* WM_DESTORY: system is destroying our window */                
         case WM_DESTROY:
+            CheckMenuItem(hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             return 0;
 
         default: 
@@ -1308,6 +1327,23 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* general window functions */
+
+/* toolges a menu item between a checked & unchecked state */
+/* returns true if new state is checked, else false if unchecked */
+int toogleMenuItemTick(HMENU hMenu,int itemId)
+{
+    int menuState=GetMenuState(hMenu,itemId,MF_BYCOMMAND);
+    if (menuState&MF_CHECKED)
+    {
+        CheckMenuItem(hMenu,itemId,MF_UNCHECKED|MF_BYCOMMAND);
+        return false;
+    }
+    else
+    {
+        CheckMenuItem(hMenu,itemId,MF_CHECKED|MF_BYCOMMAND);
+        return true;
+    }
+}
 
 /* calculates window's new position based on the location of the mouse cursor */
 void setNewWindowPosition(RECT* newPos,POINT *mouseOffset)
@@ -1375,6 +1411,7 @@ void setNewWindowSize(RECT* newPos,RECT* oldPos,POINT* oldMouse,int whichDirecti
 
     }   
 }    
+
 
 /* move a window by a certain amount of pixels */
 inline void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset)
@@ -1656,17 +1693,13 @@ void loadFile()
     {
         // Do something usefull with the filename stored in szFileName 
 
-        			// create image window and display
-    				if (!hImageWindow)
-            			setupImageWindow();
-    				ShowWindow(hImageWindow,SW_SHOW);    
-        
-        // enable Window menu items
-        EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,false);
-        EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,false);        
-
 		// Clean up any previous instance
-		if (image_handler) delete image_handler;
+		closeFile();
+
+		// create image window 
+    	if (!hImageWindow)
+    		setupImageWindow();        
+	
 	    image_handler = new ImageHandler::ImageHandler(hMainWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
 	    if (image_handler) {
 			if (image_handler->status > 0) {
@@ -1678,14 +1711,30 @@ void loadFile()
 				}
     			else
     			{
+                    // Image loaded succesfully
+                    fileIsOpen=true;
+                    
                     /* Display the file name at the top of the image window */
-                    string leader = "Parbat3D - ";
+                    string leader = "Image - ";
 					SetWindowText(hImageWindow,
 								(char *) makeMessage(leader,
 								(char *) image_handler->get_image_properties()->getFileName()));
-                    // Image loaded succesfully, so update opengl displays
+                    // update opengl displays
                     RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
                     RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
+
+                    // re-create tool window
+                    setupToolWindow();
+                    
+                    // show tool & image windows
+                    ShowWindow(hToolWindow,SW_SHOW);
+                    ShowWindow(hImageWindow,SW_SHOW);    
+
+                    // enable window menu items
+                    EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,false);
+                    EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,false);
+                    EnableMenuItem(hMainMenu,IDM_FILECLOSE,false);
+                            
                 }				
 			}
 
@@ -1694,20 +1743,33 @@ void loadFile()
 			// !! Should probably die gracefully at this point - Rowan
 		}
     }
-    // create tool window and display
-        
-        if (hToolWindow)
-        {
-            DestroyWindow(hToolWindow);
-            hToolWindow=NULL;
-        }    
-        setupToolWindow();
-        ShowWindow(hToolWindow,SW_SHOW);
-        
-        orderTheWindows();
 }
 
+void closeFile()
+{
+    
+	if (image_handler) delete image_handler;
+    image_handler=NULL; //??
+	
+    if (hToolWindow)
+    {
+        DestroyWindow(hToolWindow);
+        hToolWindow=NULL;
+    }    
+    
+    if (hImageWindow)
+    {
+        DestroyWindow(hImageWindow);
+        hImageWindow=NULL;
+    }
 
+    /* disable menu items */
+    EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,true);
+    EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
+    EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);    
+    
+    InvalidateRect(hMainWindowDisplay,0,true);  /* repaint main window */		
+}
 
 
 

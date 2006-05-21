@@ -6,6 +6,7 @@
 #define IDM_FILEOPEN        201
 #define IDM_FILESAVE        202
 #define IDM_FILESAVEAS      203
+#define IDM_FILECLOSE       205
 #define IDM_FILEEXIT        207
 
 #define IDM_IMAGEWINDOW     210
@@ -20,6 +21,7 @@
 /* function declarations */
 
 void loadFile();
+void closeFile();
 
 LRESULT CALLBACK MainWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK DisplayWindowProcedure(HWND, UINT, WPARAM, LPARAM);
@@ -30,11 +32,10 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND, UINT, WPARAM, LPAR
 LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
 
-int setupImageWindow();
 int registerToolWindow();
-
+int registerImageWindow();
+int setupImageWindow();
 int setupMainWindow();
-
 int setupToolWindow();
 
 void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset);
@@ -46,5 +47,6 @@ void setNewWindowSize(RECT* newPos,RECT* oldPos,POINT* oldMouse,int whichDirecti
 void setNewWindowPosition(RECT* newPos,POINT *mouseOffset);
 
 int isWindowInNormalState(HWND hwnd);
+int toogleMenuItemTick(HMENU hMenu,int itemId);
 
 #endif
