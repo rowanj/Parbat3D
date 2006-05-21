@@ -240,8 +240,10 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                     return 0;
 
                 case IDM_HELPCONTENTS:
-                    WinHelp( hwnd, (LPSTR) "PARBAT3D.HLP",
-                           HELP_CONTENTS, 0L );
+                     ShellExecute(NULL, "open", "index.htm", NULL, "help", SW_SHOW);
+					
+					//WinHelp( hwnd, (LPSTR) "help/index.htm",
+                           //HELP_CONTENTS, 0L );
                     return 0;
 
                 case IDM_FILEEXIT:
@@ -747,6 +749,11 @@ int setupToolWindow()
         CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * i),
 			50, 18, queryValueContainer, NULL, hThisInstance, NULL);
 	}
+	
+	/* Default radio button selection */
+	SendMessage(redRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
+	SendMessage(greenRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
+	SendMessage(blueRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
 	
 	/* add the image property information under the image tab */
 	ImageProperties* ip=image_handler->get_image_properties();

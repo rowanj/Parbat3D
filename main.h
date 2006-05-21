@@ -15,10 +15,6 @@
 #define IDM_HELPCONTENTS    215
 #define IDM_HELPABOUT       218
 
-#define IDC_RADIO_BUTTON_1 10001
-
-
-
 /* global variable declarations
     -added these so main.cpp can be split up into multiple files -shane */
 extern char szMainWindowClassName[];
@@ -57,7 +53,6 @@ extern HFONT hBoldFont,hNormalFont,hHeadingFont;
 extern HPEN hTabPen;
 extern HBRUSH hTabBrush;
 extern WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc;
-
 
 /* function declarations */
 
