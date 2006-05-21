@@ -38,20 +38,13 @@ HWND hToolWindowTabControl;
 HWND hToolWindowDisplayTabContainer;
 HWND hToolWindowQueryTabContainer;
 HWND hToolWindowImageTabContainer;
-HWND hRedRadioButton1, hRedRadioButton2;
-HWND hGreenRadioButton1, hGreenRadioButton2;
-HWND hBlueRadioButton1, hBlueRadioButton2;
 HWND hImageWindowDisplay;
 HWND hMainWindowDisplay;
-
-/* radio button globals */
-int bands = 6;
 HWND *redRadiobuttons;
 HWND *greenRadiobuttons;
 HWND *blueRadiobuttons;
-
-/* update button global */
 HWND hupdate;
+int bands = 0; // for use with radio buttons
 
 /* Variables to record when the windows have snapped to main wndow */
 int imageWindowIsSnapped=false;
@@ -74,7 +67,7 @@ int fileIsOpen=false;   /* indicates if an image file is currently loaded */
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 {
- 	MSG messages;            /* Here messages to the application is saved */
+ 	MSG messages;     /* Here messages to the application is saved */
  
     /* load window classes for common controls */
     InitCommonControls();
@@ -115,8 +108,8 @@ int setupMainWindow()
     /* The Window structure */
     wincl.hInstance = hThisInstance;
     wincl.lpszClassName = szMainWindowClassName;
-    wincl.lpfnWndProc = MainWindowProcedure;      /* This function is called by windows */
-    wincl.style = CS_DBLCLKS;                 /* Ctach double-clicks */
+    wincl.lpfnWndProc = MainWindowProcedure; /* This function is called by windows */
+    wincl.style = CS_DBLCLKS;  /* Ctach double-clicks */
     wincl.cbSize = sizeof(WNDCLASSEX);
 
     /* Use default icon and mousepointer */
@@ -124,20 +117,19 @@ int setupMainWindow()
     wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
     wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
     wincl.lpszMenuName = NULL; /* No menu */
-    wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
-    wincl.cbWndExtra = 0;                      /* structure or the window instance */
+    wincl.cbClsExtra = 0; /* No extra bytes after the window class */
+    wincl.cbWndExtra = 0; /* structure or the window instance */
     /* Use lightgray as the background of the window */
     wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
 
     /* Register the window class, if fails return false */
     if(!RegisterClassEx(&wincl)) return false;
     
-    
     /* Create window class for the display control windows */
     wincl.hInstance = hThisInstance;
     wincl.lpszClassName = szDisplayClassName;
-    wincl.lpfnWndProc = DisplayWindowProcedure;      /* This function is called by windows */
-    wincl.style = CS_DBLCLKS;                 /* Ctach double-clicks */
+    wincl.lpfnWndProc = DisplayWindowProcedure;  /* This function is called by windows */
+    wincl.style = CS_DBLCLKS;  /* Ctach double-clicks */
     wincl.cbSize = sizeof(WNDCLASSEX);
     /* Use default icon and mousepointer */
     wincl.hIcon = NULL;
@@ -156,29 +148,19 @@ int setupMainWindow()
 	if (mx <= 0) mx = CW_USEDEFAULT;
 	if (my <= 0) my = CW_USEDEFAULT;
     
-    /* The class is registered, lets create a window based on it*/
-    hMainWindow = CreateWindowEx(
-           0,                   /* Extended possibilites for variation */
-           szMainWindowClassName,         /* Classname */
-           "Parbat3D",          /* Title Text */
-           WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, /* window styles */
-           mx,                  /* x position */
-           my,                  /* y position */
-           250,                 /* The program's width */
-           296,                 /* and height in pixels */
-           hMainWindow,         /* The window is a childwindow to desktop */
-           NULL,                /* No menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
-           );
+    /* Create main window */
+    hMainWindow = CreateWindowEx(0, szMainWindowClassName, "Parbat3D",
+		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, mx, my, 250, 296,
+		hMainWindow, NULL, hThisInstance, NULL);
     if (!hMainWindow)
         return false;                        
 
-    hMainMenu = LoadMenu(hThisInstance, MAKEINTRESOURCE(ID_MENU));
+    /* set menu to main windo */
+	hMainMenu = LoadMenu(hThisInstance, MAKEINTRESOURCE(ID_MENU));
     SetMenu(hMainWindow, hMainMenu);    
     
-    /* Disable Window menu items */
-    EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,true);     /* note: true appears to disable & false enables */
+    /* Disable Window menu items. note: true appears to disable & false enables */
+    EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,true);
     EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
     EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);    
 
@@ -193,22 +175,9 @@ int setupMainWindow()
     ReleaseDC(hMainWindow,hdc);    
 
     /* create a child window that will be used by OpenGL */
-    hMainWindowDisplay=CreateWindowEx(
-           0,                   /* Extended possibilites for variation */
-           szDisplayClassName,         /* Classname */
-           NULL,         /* Title Text */
-           WS_CHILD|WS_VISIBLE, /* styles */
-           rect.left,       /* x position based on parent window */
-           rect.top,         /* y position based on parent window */
-           rect.right,                 /* The programs width */
-           rect.bottom,                 /* and height in pixels */
-           hMainWindow,        /* The window's parent window */
-           NULL,                /* No menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
-           );
+    hMainWindowDisplay=CreateWindowEx( 0, szDisplayClassName, NULL, WS_CHILD|WS_VISIBLE,
+		rect.left, rect.top, rect.right, rect.bottom, hMainWindow, NULL, hThisInstance, NULL);
    
-    
     /* Make the window visible on the screen */
     ShowWindow(hMainWindow, SW_SHOW);
     
@@ -247,7 +216,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                   
                 case IDM_FILESAVE:
                 case IDM_FILESAVEAS:
-					MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will say \"Where the #$%@ do you want to store such a big file?\"",
+					MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will say \"Where do you want to store such a big file?\"",
                               (LPSTR) szMainWindowClassName,
                               MB_ICONINFORMATION | MB_OK );
                     return 0;
@@ -257,14 +226,14 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                     return 0;                    
                           
              	case IDM_IMAGEWINDOW:
-                    if (toogleMenuItemTick(hMainMenu,IDM_IMAGEWINDOW))
+                    if (toggleMenuItemTick(hMainMenu,IDM_IMAGEWINDOW))
                         ShowWindow(hImageWindow,SW_SHOW);                        
                     else
                         ShowWindow(hImageWindow,SW_HIDE);
                     return 0;
              
                 case IDM_TOOLSWINDOW:
-                    if (toogleMenuItemTick(hMainMenu,IDM_TOOLSWINDOW))
+                    if (toggleMenuItemTick(hMainMenu,IDM_TOOLSWINDOW))
                         ShowWindow(hToolWindow,SW_SHOW);                        
                     else
                         ShowWindow(hToolWindow,SW_HIDE);
@@ -387,7 +356,7 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
             hbrush=CreateSolidBrush(0);
             hdc=GetDC(hwnd);                                                                      /* get device context (drawing) object */
             SelectObject(hdc,hNormalFont);                                                   /* set font that will be used for drawing text */    
-            GetTextExtentPoint32(hdc,text,textLen,&textSize);     /* get width & height of string in pixels */   
+            GetTextExtentPoint32(hdc,text,textLen,&textSize); /* get width & height of string in pixels */   
             ReleaseDC(hwnd,hdc);
             
             break;            
@@ -432,20 +401,19 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
     return 0; 
 }
 
-
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Image Window Functions */
 
 /* register image window class */
 int inline registerImageWindow()
 {
-    WNDCLASSEX wincl;        /* Datastructure for the windowclass */
+    WNDCLASSEX wincl;  /* Datastructure for the windowclass */
 
     /* The Window structure */
     wincl.hInstance = hThisInstance;                /* process's instance handle */
     wincl.lpszClassName = szImageWindowClassName;   /* our unique name for this class */
     wincl.lpfnWndProc = ImageWindowProcedure;      /* This function is called by windows */
-    wincl.style = CS_DBLCLKS;                 /* Ctach double-clicks */
+    wincl.style = CS_DBLCLKS; /* Ctach double-clicks */
     wincl.cbSize = sizeof(WNDCLASSEX);
 
     /* Use default icon and mousepointer */
@@ -453,15 +421,14 @@ int inline registerImageWindow()
     wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
     wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
     wincl.lpszMenuName = NULL; /* No menu */
-    wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
-    wincl.cbWndExtra = 0;                      /* structure or the window instance */
+    wincl.cbClsExtra = 0; /* No extra bytes after the window class */
+    wincl.cbWndExtra = 0; /* structure or the window instance */
     /* Use lightgray as the background of the window */
     wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
 
     /* Register the window class, if fails return false */
     return RegisterClassEx(&wincl);
 }
-
 
 /* create the image window */
 int setupImageWindow()
@@ -472,39 +439,16 @@ int setupImageWindow()
     GetWindowRect(hMainWindow, &rect);
     
     /* Create a window based on the class we just registered */
-    hImageWindow =CreateWindowEx(
-           WS_EX_OVERLAPPEDWINDOW,                   /* Extended possibilites for variation */
-           szImageWindowClassName,         /* Classname */
-           "Image Window",         /* Title Text */
-           WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MINIMIZEBOX+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL, /* defaultwindow */
-           rect.right,       /* x position based on main window */
-           rect.top,         /* y position based on main window */
-           700,                 /* The programs width */
-           600,                 /* and height in pixels */
-           0,        /* The window is a childwindow to main window */
-           NULL,                /* No menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
-           );
+    hImageWindow =CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, szImageWindowClassName, "Image Window",
+	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MINIMIZEBOX+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL,
+	     rect.right, rect.top, 700, 600, 0, NULL, hThisInstance, NULL);
 
     /* get client area of image window */
     GetClientRect(hImageWindow,&rect);
 
     /* create a child window that will be used by OpenGL */
-    hImageWindowDisplay=CreateWindowEx(
-           0,                   /* Extended possibilites for variation */
-           szDisplayClassName,         /* Classname */
-           NULL,         /* Title Text */
-           WS_CHILD+WS_VISIBLE, /* styles */
-           rect.left,       /* x position based on parent window */
-           rect.top,         /* y position based on parent window */
-           rect.right,                 /* The programs width */
-           rect.bottom,                 /* and height in pixels */
-           hImageWindow,        /* The window's parent window */
-           NULL,                /* No menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
-           );
+    hImageWindowDisplay=CreateWindowEx( 0, szDisplayClassName, NULL, WS_CHILD+WS_VISIBLE,
+		rect.left, rect.top, rect.right, rect.bottom, hImageWindow, NULL, hThisInstance, NULL);
 
     if (hImageWindow==NULL)
         return false;
@@ -615,7 +559,6 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             return 0;
             
-            
         default:
             /* let windows handle any unknown messages */
             return DefWindowProc(hwnd, message, wParam, lParam);
@@ -655,27 +598,16 @@ int inline registerToolWindow()
 /* create tool window */
 int setupToolWindow()
 {
-    TCITEM tie;             /* datastructure for tabs */
+    TCITEM tie;  /* datastructure for tabs */
     RECT rect;
     
     /* Get Main Window Location for image window alignment*/
     GetWindowRect(hMainWindow,&rect);
     
     /* The class is registered, lets create the program*/
-    hToolWindow =CreateWindowEx(
-           WS_EX_TOPMOST,                              /* Extended styles */
-           szToolWindowClassName,         /* Classname */
-           "Tools",                         /* Title Text */
-           WS_POPUP+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_VSCROLL, /* defaultwindow */
-           rect.left,       /* Windows decides the position */
-           rect.bottom,       /* where the window end up on the screen */
-           250,                 /* The programs width */
-           300,                 /* and height in pixels */
-           NULL,        /* The window is a childwindow to main window */
-           NULL,                /* No menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
-           );
+    hToolWindow =CreateWindowEx(WS_EX_TOPMOST, szToolWindowClassName, "Tools",
+           WS_POPUP+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_VSCROLL, rect.left, rect.bottom,
+           250, 300, NULL, NULL, hThisInstance, NULL);
 
     if (hToolWindow==NULL)
         return false;
@@ -687,20 +619,9 @@ int setupToolWindow()
     GetClientRect(hToolWindow,&rect);
 
     /* create tab control */
-    hToolWindowTabControl =CreateWindowEx(
-           0,                       /* Extended possibilites for variation */
-           WC_TABCONTROL,           /* Classname */
-           "Tools",                 /* Title Text */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | TCS_OWNERDRAWFIXED,
-           0,                       /* Top co-ord relative to tool window */
-           0,                       /* Left co-ord relative to tool window */
-           rect.right,              /* Set width to tool window's client area width */
-           rect.bottom,             /* Set height to tool window's client area height */
-           hToolWindow,             /* The window is a childwindow to tool window */
-           NULL,                    /* No menu */
-           hThisInstance,           /* Process's Instance handle */
-           NULL                     /* No Window Creation data */
-           );
+    hToolWindowTabControl =CreateWindowEx(0, WC_TABCONTROL, "Tools",
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | TCS_OWNERDRAWFIXED, 0, 0,
+		rect.right, rect.bottom, hToolWindow, NULL, hThisInstance, NULL);
 
     /* modify tab control's window procedure address */
     oldTabControlProc=(WNDPROC)SetWindowLong(hToolWindowTabControl,GWL_WNDPROC,(long)&ToolWindowTabControlProcedure);
@@ -731,126 +652,45 @@ int setupToolWindow()
     rect.right-=SPACING_FOR_BOARDER+SPACING_FOR_BOARDER;
     
     /* create tab containers for each tab (a window that will be shown/hidden when user clicks on a tab) */
-    hToolWindowDisplayTabContainer =CreateWindowEx(
-           0,                               /* Extended styles */
-           szStaticControl,                 /* pre-defined static text control classname */
-           "Channel Selection",         /* text to be displayed */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, /* window styles */
-           SPACING_FOR_BOARDER,             /* left position relative to tab control */
-           SPACING_FOR_TAB_HEIGHT,          /* top position relative to tab control */
-           rect.right,                      /* the width of the container */
-           rect.bottom,                     /* the height of the container */
-           hToolWindowTabControl,           /* The window is a childwindow of the tab control */
-           NULL,                            /* No menu */
-           hThisInstance,                   /* Program's Instance handle */
-           NULL                             /* No Window Creation data */
-           ); 
+    /* Display tab container */
+	hToolWindowDisplayTabContainer =CreateWindowEx( 0, szStaticControl, "Channel Selection",
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,
+		SPACING_FOR_TAB_HEIGHT, rect.right, rect.bottom, hToolWindowTabControl, NULL,
+		hThisInstance, NULL); 
            
-    hToolWindowQueryTabContainer =CreateWindowEx(
-           0,                               /* Extended styles */
-           szStaticControl,                 /* pre-defined classname for static text control */
-           "Band Values",                   /* text to display */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, /* styles */
-           SPACING_FOR_BOARDER,             /* left position relative to tab control */
-           SPACING_FOR_TAB_HEIGHT,          /* top position relative to tab control */
-           rect.right,                      /* the width of the container */
-           rect.bottom,                     /* the height of the container */
-           hToolWindowTabControl,           /* The window is a childwindow of the tab control */
-           NULL,                            /* No menu */
-           hThisInstance,                   /* Program Instance handler */
-           NULL                             /* No Window Creation data */
-           );
+	/* Query tab container */
+    hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "Band Values",
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
+           SPACING_FOR_TAB_HEIGHT, rect.right, rect.bottom, hToolWindowTabControl,           /* The window is a childwindow of the tab control */
+           NULL, hThisInstance, NULL);
            
-    hToolWindowImageTabContainer =CreateWindowEx(
-           0,                               /* Extended styles */
-           szStaticControl,                 /* pre-defined classname for static text control */
-           "Image Properties",              /* text to display */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, /* styles */
-           SPACING_FOR_BOARDER,             /* left position relative to tab control */
-           SPACING_FOR_TAB_HEIGHT,          /* top position relative to tab control */
-           rect.right,                      /* the width of the container */
-           rect.bottom,                     /* the height of the container */
-           hToolWindowTabControl,           /* The window is a childwindow of the tab control */
-           NULL,                            /* No menu */
-           hThisInstance,                   /* Program Instance handler */
-           NULL                             /* No Window Creation data */
-           ); 
+    /* Image tab container */
+    hToolWindowImageTabContainer =CreateWindowEx(0, szStaticControl, "Image Properties",              /* text to display */
+           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
+           SPACING_FOR_TAB_HEIGHT, rect.right, rect.bottom, hToolWindowTabControl, NULL,                            /* No menu */
+           hThisInstance, NULL); 
     
-
     /* modify tab containers' window procedure address 
         note: assumming proc addr is the same for all three */
     oldDisplayTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowDisplayTabContainer,GWL_WNDPROC,(long)&ToolWindowDisplayTabContainerProcedure);
     oldQueryTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowQueryTabContainer,GWL_WNDPROC,(long)&ToolWindowQueryTabContainerProcedure);
     oldImageTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowImageTabContainer,GWL_WNDPROC,(long)&ToolWindowImageTabContainerProcedure);
 
-
+	/* Assign number of image bands to global variable */
     bands = image_handler->get_image_properties()->getNumBands() + 1;
     
-    /* Create group for RED radio buttons based on band number */
-    hRed = CreateWindowEx(
-	    	0,
-			"BUTTON",
-			"R", //title
-			WS_CHILD | BS_GROUPBOX | WS_VISIBLE,
-			138, //int x,
-			25, //int y, CW_USEDEFAULT
-			26, //int nWidth,
-			20 + (20 * bands), //int nHeight
-			hToolWindowDisplayTabContainer, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
-
-
-		
-	/* Create group for GREEN radio buttons based on band number */
-    hGreen = CreateWindowEx(
-	    	0,
-			"BUTTON",
-			"G", //title
-			WS_CHILD | BS_GROUPBOX | WS_VISIBLE,
-			164, //int x,
-			25, //int y, CW_USEDEFAULT
-			26, //int nWidth,
-			20 + (20 * bands), //int nHeight
-			hToolWindowDisplayTabContainer, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
-		
-	/* Create group for BLUE radio buttons based on band number */
-    hBlue = CreateWindowEx(
-	    	0,
-			"BUTTON",
-			"B", //title
-			WS_CHILD | BS_GROUPBOX | WS_VISIBLE,
-			190, //int x,
-			25, //int y, CW_USEDEFAULT
-			26, //int nWidth,
-			20 + (20 * bands), //int nHeight
-			hToolWindowDisplayTabContainer, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
+    /* Create group for R, G & B radio buttons based on band number */
+    hRed = CreateWindowEx(0, "BUTTON", "R", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 138, 25,
+		26, 20 + (20 * bands), hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
+	hGreen = CreateWindowEx(0, "BUTTON", "G", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 164, 25,
+		26, 20 + (20 * bands), hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
+    hBlue = CreateWindowEx(0, "BUTTON", "B", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 190, 25,
+		26, 20 + (20 * bands), hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
 	
 	/* Create container for band values */
-	HWND queryValueContainer = CreateWindowEx(
-	    	0,
-			"BUTTON",
-			"Values", //title
-			WS_CHILD | BS_GROUPBOX | WS_VISIBLE,
-			138, //int x,
-			25, //int y, CW_USEDEFAULT
-			66, //int nWidth,
-			20 + (20 * bands), //int nHeight
-			hToolWindowQueryTabContainer, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
+	HWND queryValueContainer = CreateWindowEx(0, "BUTTON", "Values",
+		WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 138, 25, 66, 20 + (20 * bands),
+		hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
 
 	/* Dynamically add Radio buttons */
 	redRadiobuttons=new HWND[bands];
@@ -859,50 +699,17 @@ int setupToolWindow()
 	
     for (int i=0; i<bands; i++)
     {
-		redRadiobuttons[i] = CreateWindowEx(
-	    	0,
-			"BUTTON",
-			NULL, //title
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
-			5, //int x,
-			15 + (20 * i), //int y, CW_USEDEFAULT
-			18, //int nWidth,
-			18, //int nHeight
-			hRed, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
+		redRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+			hRed, NULL, hThisInstance, NULL);
 			
-		greenRadiobuttons[i] = CreateWindowEx(
-	    	0,
-			"BUTTON",
-			NULL, //title
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
-			5, //int x,
-			15 + (20 * i), //int y, CW_USEDEFAULT
-			18, //int nWidth,
-			18, //int nHeight
-			hGreen, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
+		greenRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+			hGreen, NULL, hThisInstance, NULL);
 			
-		blueRadiobuttons[i] = CreateWindowEx(
-	    	0,
-			"BUTTON",
-			NULL, //title
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
-			5, //int x,
-			15 + (20 * i), //int y, CW_USEDEFAULT
-			18, //int nWidth,
-			18, //int nHeight
-			hBlue, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
+		blueRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
+		WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18, hBlue, NULL,
+			hThisInstance, NULL);
 		
 		const char* name;
 		if (i>0) {
@@ -920,72 +727,25 @@ int setupToolWindow()
             name = catcstrings( (char*) "Band ", (char*) name);
         } else
                name = "NONE";
-		
-		
-        /* Display band name in tool windo */
-		CreateWindowEx(
-           0,                   /* Extended possibilites for variation */
-           szStaticControl,     /* Classname */
-           name,        		/* Title Text */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, /* defaultwindow */
-           20,       			/* Windows decides the position */
-           40 + (20 * i),       /* where the window end up on the screen */
-           100,                 /* The programs width */
-           18,                  /* and height in pixels */
-           hToolWindowDisplayTabContainer,        /* The window is a childwindow to main window */
-           NULL,                /* No menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
-           );
+
+        /* Display band name in tool window */
+		CreateWindowEx(0, szStaticControl, name,
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40 + (20 * i), 100, 18,
+			hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
            
         /* add channel names under the query tab */
-        CreateWindowEx(
-	    	0,
-			szStaticControl,
-			name, //title
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, /* defaultwindow */
-			20, //int x,
-			40 + (20 * i), //int y, CW_USEDEFAULT
-			100, //int nWidth,
-			18, //int nHeight
-			hToolWindowQueryTabContainer, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
-			
-			
-		/* Insert 'Update' button under radio buttons. Location based on band number */
-		hupdate =  CreateWindowEx(
-			0,
-			"BUTTON",
-			"Update",
-			WS_CHILD | WS_VISIBLE,
-			136,50 + (20 * bands), // x y location
-			80,25, // x y dimensions
-			hToolWindowDisplayTabContainer, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);     
+        CreateWindowEx(0, szStaticControl, name,
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40 + (20 * i), 100, 18,
+			hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
 
-			
+		/* Insert 'Update' button under radio buttons. Location based on band number */
+		hupdate =  CreateWindowEx(0, "BUTTON", "Update", WS_CHILD | WS_VISIBLE, 136,
+			50 + (20 * bands), 80, 25, hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);     
+
 		/* add the band values to the value container under the query tab */
         char tempBandValue[4] = "128"; // temporary storage for the band value
-        CreateWindowEx(
-	    	0,
-			szStaticControl,
-			tempBandValue, //title
-			WS_CHILD | WS_VISIBLE,
-			5, //int x,
-			15 + (20 * i), //int y, CW_USEDEFAULT
-			50, //int nWidth,
-			18, //int nHeight
-			queryValueContainer, //parent window     
-			NULL, //no menu
-			hThisInstance, //HINSTANCE hInstance,
-			NULL //pointer not needed
-			);
+        CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * i),
+			50, 18, queryValueContainer, NULL, hThisInstance, NULL);
 	}
 	
 	/* add the image property information under the image tab */
@@ -1014,37 +774,14 @@ int setupToolWindow()
 	n[4]="Bands"; v[4]=makeMessage(leader, ip->getNumBands());
 	
 	for (int i=0; i<ipItems; i++) {
-		CreateWindowEx(
-	    	0,
-			szStaticControl,
-			(char*) n[i].c_str(),          //title
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, /* defaultwindow */
-			20,                             //int x,
-			40+(i*20),                     //int y, CW_USEDEFAULT
-			50,                           //int nWidth,
-			18,                            //int nHeight
-			hToolWindowImageTabContainer,  //parent window     
-			NULL,                          //no menu
-			hThisInstance,                 //HINSTANCE hInstance,
-			NULL                           //pointer not needed
-			);
+		CreateWindowEx(0, szStaticControl, (char*) n[i].c_str(),
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40+(i*20), 50, 18,
+			hToolWindowImageTabContainer, NULL, hThisInstance, NULL);
 		
-		CreateWindowEx(
-	    	0,
-			szStaticControl,
-			(char*) v[i].c_str(),          //title
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, /* defaultwindow */
-			78,                           //int x,
-			40+(i*20),                     //int y, CW_USEDEFAULT
-			160,                           //int nWidth,
-			18,                            //int nHeight
-			hToolWindowImageTabContainer,  //parent window     
-			NULL,                          //no menu
-			hThisInstance,                 //HINSTANCE hInstance,
-			NULL                           //pointer not needed
-			);
+		CreateWindowEx(0, szStaticControl, (char*) v[i].c_str(),
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 78, 40+(i*20), 160, 18,
+			hToolWindowImageTabContainer, NULL, hThisInstance, NULL);
     }	
-    
     return true;
 }
 
@@ -1111,7 +848,6 @@ inline void measureTab(MEASUREITEMSTRUCT *mis)
     mis->itemHeight=size.cy+2*TEXT_MARGIN;                                   /* set height of tab */
 }
 
-
 /* setup up tool window's fonts & brushes for drawing */
 inline void setupDrawingObjects(HWND hwnd)
 {
@@ -1140,7 +876,6 @@ LRESULT CALLBACK ToolWindowTabControlProcedure(HWND hwnd, UINT message, WPARAM w
     return CallWindowProc(oldTabControlProc,hwnd,message,wParam,lParam);
 }
 
-
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1162,7 +897,6 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
             }                
             break;
         
-                     
         default:
             break;
     }        
@@ -1202,7 +936,6 @@ LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, W
     }        
     return CallWindowProc(oldImageTabContainerProc,hwnd,message,wParam,lParam);
 }
-
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -1327,13 +1060,12 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
     return 0;
 }
 
-
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* general window functions */
 
-/* toolges a menu item between a checked & unchecked state */
+/* toggles a menu item between a checked & unchecked state */
 /* returns true if new state is checked, else false if unchecked */
-int toogleMenuItemTick(HMENU hMenu,int itemId)
+int toggleMenuItemTick(HMENU hMenu,int itemId)
 {
     int menuState=GetMenuState(hMenu,itemId,MF_BYCOMMAND);
     if (menuState&MF_CHECKED)
@@ -1415,7 +1147,6 @@ void setNewWindowSize(RECT* newPos,RECT* oldPos,POINT* oldMouse,int whichDirecti
     }   
 }    
 
-
 /* move a window by a certain amount of pixels */
 inline void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset)
 {
@@ -1432,9 +1163,7 @@ inline void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindow
         moveWindowByOffset(hImageWindow,prevImageWindowRect,moveLeftOffset,moveTopOffset);
     if (moveToolWindow)
         moveWindowByOffset(hToolWindow,prevToolWindowRect,moveLeftOffset,moveTopOffset);
-       
 }
-
 
 /* returns whether window is in normal position (ie. not minimized or maximised) */
 int isWindowInNormalState(HWND hwnd)
@@ -1459,7 +1188,7 @@ int isWindowInNormalState(HWND hwnd)
 }    
 
 /* snap a window to another window (by moving it) if it is range */
-/*  snapToWin=handle of window to snap to, rect=cords of window to be moved */
+/* snapToWin=handle of window to snap to, rect=cords of window to be moved */
 /* returns: true if window has been snapped, false if not */
 int snapWindowByMoving(HWND snapToWin,RECT *rect)
 {   
@@ -1551,7 +1280,6 @@ int snapWindowByMoving(HWND snapToWin,RECT *rect)
        rect->bottom=rect->top+winsize.cy;
        isSnapped=true;
     }      
-    
     return isSnapped;
 }
 
@@ -1575,7 +1303,6 @@ int snapWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
     if ( (rect->bottom<(snapToRect.top-SNAP_PIXEL_RANGE)) || (rect->top>(snapToRect.bottom+SNAP_PIXEL_RANGE)) )
         return false;
         
-
     if ((whichDirection==WMSZ_TOP) || (whichDirection==WMSZ_TOPLEFT) || (whichDirection==WMSZ_TOPRIGHT))
     {
         //snap (top) to bottom
@@ -1653,7 +1380,6 @@ int snapWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
            isSnapped=true;       
         }    
     }
-    
     return isSnapped;
 }
 
@@ -1673,7 +1399,6 @@ void orderWindows()
     SetWindowPos(hToolWindow,hMainWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE); 
     //SetWindowPos(hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);    
 }    
-
 
 /* main functions */
 /* ------------------------------------------------------------------------------------------------------------------------ */
@@ -1775,7 +1500,3 @@ void closeFile()
     InvalidateRect(hMainWindowDisplay,0,true);  /* repaint main window */		
     UpdateWindow(hMainWindowDisplay);
 }
-
-
-
-

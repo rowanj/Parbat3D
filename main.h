@@ -88,6 +88,6 @@ void setNewWindowSize(RECT* newPos,RECT* oldPos,POINT* oldMouse,int whichDirecti
 void setNewWindowPosition(RECT* newPos,POINT *mouseOffset);
 
 int isWindowInNormalState(HWND hwnd);
-int toogleMenuItemTick(HMENU hMenu,int itemId);
+int toggleMenuItemTick(HMENU hMenu,int itemId);
 
 #endif
