@@ -902,9 +902,9 @@ int setupToolWindow()
 			);
 		
 		const char* name;
-		if (i<(bands-1)) {
+		if (i>0) {
     		/* add band names to radio buttons*/
-    		name = image_handler->get_band_info(i+1)->getColourInterpretationName();
+    		name = image_handler->get_band_info(i)->getColourInterpretationName();
     		
     		/* If Colour name unknown change band name*/
     		const char *altName ="No colour name";
@@ -913,7 +913,7 @@ int setupToolWindow()
                 
             /* Add band number to band name */
             name = catcstrings( (char*) " - ", (char*) name);
-            name = catcstrings( (char*) inttocstring(i+1), (char*) name);
+            name = catcstrings( (char*) inttocstring(i), (char*) name);
             name = catcstrings( (char*) "Band ", (char*) name);
         } else
                name = "NONE";
