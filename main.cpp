@@ -339,7 +339,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         case WM_CLOSE:
             // Shut down the image file and OpenGL
 			if (image_handler) { // Was instantiated
-                if (MessageBox(hMainWindow,"An image is currently open.\nAre you sure you wish quit?","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
+                if (MessageBox(hMainWindow,"Are you sure you wish quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
                     return 0;
                 closeFile();
 			}
