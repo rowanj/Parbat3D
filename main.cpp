@@ -64,7 +64,7 @@ enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID};
 settings winPos ("settings.ini");
 
 /* objects used for painting/drawing */
-HFONT hBoldFont,hNormalFont;
+HFONT hBoldFont,hNormalFont,hHeadingFont;
 HPEN hTabPen;
 HBRUSH hTabBrush;
 WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc;
@@ -189,6 +189,7 @@ int setupMainWindow()
     HDC hdc=GetDC(hMainWindow);      
     hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
     hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
+    hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
     ReleaseDC(hMainWindow,hdc);    
 
     /* create a child window that will be used by OpenGL */
@@ -336,12 +337,14 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                      
         /* WM_CLOSE: system or user has requested to close the window/application */
         case WM_CLOSE:
-			// Shut down the image file and OpenGL
+            // Shut down the image file and OpenGL
 			if (image_handler) { // Was instantiated
-				delete image_handler;
+                if (MessageBox(hMainWindow,"An image is currently open.\nAre you sure you wish quit?","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
+                    return 0;
+                closeFile();
 			}
             /* destroy this window */
-            DestroyWindow( hwnd );
+            DestroyWindow( hwnd );			
             return 0;
 
         /* WM_DESTROY: window is being destroyed */
@@ -1046,7 +1049,7 @@ int setupToolWindow()
 }
 
 /* draw a static text control on the screen */
-inline void drawStatic(DRAWITEMSTRUCT *dis)
+inline void drawStatic(DRAWITEMSTRUCT *dis, HFONT hfont)
 {   
     char str[255];
     int len,x,y;
@@ -1056,7 +1059,7 @@ inline void drawStatic(DRAWITEMSTRUCT *dis)
     len=strlen(str);
     
     SelectObject(dis->hDC,hTabPen);                                                             // set border
-    SelectObject(dis->hDC,hNormalFont);                                                         // set font
+    SelectObject(dis->hDC,hfont);                                                         // set font
     SetTextColor(dis->hDC,0);                                                                   // set text colour to black
     SelectObject(dis->hDC,hTabBrush);                                                           // set background fill
     GetTextExtentPoint32(dis->hDC,str,len,&size);                                               // get size of string
@@ -1128,7 +1131,7 @@ LRESULT CALLBACK ToolWindowTabControlProcedure(HWND hwnd, UINT message, WPARAM w
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
-                drawStatic((DRAWITEMSTRUCT*)lParam);
+                drawStatic((DRAWITEMSTRUCT*)lParam,hHeadingFont);
             break; 
                         
         default:
@@ -1146,7 +1149,7 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
-                drawStatic((DRAWITEMSTRUCT*)lParam);
+                drawStatic((DRAWITEMSTRUCT*)lParam,hNormalFont);
             break; 
         case WM_COMMAND:
             //if(hupdate==(HWND)lParam)
@@ -1174,7 +1177,7 @@ LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, W
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
-                drawStatic((DRAWITEMSTRUCT*)lParam);
+                drawStatic((DRAWITEMSTRUCT*)lParam,hNormalFont);
             break; 
                         
         default:
@@ -1191,7 +1194,7 @@ LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, W
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
-                drawStatic((DRAWITEMSTRUCT*)lParam);
+                drawStatic((DRAWITEMSTRUCT*)lParam,hNormalFont);
             break; 
                         
         default:
@@ -1278,7 +1281,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_TAB)
                 drawTab((DRAWITEMSTRUCT*)lParam);
             else
-                drawStatic((DRAWITEMSTRUCT*)lParam);
+                drawStatic((DRAWITEMSTRUCT*)lParam,hNormalFont);
             break;           
 
         /* WM_MEASUREITEM: an ownerdraw control needs to be measured */        
