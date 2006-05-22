@@ -1,5 +1,6 @@
 #include "ImageTileSet.h"
 #include "ImageProperties.h"
+#include <math.h>
 
 /* NB: tex_size is size of tile in memory,
 	tile_size is size of tile on image */
@@ -23,8 +24,8 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	num_bands = image_properties->getNumBands();
 	
 	/* special case for overview window */
-	if (LOD = -1) {
-		tile_size = 1;
+	if (LOD == -1) {
+		tile_size = tex_size;
 		image_width_LOD = tex_size;
 		image_height_LOD = tex_size;
 		tile_columns = 1;
@@ -33,9 +34,9 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 		last_row_height = image_height;
 	} else {
 		/* (width in tiles is width/tiles rounded up) */
-		tile_size = tex_size * (2^LOD);
-		image_width_LOD = image_width / (2^LOD);
-		image_height_LOD = image_height / (2^LOD);
+		tile_size = tex_size * (int)pow(2,LOD);
+		image_width_LOD = image_width / (int)pow(2,LOD);
+		image_height_LOD = image_height / (int)pow(2,LOD);
 		tile_columns = (image_width/tile_size) + ((image_width%tile_size)!=0);
 		tile_rows = (image_height/tile_size) + ((image_height%tile_size)!=0);
 		last_column_width = tile_size;
@@ -72,6 +73,7 @@ void ImageTileSet::set_region(int x, int y, int width, int height)
 	}
 
 	/* De-allocate tiles out of region */
+	/* Ensure pointers set to NULL for presence test */
 
 	
 	/* Validate dimensions and set region */
@@ -170,7 +172,8 @@ int ImageTileSet::load_tile(int x, int y)
 		} else {
 			image_file->getRasterData(tile_size_x, tile_size_y, x, y, (char*) tile_pointers[tile_index], tex_size, tex_size);
 		}
-		/* Shuffle data for edge tiles */
+		
+		/* !! Shuffle data for edge tiles */
 	
 		/* add index to list of allocated tiles */
 		tiles.push_back(tile_index);
@@ -189,4 +192,25 @@ void* ImageTileSet::get_point_values(int x, int y)
 	/* Find values in block */
 	
 	return return_values;
+}
+
+int ImageTileSet::get_tile_columns(void)
+{
+	return tile_columns;
+}
+int ImageTileSet::get_tile_rows(void)
+{
+	return tile_rows;
+}
+int ImageTileSet::get_tile_size(void)
+{
+	return tile_size;
+}
+int ImageTileSet::get_LOD_width(void)
+{
+	return image_width_LOD;
+}
+int ImageTileSet::get_LOD_height(void)
+{
+	return image_height_LOD;
 }

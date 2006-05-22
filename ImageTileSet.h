@@ -19,6 +19,12 @@ public:
 	char* get_tile_RGB(int x, int y, int band_R, int band_G, int band_B);
 	void* get_point_values(int x, int y);
 	
+	int get_tile_columns(void);
+	int get_tile_rows(void);
+	int get_tile_size(void);
+	int get_LOD_width(void);
+	int get_LOD_height(void);
+	
 private:
 	/* Tileset properties */
 	int LOD;
