@@ -44,6 +44,10 @@ public:
 	PRECT get_viewport(void);
 	PRECT set_viewport(void);
 	void set_bands(int band_R, int band_G, int band_B);
+	int get_LOD(void);
+	int set_LOD(int level_of_detail);
+	int get_LOD_width(void);
+	int get_LOD_height(void);
 	
 	/* State Variables */
 	int status;
@@ -58,16 +62,29 @@ private:
 
 	/* Internal Functions */
 	void make_overview_texture(void);
+	void make_textures(void);
 
 	/* State variables */
+	int LOD;
 	int image_width, image_height;
     int max_texture_size;
     int band_red, band_green, band_blue;
-    
+    bool textures_loaded;
+	int texture_size, texture_size_overview;
+	
     /* Overview window texture */
 	ImageTileSet* overview_tileset;
 	char *tex_overview;
-	unsigned int tex_overview_id;
+	unsigned int *tex_overview_id;
+	
+	/* Image window textures */
+	ImageTileSet* image_tileset;
+	int tex_rows, tex_columns, tex_count;
+	GLuint tex_base[];
+	int tile_size;
+	
+	/* Display lists */
+	unsigned int list_tile;
 };
 
 #endif

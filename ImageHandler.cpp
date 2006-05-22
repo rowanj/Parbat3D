@@ -18,11 +18,20 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	ImageProperties* image_properties;
 	status = 0; // No error
 	error_text = "No error.";
+	textures_loaded = false;
+	tex_columns = 0;
+	tex_rows = 0;
+	tex_count = 0;
+//	tex_base[] = NULL;
+	tile_size = 0;
 	
 	/* Set up defaults */
+	LOD=0; /* Acutally, set this one below - must be different */
 	band_red = 1;
 	band_green = 2;
 	band_blue = 3;
+	texture_size = 256;
+	texture_size_overview = 256;
 	
 	// Check for lazily unspecified (NULL argument) parameters
 	if (!overview_hwnd) {
@@ -86,10 +95,28 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
     gl_image->make_current();
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
+    list_tile = glGenLists(1);
+    glNewList(list_tile,GL_COMPILE);
+    {
+		glBegin(GL_QUADS);
+		{
+			glTexCoord2f(0.0,0.0);
+			glVertex3f(0.0, 0.0,0.0);
+			glTexCoord2f(1.0,0.0);
+			glVertex3f(1.0, 0.0,0.0);
+			glTexCoord2f(1.0,1.0);
+			glVertex3f(1.0,-1.0,0.0);
+			glTexCoord2f(0.0,1.0);
+			glVertex3f(0.0,-1.0,0.0);
+		}
+		glEnd();
+	}
+	glEndList();
     
     /* Get texture for overview window */
-   	overview_tileset = new ImageTileSet(-1, image_file, 256);
+   	overview_tileset = new ImageTileSet(-1, image_file, texture_size_overview);
 	this->make_overview_texture();
+	this->set_LOD(0);
 
 	/* Initialize viewports */
 	this->resize_window();
@@ -98,6 +125,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 ImageHandler::~ImageHandler(void)
 {
 	delete overview_tileset;
+	delete image_tileset;
 	delete gl_overview;
 	delete gl_image;
 	delete image_file;
@@ -106,6 +134,7 @@ ImageHandler::~ImageHandler(void)
 void ImageHandler::redraw(void)
 {
 	GLenum errorcode;
+	int tile_id;
 	
 	// Overview window
 	gl_overview->make_current();
@@ -158,6 +187,25 @@ void ImageHandler::redraw(void)
 	gl_image->make_current();
 	glClearColor(0.3f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	/* Set up view transform */
+	gluLookAt(0.0,0.0,(2.0/tan(PI/6.0)),0.0,0.0,0.0,0.0,1.0,0.0);
+	tile_id = 0;
+	glTranslatef((GLfloat)-tex_columns/2.0,(GLfloat)tex_rows/2.0, 0.0);
+	do {
+		glBindTexture(GL_TEXTURE_2D, (GLuint) tex_base[tile_id]);
+		glCallList(list_tile);
+		if (tile_id % tex_columns) {
+			glTranslatef((GLfloat)-tex_columns, -1.0, 0.0);
+		} else {
+			glTranslatef(1.0,0.0,0.0);
+		}
+		tile_id++;
+	} while (tile_id < tex_count);
+	glDisable(GL_TEXTURE_2D);
 	gl_image->GLswap();
 }
 
@@ -181,6 +229,9 @@ void ImageHandler::resize_window(void)
 	gluPerspective(60.0, (GLfloat) gl_overview->width()/(GLfloat) gl_overview->height(), 0.1, 2.0);
 	
 	gl_image->GLresize();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(60.0, (GLfloat) gl_image->width()/(GLfloat) gl_image->height(), 0.1, 20.0);
 	this->redraw();
 }
 
@@ -218,16 +269,50 @@ void ImageHandler::make_overview_texture(void)
 	/* Make texture from data */
 	gl_overview->make_current();
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, (GLuint*) &tex_overview_id);
+	if (!tex_overview_id) glGenTextures(1, (GLuint*) &tex_overview_id);
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size_overview, texture_size_overview, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
 
 	/* We don't need the RGB data here anymore */
 	free(tex_overview);
+}
+
+void ImageHandler::make_textures(void)
+{
+	unsigned int tmp_id;
+	int tx, ty;
+	char *tmp_tex;
+	
+	if (!image_tileset) image_tileset = new ImageTileSet(LOD, image_file, texture_size);	
+	
+	/* Sort out how many textures we'll need */
+	tex_columns = image_tileset->get_tile_columns();
+	tex_rows = image_tileset->get_tile_rows();
+	tex_count = tex_columns * tex_rows;
+	tile_size = image_tileset->get_tile_size();
+
+	/* !! only generate a vewport's worth */
+	/* Generate textures */
+	gl_image->make_current();
+	if (!textures_loaded) glGenTextures(tex_count, tex_base);
+	for (tx = 0; tx < tex_columns; tx++){
+		for (ty = 0; ty < tex_rows; ty++) {
+			tmp_id = (ty * tex_columns) + tx;
+			tmp_tex = image_tileset->get_tile_RGB(tile_size * tx, tile_size *ty, band_red, band_green, band_blue);
+			glBindTexture(GL_TEXTURE_2D, (GLuint) tex_base[tmp_id]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tmp_tex);
+			free(tmp_tex);
+		}
+	}
+	textures_loaded = true;
 }
 
 void ImageHandler::set_bands(int band_R, int band_G, int band_B)
@@ -236,4 +321,24 @@ void ImageHandler::set_bands(int band_R, int band_G, int band_B)
 	band_green = band_G;
 	band_blue = band_B;
 	make_overview_texture();
+	make_textures();
+	redraw();
+}
+
+int ImageHandler::get_LOD(void) {return LOD;}
+int ImageHandler::set_LOD(int level_of_detail)
+{
+	LOD = level_of_detail;
+	this->make_overview_texture();
+	this->make_textures();
+	this->redraw();
+}
+
+int ImageHandler::get_LOD_width(void)
+{
+	return image_tileset->get_LOD_width();
+}
+int ImageHandler::get_LOD_height(void)
+{
+	return image_tileset->get_LOD_height();
 }
