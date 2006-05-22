@@ -11,6 +11,8 @@
 #include "ImageProperties.h"
 #include "ImageGLView.h"
 
+#include "config.h"
+
 typedef struct pixel_values_t {
 	char number_bands;
 	int* value;
@@ -46,8 +48,10 @@ public:
 	void set_bands(int band_R, int band_G, int band_B);
 	int get_LOD(void);
 	int set_LOD(int level_of_detail);
+	#if TMP_USE_TEXTURES
 	int get_LOD_width(void);
 	int get_LOD_height(void);
+	#endif
 	
 	/* State Variables */
 	int status;
@@ -78,10 +82,12 @@ private:
 	unsigned int *tex_overview_id;
 	
 	/* Image window textures */
+	#if TMP_USE_TEXTURES
 	ImageTileSet* image_tileset;
 	int tex_rows, tex_columns, tex_count;
 	GLuint tex_base[];
 	int tile_size;
+	#endif
 	
 	/* Display lists */
 	unsigned int list_tile;

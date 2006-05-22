@@ -19,11 +19,6 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	status = 0; // No error
 	error_text = "No error.";
 	textures_loaded = false;
-	tex_columns = 0;
-	tex_rows = 0;
-	tex_count = 0;
-//	tex_base[] = NULL;
-	tile_size = 0;
 	
 	/* Set up defaults */
 	LOD=0; /* Acutally, set this one below - must be different */
@@ -116,7 +111,9 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
     /* Get texture for overview window */
    	overview_tileset = new ImageTileSet(-1, image_file, texture_size_overview);
 	this->make_overview_texture();
+	#if TMP_USE_TEXTURES
 	this->set_LOD(0);
+	#endif
 
 	/* Initialize viewports */
 	this->resize_window();
@@ -125,7 +122,9 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 ImageHandler::~ImageHandler(void)
 {
 	delete overview_tileset;
+	#if TMP_USE_TEXTURES
 	delete image_tileset;
+	#endif
 	delete gl_overview;
 	delete gl_image;
 	delete image_file;
@@ -187,6 +186,7 @@ void ImageHandler::redraw(void)
 	gl_image->make_current();
 	glClearColor(0.3f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    #if TMP_USE_TEXTURES
     glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glMatrixMode(GL_MODELVIEW);
@@ -206,6 +206,7 @@ void ImageHandler::redraw(void)
 		tile_id++;
 	} while (tile_id < tex_count);
 	glDisable(GL_TEXTURE_2D);
+	#endif
 	gl_image->GLswap();
 }
 
@@ -283,6 +284,7 @@ void ImageHandler::make_overview_texture(void)
 
 void ImageHandler::make_textures(void)
 {
+	#if TMP_USE_TEXTURES
 	unsigned int tmp_id;
 	int tx, ty;
 	char *tmp_tex;
@@ -313,6 +315,7 @@ void ImageHandler::make_textures(void)
 		}
 	}
 	textures_loaded = true;
+	#endif
 }
 
 void ImageHandler::set_bands(int band_R, int band_G, int band_B)
@@ -334,6 +337,7 @@ int ImageHandler::set_LOD(int level_of_detail)
 	this->redraw();
 }
 
+#if TMP_USE_TEXTURES
 int ImageHandler::get_LOD_width(void)
 {
 	return image_tileset->get_LOD_width();
@@ -342,3 +346,4 @@ int ImageHandler::get_LOD_height(void)
 {
 	return image_tileset->get_LOD_height();
 }
+#endif
