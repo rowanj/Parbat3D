@@ -91,7 +91,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
     glDisable(GL_DEPTH_TEST);
     
     /* Get texture for overview window */
-    tex_overview = (char*) malloc(256*256*3);
+   	overview_tileset = new ImageTileSet(-1, image_file, 256);
 	this->make_overview_texture();
 
 	/* Initialize viewports */
@@ -100,7 +100,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 
 ImageHandler::~ImageHandler(void)
 {
-	free(tex_overview);
+	delete overview_tileset;
 	delete gl_overview;
 	delete gl_image;
 	delete image_file;
@@ -214,20 +214,23 @@ const char* ImageHandler::get_info_string(void)
 
 void ImageHandler::make_overview_texture(void)
 {
+	overview_tileset->set_region(0,0,image_width, image_height);
 	// Get texture data
-	image_file->getRasterData(image_width, image_height, 0, 0, (char*)tex_overview, 256, 256);
-
+	tex_overview = overview_tileset->get_tile_RGB(0,0,1,2,3);
+	
 	/* Make texture from data */
 	gl_overview->make_current();
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, (GLuint*) &tex_overview_id);
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
-	/* */
+
+	/* We don't need the RGB data here anymore */
+	free(tex_overview);
 }
 
 void ImageHandler::set_bands(int band_R, int band_G, int band_B)

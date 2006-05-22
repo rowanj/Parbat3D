@@ -65,8 +65,9 @@ private:
     int band_red, band_green, band_blue;
     
     /* Overview window texture */
-	unsigned int tex_overview_id;
+	ImageTileSet* overview_tileset;
 	char *tex_overview;
+	unsigned int tex_overview_id;
 };
 
 #endif
