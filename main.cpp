@@ -909,7 +909,6 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
             			MB_ICONINFORMATION | MB_OK );
             // !! Insert band numbers (bands start at 1, not 0) here. - Rowan
             if (image_handler) image_handler->set_bands(3,1,2);
-            // !! Force redraw
             }                
             break;
         
