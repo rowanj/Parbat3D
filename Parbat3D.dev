@@ -278,7 +278,7 @@ BuildCmd=
 CompileCpp=1
 
 [Unit28]
-FileName=Test.h
+FileName=SnappingWindow.h
 CompileCpp=1
 Folder=View_PKG
 Compile=1
@@ -324,7 +324,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit27]
-FileName=Test.cpp
+FileName=SnappingWindow.cpp
 CompileCpp=1
 Folder=View_PKG
 Compile=1
