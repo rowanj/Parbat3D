@@ -691,7 +691,7 @@ int setupToolWindow()
 	
 	/* Create container for band values */
 	HWND queryValueContainer = CreateWindowEx(0, "BUTTON", "Values",
-		WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 138, 25, 66, 20 + (20 * bands),
+		WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 138, 45, 66, 20 + (20 * (bands-1)),
 		hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
 
 	/* Dynamically add Radio buttons */
@@ -735,19 +735,21 @@ int setupToolWindow()
 			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40 + (20 * i), 100, 18,
 			hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
            
-        /* add channel names under the query tab */
-        CreateWindowEx(0, szStaticControl, name,
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40 + (20 * i), 100, 18,
-			hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
-
 		/* Insert 'Update' button under radio buttons. Location based on band number */
 		hupdate =  CreateWindowEx(0, "BUTTON", "Update", WS_CHILD | WS_VISIBLE, 136,
 			50 + (20 * bands), 80, 25, hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);     
 
-		/* add the band values to the value container under the query tab */
-        char tempBandValue[4] = "128"; // temporary storage for the band value
-        CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * i),
-			50, 18, queryValueContainer, NULL, hThisInstance, NULL);
+        if (i>0) {
+            /* add channel names under the query tab */
+            CreateWindowEx(0, szStaticControl, name,
+    			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40 + (20 * i), 100, 18,
+    			hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
+    
+    		/* add the band values to the value container under the query tab */
+            char tempBandValue[4] = "128"; // temporary storage for the band value
+            CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * (i-1)),
+    			50, 18, queryValueContainer, NULL, hThisInstance, NULL);
+        } 			
 	}
 	
 	/* Default radio button selection */
@@ -768,12 +770,12 @@ int setupToolWindow()
 	string fname;
 	string bname;
 	string finalname;
-	if (fullname.length() > 25)
-	{
+	if (fullname.length() > 25) {
 		fname = fullname.substr(0, 12);
 		bname = fullname.substr(fullname.length()-12, fullname.length()-1);
 		finalname = fname + "…" + bname;
-	}
+	} else
+	    finalname = fullname;
 	n[0]="File Name"; v[0]=makeMessage(leader, (char*) finalname.c_str());
 	n[1]="File Type"; v[1]=makeMessage(leader, (char*) ip->getDriverLongName());
 	n[2]="Width"; v[2]=makeMessage(leader, ip->getWidth());
