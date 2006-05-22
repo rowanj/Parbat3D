@@ -40,11 +40,12 @@ HWND hToolWindowQueryTabContainer;
 HWND hToolWindowImageTabContainer;
 HWND hImageWindowDisplay;
 HWND hMainWindowDisplay;
-HWND *redRadiobuttons;
+HWND *redRadiobuttons;                // band radio buttons
 HWND *greenRadiobuttons;
 HWND *blueRadiobuttons;
+HWND *imageBandValues;                // values displayed under query tab
 HWND hupdate;
-int bands = 0; // for use with radio buttons
+int bands = 0;                        // for use with radio buttons
 
 /* Variables to record when the windows have snapped to main wndow */
 int imageWindowIsSnapped=false;
@@ -699,6 +700,9 @@ int setupToolWindow()
 	greenRadiobuttons=new HWND[bands];
 	blueRadiobuttons=new HWND[bands];
 	
+	/* Dynamically add image band values */
+	imageBandValues = new HWND[bands];
+	
     for (int i=0; i<bands; i++)
     {
 		redRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
@@ -747,15 +751,15 @@ int setupToolWindow()
     
     		/* add the band values to the value container under the query tab */
             char tempBandValue[4] = "128"; // temporary storage for the band value
-            CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * (i-1)),
+            imageBandValues[i] = CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * (i-1)),
     			50, 18, queryValueContainer, NULL, hThisInstance, NULL);
         } 			
 	}
 	
 	/* Default radio button selection */
-	SendMessage(redRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
-	SendMessage(greenRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
-	SendMessage(blueRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
+	SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+	SendMessage(greenRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
+	SendMessage(blueRadiobuttons[3],BM_SETCHECK,BST_CHECKED,0);
 	
 	/* add the image property information under the image tab */
 	ImageProperties* ip=image_handler->get_image_properties();
@@ -763,19 +767,19 @@ int setupToolWindow()
 	int ipItems=5;
 	string n[ipItems];
 	string v[ipItems];
+	
 	/* If the filename is too long to be displayed, truncate it.
 	Later on, a roll-over tooltip should be implemented to bring
 	up the full name.*/
 	string fullname = ip->getFileName();
-	string fname;
-	string bname;
-	string finalname;
+	string fname, bname, finalname;
 	if (fullname.length() > 25) {
 		fname = fullname.substr(0, 12);
 		bname = fullname.substr(fullname.length()-12, fullname.length()-1);
 		finalname = fname + "…" + bname;
 	} else
 	    finalname = fullname;
+	    
 	n[0]="File Name"; v[0]=makeMessage(leader, (char*) finalname.c_str());
 	n[1]="File Type"; v[1]=makeMessage(leader, (char*) ip->getDriverLongName());
 	n[2]="Width"; v[2]=makeMessage(leader, ip->getWidth());
@@ -790,7 +794,8 @@ int setupToolWindow()
 		CreateWindowEx(0, szStaticControl, (char*) v[i].c_str(),
 			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 78, 40+(i*20), 160, 18,
 			hToolWindowImageTabContainer, NULL, hThisInstance, NULL);
-    }	
+    }
+    
     return true;
 }
 
