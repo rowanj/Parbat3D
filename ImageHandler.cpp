@@ -19,7 +19,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	status = 0; // No error
 	error_text = "No error.";
 	
-	/* Default initial bands to display */
+	/* Set up defaults */
 	band_red = 1;
 	band_green = 2;
 	band_blue = 3;
@@ -76,9 +76,6 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		image_width = image_properties->getWidth();
 	}
 	
-	/* Set the filename to the image properties -- unused*/
-	//image_properties->setFileName(filename);
-
 	/* Find maximum supported texture size */
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
     
@@ -216,7 +213,7 @@ void ImageHandler::make_overview_texture(void)
 {
 	overview_tileset->set_region(0,0,image_width, image_height);
 	// Get texture data
-	tex_overview = overview_tileset->get_tile_RGB(0,0,1,2,3);
+	tex_overview = overview_tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
 	
 	/* Make texture from data */
 	gl_overview->make_current();
@@ -238,4 +235,5 @@ void ImageHandler::set_bands(int band_R, int band_G, int band_B)
 	band_red = band_R;
 	band_green = band_G;
 	band_blue = band_B;
+	make_overview_texture();
 }

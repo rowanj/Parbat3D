@@ -106,14 +106,35 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 {
 	int tile_index;
 	char* tile;
+	char* out_tile;
+	int pix, piy, size;
+	
 	/* Check if tile is loaded, load if not */
 	tile_index = load_tile(x,y);
+	tile = (char*) tile_pointers[tile_index];
 	
-	/* Convert color space & sample size */
+	/* Make room to put texture in */
+	size = tex_size * tex_size * 3;
+	out_tile = (char*) malloc(size);
+	
+	/* Convert color space */
+	
+	/* Convert band packing */
+	pix = 0;
+	piy = 0;
+	band_R--;
+	band_G--;
+	band_B--;
+	while (pix < size) {
+		out_tile[pix]   = tile[piy+band_R];
+		out_tile[pix+1] = tile[piy+band_G];
+		out_tile[pix+2] = tile[piy+band_B];
+		pix = pix + 3;
+		piy = piy + num_bands;
+	}
 	
 	/* return temporary tile */
-	tile = (char*) tile_pointers[tile_index];
-	return tile;
+	return out_tile;
 }
 
 int ImageTileSet::load_tile(int x, int y)
