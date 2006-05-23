@@ -111,22 +111,22 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	char* out_tile;
 	int pix, piy, size;
 	
-   MessageBox(0,"Where da bug? 5.3.1","ImageHander Constructor",MB_OK);		
-	
 	/* Check if tile is loaded, load if not */
 	tile_index = load_tile(x,y);
 	tile = (char*) tile_pointers[tile_index];
 
-   MessageBox(0,"Where da bug? 5.3.2","ImageHander Constructor",MB_OK);		
-   	
+  	
 	/* Make room to put texture in */
 	size = tex_size * tex_size * 3;
 	out_tile = (char*) malloc(size);
 
-   MessageBox(0,"Where da bug? 5.3.3","ImageHander Constructor",MB_OK);		
+//   MessageBox(0,"Where da bug? 5.3.3","ImageHander Constructor",MB_OK);		
 	
 	/* Convert color space */
-	
+//	 MessageBox(0,inttocstring(band_R),"band_R",MB_OK);
+//	 MessageBox(0,inttocstring(band_G),"band_G",MB_OK);	 
+//	 MessageBox(0,inttocstring(band_B),"band_B",MB_OK);	 
+//	 MessageBox(0,inttocstring(size),"size",MB_OK);	 	 
 	/* Convert band packing */
 	pix = 0;
 	piy = 0;
@@ -141,7 +141,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 		piy = piy + num_bands;
 	}
 
-   MessageBox(0,"Where da bug? 5.3.4","ImageHander Constructor",MB_OK);		
+//   MessageBox(0,"Where da bug? 5.3.4","ImageHander Constructor",MB_OK);		
 	
 	/* return temporary tile */
 	return out_tile;

@@ -269,31 +269,19 @@ const char* ImageHandler::get_info_string(void)
 
 void ImageHandler::make_overview_texture(void)
 {
-    	MessageBox(0,"Where da bug? 5.2","ImageHander Constructor",MB_OK);	
 	overview_tileset->set_region(0,0,image_width, image_height);
 	// Get texture data
-	    MessageBox(0,"Where da bug? 5.3","ImageHander Constructor",MB_OK);	
 	tex_overview = overview_tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
-	    MessageBox(0,"Where da bug? 5.4","ImageHander Constructor",MB_OK);		
 	/* Make texture from data */
 	gl_overview->make_current();
-	    MessageBox(0,"Where da bug? 5.5","ImageHander Constructor",MB_OK);			
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	    MessageBox(0,"Where da bug? 5.6","ImageHander Constructor",MB_OK);		
 	if (!tex_overview_id) glGenTextures(1, (GLuint*) &tex_overview_id);
-	    MessageBox(0,"Where da bug? 5.7","ImageHander Constructor",MB_OK);			
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
-	    MessageBox(0,"Where da bug? 5.8","ImageHander Constructor",MB_OK);			
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	    MessageBox(0,"Where da bug? 5.9","ImageHander Constructor",MB_OK);			
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	    MessageBox(0,"Where da bug? 5.10","ImageHander Constructor",MB_OK);			
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	    MessageBox(0,"Where da bug? 5.11","ImageHander Constructor",MB_OK);			
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	    MessageBox(0,"Where da bug? 5.12","ImageHander Constructor",MB_OK);			
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size_overview, texture_size_overview, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
-	    MessageBox(0,"Where da bug? 5.13","ImageHander Constructor",MB_OK);		
 	/* We don't need the RGB data here anymore */
 	free(tex_overview);
 		    MessageBox(0,"Where da bug? 5.14","ImageHander Constructor",MB_OK);		
