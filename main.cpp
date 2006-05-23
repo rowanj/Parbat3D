@@ -281,7 +281,6 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
         /* WM_MOVING: the window is about to be moved to a new location */
         case WM_MOVING:
-            /* lParam=the new position, which can be modified before the window is moved */
 
             /* set new window position based on position of mouse */
             setNewWindowPosition((RECT*)lParam,&snapMouseOffset);            
