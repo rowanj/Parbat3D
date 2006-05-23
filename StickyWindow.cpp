@@ -310,4 +310,5 @@ void MovingStickyWindow::moveBy(int x,int y)
     rect.right+=x;
     rect.bottom+=y;
     MoveWindow(hwnd,rect.left,rect.top,rect.right,rect.bottom,true);
+    //note: need to move relative to original position
 }
