@@ -1159,9 +1159,6 @@ void loadFile()
 					SetWindowText(hImageWindow,
 								(char *) makeMessage(leader,
 								(char *) image_handler->get_image_properties()->getFileName()));
-                    // update opengl displays
-                    RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
-                    RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
 
                     // re-create tool window
                     setupToolWindow();
@@ -1170,6 +1167,14 @@ void loadFile()
                     ShowWindow(hToolWindow,SW_SHOW);
                     ShowWindow(hImageWindow,SW_SHOW);    
                     orderWindows();                    
+
+                    // update opengl displays
+                    //InvalidateRect(hMainWindowDisplay,0,true);
+                    //UpdateWindow(hMainWindowDisplay);
+                    //InvalidateRect(hImageWindowDisplay,0,true);
+                    //UpdateWindow(hImageWindowDisplay);
+                    RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
+                    RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
 
                     // enable window menu items
                     EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,false);

@@ -113,7 +113,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	size = tex_size * tex_size * 3;
 	out_tile = (char*) malloc(size);
 
-   MessageBox(0,"Where da bug? 5.3.3","ImageHander Constructor",MB_OK);
+//   MessageBox(0,"Where da bug? 5.3.3","ImageHander Constructor",MB_OK);
    
 	/* Prevent bug on single channel images */
 	if(band_R>num_bands) band_R = num_bands;
@@ -187,7 +187,7 @@ int ImageTileSet::load_tile(int x, int y)
 		if (tile_size_y != tile_size) {
 			p_length = tile_size_x * num_bands * sample_size;
 			p_out = (tex_size * (tex_size - 1)) * num_bands * sample_size;
-			p_in = tile_size_x * (tile_size_y -1) * num_bands * sample_size);
+			p_in = tile_size_x * (tile_size_y -1) * num_bands * sample_size;
 			while (p_in > 0) {
 				p_in = p_in - (tile_size_x * num_bands * sample_size);
 			}
