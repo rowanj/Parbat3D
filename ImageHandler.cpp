@@ -116,7 +116,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
    	overview_tileset = new ImageTileSet(-1, image_file, texture_size_overview);
 	this->make_overview_texture();
   	#if TMP_USE_TEXTURES
-	this->set_LOD(0);
+	this->make_textures();
 	#endif
 
     
@@ -197,19 +197,19 @@ void ImageHandler::redraw(void)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	/* Set up view transform */
-	gluLookAt(0.0,0.0,(2.0/tan(PI/6.0)),0.0,0.0,0.0,0.0,1.0,0.0);
+	gluLookAt(0.0,0.0,(0.5/tan(PI/6.0)),0.0,0.0,0.0,0.0,1.0,0.0);
 	tile_id = 0;
 	glTranslatef((GLfloat)-tex_columns/2.0,(GLfloat)tex_rows/2.0, 0.0);
-	do {
+	while (tile_id < tex_count) {
 		glBindTexture(GL_TEXTURE_2D, (GLuint) tex_base[tile_id]);
 		glCallList(list_tile);
-		if (tile_id % tex_columns) {
+		if (!(tile_id % tex_columns)) {
 			glTranslatef((GLfloat)-tex_columns, -1.0, 0.0);
 		} else {
 			glTranslatef(1.0,0.0,0.0);
 		}
 		tile_id++;
-	} while (tile_id < tex_count);
+	}
 	glDisable(GL_TEXTURE_2D);
 	#endif
 	gl_image->GLswap();
@@ -291,7 +291,9 @@ void ImageHandler::make_textures(void)
 	int tx, ty;
 	char *tmp_tex;
 	
-	if (!image_tileset) image_tileset = new ImageTileSet(LOD, image_file, texture_size);	
+	if (!textures_loaded) {
+		image_tileset = new ImageTileSet(LOD, image_file, texture_size);
+	}
 	
 	/* Sort out how many textures we'll need */
 	tex_columns = image_tileset->get_tile_columns();
@@ -333,9 +335,13 @@ void ImageHandler::set_bands(int band_R, int band_G, int band_B)
 int ImageHandler::get_LOD(void) {return LOD;}
 int ImageHandler::set_LOD(int level_of_detail)
 {
-	LOD = level_of_detail;
-	make_textures();
-	redraw();
+	if (LOD!=level_of_detail) {
+		textures_loaded = 0;
+		delete(image_tileset);
+		LOD = level_of_detail;
+		make_textures();
+		redraw();
+	}
 }
 
 #if TMP_USE_TEXTURES

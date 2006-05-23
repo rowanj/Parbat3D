@@ -149,7 +149,7 @@ int ImageTileSet::load_tile(int x, int y)
 {
 	int tile_index, tile_index_x, tile_index_y;
 	int tile_size_x, tile_size_y;
-	int pix, piy;
+	int p_in, p_out, p_length;
 	
 	/* Calculate tile index */
 	tile_index_x = x/tile_size;
@@ -184,7 +184,14 @@ int ImageTileSet::load_tile(int x, int y)
 		}
 		
 		/* !! Shuffle data for edge tiles */
-	
+		if (tile_size_y != tile_size) {
+			p_length = tile_size_x * num_bands * sample_size;
+			p_out = (tex_size * (tex_size - 1)) * num_bands * sample_size;
+			p_in = tile_size_x * (tile_size_y -1) * num_bands * sample_size);
+			while (p_in > 0) {
+				p_in = p_in - (tile_size_x * num_bands * sample_size);
+			}
+		}
 		/* add index to list of allocated tiles */
 		tiles.push_back(tile_index);
 	
