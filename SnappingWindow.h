@@ -1,5 +1,15 @@
 
-
+class WindowSnapper
+{
+    HWND sticky;
+    public:
+        WindowSnapper(HWND main);
+        void onStartMove();
+        void onMoving();
+        void onSize();    
+        void onStartSize();
+        void onSizing();
+};
 
 void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset);
 void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RECT *prevToolWindowRect,int moveImageWindow,int moveToolWindow);

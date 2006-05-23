@@ -287,9 +287,6 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit29]
-FileName=windowFunctions.h
-
 [Unit30]
 FileName=imageWindow.cpp
 

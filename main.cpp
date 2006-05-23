@@ -968,7 +968,6 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         /* WM_NOTIFY: notification of certain events related to controls */
         case WM_NOTIFY:
             nmhdr=(NMHDR*)lParam;
-            /* nmhdr->code=the type of event that occured */
             switch(nmhdr->code)
             {
                 /* TCN_SELCHANGE: the user has selected a tab within a tab control */
@@ -1000,8 +999,6 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
         /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
         case WM_NCLBUTTONDOWN:
-            /* wParam=the area of the window where the mouse button was pressed */
-
             /* HTCAPTION: mouse button was pressed down on the window title bar
                          (occurs when user starts to move the window)              */            
             if(wParam == HTCAPTION)
@@ -1182,7 +1179,7 @@ void closeFile()
 {
     
 	if (image_handler) delete image_handler;
-    image_handler=NULL; //??
+    image_handler=NULL;
 	
     if (hToolWindow)
     {
