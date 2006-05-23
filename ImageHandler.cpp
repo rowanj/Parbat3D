@@ -230,8 +230,7 @@ void ImageHandler::resize_window(void)
 	gl_overview->GLresize();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	// !! Does this deal with files smaller than 10px wide?
-	// !! Will need to compensate for portrait-oriented images
+	
 	gluPerspective(60.0, (GLfloat) gl_overview->width()/(GLfloat) gl_overview->height(), 0.1, 2.0);
 	
 	gl_image->GLresize();
