@@ -13,7 +13,7 @@
 
 using namespace std;
 
-ImageHandler::ImageHandler* image_handler;	// Instance handle ptr
+ImageHandler::ImageHandler* image_handler = NULL;	// Instance handle ptr
 
 /* Unique class names for our main windows */
 char szMainWindowClassName[] = "Parbat3D Main Window";

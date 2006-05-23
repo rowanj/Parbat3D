@@ -114,9 +114,8 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
    
     /* Get texture for overview window */
    	overview_tileset = new ImageTileSet(-1, image_file, texture_size_overview);
-  	#if TMP_USE_TEXTURES   	
 	this->make_overview_texture();
-//	#if TMP_USE_TEXTURES
+  	#if TMP_USE_TEXTURES
 	this->set_LOD(0);
 	#endif
 
@@ -269,9 +268,9 @@ const char* ImageHandler::get_info_string(void)
 
 void ImageHandler::make_overview_texture(void)
 {
-	overview_tileset->set_region(0,0,image_width, image_height);
-	// Get texture data
+	// Get texture data	
 	tex_overview = overview_tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
+	
 	/* Make texture from data */
 	gl_overview->make_current();
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -284,7 +283,6 @@ void ImageHandler::make_overview_texture(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size_overview, texture_size_overview, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
 	/* We don't need the RGB data here anymore */
 	free(tex_overview);
-		    MessageBox(0,"Where da bug? 5.14","ImageHander Constructor",MB_OK);		
 }
 
 void ImageHandler::make_textures(void)
@@ -337,9 +335,8 @@ int ImageHandler::get_LOD(void) {return LOD;}
 int ImageHandler::set_LOD(int level_of_detail)
 {
 	LOD = level_of_detail;
-	this->make_overview_texture();
-	this->make_textures();
-	this->redraw();
+	make_textures();
+	redraw();
 }
 
 #if TMP_USE_TEXTURES

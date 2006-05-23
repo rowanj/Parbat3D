@@ -65,13 +65,6 @@ ImageTileSet::~ImageTileSet(void)
 
 void ImageTileSet::set_region(int x, int y, int width, int height)
 {
-	/* Special case for overview window */
-	if (LOD = -1) {
-		/* Grab entire image to one tile */
-		load_tile(0,0);
-		return;
-	}
-
 	/* De-allocate tiles out of region */
 	/* Ensure pointers set to NULL for presence test */
 
@@ -120,7 +113,12 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	size = tex_size * tex_size * 3;
 	out_tile = (char*) malloc(size);
 
-//   MessageBox(0,"Where da bug? 5.3.3","ImageHander Constructor",MB_OK);		
+   MessageBox(0,"Where da bug? 5.3.3","ImageHander Constructor",MB_OK);
+   
+	/* Prevent bug on single channel images */
+	if(band_R>num_bands) band_R = num_bands;
+	if(band_G>num_bands) band_G = num_bands;
+	if(band_B>num_bands) band_B = num_bands;
 	
 	/* Convert color space */
 //	 MessageBox(0,inttocstring(band_R),"band_R",MB_OK);
@@ -151,6 +149,7 @@ int ImageTileSet::load_tile(int x, int y)
 {
 	int tile_index, tile_index_x, tile_index_y;
 	int tile_size_x, tile_size_y;
+	int pix, piy;
 	
 	/* Calculate tile index */
 	tile_index_x = x/tile_size;
@@ -170,13 +169,16 @@ int ImageTileSet::load_tile(int x, int y)
 		} else {
 			tile_size_y = tile_size;
 		}
-		/* Allocate tile */
+		
+		/* Allocate tile and get tile data */
 		tile_pointers[tile_index] = (void*) malloc(tex_size * tex_size * num_bands * sample_size);
-
-		/* Get tile data */
+		if (!tile_pointers[tile_index]) {
+			MessageBox(0,"Failed allocating tile.","ImageTileSet::load_tile",MB_OK);
+		}
+                                        
 		/* !! shouldn't be cast to char* here */
 		if (LOD!=-1) {
-			image_file->getRasterData(tile_size_x, tile_size_y, x, y, (char*) tile_pointers[tile_index], tile_size_x, tile_size_y);
+			image_file->getRasterData(tile_size_x, tile_size_y, x, y, (char*) tile_pointers[tile_index], tile_size_x / (int)pow(2,LOD), tile_size_y / (int)pow(2,LOD));
 		} else {
 			image_file->getRasterData(tile_size_x, tile_size_y, x, y, (char*) tile_pointers[tile_index], tex_size, tex_size);
 		}
