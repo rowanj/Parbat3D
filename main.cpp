@@ -39,6 +39,7 @@ HWND hToolWindowTabControl;
 HWND hToolWindowDisplayTabContainer;
 HWND hToolWindowQueryTabContainer;
 HWND hToolWindowImageTabContainer;
+HWND hToolWindowScrollBar;
 HWND hImageWindowDisplay;
 HWND hMainWindowDisplay;
 HWND *redRadiobuttons;                // band radio buttons
@@ -603,13 +604,17 @@ int setupToolWindow()
 {
     TCITEM tie;  /* datastructure for tabs */
     RECT rect;
+
+    const int SCROLLBAR_WIDTH=13;
+    const int SCROLLBAR_TOP=25;
+
     
     /* Get Main Window Location for image window alignment*/
     GetWindowRect(hMainWindow,&rect);
     
     /* The class is registered, lets create the program*/
     hToolWindow =CreateWindowEx(WS_EX_TOPMOST, szToolWindowClassName, "Tools",
-           WS_POPUP+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_VSCROLL, rect.left, rect.bottom,
+           WS_POPUP+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, rect.left, rect.bottom,
            250, 300, NULL, NULL, hThisInstance, NULL);
 
     if (hToolWindow==NULL)
@@ -658,20 +663,27 @@ int setupToolWindow()
     /* Display tab container */
 	hToolWindowDisplayTabContainer =CreateWindowEx( 0, szStaticControl, "Channel Selection",
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,
-		SPACING_FOR_TAB_HEIGHT, rect.right, rect.bottom, hToolWindowTabControl, NULL,
+		SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, rect.bottom, hToolWindowTabControl, NULL,
 		hThisInstance, NULL); 
            
 	/* Query tab container */
     hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "Band Values",
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
-           SPACING_FOR_TAB_HEIGHT, rect.right, rect.bottom, hToolWindowTabControl,           /* The window is a childwindow of the tab control */
+           SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, rect.bottom, hToolWindowTabControl,           /* The window is a childwindow of the tab control */
            NULL, hThisInstance, NULL);
            
     /* Image tab container */
     hToolWindowImageTabContainer =CreateWindowEx(0, szStaticControl, "Image Properties",              /* text to display */
            WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
-           SPACING_FOR_TAB_HEIGHT, rect.right, rect.bottom, hToolWindowTabControl, NULL,                            /* No menu */
+           SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, rect.bottom, hToolWindowTabControl, NULL,                            /* No menu */
            hThisInstance, NULL); 
+
+    /* create scroll bar */
+    GetClientRect(hToolWindow,&rect);
+    hToolWindowScrollBar=CreateWindowEx(0, "SCROLLBAR", NULL,
+		WS_CHILD | WS_VISIBLE | SBS_RIGHTALIGN | SBS_VERT, 0, SCROLLBAR_TOP,
+		rect.right, rect.bottom-SCROLLBAR_TOP, hToolWindow, NULL, hThisInstance, NULL);           
+	EnableWindow(hToolWindowScrollBar,false);    
     
     /* modify tab containers' window procedure address 
         note: assumming proc addr is the same for all three */
