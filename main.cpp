@@ -72,42 +72,48 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 {
  	MSG messages;     /* Here messages to the application is saved */
   
-    /* load window classes for common controls */
-    InitCommonControls();
+
+    InitCommonControls();           /* load window classes for common controls */    
     
-    /* store this process's instance handle */
-    hThisInstance=hInstance;
+    hThisInstance=hInstance;        /* record this process's instance handle */
+    hDesktop=GetDesktopWindow();    /* record handle to desktop window */    
     
-    /* register window classes */
-    if ((!registerToolWindow())||(!registerImageWindow()))
+    /* Register window classes */
+    if ((!registerToolWindow()) || (!registerImageWindow()) || (!registerMainWindow()))
+    {
+        /* report error if window classes could not be registered */
+        MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
         return 0;
-    
-    // get desktop window handle
-    hDesktop=GetDesktopWindow();
-    
-    // create & show main window
-    if (!setupMainWindow())
+    }
+        
+    /* Setup main & image windows */
+    //  note: image window must be created before main window
+    //  note: tool window is only setup when an image is loaded
+    if ((!setupImageWindow()) || (!setupMainWindow()))
+    {
+        /* report error if windows could not be setup (note: unlikely to happen) */
+        MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
         return 0;
+    }
   
-    /* Run the messageloop. It will run until GetMessage( ) returns 0 */
+    /* Execute the message loop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))
     {
-        /* Send message to associated WindowProcedure */
+        /* Send message to the associated window procedure */
         DispatchMessage(&messages);
     }
 
-    /* The program returvalue is 0 - The value that PostQuitMessage( ) gave */
+    /* End program */
     return messages.wParam;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Main Window Functions */
 
-int setupMainWindow()
+int registerMainWindow()
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
-    RECT rect;
-
+        
     /* The Window structure */
     wincl.hInstance = hThisInstance;
     wincl.lpszClassName = szMainWindowClassName;
@@ -143,7 +149,15 @@ int setupMainWindow()
     wincl.cbWndExtra = 0;                      /* structure or the window instance */
     wincl.hbrBackground = NULL;
     /* Register the window class, if fails return false */
-    if(!RegisterClassEx(&wincl)) return false;    
+    return RegisterClassEx(&wincl);
+}
+
+
+/* create main window */
+int setupMainWindow()
+{
+
+    RECT rect;
     
     /* Get the stored window position or use defaults if there's a problem */
     int mx = atoi(winPos.getSetting("OverviewX").c_str());
@@ -154,7 +168,7 @@ int setupMainWindow()
     /* Create main window */
     hMainWindow = CreateWindowEx(0, szMainWindowClassName, "Parbat3D",
 		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, mx, my, 250, 296,
-		hMainWindow, NULL, hThisInstance, NULL);
+		NULL, NULL, hThisInstance, NULL);
     if (!hMainWindow)
         return false;                        
 
@@ -207,7 +221,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         case WM_CREATE:                
             hImageWindow=NULL;
             hToolWindow=NULL;
-            break;
+            return 0;
 
         /* WM_COMMAND: some command has been preformed by user, eg. menu item clicked */            
         case WM_COMMAND:
@@ -257,7 +271,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                     MessageBox (NULL, "Created by Team Imagery, 2006" , "Parbat3D", 0);
                     return 0;
            }
-           break;
+           return 0;
 
         /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */
         case WM_NCLBUTTONDOWN:
@@ -299,14 +313,14 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             /* move the snapped windows relative to main window's new position */
             /* only moves the windows that were already snapped to the main window */
             moveSnappedWindows((RECT*)lParam,&prevMainWindowRect,&prevImageWindowRect,&prevToolWindowRect,imageWindowIsMovingToo,toolWindowIsMovingToo);
-            break;
+            return 0;
 
         /* WM_SIZE: the window has been re-sized, minimized, maximised or restored */
         case WM_SIZE:
             /* resize display/opengl window to fit new size */
             GetClientRect(hMainWindow,&rect);
             MoveWindow(hMainWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
-            break;   
+            return 0;   
                      
         /* WM_CLOSE: system or user has requested to close the window/application */
         case WM_CLOSE:
@@ -319,6 +333,21 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             /* destroy this window */
             DestroyWindow( hwnd );			
             return 0;
+            
+        case WM_NCLBUTTONDBLCLK: /***remove***/
+            orderWindows();
+            return 0;
+
+        case WM_WINDOWPOSCHANGING: /***remove***/
+            if ((((WINDOWPOS*)lParam)->hwndInsertAfter==hImageWindow) || (((WINDOWPOS*)lParam)->hwndInsertAfter==hToolWindow))
+            {
+                static int n=0;
+                n++;
+                SetWindowText(hMainWindow,makeMessage("n:",n));
+                ((WINDOWPOS*)lParam)->flags|=SWP_NOZORDER;
+            }
+            return DefWindowProc(hwnd, message, wParam, lParam);
+
 
         /* WM_DESTROY: window is being destroyed */
         case WM_DESTROY:
@@ -330,13 +359,12 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             
             /* post a message that will cause WinMain to exit from the message loop */
             PostQuitMessage (0);
-            break;
+            return 0;
         
         default:                   /* for messages that we don't deal with */
             /* let windows peform the default operation based on the message */
             return DefWindowProc(hwnd, message, wParam, lParam);
     }
-    /* return true to indicate that we have processed the message */    
     return 0; 
 }
 
@@ -443,9 +471,11 @@ int setupImageWindow()
     GetWindowRect(hMainWindow, &rect);
     
     /* Create a window based on the class we just registered */
-    hImageWindow =CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, szImageWindowClassName, "Image Window",
-	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MINIMIZEBOX+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
-	     rect.right, rect.top, 700, 600, 0, NULL, hThisInstance, NULL);
+    hImageWindow =CreateWindowEx(0, szImageWindowClassName, "Image Window",
+	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
+	     rect.right, rect.top, 700, 600, hMainWindow, NULL, hThisInstance, NULL);
+    if (!hImageWindow)
+        return false;  
 
     /* get client area of image window */
     GetClientRect(hImageWindow,&rect);
@@ -552,6 +582,20 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
                 CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
 
+        case WM_WINDOWPOSCHANGING:
+            if ((image_handler)) 
+            {
+                if ((((WINDOWPOS*)lParam)->hwndInsertAfter==hMainWindow) || (((WINDOWPOS*)lParam)->hwndInsertAfter==hToolWindow))
+                {
+                    static int n=0;
+                    n++;
+                    SetWindowText(hImageWindow,makeMessage("n:",n));
+                    //((WINDOWPOS*)lParam)->flags|=SWP_NOZORDER;
+                }
+            }
+            return DefWindowProc(hwnd, message, wParam, lParam);
+
+
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
             /* don't destroy this window, but make it invisible */
@@ -596,7 +640,7 @@ int inline registerToolWindow()
     wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
 
     /* Register the window class, if it fails return false */
-    if(!RegisterClassEx(&wincl)) return false;    
+    return RegisterClassEx(&wincl);
 }    
 
 /* create tool window */
@@ -613,9 +657,9 @@ int setupToolWindow()
     GetWindowRect(hMainWindow,&rect);
     
     /* The class is registered, lets create the program*/
-    hToolWindow =CreateWindowEx(WS_EX_TOPMOST, szToolWindowClassName, "Tools",
-           WS_POPUP+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, rect.left, rect.bottom,
-           250, 300, NULL, NULL, hThisInstance, NULL);
+    hToolWindow =CreateWindowEx(0, szToolWindowClassName, "Tools",
+           WS_POPUP+WS_CAPTION+WS_SYSMENU, rect.left, rect.bottom,
+           250, 300, hMainWindow, NULL, hThisInstance, NULL);
 
     if (hToolWindow==NULL)
         return false;
@@ -1063,6 +1107,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             else
                 CheckMenuItem(hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
+
       
         /* WM_CLOSE: system or user has requested to close the window/application */              
         case WM_CLOSE:
@@ -1107,9 +1152,11 @@ int toggleMenuItemTick(HMENU hMenu,int itemId)
 
 void orderWindows()
 {
-    SetWindowPos(hMainWindow,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);
-    SetWindowPos(hToolWindow,hMainWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE); 
-    //SetWindowPos(hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);    
+    //SetWindowPos(hMainWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);        
+    SetWindowPos(hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(hImageWindow,hMainWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+
+
 }    
 
 /* main functions */
@@ -1205,8 +1252,8 @@ void closeFile()
     
     if (hImageWindow)
     {
-        DestroyWindow(hImageWindow);
-        hImageWindow=NULL;
+        //DestroyWindow(hImageWindow);
+        //hImageWindow=NULL;
     }
 
     /* disable menu items */

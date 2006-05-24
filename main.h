@@ -70,9 +70,11 @@ LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND, UINT, WPARAM, LPARAM
 
 int registerToolWindow();
 int registerImageWindow();
+int registerMainWindow();
 int setupImageWindow();
 int setupMainWindow();
 int setupToolWindow();
+void orderWindows();
 
 extern void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset);
 extern void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RECT *prevToolWindowRect,int moveImageWindow,int moveToolWindow);
