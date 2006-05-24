@@ -444,7 +444,7 @@ int setupImageWindow()
     
     /* Create a window based on the class we just registered */
     hImageWindow =CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, szImageWindowClassName, "Image Window",
-	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MINIMIZEBOX+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL,
+	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MINIMIZEBOX+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
 	     rect.right, rect.top, 700, 600, 0, NULL, hThisInstance, NULL);
 
     /* get client area of image window */

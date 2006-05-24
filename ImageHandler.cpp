@@ -114,7 +114,9 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
    
     /* Get texture for overview window */
    	overview_tileset = new ImageTileSet(-1, image_file, texture_size_overview);
+    #if TMP_IGNOR_BUGS   	
 	this->make_overview_texture();
+   	#endif	
   	#if TMP_USE_TEXTURES
 	this->make_textures();
 	#endif
@@ -337,7 +339,9 @@ int ImageHandler::set_LOD(int level_of_detail)
 {
 	if (LOD!=level_of_detail) {
 		textures_loaded = 0;
+		#if TMP_IGNOR_BUGS
 		delete(image_tileset);
+		#endif
 		LOD = level_of_detail;
 		make_textures();
 		redraw();
