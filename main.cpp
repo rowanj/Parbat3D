@@ -9,7 +9,7 @@
 #include "StringUtils.h"
 #include "main.h"
 #include "SnappingWindow.h"
-
+#include "console.h"
 
 using namespace std;
 
@@ -65,8 +65,6 @@ HPEN hTabPen;
 HBRUSH hTabBrush;
 WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc;
 
-int fileIsOpen=false;   /* indicates if an image file is currently loaded */
-
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 {
@@ -77,6 +75,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     
     hThisInstance=hInstance;        /* record this process's instance handle */
     hDesktop=GetDesktopWindow();    /* record handle to desktop window */    
+    
+    Console::open();
+    Console::write("testing1!\n");
+    Console::write(new string("testing2!\n"));
+
     
     /* Register window classes */
     if ((!registerToolWindow()) || (!registerImageWindow()) || (!registerMainWindow()))
@@ -341,10 +344,10 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         case WM_WINDOWPOSCHANGING: /***remove***/
             if ((((WINDOWPOS*)lParam)->hwndInsertAfter==hImageWindow) || (((WINDOWPOS*)lParam)->hwndInsertAfter==hToolWindow))
             {
-                static int n=0;
-                n++;
-                SetWindowText(hMainWindow,makeMessage("n:",n));
-                ((WINDOWPOS*)lParam)->flags|=SWP_NOZORDER;
+                //static int n=0;
+                //n++;
+                //Console::write(makeMessage("WM_WINDOWPOSCHANGING:",n));
+                //((WINDOWPOS*)lParam)->flags|=SWP_NOZORDER;
             }
             return DefWindowProc(hwnd, message, wParam, lParam);
 
@@ -587,9 +590,9 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             {
                 if ((((WINDOWPOS*)lParam)->hwndInsertAfter==hMainWindow) || (((WINDOWPOS*)lParam)->hwndInsertAfter==hToolWindow))
                 {
-                    static int n=0;
-                    n++;
-                    SetWindowText(hImageWindow,makeMessage("n:",n));
+                    //static int n=0;
+                    //n++;
+                    //SetWindowText(hImageWindow,makeMessage("n:",n));
                     //((WINDOWPOS*)lParam)->flags|=SWP_NOZORDER;
                 }
             }
@@ -1199,7 +1202,7 @@ void loadFile()
     			else
     			{
                     // Image loaded succesfully
-                    fileIsOpen=true;
+                    //fileIsOpen=true;
                     
                     /* Display the file name at the top of the image window */
                     string leader = "Image - ";
