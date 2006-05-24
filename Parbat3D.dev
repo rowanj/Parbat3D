@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=29
+UnitCount=30
 Type=0
 Ver=1
 ObjFiles=
@@ -288,7 +288,14 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit30]
-FileName=imageWindow.cpp
+FileName=StickyWindow.h
+CompileCpp=1
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
 
 [Unit25]
 FileName=TestUtils.h
