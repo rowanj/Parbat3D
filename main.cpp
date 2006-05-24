@@ -962,11 +962,38 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
         case WM_COMMAND:
             //if(hupdate==(HWND)lParam)
             {
-            MessageBox( hwnd, (LPSTR) "Updating Image",
-                        (LPSTR) szMainWindowClassName,
-            			MB_ICONINFORMATION | MB_OK );
-            // !! Insert band numbers (bands start at 1, not 0) here. - Rowan
-            if (image_handler) image_handler->set_bands(3,1,2);
+
+                // find out which bands are selected
+				int r, g, b;
+				for (int i=0; i<bands; i++)
+   				{
+					LRESULT state = SendMessageA(redRadiobuttons[i], BM_GETCHECK, 0, 0);
+					if(state==BST_CHECKED)
+						r = i;
+					
+					state = SendMessageA(greenRadiobuttons[i], BM_GETCHECK, 0, 0);
+					if(state==BST_CHECKED)
+						g = i;
+					
+					state = SendMessageA(blueRadiobuttons[i], BM_GETCHECK, 0, 0);
+					if(state==BST_CHECKED)
+						b = i;
+				}
+
+	    		// Temporary message
+	    		const char *butNum = "selected bands are: "; 
+				butNum = catcstrings( (char*) butNum, (char*) inttocstring(r) );
+				butNum = catcstrings( (char*) butNum, (char*) ", " );
+				butNum = catcstrings( (char*) butNum, (char*) inttocstring(g) );
+				butNum = catcstrings( (char*) butNum, (char*) ", " );
+				butNum = catcstrings( (char*) butNum, (char*) inttocstring(b) );
+				MessageBox( hwnd, (LPSTR) butNum,
+                    (LPSTR) szMainWindowClassName,
+        			MB_ICONINFORMATION | MB_OK );
+				
+				// !! Insert band numbers (bands start at 1, not 0) here. - Rowan
+				// 0 now equals none - Damian
+            	if (image_handler) image_handler->set_bands(r,g,b);
             }                
             break;
         
