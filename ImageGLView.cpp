@@ -78,11 +78,11 @@ void ImageGLView::GLresize(void)
 {
 	GLuint width, height;
 	LPRECT window_rect;
-	window_rect = (tagRECT*) malloc(sizeof(RECT));
+	window_rect = new RECT;
 	GetWindowRect(window_handle, window_rect);
 	width = window_rect->right - window_rect->left;
 	height = window_rect->bottom - window_rect->top;
-	free(window_rect); 
+	delete window_rect; 
 	
 	if (height == 0) height = 1; // prevent div 0
 	window_height = height;
