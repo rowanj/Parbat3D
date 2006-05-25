@@ -7,6 +7,7 @@
 #define PI 3.14159265
 
 #include "config.h"
+#include "console.h"
 
 #if DEBUG_IMAGE_REDRAW
 float redraw_rotz;
@@ -18,16 +19,19 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	ImageProperties* image_properties;
 	status = 0; // No error
 	error_text = "No error.";
-	textures_loaded = false;
+	image_tileset = NULL;
 
+	Console::write("(II) ImageHandler instantiating.\n");
 	
 	/* Set up defaults */
 	LOD=0; /* Acutally, set this one below - must be different */
 	band_red = 1;
 	band_green = 2;
 	band_blue = 3;
-	texture_size = 256;
-	texture_size_overview = 256;
+	texture_size = 256; /* !! Could load from Settings */
+	texture_size_overview = 256; /* !! Could load from Settings */
+	viewport_x = 0;
+	viewport_y = 0;
 	
 	// Check for lazily unspecified (NULL argument) parameters
 	if (!overview_hwnd) {
@@ -52,27 +56,20 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	if (!gl_overview) {
 		status = 4;
 		error_text = "Could not create ImageGLView for overview window.";
+	} else {
+		Console::write("(II) ImageHandler::Created ImageGLView for overview window.\n");
 	}
-	#if DEBUG_IMAGE_HANDLER
-	else {
-		MessageBox (NULL, "Successfully created ImageGLView for overview window.", "Parbat3D :: ImageHandler", 0);
-	}
-	#endif
 	
 	gl_image = new ImageGLView(image_hwnd);
 	if (!gl_image) {
 		status = 4;
 		error_text = "Could not create ImageGLView for image window.";
+	} else {
+		Console::write("(II) ImageHandler::Created ImageGLView for image window.\n");
 	}
-	#if DEBUG_IMAGE_HANDLER
-	else {
-		MessageBox (NULL, "Successfully created ImageGLView for image window.", "Parbat3D :: ImageHandler", 0);
-	}
-	#endif
-	
+		
 	// Initialize image file (could be threaded)
 	image_file = new ImageFile(filename);
-		
 	if (!image_file) {
 		status = 5;
 		error_text = "Could not create ImageFile object.";
@@ -85,6 +82,9 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	
 	/* Find maximum supported texture size */
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
+    Console::write("(II) ImageHandler::max_texture_size = ");
+    Console::write(max_texture_size);
+    Console::write("\n");
     
     /* Initialize OpenGL machine */
     gl_overview->make_current();
@@ -113,10 +113,11 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 
    
     /* Get texture for overview window */
-   	overview_tileset = new ImageTileSet(-1, image_file, texture_size_overview);
-    #if TMP_IGNOR_BUGS   	
+    #if DEBUG_IMAGE_HANDLER
+    Console::write("(II) ImageHandler::Creating tileset for overview\n");
+    #endif
+   	overview_tileset = new ImageTileSet(-1, image_file, texture_size_overview, 1024 * 1024 * 32);
 	this->make_overview_texture();
-   	#endif	
   	#if TMP_USE_TEXTURES
 	this->make_textures();
 	#endif
@@ -128,6 +129,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 
 ImageHandler::~ImageHandler(void)
 {
+	Console::write("(II) ImageHandler shutting  down...\n");
 	delete overview_tileset;
 	#if TMP_USE_TEXTURES
 	delete image_tileset;
@@ -229,6 +231,9 @@ BandInfo* ImageHandler::get_band_info(int band_number)
 
 void ImageHandler::resize_window(void)
 {
+	#if DEBUG_IMAGE_HANDLER
+    Console::write("(II) ImageHandler::Window resize triggered.\n");
+    #endif
 	gl_overview->GLresize();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -239,27 +244,23 @@ void ImageHandler::resize_window(void)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(60.0, (GLfloat) gl_image->width()/(GLfloat) gl_image->height(), 0.1, 20.0);
+	viewport_width = gl_image->width();
+	viewport_height = gl_image->height();
 	this->redraw();
 }
 
-PRECT ImageHandler::get_viewport(void)
+int* ImageHandler::get_pixel_values(int x, int y)
 {
-	return NULL;
-}
-
-PRECT ImageHandler::set_viewport(void)
-{
-	return NULL;
-}
-
-pixel_values_ptr ImageHandler::get_pixel_values(unsigned int x, unsigned int y)
-{
-	return NULL;
+	if (image_tileset) {
+		return image_tileset->get_pixel_values(x,y);
+	} else {
+		return NULL;
+	}
 }
 
 void ImageHandler::get_geo_pos(geo_coords_ptr pos)
 {
-	;
+	Console::write("(WW) ImageHandler::get_geo_pos() - not implemented.\n");
 }
 
 const char* ImageHandler::get_info_string(void)
@@ -269,9 +270,15 @@ const char* ImageHandler::get_info_string(void)
 
 void ImageHandler::make_overview_texture(void)
 {
+	#if DEBUG_IMAGE_HANDLER
+	Console::write("(II) ImageHandler::make_overview_texture()\n");
+	#endif
 	// Get texture data	
 	tex_overview = overview_tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
-	
+	#if DEBUG_IMAGE_HANDLER
+	Console::write("(II) ImageHandler::Successfully got overview texture from tileset.\n");
+	#endif
+
 	/* Make texture from data */
 	gl_overview->make_current();
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -283,7 +290,10 @@ void ImageHandler::make_overview_texture(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size_overview, texture_size_overview, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
 	/* We don't need the RGB data here anymore */
-	free(tex_overview);
+	delete(tex_overview);
+	#if DEBUG_IMAGE_HANDLER
+	Console::write("(II) ImageHandler::Successfully created overview texture.");
+	#endif
 }
 
 void ImageHandler::make_textures(void)
@@ -293,20 +303,26 @@ void ImageHandler::make_textures(void)
 	int tx, ty;
 	char *tmp_tex;
 	
-	if (!textures_loaded) {
-		image_tileset = new ImageTileSet(LOD, image_file, texture_size);
+	Console::write("(II) ImageHandler::Making image textures - LOD=");
+	Console::write(LOD);
+	Console::write("\n");
+	
+	if (!tileset_loaded) {
+		Console::write("(II) ImageHandler::Creating image tileset.");
+		image_tileset = new ImageTileSet(LOD, image_file, texture_size, 0);
+		tileset_loaded = true;
 	}
 	
 	/* Sort out how many textures we'll need */
-	tex_columns = image_tileset->get_tile_columns();
-	tex_rows = image_tileset->get_tile_rows();
+	tex_columns = image_tileset->get_columns();
+	tex_rows = image_tileset->get_rows();
 	tex_count = tex_columns * tex_rows;
 	tile_size = image_tileset->get_tile_size();
 
 	/* !! only generate a vewport's worth */
 	/* Generate textures */
 	gl_image->make_current();
-	if (!textures_loaded) glGenTextures(tex_count, tex_base);
+	glGenTextures(tex_count, tex_base); /* !! Re-use ?? */
 	for (tx = 0; tx < tex_columns; tx++){
 		for (ty = 0; ty < tex_rows; ty++) {
 			tmp_id = (ty * tex_columns) + tx;
@@ -320,12 +336,14 @@ void ImageHandler::make_textures(void)
 			free(tmp_tex);
 		}
 	}
-	textures_loaded = true;
 	#endif
 }
 
 void ImageHandler::set_bands(int band_R, int band_G, int band_B)
 {
+	char buffer[256];
+	sprintf(buffer, "(II) ImageHandler::set_bands(%d,%d,%d)\n",band_R,band_G,band_B);
+	Console::write(buffer);
 	band_red = band_R;
 	band_green = band_G;
 	band_blue = band_B;
@@ -337,10 +355,21 @@ void ImageHandler::set_bands(int band_R, int band_G, int band_B)
 int ImageHandler::get_LOD(void) {return LOD;}
 int ImageHandler::set_LOD(int level_of_detail)
 {
+	#if DEBUG_IMAGE_HANDLER
+	char  buffer[256];
+	sprintf(buffer, "(II) ImageHandler::set_LOD(%d) - Current: %d\n", level_of_detail, LOD);
+	Console::write(buffer);
+	#endif
+	
 	if (LOD!=level_of_detail) {
-		textures_loaded = 0;
-		#if TMP_IGNOR_BUGS
-		delete(image_tileset);
+		#if TMP_USE_TILESET
+		if (image_tileset) {
+			#if DEBUG_IMAGE_HANDLER
+			Console::write("(II) ImageHandler::Deleting image_tileset;");
+			#endif
+			delete(image_tileset);
+			image_tileset = NULL;
+		}
 		#endif
 		LOD = level_of_detail;
 		make_textures();
@@ -348,13 +377,9 @@ int ImageHandler::set_LOD(int level_of_detail)
 	}
 }
 
-#if TMP_USE_TEXTURES
-int ImageHandler::get_LOD_width(void)
-{
-	return image_tileset->get_LOD_width();
-}
-int ImageHandler::get_LOD_height(void)
-{
-	return image_tileset->get_LOD_height();
-}
-#endif
+int ImageHandler::get_LOD_width(void) {return image_tileset->get_LOD_width();}
+int ImageHandler::get_LOD_height(void) {return image_tileset->get_LOD_height();}
+int ImageHandler::get_viewport_width(void) {return viewport_width;}
+int ImageHandler::get_viewport_height(void) {return viewport_height;}
+int ImageHandler::get_viewport_x(void) {return viewport_x;}
+int ImageHandler::get_viewport_y(void) {return viewport_y;}

@@ -1,6 +1,8 @@
 
 #include <Windows.h>
 #include <string>
+#include <stdlib.h>
+//#include <stringstream>
 
 #include "console.h"
 #include "config.h"
@@ -37,5 +39,15 @@ void Console::write(string *msg)
     int len,written;
     len=msg->length();
     WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE),msg->c_str(),len,(DWORD*)&written,NULL);           
+    #endif
+}
+
+void Console::write(int msg)
+{
+    #if TMP_USE_CONSOLE        
+    int written;
+    char message[33];
+    itoa(msg,message,10);
+    WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE),message,strlen(message),(DWORD*)&written,NULL);
     #endif
 }

@@ -15,7 +15,7 @@
 
 typedef struct pixel_values_t {
 	char number_bands;
-	int* value;
+	int* values;
 } pixel_values, *pixel_values_ptr;
 
 typedef struct geo_coords_t {
@@ -36,22 +36,28 @@ public:
 	/* Data Operators */
 	ImageProperties* get_image_properties(void);
 	BandInfo* get_band_info(int band_number);
-	pixel_values_ptr get_pixel_values(unsigned int x, unsigned int y);
+		/* free() pixel_values_ptr->values and pixel_values_ptr after use */
+	int* get_pixel_values(int x, int y);
 	void get_geo_pos(geo_coords_ptr pos);
-	const char* get_info_string(void);   
+	const char* get_info_string(void);
 	
 	/* Viewport Operators */
 	void redraw(void);
 	void resize_window(void);
-	PRECT get_viewport(void);
-	PRECT set_viewport(void);
+	void set_viewport(int x, int y);
 	void set_bands(int band_R, int band_G, int band_B);
+	int get_viewport_x(void);
+	int get_viewport_y(void);
+	int get_viewport_width(void);
+	int get_viewport_height(void);
+	
+	/* Control current zoom, 0 = 1:1, 1 = 2:1, 2 = 4:1, etc. */
 	int get_LOD(void);
 	int set_LOD(int level_of_detail);
-	#if TMP_USE_TEXTURES
+	
+	/* Image dimension (screen pixels) at current zoom */
 	int get_LOD_width(void);
 	int get_LOD_height(void);
-	#endif
 	
 	/* State Variables */
 	int status;
@@ -73,8 +79,8 @@ private:
 	int image_width, image_height;
     int max_texture_size;
     int band_red, band_green, band_blue;
-    bool textures_loaded;
 	int texture_size, texture_size_overview;
+	int viewport_width, viewport_height, viewport_x, viewport_y;
 	
     /* Overview window texture */
 	ImageTileSet* overview_tileset;
@@ -82,12 +88,10 @@ private:
 	unsigned int *tex_overview_id;
 	
 	/* Image window textures */
-	#if TMP_USE_TEXTURES
 	ImageTileSet* image_tileset;
 	int tex_rows, tex_columns, tex_count;
 	GLuint tex_base[];
 	int tile_size;
-	#endif
 	
 	/* Display lists */
 	unsigned int list_tile;

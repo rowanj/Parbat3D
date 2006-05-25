@@ -13,4 +13,5 @@ class Console
     static void close();
     static void write(char *msg);
     static void write(string *msg);
+    static void write(int msg);
 };
