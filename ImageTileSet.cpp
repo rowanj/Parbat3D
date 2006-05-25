@@ -107,17 +107,41 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	/* Convert band packing */
 	pix = 0;
 	piy = 0;
-	band_R--;
-	band_G--;
-	band_B--;
-	while (pix < size) {
-		out_tile[pix]   = tile[piy+band_R];
-		out_tile[pix+1] = tile[piy+band_G];
-		out_tile[pix+2] = tile[piy+band_B];
-		pix = pix + 3;
-		piy = piy + num_bands;
+	if (band_R && band_G && band_B) {
+		/* Optimized loop for usual case */
+		band_R--;
+		band_G--;
+		band_B--;
+		while (pix < size) {
+			out_tile[pix]   = tile[piy+band_R];
+			out_tile[pix+1] = tile[piy+band_G];
+			out_tile[pix+2] = tile[piy+band_B];
+			pix = pix + 3;
+			piy = piy + num_bands;
+		}
+	} else {
+		/* Conditional loop for 'none' case.*/
+		while (pix < size) {
+			if (band_R) {
+				out_tile[pix]   = tile[piy+band_R-1];
+			} else {
+				out_tile[pix]   = 0;
+			}
+			if (band_G) {
+				out_tile[pix+1] = tile[piy+band_G-1];
+			} else {
+				out_tile[pix+1] = 0;
+			}
+			if (band_B) {
+				out_tile[pix+2] = tile[piy+band_B];
+			} else {
+				out_tile[pix+2] = 0;
+			}
+			pix = pix + 3;
+			piy = piy + num_bands;
+		}
 	}
-
+	
 	/* return temporary tile */
 	return out_tile;
 }

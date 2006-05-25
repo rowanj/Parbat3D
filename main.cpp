@@ -981,7 +981,7 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
 				}
 
 	    		// Temporary message
-	    		const char *butNum = "selected bands are: "; 
+	    		/*const char *butNum = "selected bands are: "; 
 				butNum = catcstrings( (char*) butNum, (char*) inttocstring(r) );
 				butNum = catcstrings( (char*) butNum, (char*) ", " );
 				butNum = catcstrings( (char*) butNum, (char*) inttocstring(g) );
@@ -989,7 +989,8 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
 				butNum = catcstrings( (char*) butNum, (char*) inttocstring(b) );
 				MessageBox( hwnd, (LPSTR) butNum,
                     (LPSTR) szMainWindowClassName,
-        			MB_ICONINFORMATION | MB_OK );
+        			MB_ICONINFORMATION | MB_OK );*/
+        		// #define DEBUG_IMAGE_HANDLER to see these values printed in console window.
 				
 				// !! Insert band numbers (bands start at 1, not 0) here. - Rowan
 				// 0 now equals none - Damian

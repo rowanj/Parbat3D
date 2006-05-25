@@ -341,9 +341,11 @@ void ImageHandler::make_textures(void)
 
 void ImageHandler::set_bands(int band_R, int band_G, int band_B)
 {
+	#if DEBUG_IMAGE_HANDLER
 	char buffer[256];
 	sprintf(buffer, "(II) ImageHandler::set_bands(%d,%d,%d)\n",band_R,band_G,band_B);
 	Console::write(buffer);
+	#endif
 	band_red = band_R;
 	band_green = band_G;
 	band_blue = band_B;
