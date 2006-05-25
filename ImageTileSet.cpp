@@ -38,7 +38,7 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	
 	/* special case for overview window */
 	if (LOD == -1) {
-		tile_size = 1;
+		tile_size = tex_size;
 		LOD_width = tex_size;
 		LOD_height = tex_size;
 		columns = 1;
@@ -79,6 +79,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	int tile_index;
 	char* tile;
 	char* out_tile;
+	char message[256];
 	int pix, piy, size;
 	
 	#if DEBUG_IMAGE_TILESET
@@ -87,7 +88,8 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	/* Check if tile is loaded, load if not */
 	tile_index = load_tile(x,y);
 	#if DEBUG_IMAGE_TILESET
-	Console::write("(II) ImageTileset::get_tile_RGB - Tile loaded.\n");
+	sprintf(message, "(II) ImageTileset::get_tile_RGB - tile cache: hits=%d, misses=%d.\n", cache_hits, cache_misses);
+	Console::write(message);
 	#endif
 	tile = tiles[tile_index]->data;
 
@@ -130,7 +132,9 @@ int ImageTileSet::load_tile(int x, int y)
 	tile_ptr new_tile;
 	int tile_index, tile_index_x, tile_index_y;
 	int tile_size_x, tile_size_y;
+	int data_size_x, data_size_y;
 	int p_in, p_out, p_length;
+	int tile_check;
 	
 	/* Calculate tile index */
 	tile_index_x = x/tile_size;
@@ -142,15 +146,20 @@ int ImageTileSet::load_tile(int x, int y)
 	#endif
 	
 	/* Load if not already */
-	if(false) {
-		return 0; /* !! index of tile in vector */
-	} else {
+	tile_check = 0;
+	while (tile_check < tiles.size()) {
+		if (tiles[tile_check]->tile_index == tile_index) {
+			cache_hits++;
+			return 0; /* !! index of tile in vector */
+		}
+	}
+	
+	{ // Tile wasn't in cache
 		/* Check cache space, deallocate head if not */
+		cache_misses++;
 		/* Allocate tile */
 		new_tile = new tile;
-		new_tile->index = tile_index;
-		new_tile->image_x = x;
-		new_tile->image_y = y;
+		new_tile->tile_index = tile_index;
 		new_tile->data = new char[tex_size * tex_size * sample_size * num_bands];
 		
 		/* Adjust for border tiles */
@@ -164,15 +173,21 @@ int ImageTileSet::load_tile(int x, int y)
 		} else {
 			tile_size_y = tile_size;
 		}
+		
                                         
 		if (LOD!=-1) {
-			image_file->getRasterData(tile_size_x, tile_size_y, x, y, new_tile->data, tile_size_x / (int)pow(2,LOD), tile_size_y / (int)pow(2,LOD));
+			data_size_x = tile_size_x / (2^LOD);
+			data_size_y = tile_size_y / (2^LOD);
+			image_file->getRasterData(tile_size_x, tile_size_y, x, y, new_tile->data, data_size_x, data_size_y);
+			/* !! Shuffle data for edge tiles */
+			if (!((tile_size_y == tile_size) && (tile_size_x == tile_size))) {
+				align_tile(new_tile->data, tex_size, data_size_x, data_size_y);
+			}
 		} else {
+			data_size_x = tex_size;
+			data_size_y = tex_size;
 			image_file->getRasterData(tile_size_x, tile_size_y, x, y, new_tile->data, tex_size, tex_size);
 		}
-		
-		/* !! Shuffle data for edge tiles */
-		
 		
 		/* add index to list of allocated tiles */
 		tiles.push_back(new_tile);
@@ -196,6 +211,7 @@ int* ImageTileSet::get_pixel_values(int x, int y)
 	return return_values;
 }
 
+/* !! tile_dimension will probably always be tex_size */
 void ImageTileSet::align_tile(void* tile, int tile_dimension,
 					int data_width, int data_height)
 {

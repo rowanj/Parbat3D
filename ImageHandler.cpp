@@ -292,7 +292,7 @@ void ImageHandler::make_overview_texture(void)
 	/* We don't need the RGB data here anymore */
 	delete(tex_overview);
 	#if DEBUG_IMAGE_HANDLER
-	Console::write("(II) ImageHandler::Successfully created overview texture.");
+	Console::write("(II) ImageHandler::Successfully created overview texture.\n");
 	#endif
 }
 

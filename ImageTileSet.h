@@ -6,9 +6,7 @@
 #include <sys/types.h>
 
 typedef struct tile_t {
-	int index;
-	int image_x;
-	int image_y;
+	int tile_index;
 	char* data;
 } tile, *tile_ptr;
 
