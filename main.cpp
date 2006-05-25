@@ -1283,6 +1283,7 @@ void closeFile()
     
     if (hImageWindow)
     {
+        ShowWindow(hImageWindow,SW_HIDE);
         //DestroyWindow(hImageWindow);
         //hImageWindow=NULL;
     }
