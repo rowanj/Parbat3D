@@ -67,6 +67,8 @@ HPEN hTabPen;
 HBRUSH hTabBrush;
 WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc;
 
+const int OVERVIEW_WINDOW_WIDTH=250;   // width of the overview window in pixels
+
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 {
@@ -114,6 +116,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
+/* Main Window Functions */
 
 int registerMainWindow()
 {
@@ -144,9 +147,10 @@ int registerMainWindow()
 int setupMainWindow()
 {
 
+
     /* Create main window */
     hMainWindow = CreateWindowEx(0, szMainWindowClassName, "Parbat3D",
-		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, -50, -50, 10, 10,
+		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, -50, -50, 1, 1,
 		NULL, NULL, hThisInstance, NULL);
     if (!hMainWindow)
         return false;                        
@@ -156,27 +160,33 @@ int setupMainWindow()
     return true;
 }
 
+/* handle events related to the main window */
 LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static int imageWindowState;
-    static int toolWindowState;
+    static int imageWindowState=SW_HIDE;    // recoreded state of image window when minimised
+    static int toolWindowState=SW_HIDE;     // recoreded state of tool window when minimised
     static WINDOWPLACEMENT wp;
     
     switch (message)                  /* handle the messages */
     {
+        /* check if main window has been minimized or restored */
 		case WM_SIZE:
 		    switch(wParam)
 		    {
                 case SIZE_RESTORED:
+                    /* restore other windows to their previous state */
                     ShowWindow(hImageWindow,imageWindowState);
                     ShowWindow(hToolWindow,toolWindowState);                    
                     ShowWindow(hOverviewWindow,SW_RESTORE);
                     break;
                 case SIZE_MINIMIZED:
+                    /* record the current state of the child windows */
                     GetWindowPlacement(hImageWindow,&wp);
                     imageWindowState=wp.showCmd;
                     GetWindowPlacement(hToolWindow,&wp);
-                    toolWindowState=wp.showCmd;        
+                    toolWindowState=wp.showCmd;   
+                    
+                    /* hide the child windows */     
                     ShowWindow(hImageWindow,SW_HIDE);            
                     ShowWindow(hToolWindow,SW_HIDE);                    
                     ShowWindow(hOverviewWindow,SW_HIDE);                    
@@ -193,8 +203,9 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
-/* Main Window Functions */
+/* Overview Window Functions */
 
+/* register overview window's class */
 int registerOverviewWindow()
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
@@ -244,15 +255,12 @@ int setupOverviewWindow()
 
     RECT rect;
     
-    /* Get the stored window position or use defaults if there's a problem */
-    int mx = atoi(winPos.getSetting("OverviewX").c_str());
-	int my = atoi(winPos.getSetting("OverviewY").c_str());
-	if (mx <= 0) mx = CW_USEDEFAULT;
-	if (my <= 0) my = CW_USEDEFAULT;
-    
+    /* get co-ords of image window */
+    GetWindowRect(hImageWindow,&rect);
+        
     /* Create main window */
     hOverviewWindow = CreateWindowEx(0, szOverviewWindowClassName, "Parbat3D",
-		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, mx, my, 250, 296,
+		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, rect.left-OVERVIEW_WINDOW_WIDTH, rect.top, OVERVIEW_WINDOW_WIDTH, 296,
 		hImageWindow, NULL, hThisInstance, NULL);
     if (!hOverviewWindow)
         return false;                        
@@ -402,10 +410,13 @@ LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam,
             GetClientRect(hOverviewWindow,&rect);
             MoveWindow(hOverviewWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
             return 0;
-            
+        
+        /* WM_SYSCOMMAND: a system-related command associated with window needs to be executed */    
         case WM_SYSCOMMAND:
+            /* check if user has tried to minimize the overview window */
             if (wParam==SC_MINIMIZE)
             {
+                /* cause the main window to minimised instead */
                 ShowWindow(hMainWindow,SW_MINIMIZE);
                 return 0;
             }            
@@ -573,15 +584,18 @@ int inline registerImageWindow()
 /* create the image window */
 int setupImageWindow()
 {
-    
-    /* Get Main Window coords for Image Window alignment*/
     RECT rect;
-    //GetWindowRect(hOverviewWindow, &rect);
+
+    /* Get the stored window position or use defaults if there's a problem */
+    int mx = atoi(winPos.getSetting("OverviewX").c_str());
+	int my = atoi(winPos.getSetting("OverviewY").c_str());
+	if (mx <= 0) mx = CW_USEDEFAULT;
+	if (my <= 0) my = CW_USEDEFAULT;
     
-    /* Create a window based on the class we just registered */
+    /* create image window */
     hImageWindow =CreateWindowEx(0, szImageWindowClassName, "Image Window",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
-	     50, 50, 700, 600, hMainWindow, NULL, hThisInstance, NULL);
+	     mx+OVERVIEW_WINDOW_WIDTH, my, 700, 600, hMainWindow, NULL, hThisInstance, NULL);
     if (!hImageWindow)
         return false;  
 
