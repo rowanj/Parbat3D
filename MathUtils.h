@@ -4,7 +4,7 @@
 class MathUtils
 {
 	public:
-		static int ipow(int base, int exponent);
+		static int ipow(int value, int exponent);
 	private:		
 };
 
