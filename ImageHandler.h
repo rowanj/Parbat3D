@@ -73,6 +73,7 @@ private:
 	/* Internal Functions */
 	void make_overview_texture(void);
 	void make_textures(void);
+	void GLinit(void);
 
 	/* State variables */
 	int LOD;
@@ -81,16 +82,17 @@ private:
     int band_red, band_green, band_blue;
 	int texture_size, texture_size_overview;
 	int viewport_width, viewport_height, viewport_x, viewport_y;
+	int viewport_columns, viewport_rows;
 	
     /* Overview window texture */
 	ImageTileSet* overview_tileset;
 	char *tex_overview;
-	unsigned int *tex_overview_id;
+	GLuint tex_overview_id;
 	
 	/* Image window textures */
 	ImageTileSet* image_tileset;
 	int tex_rows, tex_columns, tex_count;
-	GLuint tex_base[];
+	GLuint *tex_base;
 	int tile_size;
 	
 	/* Display lists */

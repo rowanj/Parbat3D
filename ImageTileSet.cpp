@@ -3,6 +3,7 @@
 #include "console.h"
 #include "config.h"
 #include <math.h>
+#include "MathUtils.h"
 
 /* NB: tex_size is size of tile in memory,
 	tile_size is size of tile on image */
@@ -47,7 +48,7 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 		last_row_height = image_height;
 	} else {
 		/* (width in tiles is width/tiles rounded up) */
-		int LOD_temp = (int)pow((double)2,(double)LOD);
+		int LOD_temp = MathUtils::ipow(2,LOD);
 		tile_size = tex_size * LOD_temp;
 		LOD_width = image_width / LOD_temp;
 		LOD_height = image_height / LOD_temp;
@@ -96,7 +97,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 
 	/* Make room to put texture in */
 	size = tex_size * tex_size * 3;
-	out_tile = (char*) malloc(size);
+	out_tile = new char[size];
 
 	/* Prevent bug on single channel images */
 	if(band_R>num_bands) band_R = num_bands;
@@ -170,13 +171,19 @@ int ImageTileSet::load_tile(int x, int y)
 	Console::write(buffer);
 	#endif
 	
+	/* Quick hack to wrap out-of-bounds requests */
+	while (tile_index_x >= columns) tile_index_x--;
+	while (tile_index_y >= rows) tile_index_y--;
+	tile_index = (columns * tile_index_y) + tile_index_x;
+	
 	/* Load if not already */
 	tile_check = 0;
 	while (tile_check < tiles.size()) {
 		if (tiles[tile_check]->tile_index == tile_index) {
 			cache_hits++;
-			return 0; /* !! index of tile in vector */
+			return tile_check;
 		}
+		tile_check++;
 	}
 	
 	{ // Tile wasn't in cache
@@ -201,12 +208,12 @@ int ImageTileSet::load_tile(int x, int y)
 		
                                         
 		if (LOD!=-1) {
-			data_size_x = tile_size_x / (2^LOD);
-			data_size_y = tile_size_y / (2^LOD);
+			data_size_x = tile_size_x / MathUtils::ipow(2,LOD);
+			data_size_y = tile_size_y / MathUtils::ipow(2,LOD);
 			image_file->getRasterData(tile_size_x, tile_size_y, x, y, new_tile->data, data_size_x, data_size_y);
 			/* !! Shuffle data for edge tiles */
 			if (!((tile_size_y == tile_size) && (tile_size_x == tile_size))) {
-				align_tile(new_tile->data, tex_size, data_size_x, data_size_y);
+				align_tile(&(new_tile->data), tex_size, data_size_x, data_size_y);
 			}
 		} else {
 			data_size_x = tex_size;
@@ -237,9 +244,129 @@ int* ImageTileSet::get_pixel_values(int x, int y)
 }
 
 /* !! tile_dimension will probably always be tex_size */
-void ImageTileSet::align_tile(void* tile, int tile_dimension,
-					int data_width, int data_height)
+void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, int data_height)
 {
-	/* !! Insert Dave's code here */
+    char* temp_tile;        //our working space
+    char* height_pad;       //our block of zeros to pad (height-wise)
+    char* width_pad;        //our end-of-row padding block
+    int height_pad_size, width_pad_size;    //the dimensions of our pads
+    
+    int i;
+    
+    int row_length = tile_dimension * num_bands * sample_size;   //how long is a row?
+    int pad_row_length;     //the part of a row that's pad
+    int data_row_length;    //the part of a row that's data
+    char* copy_from_loc;    //our copy-from location pointer for memcpy
+    char* copy_to_loc;      //our copy-to location pointer for memcpy
+    
+    // Get the sizes of our pads (in pixels)
+    height_pad_size = tile_dimension - data_height;
+    width_pad_size = tile_dimension - data_width;
+    
+    //if we need a height pad, make one of the appropriate size
+    if (height_pad_size != 0)
+    {
+//        height_pad = (char*) malloc(row_length);    //height padding rows will always be row_length
+		height_pad = new char[row_length];
+        for (i = 0; i < row_length; i++)
+        {
+            height_pad[i] = 0;
+        }
+    }
+    
+    //if we need a width pad, make one of appropriate size
+    if (width_pad_size != 0)
+    {
+        pad_row_length = width_pad_size * num_bands * sample_size;   //our padin bytes
+//        width_pad = (char*) malloc(pad_row_length);
+		width_pad = new char[pad_row_length];
+        for (i = 0; i < pad_row_length; i++)
+        {
+            width_pad[i] = 0;
+        }
+    }
+    
+    data_row_length = data_width * num_bands * sample_size;  //our row data chunk, in bytes
+    
+    
+    //allocate our working area to the same size as the actual tile
+//    temp_tile = (char*) malloc(tile_dimension * tile_dimension * num_bands * sample_size);
+	temp_tile = new char[tile_dimension * tile_dimension * num_bands * sample_size];
+    
+    //set our locator pointers
+    copy_from_loc = *tile;
+    copy_to_loc = temp_tile;
+    
+    if (data_row_length == row_length && height_pad_size > 0) //if we have no need for row padding
+    {
+        for (i = 0; i < data_height; i++)   //copy data_height rows of data
+        {
+            memcpy(copy_to_loc, copy_from_loc, data_row_length);
+            copy_from_loc = copy_from_loc + data_row_length;
+            copy_to_loc = copy_to_loc + data_row_length;
+        }
+        for (i = 0; i < height_pad_size; i++)   //and add height_pad_size rows of zeros
+        {
+            memcpy(copy_to_loc, height_pad, row_length);
+            copy_to_loc = copy_to_loc + row_length;
+        }
+    }
+    else if (data_row_length < row_length && height_pad_size > 0)   //else if we need row padding and height padding
+    {
+        for (i = 0; i < data_height; i++)   //copy data_height rows of data + padding
+        {
+            memcpy(copy_to_loc, copy_from_loc, data_row_length);
+            copy_from_loc = copy_from_loc + data_row_length;
+            copy_to_loc = copy_to_loc + data_row_length;
+            
+            memcpy(copy_to_loc, width_pad, pad_row_length);
+            copy_to_loc = copy_to_loc + pad_row_length;
+        }
+        for (i = 0; i < height_pad_size; i++)   //and add height_pad_size rows of zeros
+        {
+            memcpy(copy_to_loc, height_pad, row_length);
+            copy_to_loc = copy_to_loc + row_length;
+        }
+    }
+    else if (data_row_length < row_length && height_pad_size == 0)  //if we just need row padding
+    {
+        for (i = 0; i < data_height; i++)   //copy data_height rows of data + padding
+        {
+            memcpy(copy_to_loc, copy_from_loc, data_row_length);
+            copy_from_loc = copy_from_loc + data_row_length;
+            copy_to_loc = copy_to_loc + data_row_length;
+            
+            memcpy(copy_to_loc, width_pad, pad_row_length);
+            copy_to_loc = copy_to_loc + pad_row_length;
+        }
+    }
+    else    //if we were accidentaly passed a block that didn't need padding, we'd better copy it just in case.
+    {
+        for (i = 0; i < data_height; i++)   //copy data_height rows of data
+        {
+            memcpy(copy_to_loc, copy_from_loc, data_row_length);
+            copy_from_loc = copy_from_loc + data_row_length;
+            copy_to_loc = copy_to_loc + data_row_length;
+        }
+    }
+    
+    //free the old tile block (could be bad otherwise)
+//    free(*tile);
+	delete[] *tile;
+    
+    //...and free our pads
+    if (height_pad_size != 0)
+    {
+//        free(height_pad);
+		delete[] height_pad;
+    }
+    
+    if (width_pad_size != 0)
+    {
+//        free(width_pad);
+		delete[] width_pad;
+    }
+    
+    //replace the old tile with the new one
+    *tile = temp_tile;
 }
-

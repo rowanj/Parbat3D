@@ -24,7 +24,6 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	Console::write("(II) ImageHandler instantiating.\n");
 	
 	/* Set up defaults */
-	LOD=0; /* Acutally, set this one below - must be different */
 	band_red = 1;
 	band_green = 2;
 	band_blue = 3;
@@ -47,10 +46,6 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		error_text = "No filename given.";
 	}
 	
-	// Validate handles to objects
-	// !! ToDo
-
-			
 	/* Initialize OpenGL*/
 	gl_overview = new ImageGLView(overview_hwnd);
 	if (!gl_overview) {
@@ -66,6 +61,8 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		error_text = "Could not create ImageGLView for image window.";
 	} else {
 		Console::write("(II) ImageHandler::Created ImageGLView for image window.\n");
+		viewport_width = gl_image->width();
+		viewport_height = gl_image->height();
 	}
 		
 	// Initialize image file (could be threaded)
@@ -86,7 +83,38 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
     Console::write(max_texture_size);
     Console::write("\n");
     
-    /* Initialize OpenGL machine */
+    
+	this->GLinit();
+   
+    #if DEBUG_IMAGE_HANDLER
+    Console::write("(II) ImageHandler::Creating tileset for overview\n");
+    #endif
+   	overview_tileset = new ImageTileSet(-1, image_file, texture_size_overview, 0);
+	this->make_overview_texture();
+    this->set_LOD(1);
+	/* Initialize viewports */
+	this->resize_window();
+}
+
+ImageHandler::~ImageHandler(void)
+{
+	Console::write("(II) ImageHandler shutting  down...\n");
+	delete overview_tileset;
+	delete image_tileset;
+	delete[] tex_base;
+	delete gl_overview;
+	delete gl_image;
+	delete image_file;
+}
+
+void ImageHandler::GLinit(void)
+{
+	#if DEBUG_OPENGL
+	Console::write("(II) ImageHandler::GLinit - OpenGL Extensions found: ");
+	Console::write((char*)glGetString(GL_EXTENSIONS));
+	Console::write("\n");
+	#endif
+	/* Initialize OpenGL machine */
     gl_overview->make_current();
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
@@ -101,42 +129,15 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 			glTexCoord2f(0.0,0.0);
 			glVertex3f(0.0, 0.0,0.0);
 			glTexCoord2f(1.0,0.0);
-			glVertex3f(1.0, 0.0,0.0);
+			glVertex3f(texture_size, 0.0,0.0);
 			glTexCoord2f(1.0,1.0);
-			glVertex3f(1.0,-1.0,0.0);
+			glVertex3f(texture_size,-texture_size,0.0);
 			glTexCoord2f(0.0,1.0);
-			glVertex3f(0.0,-1.0,0.0);
+			glVertex3f(0.0,-texture_size,0.0);
 		}
 		glEnd();
 	}
 	glEndList();
-
-   
-    /* Get texture for overview window */
-    #if DEBUG_IMAGE_HANDLER
-    Console::write("(II) ImageHandler::Creating tileset for overview\n");
-    #endif
-   	overview_tileset = new ImageTileSet(-1, image_file, texture_size_overview, 1024 * 1024 * 32);
-	this->make_overview_texture();
-  	#if TMP_USE_TEXTURES
-	this->make_textures();
-	#endif
-
-    
-	/* Initialize viewports */
-	this->resize_window();
-}
-
-ImageHandler::~ImageHandler(void)
-{
-	Console::write("(II) ImageHandler shutting  down...\n");
-	delete overview_tileset;
-	#if TMP_USE_TEXTURES
-	delete image_tileset;
-	#endif
-	delete gl_overview;
-	delete gl_image;
-	delete image_file;
 }
 
 void ImageHandler::redraw(void)
@@ -195,13 +196,21 @@ void ImageHandler::redraw(void)
 	gl_image->make_current();
 	glClearColor(0.3f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    #if TMP_USE_TEXTURES
-    glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	/* Set up view transform */
-	gluLookAt(0.0,0.0,(0.5/tan(PI/6.0)),0.0,0.0,0.0,0.0,1.0,0.0);
+	gluLookAt(0.0,0.0,(1.0/tan(PI/6.0)),0.0,0.0,0.0,0.0,1.0,0.0);
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glBindTexture(GL_TEXTURE_2D, tex_base[0]);
+	glCallList(list_tile);
+	glTranslatef((GLfloat)texture_size, 0.0, 0.0);
+	glBindTexture(GL_TEXTURE_2D, tex_base[1]);
+	glCallList(list_tile);
+	glDisable(GL_TEXTURE_2D);
+    #if FALSE
+    glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	tile_id = 0;
 	glTranslatef((GLfloat)-tex_columns/2.0,(GLfloat)tex_rows/2.0, 0.0);
 	while (tile_id < tex_count) {
@@ -243,9 +252,10 @@ void ImageHandler::resize_window(void)
 	gl_image->GLresize();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60.0, (GLfloat) gl_image->width()/(GLfloat) gl_image->height(), 0.1, 20.0);
+	//gluPerspective(60.0, (GLfloat) gl_image->width()/(GLfloat) gl_image->height(), 0.1, 20.0);
 	viewport_width = gl_image->width();
 	viewport_height = gl_image->height();
+	glOrtho(0.0, viewport_width, -viewport_height, 0.0, 0.1, 10.0);
 	this->redraw();
 }
 
@@ -282,7 +292,7 @@ void ImageHandler::make_overview_texture(void)
 	/* Make texture from data */
 	gl_overview->make_current();
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	if (!tex_overview_id) glGenTextures(1, (GLuint*) &tex_overview_id);
+	if (!tex_overview_id) glGenTextures(1, &tex_overview_id);
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -298,7 +308,6 @@ void ImageHandler::make_overview_texture(void)
 
 void ImageHandler::make_textures(void)
 {
-	#if TMP_USE_TEXTURES
 	unsigned int tmp_id;
 	int tx, ty;
 	char *tmp_tex;
@@ -307,36 +316,30 @@ void ImageHandler::make_textures(void)
 	Console::write(LOD);
 	Console::write("\n");
 	
-	if (!tileset_loaded) {
-		Console::write("(II) ImageHandler::Creating image tileset.");
-		image_tileset = new ImageTileSet(LOD, image_file, texture_size, 0);
-		tileset_loaded = true;
+	if (!image_tileset) {
+		Console::write("(II) ImageHandler:: Creating prototype image tileset.\n");
+		image_tileset = new ImageTileSet(LOD, image_file, texture_size, 32 * 1024 * 1024);
 	}
-	
-	/* Sort out how many textures we'll need */
-	tex_columns = image_tileset->get_columns();
-	tex_rows = image_tileset->get_rows();
-	tex_count = tex_columns * tex_rows;
+	tex_columns = 2;
+	tex_rows = 1;
 	tile_size = image_tileset->get_tile_size();
-
-	/* !! only generate a vewport's worth */
-	/* Generate textures */
+	tex_count = tex_columns * tex_rows;
 	gl_image->make_current();
-	glGenTextures(tex_count, tex_base); /* !! Re-use ?? */
-	for (tx = 0; tx < tex_columns; tx++){
-		for (ty = 0; ty < tex_rows; ty++) {
+	tex_base = new GLuint[tex_count];
+	glGenTextures(tex_count, tex_base);
+	for (ty = 0; ty < tex_rows; ty++){
+		for (tx = 0; tx < tex_columns; tx++) {
 			tmp_id = (ty * tex_columns) + tx;
-			tmp_tex = image_tileset->get_tile_RGB(tile_size * tx, tile_size *ty, band_red, band_green, band_blue);
-			glBindTexture(GL_TEXTURE_2D, (GLuint) tex_base[tmp_id]);
+			tmp_tex = image_tileset->get_tile_RGB(tile_size * tx + 1, tile_size * ty + 1, band_red, band_green, band_blue);
+			glBindTexture(GL_TEXTURE_2D, tex_base[tmp_id]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tmp_tex);
-			free(tmp_tex);
+			delete[] tmp_tex;
 		}
 	}
-	#endif
 }
 
 void ImageHandler::set_bands(int band_R, int band_G, int band_B)
@@ -363,8 +366,14 @@ int ImageHandler::set_LOD(int level_of_detail)
 	Console::write(buffer);
 	#endif
 	
+	if (!image_tileset) {
+		Console::write("(II) Making initial tileset.\n");
+		LOD = level_of_detail;
+		make_textures();
+		redraw();
+	}
+	
 	if (LOD!=level_of_detail) {
-		#if TMP_USE_TILESET
 		if (image_tileset) {
 			#if DEBUG_IMAGE_HANDLER
 			Console::write("(II) ImageHandler::Deleting image_tileset;");
@@ -372,7 +381,6 @@ int ImageHandler::set_LOD(int level_of_detail)
 			delete(image_tileset);
 			image_tileset = NULL;
 		}
-		#endif
 		LOD = level_of_detail;
 		make_textures();
 		redraw();

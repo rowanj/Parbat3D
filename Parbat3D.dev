@@ -350,7 +350,7 @@ BuildCmd=
 [Unit31]
 FileName=MathUtils.h
 CompileCpp=1
-Folder=
+Folder=Utils
 Compile=1
 Link=1
 Priority=1000
@@ -358,9 +358,9 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit32]
-FileName=MathUtiles.cpp
+FileName=MathUtils.cpp
 CompileCpp=1
-Folder=
+Folder=Utils
 Compile=1
 Link=1
 Priority=1000

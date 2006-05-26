@@ -36,7 +36,7 @@ public:
 private:
 	/* Helper functions */
 	int load_tile(int image_x, int image_y);
-	void align_tile(void* tile, int tile_dimension,
+	void align_tile(char** tile, int tile_dimension,
 					int data_width, int data_height);
 	
 	/* Tileset properties */
