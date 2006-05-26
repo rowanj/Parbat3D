@@ -17,6 +17,7 @@ ImageHandler::ImageHandler* image_handler = NULL;	// Instance handle ptr
 
 /* Unique class names for our main windows */
 char szMainWindowClassName[] = "Parbat3D Main Window";
+char szOverviewWindowClassName[] = "Parbat3D Overview Window";
 char szImageWindowClassName[] = "Parbat3D Image Window";
 char szToolWindowClassName[] = "Parbat3D Tool Window";
 char szDisplayClassName[] = "Parbat3D Display Window";
@@ -29,6 +30,7 @@ HINSTANCE hThisInstance;
 /* global variables to store handles to our windows */
 HWND hRed, hBlue, hGreen;
 HWND hMainWindow=NULL;
+HWND hOverviewWindow=NULL;
 HWND hImageWindow=NULL;
 HWND hToolWindow=NULL;
 HWND hDesktop;
@@ -41,7 +43,7 @@ HWND hToolWindowQueryTabContainer;
 HWND hToolWindowImageTabContainer;
 HWND hToolWindowScrollBar;
 HWND hImageWindowDisplay;
-HWND hMainWindowDisplay;
+HWND hOverviewWindowDisplay;
 HWND *redRadiobuttons;                // band radio buttons
 HWND *greenRadiobuttons;
 HWND *blueRadiobuttons;
@@ -82,7 +84,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 
     
     /* Register window classes */
-    if ((!registerToolWindow()) || (!registerImageWindow()) || (!registerMainWindow()))
+    if ((!registerMainWindow()) || (!registerToolWindow()) || (!registerImageWindow()) || (!registerOverviewWindow()))
     {
         /* report error if window classes could not be registered */
         MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
@@ -92,7 +94,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Setup main & image windows */
     //  note: image window must be created before main window
     //  note: tool window is only setup when an image is loaded
-    if ((!setupMainWindow()) || (!setupImageWindow()))
+    if ((!setupMainWindow()) || (!setupImageWindow()) || (!setupOverviewWindow()))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
@@ -110,8 +112,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     return messages.wParam;
 }
 
+
 /* ------------------------------------------------------------------------------------------------------------------------ */
-/* Main Window Functions */
 
 int registerMainWindow()
 {
@@ -121,6 +123,86 @@ int registerMainWindow()
     wincl.hInstance = hThisInstance;
     wincl.lpszClassName = szMainWindowClassName;
     wincl.lpfnWndProc = MainWindowProcedure; /* This function is called by windows */
+    wincl.style = CS_DBLCLKS;  /* Ctach double-clicks */
+    wincl.cbSize = sizeof(WNDCLASSEX);
+
+    /* Use default icon and mousepointer */
+    wincl.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+    wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wincl.lpszMenuName = NULL; /* No menu */
+    wincl.cbClsExtra = 0; /* No extra bytes after the window class */
+    wincl.cbWndExtra = 0; /* structure or the window instance */
+    /* Use lightgray as the background of the window */
+    wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
+
+    /* Register the window class, if fails return false */
+    return RegisterClassEx(&wincl);
+}
+
+/* create main window */
+int setupMainWindow()
+{
+
+    /* Create main window */
+    hMainWindow = CreateWindowEx(0, szMainWindowClassName, "Parbat3D",
+		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, -50, -50, 10, 10,
+		NULL, NULL, hThisInstance, NULL);
+    if (!hMainWindow)
+        return false;                        
+
+    ShowWindow(hMainWindow, SW_SHOW);
+    
+    return true;
+}
+
+LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    static int imageWindowState;
+    static int toolWindowState;
+    static WINDOWPLACEMENT wp;
+    
+    switch (message)                  /* handle the messages */
+    {
+		case WM_SIZE:
+		    switch(wParam)
+		    {
+                case SIZE_RESTORED:
+                    ShowWindow(hImageWindow,imageWindowState);
+                    ShowWindow(hToolWindow,toolWindowState);                    
+                    ShowWindow(hOverviewWindow,SW_RESTORE);
+                    break;
+                case SIZE_MINIMIZED:
+                    GetWindowPlacement(hImageWindow,&wp);
+                    imageWindowState=wp.showCmd;
+                    GetWindowPlacement(hToolWindow,&wp);
+                    toolWindowState=wp.showCmd;        
+                    ShowWindow(hImageWindow,SW_HIDE);            
+                    ShowWindow(hToolWindow,SW_HIDE);                    
+                    ShowWindow(hOverviewWindow,SW_HIDE);                    
+                    break;
+		    }    
+  	       return 0;
+  	       
+        default:                   /* for messages that we don't deal with */
+            /* let windows peform the default operation based on the message */
+            return DefWindowProc(hwnd, message, wParam, lParam);
+    }
+    return 0; 
+}
+
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* Main Window Functions */
+
+int registerOverviewWindow()
+{
+    WNDCLASSEX wincl;        /* Datastructure for the windowclass */
+        
+    /* The Window structure */
+    wincl.hInstance = hThisInstance;
+    wincl.lpszClassName = szOverviewWindowClassName;
+    wincl.lpfnWndProc = OverviewWindowProcedure; /* This function is called by windows */
     wincl.style = CS_DBLCLKS;  /* Ctach double-clicks */
     wincl.cbSize = sizeof(WNDCLASSEX);
 
@@ -157,7 +239,7 @@ int registerMainWindow()
 
 
 /* create main window */
-int setupMainWindow()
+int setupOverviewWindow()
 {
 
     RECT rect;
@@ -169,15 +251,15 @@ int setupMainWindow()
 	if (my <= 0) my = CW_USEDEFAULT;
     
     /* Create main window */
-    hMainWindow = CreateWindowEx(0, szMainWindowClassName, "Parbat3D",
+    hOverviewWindow = CreateWindowEx(0, szOverviewWindowClassName, "Parbat3D",
 		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, mx, my, 250, 296,
-		NULL, NULL, hThisInstance, NULL);
-    if (!hMainWindow)
+		hImageWindow, NULL, hThisInstance, NULL);
+    if (!hOverviewWindow)
         return false;                        
 
     /* set menu to main windo */
 	hMainMenu = LoadMenu(hThisInstance, MAKEINTRESOURCE(ID_MENU));
-    SetMenu(hMainWindow, hMainMenu);    
+    SetMenu(hOverviewWindow, hMainMenu);    
     
     /* Disable Window menu items. note: true appears to disable & false enables */
     EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,true);
@@ -185,32 +267,32 @@ int setupMainWindow()
     EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);    
 
     /* get client area of image window */
-    GetClientRect(hMainWindow,&rect);
+    GetClientRect(hOverviewWindow,&rect);
 
     /* setup font objects */
-    HDC hdc=GetDC(hMainWindow);      
+    HDC hdc=GetDC(hOverviewWindow);      
     hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
     hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
     hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
-    ReleaseDC(hMainWindow,hdc);    
+    ReleaseDC(hOverviewWindow,hdc);    
 
     /* create a child window that will be used by OpenGL */
-    hMainWindowDisplay=CreateWindowEx( 0, szDisplayClassName, NULL, WS_CHILD|WS_VISIBLE,
-		rect.left, rect.top, rect.right, rect.bottom, hMainWindow, NULL, hThisInstance, NULL);
+    hOverviewWindowDisplay=CreateWindowEx( 0, szDisplayClassName, NULL, WS_CHILD|WS_VISIBLE,
+		rect.left, rect.top, rect.right, rect.bottom, hOverviewWindow, NULL, hThisInstance, NULL);
    
     /* Make the window visible on the screen */
-    ShowWindow(hMainWindow, SW_SHOW);
+    ShowWindow(hOverviewWindow, SW_SHOW);
     
     return true;
 }
 
 /* This function is called by the Windows function DispatchMessage( ) */
 /* All messages/events related to the main window (or it's controls) are sent to this procedure */
-LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     /* static variables used for snapping windows */
     static POINT snapMouseOffset;           /* mouse co-ords relative to position of window */
-    static RECT prevMainWindowRect;         /* main window position before it was moved */
+    static RECT prevOverviewWindowRect;         /* main window position before it was moved */
     static RECT prevImageWindowRect;        /* image window position before it was moved */
     static RECT prevToolWindowRect;         /* tool window position before it was moved */
     static int toolWindowIsMovingToo;       /* whether or not the tool window should be moved with the main window */
@@ -231,7 +313,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                 case IDM_FILESAVE:
                 case IDM_FILESAVEAS:
 					MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will say \"Where do you want to store such a big file?\"",
-                              (LPSTR) szMainWindowClassName,
+                              (LPSTR) szOverviewWindowClassName,
                               MB_ICONINFORMATION | MB_OK );
                     return 0;
                 
@@ -281,7 +363,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                 getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
                      
                 /* record current window positions */
-                GetWindowRect(hwnd,&prevMainWindowRect);  
+                GetWindowRect(hwnd,&prevOverviewWindowRect);  
                 GetWindowRect(hImageWindow,&prevImageWindowRect); 
                 GetWindowRect(hToolWindow,&prevToolWindowRect);
                
@@ -310,21 +392,30 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             
             /* move the snapped windows relative to main window's new position */
             /* only moves the windows that were already snapped to the main window */
-            moveSnappedWindows((RECT*)lParam,&prevMainWindowRect,&prevImageWindowRect,&prevToolWindowRect,imageWindowIsMovingToo,toolWindowIsMovingToo);
+            moveSnappedWindows((RECT*)lParam,&prevOverviewWindowRect,&prevImageWindowRect,&prevToolWindowRect,imageWindowIsMovingToo,toolWindowIsMovingToo);
             return 0;
 
         /* WM_SIZE: the window has been re-sized, minimized, maximised or restored */
         case WM_SIZE:
+                
             /* resize display/opengl window to fit new size */
-            GetClientRect(hMainWindow,&rect);
-            MoveWindow(hMainWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
-            return 0;   
+            GetClientRect(hOverviewWindow,&rect);
+            MoveWindow(hOverviewWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
+            return 0;
+            
+        case WM_SYSCOMMAND:
+            if (wParam==SC_MINIMIZE)
+            {
+                ShowWindow(hMainWindow,SW_MINIMIZE);
+                return 0;
+            }            
+            return DefWindowProc(hwnd, message, wParam, lParam);
                      
         /* WM_CLOSE: system or user has requested to close the window/application */
         case WM_CLOSE:
             // Shut down the image file and OpenGL
 			if (image_handler) { // Was instantiated
-                if (MessageBox(hMainWindow,"Are you sure you wish quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
+                if (MessageBox(hOverviewWindow,"Are you sure you wish quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
                     return 0;
                 closeFile();
 			}
@@ -485,12 +576,12 @@ int setupImageWindow()
     
     /* Get Main Window coords for Image Window alignment*/
     RECT rect;
-    GetWindowRect(hMainWindow, &rect);
+    //GetWindowRect(hOverviewWindow, &rect);
     
     /* Create a window based on the class we just registered */
     hImageWindow =CreateWindowEx(0, szImageWindowClassName, "Image Window",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
-	     rect.right, rect.top, 700, 600, hMainWindow, NULL, hThisInstance, NULL);
+	     50, 50, 700, 600, hMainWindow, NULL, hThisInstance, NULL);
     if (!hImageWindow)
         return false;  
 
@@ -563,7 +654,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             snapWindowByMoving(hDesktop,(RECT*)lParam);      
             
             /* snap the window the main window (if near it) */
-            imageWindowIsSnapped=snapWindowByMoving(hMainWindow,(RECT*)lParam);
+            imageWindowIsSnapped=snapWindowByMoving(hOverviewWindow,(RECT*)lParam);
             break;
     
         /* WM_SIZING: the window size is about to change */
@@ -576,16 +667,17 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             snapWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
                         
             /* snap the window the main window (if near it) */
-            imageWindowIsSnapped=snapWindowBySizing(hMainWindow,(RECT*)lParam,(int)wParam);           
+            imageWindowIsSnapped=snapWindowBySizing(hOverviewWindow,(RECT*)lParam,(int)wParam);           
             break;
 
         /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            
         case WM_SIZE:
-            if (imageWindowIsSnapped)
+            if (imageWindowIsSnapped)  //***change***
             {
                 /* re-snap window in case the main window has now moved away */
                 GetWindowRect(hwnd,&rect);
                 imageWindowIsSnapped=snapWindowByMoving(hwnd,&rect);
+
             }    
            
             /* resize display/opengl window to fit new size */            
@@ -604,7 +696,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
         case WM_WINDOWPOSCHANGING:
             if ((image_handler)) 
             {
-                if ((((WINDOWPOS*)lParam)->hwndInsertAfter==hMainWindow) || (((WINDOWPOS*)lParam)->hwndInsertAfter==hToolWindow))
+                if ((((WINDOWPOS*)lParam)->hwndInsertAfter==hOverviewWindow) || (((WINDOWPOS*)lParam)->hwndInsertAfter==hToolWindow))
                 {
                     //static int n=0;
                     //n++;
@@ -673,12 +765,12 @@ int setupToolWindow()
 
     
     /* Get Main Window Location for image window alignment*/
-    GetWindowRect(hMainWindow,&rect);
+    GetWindowRect(hOverviewWindow,&rect);
     
     /* The class is registered, lets create the program*/
     hToolWindow =CreateWindowEx(0, szToolWindowClassName, "Tools",
            WS_POPUP+WS_CAPTION+WS_SYSMENU, rect.left, rect.bottom,
-           250, 300, hMainWindow, NULL, hThisInstance, NULL);
+           250, 300, hImageWindow, NULL, hThisInstance, NULL);
 
     if (hToolWindow==NULL)
         return false;
@@ -1004,7 +1096,7 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
 				butNum = catcstrings( (char*) butNum, (char*) ", " );
 				butNum = catcstrings( (char*) butNum, (char*) inttocstring(b) );
 				MessageBox( hwnd, (LPSTR) butNum,
-                    (LPSTR) szMainWindowClassName,
+                    (LPSTR) szOverviewWindowClassName,
         			MB_ICONINFORMATION | MB_OK );*/
         		// #define DEBUG_IMAGE_HANDLER to see these values printed in console window.
 				
@@ -1120,7 +1212,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             snapWindowByMoving(hDesktop,(RECT*)lParam);  
             
             /* if new position is near main window, snap to it */    
-            toolWindowIsSnapped=snapWindowByMoving(hMainWindow,(RECT*)lParam);
+            toolWindowIsSnapped=snapWindowByMoving(hOverviewWindow,(RECT*)lParam);
             break;
         
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
@@ -1143,7 +1235,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             {
                 // re-snap window in case the main window has now moved away
                 GetWindowRect(hwnd,&rect);
-                toolWindowIsSnapped=snapWindowByMoving(hMainWindow,&rect);
+                toolWindowIsSnapped=snapWindowByMoving(hOverviewWindow,&rect);
             }    
             break;
 
@@ -1199,9 +1291,9 @@ int toggleMenuItemTick(HMENU hMenu,int itemId)
 
 void orderWindows()
 {
-    //SetWindowPos(hMainWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);        
+    //SetWindowPos(hOverviewWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);        
     SetWindowPos(hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
-    SetWindowPos(hImageWindow,hMainWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(hImageWindow,hOverviewWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
 
 
 }    
@@ -1216,7 +1308,7 @@ void loadFile()
     ZeroMemory(&ofn, sizeof(ofn));
 
     ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW - which note?
-    ofn.hwndOwner = hMainWindow;
+    ofn.hwndOwner = hOverviewWindow;
     ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tif\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPEG / JPEG 2000 (*.jpg)\0*.jpg\0TIFF / GeoTIFF (*.tif)\0*.tif\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile = szFileName;
     ofn.nMaxFile = MAX_PATH;
@@ -1234,7 +1326,7 @@ void loadFile()
     	if (!hImageWindow)
     		setupImageWindow();        
 	
-	    image_handler = new ImageHandler::ImageHandler(hMainWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
+	    image_handler = new ImageHandler::ImageHandler(hOverviewWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
 	    if (image_handler) {
 			if (image_handler->status > 0) {
 				// An error occurred instantiaing the image handler class.
@@ -1263,11 +1355,11 @@ void loadFile()
                     orderWindows();                    
 
                     // update opengl displays
-                    //InvalidateRect(hMainWindowDisplay,0,true);
-                    //UpdateWindow(hMainWindowDisplay);
+                    //InvalidateRect(hOverviewWindowDisplay,0,true);
+                    //UpdateWindow(hOverviewWindowDisplay);
                     //InvalidateRect(hImageWindowDisplay,0,true);
                     //UpdateWindow(hImageWindowDisplay);
-                    RedrawWindow(hMainWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
+                    RedrawWindow(hOverviewWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
                     RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
 
                     // enable window menu items
@@ -1309,6 +1401,6 @@ void closeFile()
     EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
     EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);    
     
-    InvalidateRect(hMainWindowDisplay,0,true);  /* repaint main window */		
-    UpdateWindow(hMainWindowDisplay);
+    InvalidateRect(hOverviewWindowDisplay,0,true);  /* repaint main window */		
+    UpdateWindow(hOverviewWindowDisplay);
 }

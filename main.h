@@ -59,6 +59,7 @@ extern WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainer
 void loadFile();
 void closeFile();
 
+LRESULT CALLBACK OverviewWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK MainWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK DisplayWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ImageWindowProcedure(HWND, UINT, WPARAM, LPARAM);
@@ -71,9 +72,11 @@ LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND, UINT, WPARAM, LPARAM
 int registerToolWindow();
 int registerImageWindow();
 int registerMainWindow();
+int registerOverviewWindow();
 int setupImageWindow();
 int setupMainWindow();
 int setupToolWindow();
+int setupOverviewWindow();
 void orderWindows();
 
 extern void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset);
