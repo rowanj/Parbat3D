@@ -28,9 +28,9 @@ HINSTANCE hThisInstance;
 
 /* global variables to store handles to our windows */
 HWND hRed, hBlue, hGreen;
-HWND hMainWindow;
-HWND hImageWindow;
-HWND hToolWindow;
+HWND hMainWindow=NULL;
+HWND hImageWindow=NULL;
+HWND hToolWindow=NULL;
 HWND hDesktop;
 
 /* global variables to store handles to our window controls */
@@ -220,12 +220,6 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
     switch (message)                  /* handle the messages */
     {
 			
-        /* WM_CREATE: window has been created */
-        case WM_CREATE:                
-            hImageWindow=NULL;
-            hToolWindow=NULL;
-            return 0;
-
         /* WM_COMMAND: some command has been preformed by user, eg. menu item clicked */            
         case WM_COMMAND:
             switch( wParam )
