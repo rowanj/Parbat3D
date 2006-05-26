@@ -3,7 +3,7 @@
 #include "settings.h"
 #include "main.h"
 #include "SnappingWindow.h"
-
+#include "console.h"
 
 /* calculates window's new position based on the location of the mouse cursor */
 void setNewWindowPosition(RECT* newPos,POINT *mouseOffset)
@@ -358,7 +358,7 @@ int isWindowSnapped(HWND main,HWND sticky)
 
     // check if sticky window co-ords are outside of the main window
     if ((rmain.top>rsticky.bottom) || (rmain.bottom<rsticky.top) ||
-            ((rmain.left>rsticky.right) || (rmain.right<rsticky.left))
+            ((rmain.left>rsticky.right) || (rmain.right<rsticky.left)) )
         return false;    
     
     // check if the borders of the two windows are tuching
