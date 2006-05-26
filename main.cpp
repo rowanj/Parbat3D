@@ -92,7 +92,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Setup main & image windows */
     //  note: image window must be created before main window
     //  note: tool window is only setup when an image is loaded
-    if ((!setupImageWindow()) || (!setupMainWindow()))
+    if ((!setupMainWindow()) || (!setupImageWindow()))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
