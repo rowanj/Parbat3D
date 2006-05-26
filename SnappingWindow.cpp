@@ -98,6 +98,34 @@ int isWindowInNormalState(HWND hwnd)
     wp.length=sizeof(WINDOWPLACEMENT);
 
     GetWindowPlacement(hwnd,&wp);
+    
+    Console::write("IsWindowInNormalState() ");
+    Console::write(wp.showCmd);
+    if (wp.showCmd&SW_HIDE!=0)
+        Console::write("SW_HIDE ");
+    if (wp.showCmd&SW_MAXIMIZE!=0)
+        Console::write("SW_MAXIMIZE ");
+    if (wp.showCmd&SW_MINIMIZE!=0)
+        Console::write("SW_MINIMIZE ");
+    if (wp.showCmd&SW_RESTORE!=0)
+        Console::write("SW_RESTORE ");
+    if (wp.showCmd&SW_SHOW!=0)
+        Console::write("SW_SHOW ");
+    if (wp.showCmd&SW_SHOWMAXIMIZED!=0)
+        Console::write("SW_SHOWMAXIMIZED ");
+    if (wp.showCmd&SW_SHOWMINIMIZED!=0)
+        Console::write("SW_SHOWMINIMIZED ");
+    if (wp.showCmd&SW_SHOWMINNOACTIVE!=0)
+        Console::write("SW_SHOWMINNOACTIVE ");
+    if (wp.showCmd&SW_SHOWNA)
+        Console::write("SW_SHOWNA ");
+    if (wp.showCmd&SW_SHOWNOACTIVATE!=0)
+        Console::write("SW_SHOWNOACTIVATE ");
+    if (wp.showCmd&SW_SHOWNORMAL!=0)
+        Console::write("SW_SHOWNORMAL");
+        
+    Console::write("\n");
+    
     GetWindowRect(hwnd,&rect);
     if (wp.rcNormalPosition.top!=rect.top)
         return false;
@@ -107,7 +135,9 @@ int isWindowInNormalState(HWND hwnd)
         return false;
     if (wp.rcNormalPosition.bottom!=rect.bottom)
         return false;
-    if (wp.showCmd==SW_HIDE)
+    if ((wp.showCmd==SW_HIDE) || (wp.showCmd==SW_SHOWMINIMIZED) ||
+            (wp.showCmd==SW_MINIMIZE) || (wp.showCmd==SW_MAXIMIZE) || 
+            (wp.showCmd==SW_SHOWMAXIMIZED))
         return false;
     return true;
 }    
@@ -317,3 +347,25 @@ void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
     mouseOffset->x=mx-win.left;
     mouseOffset->y=my-win.top;
 }
+
+
+int isWindowSnapped(HWND main,HWND sticky)
+{
+    RECT rmain,rsticky;
+    
+    GetWindowRect(main,&rmain);
+    GetWindowRect(sticky,&rsticky);
+
+    // check if sticky window co-ords are outside of the main window
+    if ((rmain.top>rsticky.bottom) || (rmain.bottom<rsticky.top) ||
+            ((rmain.left>rsticky.right) || (rmain.right<rsticky.left))
+        return false;    
+    
+    // check if the borders of the two windows are tuching
+    if ((rmain.right==rsticky.left) || (rmain.left==rsticky.left) ||
+            (rmain.top==rsticky.bottom) || (rmain.bottom=rsticky.top))
+        return true;
+
+    return false;
+}   
+ 
