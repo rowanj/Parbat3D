@@ -583,19 +583,29 @@ int inline registerImageWindow()
 
 /* create the image window */
 int setupImageWindow()
-{
+{   
     RECT rect;
+    int mx,my;
+    const int IMAGE_WINDOW_WIDTH=700;
+    const int IMAGE_WINDOW_HEIGHT=600;
+
+    /* Get the width & height of the desktop window */
+    GetWindowRect(hDesktop,&rect);
 
     /* Get the stored window position or use defaults if there's a problem */
-    int mx = atoi(winPos.getSetting("OverviewX").c_str());
-	int my = atoi(winPos.getSetting("OverviewY").c_str());
-	if (mx <= 0) mx = 0; //CW_USEDEFAULT;
-	if (my <= 0) my = 0; //CW_USEDEFAULT;
+    mx = atoi(winPos.getSetting("OverviewX").c_str());
+	my = atoi(winPos.getSetting("OverviewY").c_str());
+	if ((mx <= 0) || (mx >= rect.right))
+        mx = (rect.right /2) - ((IMAGE_WINDOW_WIDTH+OVERVIEW_WINDOW_WIDTH) /2);         /* default x position to center windows */
+    mx+=OVERVIEW_WINDOW_WIDTH;                                                          /* leave room for overview window */
+	       
+	if ((my <= 0) || (my >= rect.bottom))
+       my = (rect.bottom /2) - (IMAGE_WINDOW_HEIGHT/2);                                 /* default y position to center windows */
 
     /* create image window */
     hImageWindow =CreateWindowEx(0, szImageWindowClassName, "Image Window",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
-	     mx+OVERVIEW_WINDOW_WIDTH, my, 700, 600, hMainWindow, NULL, hThisInstance, NULL);
+	     mx, my, IMAGE_WINDOW_WIDTH, IMAGE_WINDOW_HEIGHT, hMainWindow, NULL, hThisInstance, NULL);
     if (!hImageWindow)
         return false;  
 
