@@ -289,7 +289,8 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                 imageWindowIsMovingToo=((imageWindowIsSnapped)&&(isWindowInNormalState(hImageWindow)));
                 toolWindowIsMovingToo=((toolWindowIsSnapped)&&(isWindowInNormalState(hToolWindow)));  
            }
-           return DefWindowProc(hwnd, message, wParam, lParam); 
+           return DefWindowProc(hwnd, message, wParam, lParam);
+
 
         /* WM_MOVING: the window is about to be moved to a new location */
         case WM_MOVING:
@@ -387,21 +388,40 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
             SelectObject(hdc,hNormalFont);                                                   /* set font that will be used for drawing text */    
             GetTextExtentPoint32(hdc,text,textLen,&textSize); /* get width & height of string in pixels */   
             ReleaseDC(hwnd,hdc);
+            break;
             
-            break;            
         case WM_SIZE:           
-            if (image_handler) 
-            {
+            if (image_handler) {
                 /* Re-size OpenGL stuff */
                 image_handler->resize_window();
-            }    
-            else
-            {
+            } else {
                 /* re-position message */
                 GetClientRect(hwnd,&rect);
                 textPos.x=(rect.right-rect.left)/2 - textSize.cx/2;
                 textPos.y=(rect.bottom-rect.top)/2 - textSize.cy/2;            
             }    
+            break;
+
+        case WM_MOUSEMOVE:
+            {
+                if (image_handler) {
+                    /* Get mouse screen position */
+                    int x = (short)LOWORD(lParam);
+                    int y = (short)HIWORD(lParam);
+                  
+                    /* Convert screen position to image position */
+                    //unsigned int ix;
+                    //unsigned int iy;
+                  
+                    /* Get band values */
+                    //pixel_values_ptr bv = image_handler->get_pixel_values(ix, iy);
+                  
+                    string leader = "";
+                    for (int i=1; i<=bands; i++)
+                        SetWindowText(imageBandValues[i], (char *) makeMessage(leader, x));
+                        //SetWindowText(imageBandValues[i], (char *) makeMessage(leader, bv->value[i]));
+                }
+            }
             break;
             
 		case WM_PAINT:
@@ -531,6 +551,8 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             return DefWindowProc(hwnd, message, wParam, lParam); 
         
             
+
+
         /* WM_MOVING: the window is about to be moved to a new location */
         case WM_MOVING:
 
@@ -810,9 +832,9 @@ int setupToolWindow()
 	}
 	
 	/* Default radio button selection */
-	SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
-	SendMessage(greenRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
-	SendMessage(blueRadiobuttons[3],BM_SETCHECK,BST_CHECKED,0);
+	SendMessage(redRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
+	SendMessage(greenRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
+	SendMessage(blueRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
 	
 	/* add the image property information under the image tab */
 	ImageProperties* ip=image_handler->get_image_properties();

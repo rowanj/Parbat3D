@@ -47,9 +47,10 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 		last_row_height = image_height;
 	} else {
 		/* (width in tiles is width/tiles rounded up) */
-		tile_size = tex_size * (int)pow((double)2,(double)LOD);
-		LOD_width = image_width / (int)pow((double)2,(double)LOD);
-		LOD_height = image_height / (int)pow((double)2,(double)LOD);
+		int LOD_temp = (int)pow((double)2,(double)LOD);
+		tile_size = tex_size * LOD_temp;
+		LOD_width = image_width / LOD_temp;
+		LOD_height = image_height / LOD_temp;
 		columns = (image_width/tile_size) + ((image_width%tile_size)!=0);
 		rows = (image_height/tile_size) + ((image_height%tile_size)!=0);
 		last_column_width = tile_size;
