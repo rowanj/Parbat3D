@@ -101,27 +101,27 @@ int isWindowInNormalState(HWND hwnd)
     
     Console::write("IsWindowInNormalState() ");
     Console::write(wp.showCmd);
-    if (wp.showCmd&SW_HIDE!=0)
+    if (wp.showCmd&SW_HIDE==SW_HIDE)
         Console::write("SW_HIDE ");
-    if (wp.showCmd&SW_MAXIMIZE!=0)
+    if (wp.showCmd&SW_MAXIMIZE==SW_MAXIMIZE)
         Console::write("SW_MAXIMIZE ");
-    if (wp.showCmd&SW_MINIMIZE!=0)
+    if (wp.showCmd&SW_MINIMIZE==SW_MINIMIZE)
         Console::write("SW_MINIMIZE ");
-    if (wp.showCmd&SW_RESTORE!=0)
+    if (wp.showCmd&SW_RESTORE==SW_RESTORE)
         Console::write("SW_RESTORE ");
-    if (wp.showCmd&SW_SHOW!=0)
+    if (wp.showCmd&SW_SHOW==SW_SHOW)
         Console::write("SW_SHOW ");
-    if (wp.showCmd&SW_SHOWMAXIMIZED!=0)
+    if (wp.showCmd&SW_SHOWMAXIMIZED==SW_SHOWMAXIMIZED)
         Console::write("SW_SHOWMAXIMIZED ");
-    if (wp.showCmd&SW_SHOWMINIMIZED!=0)
+    if (wp.showCmd&SW_SHOWMINIMIZED==SW_SHOWMINIMIZED)
         Console::write("SW_SHOWMINIMIZED ");
-    if (wp.showCmd&SW_SHOWMINNOACTIVE!=0)
+    if (wp.showCmd&SW_SHOWMINNOACTIVE!=SW_SHOWMINNOACTIVE)
         Console::write("SW_SHOWMINNOACTIVE ");
-    if (wp.showCmd&SW_SHOWNA)
+    if (wp.showCmd&SW_SHOWNA==SW_SHOWNA)
         Console::write("SW_SHOWNA ");
-    if (wp.showCmd&SW_SHOWNOACTIVATE!=0)
+    if (wp.showCmd&SW_SHOWNOACTIVATE==SW_SHOWNOACTIVATE)
         Console::write("SW_SHOWNOACTIVATE ");
-    if (wp.showCmd&SW_SHOWNORMAL!=0)
+    if (wp.showCmd&SW_SHOWNORMAL==SW_SHOWNORMAL)
         Console::write("SW_SHOWNORMAL");
         
     Console::write("\n");

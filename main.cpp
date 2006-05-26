@@ -589,9 +589,9 @@ int setupImageWindow()
     /* Get the stored window position or use defaults if there's a problem */
     int mx = atoi(winPos.getSetting("OverviewX").c_str());
 	int my = atoi(winPos.getSetting("OverviewY").c_str());
-	if (mx <= 0) mx = CW_USEDEFAULT;
-	if (my <= 0) my = CW_USEDEFAULT;
-    
+	if (mx <= 0) mx = 0; //CW_USEDEFAULT;
+	if (my <= 0) my = 0; //CW_USEDEFAULT;
+
     /* create image window */
     hImageWindow =CreateWindowEx(0, szImageWindowClassName, "Image Window",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
