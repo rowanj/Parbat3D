@@ -51,9 +51,6 @@ HWND *imageBandValues;                // values displayed under query tab
 HWND hupdate;
 int bands = 0;                        // for use with radio buttons
 
-/* Variables to record when the windows have snapped to main wndow */
-int imageWindowIsSnapped=false;
-int toolWindowIsSnapped=false;
 
 /* Define id numbers for the tab's in the tool window */
 enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID};
@@ -303,8 +300,13 @@ LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam,
     static RECT prevOverviewWindowRect;         /* main window position before it was moved */
     static RECT prevImageWindowRect;        /* image window position before it was moved */
     static RECT prevToolWindowRect;         /* tool window position before it was moved */
-    static int toolWindowIsMovingToo;       /* whether or not the tool window should be moved with the main window */
-    static int imageWindowIsMovingToo;      /* whether or not the image window should be moved with the main window */
+    static int moveToolWindow=false;       /* whether or not the tool window should be moved with the main window */
+    static int moveImageWindow=false;      /* whether or not the image window should be moved with the main window */
+    static int imageAndMainSnapped=false;
+    static int toolAndMainSnapped=false;
+    static int toolAndImageSnapped=false;
+    static int imageNormalState=false;
+    static int toolNormalState=false;
     static RECT rect;                       /* for general use */
     
     switch (message)                  /* handle the messages */
@@ -367,6 +369,7 @@ LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam,
                          (occurs when user starts to move the window)              */
             if(wParam == HTCAPTION)
             {
+
                 /* record mouse position relative to window position */
                 getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
                      
@@ -375,9 +378,39 @@ LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam,
                 GetWindowRect(hImageWindow,&prevImageWindowRect); 
                 GetWindowRect(hToolWindow,&prevToolWindowRect);
                
-                /* record which windows are currently snapped (which ones should move with the main window) */
-                imageWindowIsMovingToo=((imageWindowIsSnapped)&&(isWindowInNormalState(hImageWindow)));
-                toolWindowIsMovingToo=((toolWindowIsSnapped)&&(isWindowInNormalState(hToolWindow)));  
+                /* find out which windows are connected & which are in a normal state */
+                imageNormalState=isWindowInNormalState(hImageWindow);
+                toolNormalState=isWindowInNormalState(hToolWindow);
+                imageAndMainSnapped=(isWindowSnapped(hOverviewWindow,hImageWindow));
+                toolAndMainSnapped=(isWindowSnapped(hOverviewWindow,hToolWindow));
+                toolAndImageSnapped=(isWindowSnapped(hToolWindow,hImageWindow));
+
+                /* calculate whether the image window should be moved */
+                if (imageNormalState)
+                {
+                    if (imageAndMainSnapped)
+                        moveImageWindow=true;
+                    else if (toolAndImageSnapped && toolNormalState && toolAndMainSnapped)
+                        moveImageWindow=true;
+                    else
+                        moveImageWindow=false;
+                }  
+                else
+                    moveImageWindow=false;  
+
+                /* calculate whether the tool window should be moved */
+                if (toolNormalState)
+                {
+                    if (toolAndMainSnapped)
+                        moveToolWindow=true;
+                    else if (toolAndImageSnapped && moveImageWindow)
+                        moveToolWindow=true;
+                    else
+                        moveToolWindow=false;
+                } 
+                else
+                    moveToolWindow=false; 
+
            }
            return DefWindowProc(hwnd, message, wParam, lParam);
 
@@ -389,18 +422,18 @@ LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam,
             setNewWindowPosition((RECT*)lParam,&snapMouseOffset);            
             
             /* snap main window to edge of desktop */           
-            snapWindowByMoving(hDesktop,(RECT*)lParam);
+            snapInsideWindowByMoving(hDesktop,(RECT*)lParam);
 
-            if (!imageWindowIsMovingToo)
-                imageWindowIsSnapped=snapWindowByMoving(hImageWindow,(RECT*)lParam); 
+            if (!moveImageWindow)
+                snapWindowByMoving(hImageWindow,(RECT*)lParam); 
 
             /* snap main window to tool window, if near it, if it's not already snapped */
-            if (!toolWindowIsMovingToo)
-                toolWindowIsSnapped=snapWindowByMoving(hToolWindow,(RECT*)lParam);
+            if (!moveToolWindow)
+                snapWindowByMoving(hToolWindow,(RECT*)lParam);
             
             /* move the snapped windows relative to main window's new position */
             /* only moves the windows that were already snapped to the main window */
-            moveSnappedWindows((RECT*)lParam,&prevOverviewWindowRect,&prevImageWindowRect,&prevToolWindowRect,imageWindowIsMovingToo,toolWindowIsMovingToo);
+            moveSnappedWindows((RECT*)lParam,&prevOverviewWindowRect,&prevImageWindowRect,&prevToolWindowRect,moveImageWindow,moveToolWindow);
             return 0;
 
         /* WM_SIZE: the window has been re-sized, minimized, maximised or restored */
@@ -434,20 +467,6 @@ LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam,
             DestroyWindow( hwnd );			
             return 0;
             
-        case WM_NCLBUTTONDBLCLK: /***remove***/
-            orderWindows();
-            return 0;
-
-        case WM_WINDOWPOSCHANGING: /***remove***/
-            if ((((WINDOWPOS*)lParam)->hwndInsertAfter==hImageWindow) || (((WINDOWPOS*)lParam)->hwndInsertAfter==hToolWindow))
-            {
-                //static int n=0;
-                //n++;
-                //Console::write(makeMessage("WM_WINDOWPOSCHANGING:",n));
-                //((WINDOWPOS*)lParam)->flags|=SWP_NOZORDER;
-            }
-            return DefWindowProc(hwnd, message, wParam, lParam);
-
 
         /* WM_DESTROY: window is being destroyed */
         case WM_DESTROY:
@@ -619,7 +638,6 @@ int setupImageWindow()
     if (hImageWindow==NULL)
         return false;
 
-    imageWindowIsSnapped=true;
 
     return true;
 }
@@ -674,11 +692,10 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             /* set new window position based on position of mouse */
             setNewWindowPosition((RECT*)lParam,&moveMouseOffset);
 
-            /* snap the window to the edge of the desktop (if near it) */
-            snapWindowByMoving(hDesktop,(RECT*)lParam);      
-            
-            /* snap the window the main window (if near it) */
-            imageWindowIsSnapped=snapWindowByMoving(hOverviewWindow,(RECT*)lParam);
+            /* snap the window to other windows if in range */
+            snapInsideWindowByMoving(hDesktop,(RECT*)lParam);      
+            snapWindowByMoving(hOverviewWindow,(RECT*)lParam);
+            snapWindowByMoving(hToolWindow,(RECT*)lParam);            
             break;
     
         /* WM_SIZING: the window size is about to change */
@@ -688,21 +705,14 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
 
             /* snap the window to the edge of the desktop (if near it) */
-            snapWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
+            snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
                         
             /* snap the window the main window (if near it) */
-            imageWindowIsSnapped=snapWindowBySizing(hOverviewWindow,(RECT*)lParam,(int)wParam);           
+            snapWindowBySizing(hOverviewWindow,(RECT*)lParam,(int)wParam);           
             break;
 
         /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            
         case WM_SIZE:
-            if (imageWindowIsSnapped)  //***change***
-            {
-                /* re-snap window in case the main window has now moved away */
-                GetWindowRect(hwnd,&rect);
-                imageWindowIsSnapped=snapWindowByMoving(hwnd,&rect);
-
-            }    
            
             /* resize display/opengl window to fit new size */            
             GetClientRect(hImageWindow,&rect);
@@ -716,19 +726,6 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             else
                 CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
-
-        case WM_WINDOWPOSCHANGING:
-            if ((image_handler)) 
-            {
-                if ((((WINDOWPOS*)lParam)->hwndInsertAfter==hOverviewWindow) || (((WINDOWPOS*)lParam)->hwndInsertAfter==hToolWindow))
-                {
-                    //static int n=0;
-                    //n++;
-                    //SetWindowText(hImageWindow,makeMessage("n:",n));
-                    //((WINDOWPOS*)lParam)->flags|=SWP_NOZORDER;
-                }
-            }
-            return DefWindowProc(hwnd, message, wParam, lParam);
 
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
@@ -799,8 +796,6 @@ int setupToolWindow()
     if (hToolWindow==NULL)
         return false;
     
-    /* indicate tool window as snapped to the main window */
-    toolWindowIsSnapped=true;
 
     /* get width & height of tool window's client area (ie. inside window's border) */
     GetClientRect(hToolWindow,&rect);
@@ -1233,10 +1228,11 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             setNewWindowPosition((RECT*)lParam,&snapMouseOffset);
 
             /* if new position is near desktop edge, snap to it */
-            snapWindowByMoving(hDesktop,(RECT*)lParam);  
+            snapInsideWindowByMoving(hDesktop,(RECT*)lParam);  
             
             /* if new position is near main window, snap to it */    
-            toolWindowIsSnapped=snapWindowByMoving(hOverviewWindow,(RECT*)lParam);
+            snapWindowByMoving(hOverviewWindow,(RECT*)lParam);
+            snapWindowByMoving(hImageWindow,(RECT*)lParam);
             break;
         
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
@@ -1251,16 +1247,6 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         case WM_MEASUREITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_TAB)
                 measureTab((MEASUREITEMSTRUCT*)lParam);
-            break;
-
-        /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            
-        case WM_SIZE:
-            if (toolWindowIsSnapped)
-            {
-                // re-snap window in case the main window has now moved away
-                GetWindowRect(hwnd,&rect);
-                toolWindowIsSnapped=snapWindowByMoving(hOverviewWindow,&rect);
-            }    
             break;
 
         case WM_SHOWWINDOW:

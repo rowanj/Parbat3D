@@ -83,64 +83,78 @@ void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RE
 {
     int moveLeftOffset=newRect->left-oldRect->left;
     int moveTopOffset=newRect->top-oldRect->top;
-
     if (moveImageWindow)
         moveWindowByOffset(hImageWindow,prevImageWindowRect,moveLeftOffset,moveTopOffset);
     if (moveToolWindow)
         moveWindowByOffset(hToolWindow,prevToolWindowRect,moveLeftOffset,moveTopOffset);
 }
 
-/* returns whether window is in normal position (ie. not minimized or maximised) */
+/* checks whether a window is in normal state (not hidden, minimized, or maximized) */
 int isWindowInNormalState(HWND hwnd)
 {
-    WINDOWPLACEMENT wp;
-    RECT rect;
-    wp.length=sizeof(WINDOWPLACEMENT);
+    /* check if window is hidden,  maximized, or minimized */
+    if ((!IsWindowVisible(hwnd)) || (IsZoomed(hwnd)) || (IsIconic(hwnd)))
+        return false;
 
-    GetWindowPlacement(hwnd,&wp);
-    
-    Console::write("IsWindowInNormalState() ");
-    Console::write(wp.showCmd);
-    if (wp.showCmd&SW_HIDE==SW_HIDE)
-        Console::write("SW_HIDE ");
-    if (wp.showCmd&SW_MAXIMIZE==SW_MAXIMIZE)
-        Console::write("SW_MAXIMIZE ");
-    if (wp.showCmd&SW_MINIMIZE==SW_MINIMIZE)
-        Console::write("SW_MINIMIZE ");
-    if (wp.showCmd&SW_RESTORE==SW_RESTORE)
-        Console::write("SW_RESTORE ");
-    if (wp.showCmd&SW_SHOW==SW_SHOW)
-        Console::write("SW_SHOW ");
-    if (wp.showCmd&SW_SHOWMAXIMIZED==SW_SHOWMAXIMIZED)
-        Console::write("SW_SHOWMAXIMIZED ");
-    if (wp.showCmd&SW_SHOWMINIMIZED==SW_SHOWMINIMIZED)
-        Console::write("SW_SHOWMINIMIZED ");
-    if (wp.showCmd&SW_SHOWMINNOACTIVE!=SW_SHOWMINNOACTIVE)
-        Console::write("SW_SHOWMINNOACTIVE ");
-    if (wp.showCmd&SW_SHOWNA==SW_SHOWNA)
-        Console::write("SW_SHOWNA ");
-    if (wp.showCmd&SW_SHOWNOACTIVATE==SW_SHOWNOACTIVATE)
-        Console::write("SW_SHOWNOACTIVATE ");
-    if (wp.showCmd&SW_SHOWNORMAL==SW_SHOWNORMAL)
-        Console::write("SW_SHOWNORMAL");
-        
-    Console::write("\n");
-    
-    GetWindowRect(hwnd,&rect);
-    if (wp.rcNormalPosition.top!=rect.top)
-        return false;
-    if (wp.rcNormalPosition.left!=rect.left)
-        return false;
-    if (wp.rcNormalPosition.right!=rect.right)
-        return false;
-    if (wp.rcNormalPosition.bottom!=rect.bottom)
-        return false;
-    if ((wp.showCmd==SW_HIDE) || (wp.showCmd==SW_SHOWMINIMIZED) ||
-            (wp.showCmd==SW_MINIMIZE) || (wp.showCmd==SW_MAXIMIZE) || 
-            (wp.showCmd==SW_SHOWMAXIMIZED))
-        return false;
     return true;
 }    
+
+int snapInsideWindowByMoving(HWND snapToWin,RECT *rect)
+{
+    const int SNAP_PIXEL_RANGE=10;
+    RECT snapToRect;
+    SIZE winsize={rect->right-rect->left,rect->bottom-rect->top};
+    int difference;
+    int isSnapped=false;
+    int winState;
+    
+    // get position of the window that we may snap to
+    GetWindowRect(snapToWin,&snapToRect);
+    
+    //check if window is close enough to snap to
+    if ( (rect->left+winsize.cx<=(snapToRect.left-SNAP_PIXEL_RANGE)) || (rect->left>=(snapToRect.right+SNAP_PIXEL_RANGE)) )
+        return false;
+
+    if ( (rect->top+winsize.cy<=(snapToRect.top-SNAP_PIXEL_RANGE)) || (rect->top>=(snapToRect.bottom+SNAP_PIXEL_RANGE)) )
+        return false;
+            
+    // snap (top) to top
+    difference=(rect->top-(snapToRect.top));
+    if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+    {
+       rect->top=snapToRect.top;
+       rect->bottom=rect->top+winsize.cy;
+       isSnapped=true;       
+    }      
+
+    // snap (right) to right
+    difference=(rect->left+winsize.cx-(snapToRect.right));
+    if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+    {
+       rect->left=snapToRect.right-winsize.cx;
+       rect->right=rect->left+winsize.cx;       
+       isSnapped=true;       
+    }    
+         
+    // snap (bottom) to bottom
+    difference=((rect->top+winsize.cy)-(snapToRect.bottom));
+    if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+    {
+       rect->top=snapToRect.bottom-winsize.cy;
+       rect->bottom=rect->top+winsize.cy;
+       isSnapped=true;
+    } 
+    
+    // snap (left) to left
+    difference=(rect->left-(snapToRect.left));
+    if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+    {
+       rect->left=snapToRect.left;
+       rect->right=rect->left+winsize.cx;
+       isSnapped=true;
+    }        
+    
+}
 
 /* snap a window to another window (by moving it) if it is range */
 /* snapToWin=handle of window to snap to, rect=cords of window to be moved */
@@ -172,25 +186,7 @@ int snapWindowByMoving(HWND snapToWin,RECT *rect)
        rect->bottom=rect->top+winsize.cy;
        isSnapped=true;
     }
-    
-    // snap (bottom) to bottom
-    difference=((rect->top+winsize.cy)-(snapToRect.bottom));
-    if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
-    {
-       rect->top=snapToRect.bottom-winsize.cy;
-       rect->bottom=rect->top+winsize.cy;
-       isSnapped=true;
-    }    
-    
-    // snap (left) to left
-    difference=(rect->left-(snapToRect.left));
-    if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
-    {
-       rect->left=snapToRect.left;
-       rect->right=rect->left+winsize.cx;
-       isSnapped=true;
-    }
-    
+       
     // snap (right) to left
     difference=((rect->left+winsize.cx)-(snapToRect.left));
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
@@ -198,17 +194,8 @@ int snapWindowByMoving(HWND snapToWin,RECT *rect)
        rect->left=snapToRect.left-winsize.cx;
        rect->right=rect->left+winsize.cx;       
        isSnapped=true;       
-    }    
-    
-    // snap (right) to right
-    difference=(rect->left+winsize.cx-(snapToRect.right));
-    if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
-    {
-       rect->left=snapToRect.right-winsize.cx;
-       rect->right=rect->left+winsize.cx;       
-       isSnapped=true;       
-    }    
-    
+    }     
+  
     // snap (left) to right
     difference=(rect->left-(snapToRect.right));
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
@@ -218,15 +205,6 @@ int snapWindowByMoving(HWND snapToWin,RECT *rect)
        isSnapped=true;       
     }        
 
-    // snap (top) to top
-    difference=(rect->top-(snapToRect.top));
-    if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
-    {
-       rect->top=snapToRect.top;
-       rect->bottom=rect->top+winsize.cy;
-       isSnapped=true;       
-    }      
-
     // snap (bottom) to top
     difference=((rect->top+winsize.cy)-(snapToRect.top));
     if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
@@ -235,6 +213,7 @@ int snapWindowByMoving(HWND snapToWin,RECT *rect)
        rect->bottom=rect->top+winsize.cy;
        isSnapped=true;
     }      
+           
     return isSnapped;
 }
 
@@ -267,25 +246,10 @@ int snapWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
            rect->top=snapToRect.bottom;
            isSnapped=true;
         }
-        
-        // snap (top) to top
-        difference=(rect->top-(snapToRect.top));
-        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
-        {
-           rect->top=snapToRect.top;
-           isSnapped=true;       
-        }           
     }
     
     if ((whichDirection==WMSZ_BOTTOM) || (whichDirection==WMSZ_BOTTOMLEFT) || (whichDirection==WMSZ_BOTTOMRIGHT))
     {    
-        // snap (bottom) to bottom
-        difference=((rect->bottom)-(snapToRect.bottom));
-        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
-        {
-           rect->bottom=snapToRect.bottom;
-           isSnapped=true;
-        }    
 
         // snap (bottom) to top
         difference=((rect->bottom)-(snapToRect.top));
@@ -298,13 +262,6 @@ int snapWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
     
     if ((whichDirection==WMSZ_LEFT) || (whichDirection==WMSZ_BOTTOMLEFT) || (whichDirection==WMSZ_TOPLEFT))
     {    
-        // snap (left) to left
-        difference=(rect->left-(snapToRect.left));
-        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
-        {
-           rect->left=snapToRect.left;
-           isSnapped=true;
-        }
 
         // snap (left) to right
         difference=(rect->left-(snapToRect.right));
@@ -339,6 +296,73 @@ int snapWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
 }
 
 
+int snapInsideWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
+{
+    const int SNAP_PIXEL_RANGE=10;
+    RECT snapToRect;
+    int difference;
+    int isSnapped=false;
+
+    // get position of the window that we may snap to
+    GetWindowRect(snapToWin,&snapToRect);
+    
+    //check if window is close enough to snap to
+    if ( (rect->right<(snapToRect.left-SNAP_PIXEL_RANGE)) || (rect->left>(snapToRect.right+SNAP_PIXEL_RANGE)) )
+        return false;
+
+    if ( (rect->bottom<(snapToRect.top-SNAP_PIXEL_RANGE)) || (rect->top>(snapToRect.bottom+SNAP_PIXEL_RANGE)) )
+        return false;
+        
+    if ((whichDirection==WMSZ_TOP) || (whichDirection==WMSZ_TOPLEFT) || (whichDirection==WMSZ_TOPRIGHT))
+    {
+        // snap (top) to top
+        difference=(rect->top-(snapToRect.top));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->top=snapToRect.top;
+           isSnapped=true;       
+        }         
+    }
+    
+    if ((whichDirection==WMSZ_BOTTOM) || (whichDirection==WMSZ_BOTTOMLEFT) || (whichDirection==WMSZ_BOTTOMRIGHT))
+    {    
+        // snap (bottom) to bottom
+        difference=((rect->bottom)-(snapToRect.bottom));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->bottom=snapToRect.bottom;
+           isSnapped=true;
+        } 
+
+    }
+    
+    if ((whichDirection==WMSZ_LEFT) || (whichDirection==WMSZ_BOTTOMLEFT) || (whichDirection==WMSZ_TOPLEFT))
+    {    
+        // snap (left) to left
+        difference=(rect->left-(snapToRect.left));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->left=snapToRect.left;
+           isSnapped=true;
+        }
+    }
+    
+
+    if ((whichDirection==WMSZ_RIGHT) || (whichDirection==WMSZ_BOTTOMRIGHT) || (whichDirection==WMSZ_TOPRIGHT))
+    { 
+    
+        // snap (right) to right
+        difference=(rect->right-(snapToRect.right));
+        if ((difference<SNAP_PIXEL_RANGE)&&(difference>-SNAP_PIXEL_RANGE))
+        {
+           rect->right=snapToRect.right;       
+           isSnapped=true;       
+        }    
+    }
+    return isSnapped;
+}
+
+
 //calculate mouse co-ords relative to position of window
 void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
 {
@@ -349,23 +373,24 @@ void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
 }
 
 
+/* calculates whether a window is connected to another by its border */
 int isWindowSnapped(HWND main,HWND sticky)
 {
     RECT rmain,rsticky;
     
-    GetWindowRect(main,&rmain);
-    GetWindowRect(sticky,&rsticky);
 
-    // check if sticky window co-ords are outside of the main window
+    GetWindowRect(sticky,&rsticky);
+    GetWindowRect(main,&rmain);    
+
+    // check if sticky window co-ords are outside of the main window's co-ords
     if ((rmain.top>rsticky.bottom) || (rmain.bottom<rsticky.top) ||
             ((rmain.left>rsticky.right) || (rmain.right<rsticky.left)) )
         return false;    
     
     // check if the borders of the two windows are tuching
-    if ((rmain.right==rsticky.left) || (rmain.left==rsticky.left) ||
-            (rmain.top==rsticky.bottom) || (rmain.bottom=rsticky.top))
+    if ((rmain.right==rsticky.left) || (rmain.left==rsticky.right) ||
+            (rmain.top==rsticky.bottom) || (rmain.bottom==rsticky.top))
         return true;
-
     return false;
 }   
  
