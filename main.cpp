@@ -642,6 +642,21 @@ int setupImageWindow()
     return true;
 }
 
+/* display image information in image window's title bar */
+void updateImageWindowTitle()
+{
+    /* Display the file name at the top of the image window */
+    Console::write("updateImageWindowTitle LOD=");
+    Console::write(image_handler->get_LOD());
+    Console::write("\n");
+    string leader = "Image - ";
+    string title  = makeMessage(leader,(char*)image_handler->get_image_properties()->getFileName());
+    title+=" (";
+    title+=(int) (100.0 / pow((double)2,(double)image_handler->get_LOD()));
+    title+="%)";
+	SetWindowText(hImageWindow, (char*) title.c_str());    
+}
+
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 /* All messages/events related to the image window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -1332,10 +1347,6 @@ void loadFile()
 		// Clean up any previous instance
 		closeFile();
 
-		// create image window 
-    	if (!hImageWindow)
-    		setupImageWindow();        
-	
 	    image_handler = new ImageHandler::ImageHandler(hOverviewWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
 	    if (image_handler) {
 			if (image_handler->status > 0) {
@@ -1349,16 +1360,12 @@ void loadFile()
     			{
                     // Image loaded succesfully
                     //fileIsOpen=true;
-                    
-                    /* Display the file name at the top of the image window */
-                    string leader = "Image - ";
-					SetWindowText(hImageWindow,
-								(char *) makeMessage(leader,
-								(char *) image_handler->get_image_properties()->getFileName()));
+
+                    updateImageWindowTitle();                    
 
                     // re-create tool window
                     setupToolWindow();
-
+                    
                     // show tool & image windows
                     ShowWindow(hToolWindow,SW_SHOW);
                     ShowWindow(hImageWindow,SW_SHOW);    

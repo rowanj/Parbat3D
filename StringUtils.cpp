@@ -12,6 +12,18 @@ const char* makeMessage(std::string leader, double input)
 	return buffer.c_str();
 }
 
+std::string makeString(std::string leader, double input)
+{
+	std::string sinput;
+	std::string buffer;
+	std::stringstream s;
+	
+	s << input;
+	s >> sinput;
+	buffer = leader + sinput;
+	return buffer;
+}
+
 const char* makeMessage(std::string leader, int input)
 {
 	std::string sinput;
@@ -24,6 +36,18 @@ const char* makeMessage(std::string leader, int input)
 	return buffer.c_str();
 }
 
+std::string makeString(std::string leader, int input)
+{
+	std::string sinput;
+	std::string buffer;
+	std::stringstream s;
+	
+	s << input;
+	s >> sinput;
+	buffer = leader + sinput;
+	return buffer;
+}
+
 const char* makeMessage(std::string leader, char* input)
 {
 	std::string sinput;
@@ -32,6 +56,16 @@ const char* makeMessage(std::string leader, char* input)
 	sinput = input;
 	buffer = leader + sinput;
 	return buffer.c_str();
+}
+
+std::string makeString(std::string leader, char* input)
+{
+	std::string sinput;
+	std::string buffer;
+	
+	sinput = input;
+	buffer = leader + sinput;
+	return buffer;
 }
 
 const char* catcstrings(char* input1, char* input2)
