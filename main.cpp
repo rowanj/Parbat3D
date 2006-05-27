@@ -64,7 +64,8 @@ HPEN hTabPen;
 HBRUSH hTabBrush;
 WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc;
 
-const int OVERVIEW_WINDOW_WIDTH=250;   // width of the overview window in pixels
+/* constants */
+const int OVERVIEW_WINDOW_WIDTH=250;    /* width of the overview window in pixels */
 
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
@@ -736,7 +737,7 @@ void scrollImageX(int scrollMsg)
             pos=HIWORD(scrollMsg);
             break;
         default:
-            return 0;
+            return;
     }
     Console::write("xpos=");
     Console::write(pos);
@@ -771,7 +772,7 @@ void scrollImageY(int scrollMsg)
             pos=HIWORD(scrollMsg);
             break;                   
         default:
-            return 0;
+            return;
     }
     Console::write("ypos=");
     Console::write(pos);
@@ -780,14 +781,34 @@ void scrollImageY(int scrollMsg)
     //image_handler->set_viewport(image_handler->get_viewport_x(),pos);       
 }
 
+/* zoom the image in/out */
+void zoomImage(int nlevels)
+{
+    const int MAX_LOD=7;
+    int LOD;
+ 
+    Console::write("zoomImage() nlevels=");   
+    Console::write(nlevels);
+    Console::write("\n");
+    LOD=image_handler->get_LOD();
+    LOD+=nlevels;
+    if (LOD<0)
+        LOD=0;
+    else if (LOD>MAX_LOD)
+        LOD=MAX_LOD;
+    image_handler->set_LOD(LOD);
+    updateImageWindowTitle();
+    updateImageScrollbar();
+}
+
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 /* All messages/events related to the image window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static POINT moveMouseOffset;     /* mouse offset relative to window, used for snapping */
     static POINT sizeMousePosition;   /* mouse position, used for sizing window */
-    static RECT  sizeWindowPosition;   /* window position, used for sizing window */
-    static RECT rect;                   /* for general use */
+    static RECT  sizeWindowPosition;  /* window position, used for sizing window */
+    static RECT rect;                 /* for general use */
     
     switch (message)                  /* handle the messages */
     {
@@ -871,6 +892,10 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             
         case WM_VSCROLL:
             scrollImageY(wParam);
+            return 0;
+            
+        case WM_MOUSEWHEEL:
+            zoomImage(GET_WHEEL_DELTA_WPARAM(wParam)/WHEEL_DELTA);
             return 0;
 
 
