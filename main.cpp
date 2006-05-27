@@ -784,7 +784,7 @@ void scrollImageY(int scrollMsg)
 /* zoom the image in/out */
 void zoomImage(int nlevels)
 {
-    const int MAX_LOD=7;
+    const int MAX_LOD=6;
     int LOD;
  
     Console::write("zoomImage() nlevels=");   
