@@ -90,4 +90,7 @@ extern void setNewWindowPosition(RECT* newPos,POINT *mouseOffset);
 int isWindowInNormalState(HWND hwnd);
 int toggleMenuItemTick(HMENU hMenu,int itemId);
 
+void updateImageScrollbar();
+void updateImageWindowTitle();
+
 #endif

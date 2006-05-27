@@ -648,9 +648,65 @@ void updateImageWindowTitle()
     /* Display the file name & zoom level on the image window title bar */
     string leader = "Image - ";
     string title  = makeMessage(leader,(char*)image_handler->get_image_properties()->getFileName());
-    title+=makeString(" (",(100.0 / pow((double)2,(double)image_handler->get_LOD())));
+    title+=makeString(" (",int(100.0 / pow((double)2,(double)image_handler->get_LOD())));
     title+="%)";
 	SetWindowText(hImageWindow, (char*) title.c_str());    
+}
+
+void updateImageScrollbar()
+{
+    int viewport_width,viewport_height;
+    int LOD_width,LOD_height;
+    int scroll_width,scroll_height;
+    int scroll_x,scroll_y;
+    
+    viewport_width=image_handler->get_viewport_width();
+    viewport_height=image_handler->get_viewport_height();    
+    LOD_width=image_handler->get_LOD_width();
+    LOD_height=image_handler->get_LOD_height();
+    
+    scroll_width=LOD_width - viewport_width;
+    scroll_height=LOD_height - viewport_height;
+    
+    scroll_x=image_handler->get_viewport_x();
+    scroll_y=image_handler->get_viewport_y();
+    
+    Console::write("updateScrollbarSettings():\n");
+    Console::write("LOD_width=");
+    Console::write(LOD_width);
+    Console::write("\nLOD_height=");
+    Console::write(LOD_height);
+    Console::write("\nviewport_width=");
+    Console::write(viewport_width);
+    Console::write("\nviewport_height=");
+    Console::write(viewport_height);
+    Console::write("\nscroll_width=");
+    Console::write(scroll_width);
+    Console::write("\nscroll_height=");
+    Console::write(scroll_height);
+    Console::write("\nscroll_x=");
+    Console::write(scroll_x);
+    Console::write("\nscroll_y=");
+    Console::write(scroll_y);
+    
+    /* set scrolling range */
+    SetScrollRange(hImageWindow,SB_HORZ,0,scroll_width,true);
+    SetScrollRange(hImageWindow,SB_VERT,0,scroll_height,true);    
+    
+    /* enable/disable scrollbars depending on whether there is data to scroll */
+    if (scroll_width<=0)
+        EnableScrollBar(hImageWindow,SB_HORZ,ESB_DISABLE_BOTH);
+    else
+        EnableScrollBar(hImageWindow,SB_HORZ,ESB_ENABLE_BOTH);
+
+    if (scroll_height<=0)
+        EnableScrollBar(hImageWindow,SB_VERT,ESB_DISABLE_BOTH);
+    else
+        EnableScrollBar(hImageWindow,SB_VERT,ESB_ENABLE_BOTH);
+   
+    /* set scrollbar positions */
+    SetScrollPos(hImageWindow,SB_HORZ,scroll_x,true);
+    SetScrollPos(hImageWindow,SB_VERT,scroll_y,true);
 }
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
@@ -1354,10 +1410,9 @@ void loadFile()
 				}
     			else
     			{
-                    // Image loaded succesfully
-                    //fileIsOpen=true;
-
-                    updateImageWindowTitle();                    
+                    // update image window settings
+                    updateImageWindowTitle();              
+                    updateImageScrollbar();      
 
                     // re-create tool window
                     setupToolWindow();
