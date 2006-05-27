@@ -443,7 +443,7 @@ LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam,
             GetClientRect(hOverviewWindow,&rect);
             MoveWindow(hOverviewWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
             return 0;
-        
+                   
         /* WM_SYSCOMMAND: a system-related command associated with window needs to be executed */    
         case WM_SYSCOMMAND:
             /* check if user has tried to minimize the overview window */
@@ -653,6 +653,7 @@ void updateImageWindowTitle()
 	SetWindowText(hImageWindow, (char*) title.c_str());    
 }
 
+/* update image window's scroll bar display settings  */
 void updateImageScrollbar()
 {
     int viewport_width,viewport_height;
@@ -707,6 +708,76 @@ void updateImageScrollbar()
     /* set scrollbar positions */
     SetScrollPos(hImageWindow,SB_HORZ,scroll_x,true);
     SetScrollPos(hImageWindow,SB_VERT,scroll_y,true);
+}
+
+/* scroll image window horizontally */
+void scrollImageX(int scrollMsg)
+{
+    int pos;
+    
+    Console::write("scrollImageX() ");
+    switch(LOWORD(scrollMsg))
+    {
+        case SB_LINEUP:
+            pos=image_handler->get_viewport_x()+1;
+            break;
+        case SB_LINEDOWN:
+            pos=image_handler->get_viewport_x()-1;            
+            break;
+        case SB_PAGEUP:
+            pos=image_handler->get_viewport_x();
+            pos+=image_handler->get_viewport_width();           
+            break;
+        case SB_PAGEDOWN:
+            pos=image_handler->get_viewport_x();
+            pos-=image_handler->get_viewport_width();                       
+            break;
+        case SB_THUMBTRACK:
+            pos=HIWORD(scrollMsg);
+            break;
+        default:
+            return 0;
+    }
+    Console::write("xpos=");
+    Console::write(pos);
+    Console::write("\n");
+    SetScrollPos(hImageWindow,SB_HORZ,pos,true);
+    //image_handler->set_viewport(pos,image_handler->get_viewport_y());   
+}
+
+/* scroll image window vertically */
+void scrollImageY(int scrollMsg)
+{
+    int pos;
+    
+    Console::write("scrollImageY() ");
+    switch(LOWORD(scrollMsg))
+    {
+        case SB_LINEUP:
+            pos=image_handler->get_viewport_x()+1;
+            break;
+        case SB_LINEDOWN:
+            pos=image_handler->get_viewport_x()-1;            
+            break;
+        case SB_PAGEUP:
+            pos=image_handler->get_viewport_x();
+            pos+=image_handler->get_viewport_width();           
+            break;
+        case SB_PAGEDOWN:
+            pos=image_handler->get_viewport_x();
+            pos-=image_handler->get_viewport_width();                       
+            break;
+        case SB_THUMBTRACK:
+            pos=HIWORD(scrollMsg);
+            break;                   
+        default:
+            return 0;
+    }
+    Console::write("ypos=");
+    Console::write(pos);
+    Console::write("\n");
+    SetScrollPos(hImageWindow,SB_VERT,pos,true);
+    //image_handler->set_viewport(image_handler->get_viewport_x(),pos);       
 }
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
@@ -792,6 +863,14 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
                 CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_CHECKED|MF_BYCOMMAND);            
             else
                 CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
+            return 0;
+
+        case WM_HSCROLL:
+            scrollImageX(wParam);
+            return 0;
+            
+        case WM_VSCROLL:
+            scrollImageY(wParam);
             return 0;
 
 
