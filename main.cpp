@@ -645,14 +645,10 @@ int setupImageWindow()
 /* display image information in image window's title bar */
 void updateImageWindowTitle()
 {
-    /* Display the file name at the top of the image window */
-    Console::write("updateImageWindowTitle LOD=");
-    Console::write(image_handler->get_LOD());
-    Console::write("\n");
+    /* Display the file name & zoom level on the image window title bar */
     string leader = "Image - ";
     string title  = makeMessage(leader,(char*)image_handler->get_image_properties()->getFileName());
-    title+=" (";
-    title+=(int) (100.0 / pow((double)2,(double)image_handler->get_LOD()));
+    title+=makeString(" (",(100.0 / pow((double)2,(double)image_handler->get_LOD())));
     title+="%)";
 	SetWindowText(hImageWindow, (char*) title.c_str());    
 }
