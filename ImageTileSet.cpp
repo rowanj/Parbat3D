@@ -237,9 +237,21 @@ int* ImageTileSet::get_pixel_values(int x, int y)
 	for (tmp = 0; tmp < num_bands; tmp++) {
 		return_values[tmp] = tmp * 2;
 	}
+	
 	/* !! Find values in block */
+	/* This finds values by image pixels */
+	return return_values;
+}
+
+int* ImageTileSet::get_pixel_values_LOD(int x, int y)
+{
+	int* return_values = new int[num_bands];
 	
-	
+	int tmp;
+	for (tmp = 0; tmp < num_bands; tmp++) {
+		return_values[tmp] = tmp * 40;
+	}
+	/* Find value in block pixels */
 	return return_values;
 }
 

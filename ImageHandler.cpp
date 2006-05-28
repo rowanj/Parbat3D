@@ -268,6 +268,15 @@ int* ImageHandler::get_pixel_values(int x, int y)
 	}
 }
 
+int* ImageHandler::get_pixel_values_viewport(int viewport_x_pos, int viewport_y_pos)
+{
+	if (image_tileset) {
+		return image_tileset->get_pixel_values_LOD(viewport_x_pos + viewport_x, viewport_y_pos + viewport_x);
+	} else {
+		return NULL;
+	}
+}
+
 void ImageHandler::get_geo_pos(geo_coords_ptr pos)
 {
 	Console::write("(WW) ImageHandler::get_geo_pos() - not implemented.\n");

@@ -20,6 +20,7 @@ public:
 	/* Tile Data */
 	char* get_tile_RGB(int x, int y, int band_R, int band_G, int band_B);
 	int* get_pixel_values(int x, int y);
+	int* get_pixel_values_LOD(int x, int y);
 	
 	int get_tex_size(void)		{return tex_size;}
 	int get_columns(void)		{return columns;}
