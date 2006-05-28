@@ -572,18 +572,19 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
                     /* Get band values */
                     int* bv = image_handler->get_pixel_values(ix, iy);
                     
-                    /* add values under query tab */
                     string leader = "";
                     
+                    /* Update display of cursor position */
                     SetWindowText(cursorXPos, (char *) makeMessage(leader, ix));
                     SetWindowText(cursorYPos, (char *) makeMessage(leader, iy));
 
+                    /* Update display of pixel values under query tab */                    
                     if (bv) { /* make sure the band values were returned */
                         for (int i=1; i<=bands; i++)
-                            SetWindowText(imageBandValues[i], (char *) makeMessage(leader, bv[i]));
+                            SetWindowText(imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
                     }
                     
-                    delete bv;
+                    delete[] bv;
                 }
             }
             break;
