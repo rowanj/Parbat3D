@@ -161,29 +161,59 @@ int setupMainWindow()
 /* handle events related to the main window */
 LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static int imageWindowState=SW_HIDE;    // recoreded state of image window when minimised
-    static int toolWindowState=SW_HIDE;     // recoreded state of tool window when minimised
-    static WINDOWPLACEMENT wp;
+    static WINDOWPLACEMENT imageWindowPlacement;        // recorded state of image window when minimised
+    static WINDOWPLACEMENT toolWindowPlacement;         // recorded state of tool window when minimised
+    static int imageWindowState;                      // recorded visibility state of image window
+    static int toolWindowState;                       // recorded visibility state of tool window
     
     switch (message)                  /* handle the messages */
     {
-        /* check if main window has been minimized or restored */
+        case WM_CREATE:
+            /* indicate that the window states have not yet been recorded */
+            imageWindowState=0;
+            toolWindowState=0;            
+            break;
+            
 		case WM_SIZE:
+        /* handle minimizing and restoring the child windows */            
 		    switch(wParam)
 		    {
                 case SIZE_RESTORED:
-                    /* restore other windows to their previous state */
-                    ShowWindow(hImageWindow,imageWindowState);
-                    ShowWindow(hToolWindow,toolWindowState);                    
+                    /* restore child windows to their previous state */
+                    if (imageWindowState!=0)
+                        ShowWindow(hImageWindow,imageWindowState);
+                    if (toolWindowState!=0)
+                        ShowWindow(hToolWindow,toolWindowState);
                     ShowWindow(hOverviewWindow,SW_RESTORE);
                     break;
+
                 case SIZE_MINIMIZED:
                     /* record the current state of the child windows */
-                    GetWindowPlacement(hImageWindow,&wp);
-                    imageWindowState=wp.showCmd;
-                    GetWindowPlacement(hToolWindow,&wp);
-                    toolWindowState=wp.showCmd;   
-                    
+                    if (hImageWindow!=NULL)
+                    {
+                        if (!IsWindowVisible(hImageWindow))
+                            imageWindowState=0;
+                        else
+                            imageWindowState=SW_RESTORE;
+                        
+                    }
+                    else
+                    {
+                        imageWindowState=0;
+                    }
+
+                    if (hToolWindow!=NULL)
+                    {
+                        if (!IsWindowVisible(hToolWindow))
+                            toolWindowState=0;
+                        else
+                            toolWindowState=SW_RESTORE;                        
+                    }
+                    else
+                    {
+                        toolWindowState=0;
+                    }
+
                     /* hide the child windows */     
                     ShowWindow(hImageWindow,SW_HIDE);            
                     ShowWindow(hToolWindow,SW_HIDE);                    
@@ -1490,7 +1520,7 @@ void loadFile()
 
     ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW - which note?
     ofn.hwndOwner = hOverviewWindow;
-    ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tif\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPEG / JPEG 2000 (*.jpg)\0*.jpg\0TIFF / GeoTIFF (*.tif)\0*.tif\0All Files (*.*)\0*.*\0";
+    ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tif;*.j2k;*.jp2\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPEG (*.jpg)\0*.jpg\0JPEG 2000 (*.j2k,*.jp2)\0*.j2k;*.jp2\0TIFF / GeoTIFF (*.tif)\0*.tif\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile = szFileName;
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
