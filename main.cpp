@@ -184,7 +184,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                         ShowWindow(hImageWindow,imageWindowState);
                     if (toolWindowState!=0)
                         ShowWindow(hToolWindow,toolWindowState);
-                    ShowWindow(hOverviewWindow,SW_RESTORE);
+                    ShowWindow(hOverviewWindow,SW_SHOW);
                     break;
 
                 case SIZE_MINIMIZED:
@@ -194,7 +194,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                         if (!IsWindowVisible(hImageWindow))
                             imageWindowState=0;
                         else
-                            imageWindowState=SW_RESTORE;
+                            imageWindowState=SW_SHOW;
                         
                     }
                     else
@@ -207,7 +207,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                         if (!IsWindowVisible(hToolWindow))
                             toolWindowState=0;
                         else
-                            toolWindowState=SW_RESTORE;                        
+                            toolWindowState=SW_SHOW;                        
                     }
                     else
                     {
