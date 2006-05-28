@@ -48,6 +48,7 @@ HWND *redRadiobuttons;                // band radio buttons
 HWND *greenRadiobuttons;
 HWND *blueRadiobuttons;
 HWND *imageBandValues;                // values displayed under query tab
+HWND cursorXPos, cursorYPos;          // position of cursor in image
 HWND hupdate;
 int bands = 0;                        // for use with radio buttons
 
@@ -558,20 +559,31 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
             {
                 if (image_handler) {
                     /* Get mouse screen position */
-                    int x = (short)LOWORD(lParam);
-                    int y = (short)HIWORD(lParam);
-                  
+                    int mx = (short)LOWORD(lParam);
+                    int my = (short)HIWORD(lParam);
+                    
                     /* Convert screen position to image position */
-                    //unsigned int ix;
-                    //unsigned int iy;
-                  
+                    int vx = image_handler->get_viewport_x(); /* get top right corner of screen position in image */
+                    int vy = image_handler->get_viewport_y();
+                    int lod = (int)pow((double)2,(double)image_handler->get_LOD());
+                    int ix = (mx + vx) * lod;
+                    int iy = (my + vy) * lod;
+                    
                     /* Get band values */
-                    //pixel_values_ptr bv = image_handler->get_pixel_values(ix, iy);
-                  
+                    int* bv = image_handler->get_pixel_values(ix, iy);
+                    
+                    /* add values under query tab */
                     string leader = "";
-                    for (int i=1; i<=bands; i++)
-                        SetWindowText(imageBandValues[i], (char *) makeMessage(leader, x));
-                        //SetWindowText(imageBandValues[i], (char *) makeMessage(leader, bv->value[i]));
+                    
+                    SetWindowText(cursorXPos, (char *) makeMessage(leader, ix));
+                    SetWindowText(cursorYPos, (char *) makeMessage(leader, iy));
+
+                    if (bv) { /* make sure the band values were returned */
+                        for (int i=1; i<=bands; i++)
+                            SetWindowText(imageBandValues[i], (char *) makeMessage(leader, bv[i]));
+                    }
+                    
+                    delete bv;
                 }
             }
             break;
@@ -1164,16 +1176,36 @@ int setupToolWindow()
     			hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
     
     		/* add the band values to the value container under the query tab */
-            char tempBandValue[4] = "128"; // temporary storage for the band value
+            char tempBandValue[4] = "0"; // temporary storage for the band value
             imageBandValues[i] = CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * (i-1)),
     			50, 18, queryValueContainer, NULL, hThisInstance, NULL);
         } 			
 	}
 	
+	/* display cursor position under query tab */
+	CreateWindowEx(0, szStaticControl, "X", WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW,
+                 20, 60 + (20 * bands), 100, 18, hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
+	CreateWindowEx(0, szStaticControl, "Y", WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW,
+                 20, 60 + (20 * (bands+1)), 100, 18, hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
+    cursorXPos = CreateWindowEx(0, szStaticControl, "-", WS_CHILD | WS_VISIBLE,
+                 143, 60 + (20 * bands), 50, 18, hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);			
+    cursorYPos = CreateWindowEx(0, szStaticControl, "-", WS_CHILD | WS_VISIBLE,
+                 143, 60 + (20 * (bands+1)), 50, 18, hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);			
+	
 	/* Default radio button selection */
-	SendMessage(redRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
-	SendMessage(greenRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
-	SendMessage(blueRadiobuttons[0],BM_SETCHECK,BST_CHECKED,0);
+	if (bands == 1) {
+    	SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(greenRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(blueRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    } else if (bands == 2) {
+        SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(greenRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(blueRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
+    } else {
+        SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(greenRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(blueRadiobuttons[3],BM_SETCHECK,BST_CHECKED,0);
+    }
 	
 	/* add the image property information under the image tab */
 	ImageProperties* ip=image_handler->get_image_properties();
