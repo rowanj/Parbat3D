@@ -744,71 +744,98 @@ void updateImageScrollbar()
 /* scroll image window horizontally */
 void scrollImageX(int scrollMsg)
 {
-    int pos;
-    
+    SCROLLINFO info;
+
+    /* get current scroll position & range */    
+    info.cbSize=sizeof(SCROLLINFO);
+    info.fMask=SIF_POS|SIF_RANGE|SIF_TRACKPOS;
+    GetScrollInfo(hImageWindow,SB_HORZ,&info);
+     
     Console::write("scrollImageX() ");
     switch(LOWORD(scrollMsg))
     {
         case SB_LINEUP:
-            pos=image_handler->get_viewport_x()+1;
+            info.nPos--;
             break;
         case SB_LINEDOWN:
-            pos=image_handler->get_viewport_x()-1;            
+            info.nPos++;
             break;
         case SB_PAGEUP:
-            pos=image_handler->get_viewport_x();
-            pos+=image_handler->get_viewport_width();           
+            info.nPos-=image_handler->get_viewport_width();
             break;
         case SB_PAGEDOWN:
-            pos=image_handler->get_viewport_x();
-            pos-=image_handler->get_viewport_width();                       
+            info.nPos+=image_handler->get_viewport_width();                
             break;
         case SB_THUMBTRACK:
-            pos=HIWORD(scrollMsg);
+            info.nPos=info.nTrackPos;
             break;
         default:
             return;
     }
+
+    // check new position is within scroll range
+    if (info.nPos<info.nMin)
+        info.nPos=info.nMin;
+    else if (info.nPos>info.nMax)
+        info.nPos=info.nMax;
+
     Console::write("xpos=");
-    Console::write(pos);
+    Console::write(info.nPos);
     Console::write("\n");
-    SetScrollPos(hImageWindow,SB_HORZ,pos,true);
-    //image_handler->set_viewport(pos,image_handler->get_viewport_y());   
+
+    // update scroll position
+    info.fMask=SIF_POS;
+    SetScrollInfo(hImageWindow,SB_HORZ,&info,true);
+    //image_handler->set_viewport(info.nPos,image_handler->get_viewport_y());   
+            
 }
 
 /* scroll image window vertically */
 void scrollImageY(int scrollMsg)
 {
-    int pos;
-    
+    SCROLLINFO info;
+
+    /* get current scroll position & range */    
+    info.cbSize=sizeof(SCROLLINFO);
+    info.fMask=SIF_POS|SIF_RANGE|SIF_TRACKPOS;
+    GetScrollInfo(hImageWindow,SB_VERT,&info);
+     
     Console::write("scrollImageY() ");
     switch(LOWORD(scrollMsg))
     {
         case SB_LINEUP:
-            pos=image_handler->get_viewport_x()+1;
+            info.nPos--;
             break;
         case SB_LINEDOWN:
-            pos=image_handler->get_viewport_x()-1;            
+            info.nPos++;
             break;
         case SB_PAGEUP:
-            pos=image_handler->get_viewport_x();
-            pos+=image_handler->get_viewport_width();           
+            info.nPos-=image_handler->get_viewport_height();
             break;
         case SB_PAGEDOWN:
-            pos=image_handler->get_viewport_x();
-            pos-=image_handler->get_viewport_width();                       
+            info.nPos+=image_handler->get_viewport_height();                
             break;
         case SB_THUMBTRACK:
-            pos=HIWORD(scrollMsg);
-            break;                   
+            info.nPos=info.nTrackPos;
+            break;
         default:
             return;
     }
+
+    // check new position is within scroll range
+    if (info.nPos<info.nMin)
+        info.nPos=info.nMin;
+    else if (info.nPos>info.nMax)
+        info.nPos=info.nMax;
+
     Console::write("ypos=");
-    Console::write(pos);
+    Console::write(info.nPos);
     Console::write("\n");
-    SetScrollPos(hImageWindow,SB_VERT,pos,true);
-    //image_handler->set_viewport(image_handler->get_viewport_x(),pos);       
+
+    // update scroll position
+    info.fMask=SIF_POS;
+    SetScrollInfo(hImageWindow,SB_VERT,&info,true);
+    //image_handler->set_viewport(image_handler->get_viewport_x(),info.nPos);       
 }
 
 /* zoom the image in/out */
