@@ -36,6 +36,7 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	image_width = image_properties->getWidth();
 	image_height = image_properties->getHeight();
 	num_bands = image_properties->getNumBands();
+		tile_memory_size = tex_size * tex_size * sample_size * num_bands;
 	
 	/* special case for overview window */
 	if (LOD == -1) {
@@ -59,8 +60,6 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 		if (image_width % tile_size) last_column_width = (image_width % tile_size);
 		if (image_height % tile_size) last_row_height = (image_height % tile_size);
 	}
-	
-	/* Allocate pointer list */
 }
 
 ImageTileSet::~ImageTileSet(void)
@@ -161,6 +160,7 @@ int ImageTileSet::load_tile(int x, int y)
 	int data_size_x, data_size_y;
 	int p_in, p_out, p_length;
 	int tile_check;
+	int tile_memory_size;
 	
 	/* Calculate tile index */
 	tile_index_x = x/tile_size;
@@ -187,12 +187,21 @@ int ImageTileSet::load_tile(int x, int y)
 	}
 	
 	{ // Tile wasn't in cache
-		/* Check cache space, deallocate head if not */
 		cache_misses++;
 		/* Allocate tile */
 		new_tile = new tile;
 		new_tile->tile_index = tile_index;
-		new_tile->data = new char[tex_size * tex_size * sample_size * num_bands];
+		new_tile->data = new char[tile_memory_size];
+		/* Check cache space, deallocate head if oversize */
+		cache_fill = cache_fill + tile_memory_size;
+		if (cache_fill > cache_size) {
+			if (tiles.size() > 0) {
+				delete[] tiles[0]->data; /* Delete data */
+				delete tiles[0]; /* Delete structure */
+				tiles.erase(tiles.begin());
+				cache_fill = cache_fill - tile_memory_size;
+			}
+		}
 		
 		/* Adjust for border tiles */
 		if (tile_index_x == columns-1) {

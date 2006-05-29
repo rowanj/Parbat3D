@@ -801,8 +801,7 @@ void scrollImageX(int scrollMsg)
     // update scroll position
     info.fMask=SIF_POS;
     SetScrollInfo(hImageWindow,SB_HORZ,&info,true);
-    //image_handler->set_viewport(info.nPos,image_handler->get_viewport_y());   
-            
+    image_handler->set_viewport_x(info.nPos);
 }
 
 /* scroll image window vertically */
@@ -850,7 +849,7 @@ void scrollImageY(int scrollMsg)
     // update scroll position
     info.fMask=SIF_POS;
     SetScrollInfo(hImageWindow,SB_VERT,&info,true);
-    //image_handler->set_viewport(image_handler->get_viewport_x(),info.nPos);       
+    image_handler->set_viewport_y(info.nPos);
 }
 
 /* zoom the image in/out */

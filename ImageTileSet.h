@@ -55,7 +55,7 @@ private:
 	int LOD_width, LOD_height;
 	int columns, rows, tile_size;
 	int last_column_width, last_row_height;
-	int tex_size;
+	int tex_size, tile_memory_size;
 
 	/* This stores the actual tile information */
 	vector<tile_ptr> tiles;

@@ -176,6 +176,7 @@ void ImageHandler::redraw(void)
 		glTexCoord2f(0.0, 1.0);
 		glVertex3f(-0.5,-0.5, 0.0);
 	glEnd();
+	
 	glPopMatrix(); // Restore model transform
 	glDisable(GL_TEXTURE_2D);
 	
@@ -196,6 +197,14 @@ void ImageHandler::redraw(void)
 	gl_image->make_current();
 	glClearColor(0.3f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    Console::write("(II) ImageHandler::redraw() viewport_x=");
+    Console::write(viewport_x);
+    Console::write("\n");
+   	glOrtho(viewport_x, viewport_x + viewport_width,
+	   		-(viewport_y + viewport_height),-viewport_y,
+			0.1, 10.0);
     glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	/* Set up view transform */
@@ -255,7 +264,6 @@ void ImageHandler::resize_window(void)
 	//gluPerspective(60.0, (GLfloat) gl_image->width()/(GLfloat) gl_image->height(), 0.1, 20.0);
 	viewport_width = gl_image->width();
 	viewport_height = gl_image->height();
-	glOrtho(0.0, viewport_width, -viewport_height, 0.0, 0.1, 10.0);
 	this->redraw();
 }
 
@@ -396,6 +404,15 @@ int ImageHandler::set_LOD(int level_of_detail)
 	}
 }
 
+void ImageHandler::set_viewport(int x, int y)
+{
+	viewport_x = x;
+	viewport_y = y;
+	make_textures();
+	redraw();
+}
+void ImageHandler::set_viewport_x(int x) {set_viewport(x, viewport_y);}
+void ImageHandler::set_viewport_y(int y) {set_viewport(viewport_x, y);}
 int ImageHandler::get_LOD_width(void) {return image_tileset->get_LOD_width();}
 int ImageHandler::get_LOD_height(void) {return image_tileset->get_LOD_height();}
 int ImageHandler::get_viewport_width(void) {return viewport_width;}

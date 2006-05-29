@@ -46,6 +46,8 @@ public:
 	void redraw(void);
 	void resize_window(void);
 	void set_viewport(int x, int y);
+	void set_viewport_x(int x);
+	void set_viewport_y(int y);
 	void set_bands(int band_R, int band_G, int band_B);
 	int get_viewport_x(void);
 	int get_viewport_y(void);
