@@ -386,7 +386,7 @@ LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam,
                     return 0;
 
                 case IDM_HELPCONTENTS:
-                     ShellExecute(NULL, "open", "index.htm", NULL, "help", SW_SHOW);
+                     ShellExecute(NULL, "open", "\\help\\index.htm", NULL, "help", SW_SHOW);
 					
 					//WinHelp( hwnd, (LPSTR) "help/index.htm",
                            //HELP_CONTENTS, 0L );
