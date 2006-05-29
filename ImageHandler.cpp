@@ -339,7 +339,7 @@ void ImageHandler::make_textures(void)
 	for (ty = 0; ty < tex_rows; ty++){
 		for (tx = 0; tx < tex_columns; tx++) {
 			tmp_id = (ty * tex_columns) + tx;
-			tmp_tex = image_tileset->get_tile_RGB(tile_size * tx + 1, tile_size * ty + 1, band_red, band_green, band_blue);
+			tmp_tex = image_tileset->get_tile_RGB(tile_size * tx, tile_size * ty, band_red, band_green, band_blue);
 			glBindTexture(GL_TEXTURE_2D, tex_base[tmp_id]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
