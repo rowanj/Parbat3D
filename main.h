@@ -68,6 +68,7 @@ LRESULT CALLBACK ToolWindowTabControlProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK ToolWindowScrollBarProcedure(HWND, UINT, WPARAM, LPARAM);
 
 int registerToolWindow();
 int registerImageWindow();
@@ -78,6 +79,7 @@ int setupMainWindow();
 int setupToolWindow();
 int setupOverviewWindow();
 void orderWindows();
+void showToolWindowTabContainer(int);
 
 extern void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset);
 extern void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RECT *prevToolWindowRect,int moveImageWindow,int moveToolWindow);
@@ -92,5 +94,6 @@ int toggleMenuItemTick(HMENU hMenu,int itemId);
 
 void updateImageScrollbar();
 void updateImageWindowTitle();
+void updateToolWindowScrollbar();
 
 #endif

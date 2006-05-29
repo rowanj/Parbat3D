@@ -41,6 +41,7 @@ HWND hToolWindowTabControl;
 HWND hToolWindowDisplayTabContainer;
 HWND hToolWindowQueryTabContainer;
 HWND hToolWindowImageTabContainer;
+HWND hToolWindowCurrentTabContainer;
 HWND hToolWindowScrollBar;
 HWND hImageWindowDisplay;
 HWND hOverviewWindowDisplay;
@@ -63,7 +64,11 @@ settings winPos ("settings.ini");
 HFONT hBoldFont,hNormalFont,hHeadingFont;
 HPEN hTabPen;
 HBRUSH hTabBrush;
-WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc;
+
+/* variables used to store addresses to window procedures */
+WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc,oldScrollBarContainerProc;
+
+char *filename=NULL;                    // currently open image filename
 
 /* constants */
 const int OVERVIEW_WINDOW_WIDTH=250;    /* width of the overview window in pixels */
@@ -691,7 +696,7 @@ void updateImageWindowTitle()
 {
     /* Display the file name & zoom level on the image window title bar */
     string leader = "Image - ";
-    string title  = makeMessage(leader,(char*)image_handler->get_image_properties()->getFileName());
+    string title  = makeMessage(leader,filename);
     title+=makeString(" (",int(100.0 / pow((double)2,(double)image_handler->get_LOD())));
     title+="%)";
 	SetWindowText(hImageWindow, (char*) title.c_str());    
@@ -700,21 +705,25 @@ void updateImageWindowTitle()
 /* update image window's scroll bar display settings  */
 void updateImageScrollbar()
 {
-    int viewport_width,viewport_height;
     int LOD_width,LOD_height;
-    int scroll_width,scroll_height;
-    int scroll_x,scroll_y;
-    
-    viewport_width=image_handler->get_viewport_width();
-    viewport_height=image_handler->get_viewport_height();    
+
+    SCROLLINFO info_x,info_y;
+
+    /* get window size and image size at current zoom level */   
+    info_x.nPage=image_handler->get_viewport_width();
+    info_y.nPage=image_handler->get_viewport_height();    
     LOD_width=image_handler->get_LOD_width();
     LOD_height=image_handler->get_LOD_height();
     
-    scroll_width=LOD_width - viewport_width;
-    scroll_height=LOD_height - viewport_height;
+    /* set scroll range */
+    info_x.nMin=0;
+    info_y.nMin=0;
+    info_x.nMax=LOD_width;// - info_x.nPage;
+    info_y.nMax=LOD_height;// - info_y.nPage;
     
-    scroll_x=image_handler->get_viewport_x();
-    scroll_y=image_handler->get_viewport_y();
+    /* set scroll position */
+    info_x.nPos=image_handler->get_viewport_x();
+    info_y.nPos=image_handler->get_viewport_y();
     
     Console::write("updateScrollbarSettings():\n");
     Console::write("LOD_width=");
@@ -722,36 +731,26 @@ void updateImageScrollbar()
     Console::write("\nLOD_height=");
     Console::write(LOD_height);
     Console::write("\nviewport_width=");
-    Console::write(viewport_width);
+    Console::write(info_x.nPage);
     Console::write("\nviewport_height=");
-    Console::write(viewport_height);
+    Console::write(info_y.nPage);
     Console::write("\nscroll_width=");
-    Console::write(scroll_width);
+    Console::write(info_x.nMax);
     Console::write("\nscroll_height=");
-    Console::write(scroll_height);
+    Console::write(info_y.nMax);
     Console::write("\nscroll_x=");
-    Console::write(scroll_x);
+    Console::write(info_x.nPos);
     Console::write("\nscroll_y=");
-    Console::write(scroll_y);
+    Console::write(info_y.nPos);
     
-    /* set scrolling range */
-    SetScrollRange(hImageWindow,SB_HORZ,0,scroll_width,true);
-    SetScrollRange(hImageWindow,SB_VERT,0,scroll_height,true);    
-    
-    /* enable/disable scrollbars depending on whether there is data to scroll */
-    if (scroll_width<=0)
-        EnableScrollBar(hImageWindow,SB_HORZ,ESB_DISABLE_BOTH);
-    else
-        EnableScrollBar(hImageWindow,SB_HORZ,ESB_ENABLE_BOTH);
-
-    if (scroll_height<=0)
-        EnableScrollBar(hImageWindow,SB_VERT,ESB_DISABLE_BOTH);
-    else
-        EnableScrollBar(hImageWindow,SB_VERT,ESB_ENABLE_BOTH);
-   
-    /* set scrollbar positions */
-    SetScrollPos(hImageWindow,SB_HORZ,scroll_x,true);
-    SetScrollPos(hImageWindow,SB_VERT,scroll_y,true);
+    /* set scrollbar info */
+    info_x.cbSize=sizeof(SCROLLINFO);
+    info_x.fMask=SIF_ALL;
+    info_y.cbSize=sizeof(SCROLLINFO);
+    info_y.fMask=SIF_ALL;    
+    SetScrollInfo(hImageWindow,SB_HORZ,&info_x,true);
+    SetScrollInfo(hImageWindow,SB_VERT,&info_y,true);    
+      
 }
 
 /* scroll image window horizontally */
@@ -761,7 +760,7 @@ void scrollImageX(int scrollMsg)
 
     /* get current scroll position & range */    
     info.cbSize=sizeof(SCROLLINFO);
-    info.fMask=SIF_POS|SIF_RANGE|SIF_TRACKPOS;
+    info.fMask=SIF_ALL;
     GetScrollInfo(hImageWindow,SB_HORZ,&info);
      
     Console::write("scrollImageX() ");
@@ -789,8 +788,8 @@ void scrollImageX(int scrollMsg)
     // check new position is within scroll range
     if (info.nPos<info.nMin)
         info.nPos=info.nMin;
-    else if (info.nPos>info.nMax)
-        info.nPos=info.nMax;
+    else if (info.nPos>(info.nMax-info.nPage))
+        info.nPos=info.nMax-info.nPage;
 
     Console::write("xpos=");
     Console::write(info.nPos);
@@ -810,7 +809,7 @@ void scrollImageY(int scrollMsg)
 
     /* get current scroll position & range */    
     info.cbSize=sizeof(SCROLLINFO);
-    info.fMask=SIF_POS|SIF_RANGE|SIF_TRACKPOS;
+    info.fMask=SIF_ALL;
     GetScrollInfo(hImageWindow,SB_VERT,&info);
      
     Console::write("scrollImageY() ");
@@ -838,8 +837,8 @@ void scrollImageY(int scrollMsg)
     // check new position is within scroll range
     if (info.nPos<info.nMin)
         info.nPos=info.nMin;
-    else if (info.nPos>info.nMax)
-        info.nPos=info.nMax;
+    else if (info.nPos>(info.nMax-info.nPage))
+        info.nPos=info.nMax-info.nPage;
 
     Console::write("ypos=");
     Console::write(info.nPos);
@@ -911,9 +910,6 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
 
             /* also let windows handle this event */
             return DefWindowProc(hwnd, message, wParam, lParam); 
-        
-            
-
 
         /* WM_MOVING: the window is about to be moved to a new location */
         case WM_MOVING:
@@ -946,6 +942,10 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             /* resize display/opengl window to fit new size */            
             GetClientRect(hImageWindow,&rect);
             MoveWindow(hImageWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
+            
+            /* update scroll bar settings */
+            if (image_handler)
+                updateImageScrollbar();
             return 0;
            
         case WM_SHOWWINDOW:
@@ -1068,6 +1068,13 @@ int setupToolWindow()
     /* get size of tab control's client area (the area inside the tab control) */
     GetClientRect(hToolWindowTabControl,&rect);   
 
+	/* Assign number of image bands to global variable */
+    bands = image_handler->get_image_properties()->getNumBands() + 1;
+
+	/* Temp: added +10 for testing -shane */
+	int originalBands=bands;
+	bands+=10;
+
     /* calculate the width & height for our tab container windows */
     const int SPACING_FOR_TAB_HEIGHT=30;    /* the height of the tabs + a bit of spacing */
     const int SPACING_FOR_BOARDER=5;        /* left & right margain + spacing for tab control's borders */
@@ -1078,7 +1085,7 @@ int setupToolWindow()
     /* Display tab container */
 	hToolWindowDisplayTabContainer =CreateWindowEx( 0, szStaticControl, "Channel Selection",
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,
-		SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, rect.bottom, hToolWindowTabControl, NULL,
+		SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, 90 + (20 * bands), hToolWindowTabControl, NULL,
 		hThisInstance, NULL); 
            
 	/* Query tab container */
@@ -1092,6 +1099,9 @@ int setupToolWindow()
            WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
            SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, rect.bottom, hToolWindowTabControl, NULL,                            /* No menu */
            hThisInstance, NULL); 
+           
+    /* show display tab container */
+    showToolWindowTabContainer(DISPLAY_TAB_ID);
 
     /* create scroll bar */
     GetClientRect(hToolWindow,&rect);
@@ -1100,15 +1110,13 @@ int setupToolWindow()
 		rect.right, rect.bottom-SCROLLBAR_TOP, hToolWindow, NULL, hThisInstance, NULL);           
 	EnableWindow(hToolWindowScrollBar,false);    
     
-    /* modify tab containers' window procedure address 
-        note: assumming proc addr is the same for all three */
+    /* modify tab containers' & scrollbar's window procedure address */
     oldDisplayTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowDisplayTabContainer,GWL_WNDPROC,(long)&ToolWindowDisplayTabContainerProcedure);
     oldQueryTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowQueryTabContainer,GWL_WNDPROC,(long)&ToolWindowQueryTabContainerProcedure);
     oldImageTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowImageTabContainer,GWL_WNDPROC,(long)&ToolWindowImageTabContainerProcedure);
-
-	/* Assign number of image bands to global variable */
-    bands = image_handler->get_image_properties()->getNumBands() + 1;
+    oldScrollBarContainerProc=(WNDPROC)SetWindowLong(hToolWindowScrollBar,GWL_WNDPROC,(long)&ToolWindowScrollBarProcedure);
     
+   
     /* Create group for R, G & B radio buttons based on band number */
     hRed = CreateWindowEx(0, "BUTTON", "R", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 138, 25,
 		26, 20 + (20 * bands), hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
@@ -1130,7 +1138,8 @@ int setupToolWindow()
 	/* Dynamically add image band values */
 	imageBandValues = new HWND[bands];
 	
-    for (int i=0; i<bands; i++)
+
+    for (int i=0; i<bands; i++)  
     {
 		redRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
 			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
@@ -1145,7 +1154,7 @@ int setupToolWindow()
 			hThisInstance, NULL);
 		
 		const char* name;
-		if (i>0) {
+		if ((i>0)&&(i<originalBands)) {    /* Temp: added (i<originalBands) for testing -shane */
     		/* add band names to radio buttons*/
     		name = image_handler->get_band_info(i)->getColourInterpretationName();
     		
@@ -1170,7 +1179,7 @@ int setupToolWindow()
 		hupdate =  CreateWindowEx(0, "BUTTON", "Update", WS_CHILD | WS_VISIBLE, 136,
 			50 + (20 * bands), 80, 25, hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);     
 
-        if (i>0) {
+        if (i>0) { 
             /* add channel names under the query tab */
             CreateWindowEx(0, szStaticControl, name,
     			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40 + (20 * i), 100, 18,
@@ -1242,6 +1251,9 @@ int setupToolWindow()
 			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 78, 40+(i*20), 160, 18,
 			hToolWindowImageTabContainer, NULL, hThisInstance, NULL);
     }
+    
+    /* setup tool window scrollbar */
+    updateToolWindowScrollbar();
     
     return true;
 }
@@ -1426,6 +1438,72 @@ LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, W
     return CallWindowProc(oldImageTabContainerProc,hwnd,message,wParam,lParam);
 }
 
+/* show the correct tab container window for the selected tab */
+void showToolWindowTabContainer(int selectedTabId)
+{
+    /* hide previously visible tab container window */
+    if (hToolWindowCurrentTabContainer!=NULL)
+        ShowWindow(hToolWindowCurrentTabContainer,SW_HIDE);                              
+
+    /* update the handle to the current tab container window */        
+    switch(selectedTabId)
+    {
+        case DISPLAY_TAB_ID:
+                hToolWindowCurrentTabContainer=hToolWindowDisplayTabContainer;
+                break;
+        case QUERY_TAB_ID:
+                hToolWindowCurrentTabContainer=hToolWindowQueryTabContainer;
+                break;
+        case IMAGE_TAB_ID:
+                hToolWindowCurrentTabContainer=hToolWindowImageTabContainer;                
+                break;
+    }       
+
+    /* show new tab container window */
+    ShowWindow(hToolWindowCurrentTabContainer,SW_SHOW);
+}    
+
+/* change the tool window's scrollbar settings based on the currently visible tab container */
+void updateToolWindowScrollbar()
+{
+    RECT rcontainer,rscrollbar;
+    SCROLLINFO info;    
+    
+    /* get position of current container & scrollbar */
+    GetWindowRect(hToolWindowCurrentTabContainer,&rcontainer);
+    GetWindowRect(hToolWindowScrollBar,&rscrollbar);
+
+    /* set height of visible scroll area */   
+    info.nPage=rscrollbar.bottom-rscrollbar.top;
+    
+    /* set scroll range */
+    info.nMin=0;
+    info.nMax=rcontainer.bottom-rcontainer.top;
+    
+    /* set scroll position */
+    info.nPos=0;
+    
+    Console::write("updateToolWindowScrollbar() ");
+    Console::write("\ninfo.nMin=");
+    Console::write(info.nMin);
+    Console::write(" info.nMax=");
+    Console::write(info.nMax);
+    Console::write("\ninfo.nPage=");
+    Console::write(info.nPage);
+    Console::write("\n");
+       
+    /* set scrollbar info */
+    info.cbSize=sizeof(SCROLLINFO);
+    info.fMask=SIF_ALL;
+    SetScrollInfo(hToolWindowScrollBar,SB_VERT,&info,true);  
+    
+}    
+
+void scrollToolWindow(int a)
+{
+    Console::write("scrollToolWindow()");
+}    
+
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1443,31 +1521,10 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         case WM_NOTIFY:
             nmhdr=(NMHDR*)lParam;
             switch(nmhdr->code)
-            {
-                /* TCN_SELCHANGE: the user has selected a tab within a tab control */
+            {                   
                 case TCN_SELCHANGE:
-                    
-                    /* display the container that is associated with the selected tab
-                       and hide the remaining tab containers */
-                    switch(TabCtrl_GetCurSel(hToolWindowTabControl))
-                    {
-                        case DISPLAY_TAB_ID:
-                            ShowWindow(hToolWindowDisplayTabContainer,SW_SHOW);
-                            ShowWindow(hToolWindowQueryTabContainer,SW_HIDE);                            
-                            ShowWindow(hToolWindowImageTabContainer,SW_HIDE);
-                            break;
-                        case QUERY_TAB_ID:
-                            ShowWindow(hToolWindowDisplayTabContainer,SW_HIDE);
-                            ShowWindow(hToolWindowQueryTabContainer,SW_SHOW);
-                            ShowWindow(hToolWindowImageTabContainer,SW_HIDE);                                                        
-                            break;
-                        case IMAGE_TAB_ID:
-                            ShowWindow(hToolWindowDisplayTabContainer,SW_HIDE);
-                            ShowWindow(hToolWindowQueryTabContainer,SW_HIDE);
-                            ShowWindow(hToolWindowImageTabContainer,SW_SHOW);
-                            break;
-                    }    
-                    break;
+                   /* display the tab container window that is associated with the selected tab */                                   
+                   showToolWindowTabContainer(TabCtrl_GetCurSel(hToolWindowTabControl));
             }    
             break;
 
@@ -1517,8 +1574,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             else
                 CheckMenuItem(hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
-
-      
+                
         /* WM_CLOSE: system or user has requested to close the window/application */              
         case WM_CLOSE:
             /* don't destory this window, but make it invisible */            
@@ -1537,6 +1593,24 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
     /* return 0 to indicate that we have processed the message */          
     return 0;
 }
+
+/* This function is called by the Windows function DispatchMessage( ) */
+/* All messages/events related to one of the display windows are sent to this procedure */
+LRESULT CALLBACK ToolWindowScrollBarProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    /* handle the messages */    
+    switch (message)
+    {
+        case WM_VSCROLL:
+            scrollToolWindow(wParam);
+            return 0;
+                        
+        default:
+            break;
+    }        
+    return CallWindowProc(oldTabControlProc,hwnd,message,wParam,lParam);
+}
+
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* general window functions */
@@ -1605,6 +1679,7 @@ void loadFile()
     			else
     			{
                     // update image window settings
+                    filename=(char*)image_handler->get_image_properties()->getFileName();
                     updateImageWindowTitle();              
                     updateImageScrollbar();      
 
