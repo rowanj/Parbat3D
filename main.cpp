@@ -42,6 +42,9 @@ HWND hToolWindowDisplayTabContainer;
 HWND hToolWindowQueryTabContainer;
 HWND hToolWindowImageTabContainer;
 HWND hToolWindowCurrentTabContainer;
+HWND hToolWindowDisplayTabHeading;
+HWND hToolWindowImageTabHeading;
+HWND hToolWindowQueryTabHeading;
 HWND hToolWindowScrollBar;
 HWND hImageWindowDisplay;
 HWND hOverviewWindowDisplay;
@@ -1071,10 +1074,6 @@ int setupToolWindow()
 	/* Assign number of image bands to global variable */
     bands = image_handler->get_image_properties()->getNumBands() + 1;
 
-	/* Temp: added +10 for testing -shane */
-	int originalBands=bands;
-	bands+=10;
-
     /* calculate the width & height for our tab container windows */
     const int SPACING_FOR_TAB_HEIGHT=30;    /* the height of the tabs + a bit of spacing */
     const int SPACING_FOR_BOARDER=5;        /* left & right margain + spacing for tab control's borders */
@@ -1083,22 +1082,38 @@ int setupToolWindow()
     
     /* create tab containers for each tab (a window that will be shown/hidden when user clicks on a tab) */
     /* Display tab container */
-	hToolWindowDisplayTabContainer =CreateWindowEx( 0, szStaticControl, "", //Channel Selection
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,
+	hToolWindowDisplayTabContainer =CreateWindowEx( 0, szStaticControl, "", 
+		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,
 		SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, 90 + (20 * bands), hToolWindowTabControl, NULL,
 		hThisInstance, NULL); 
+
+	hToolWindowDisplayTabHeading =CreateWindowEx( 0, szStaticControl, "Channel Selection", 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
+		0, rect.right-SCROLLBAR_WIDTH, 20, hToolWindowDisplayTabContainer, NULL,
+		hThisInstance, NULL); 		
            
 	/* Query tab container */
-    hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "", //Band Values
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
+    hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "", 
+		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
            SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, 80 + (20 * (bands+1)), hToolWindowTabControl,           /* The window is a childwindow of the tab control */
            NULL, hThisInstance, NULL);
-           
+
+	hToolWindowQueryTabHeading =CreateWindowEx( 0, szStaticControl, "Band Values", 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
+		0, rect.right-SCROLLBAR_WIDTH, 20, hToolWindowQueryTabContainer, NULL,
+		hThisInstance, NULL); 		
+                      
     /* Image tab container */
-    hToolWindowImageTabContainer =CreateWindowEx(0, szStaticControl, "Image Properties",              /* text to display */
-           WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
+    hToolWindowImageTabContainer =CreateWindowEx(0, szStaticControl, "",                            
+           WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
            SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, rect.bottom, hToolWindowTabControl, NULL,                            /* No menu */
            hThisInstance, NULL); 
+
+	hToolWindowImageTabHeading =CreateWindowEx( 0, szStaticControl, "Image Properties", 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
+		0, rect.right-SCROLLBAR_WIDTH, 20, hToolWindowImageTabContainer, NULL,
+		hThisInstance, NULL); 		
+
            
     /* show display tab container */
     showToolWindowTabContainer(DISPLAY_TAB_ID);
@@ -1153,7 +1168,7 @@ int setupToolWindow()
 			hThisInstance, NULL);
 		
 		const char* name;
-		if ((i>0)&&(i<originalBands)) {    /* Temp: added (i<originalBands) for testing -shane */
+		if (i>0) { 
     		/* add band names to radio buttons*/
     		name = image_handler->get_band_info(i)->getColourInterpretationName();
     		
@@ -1356,7 +1371,10 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
-                drawStatic((DRAWITEMSTRUCT*)lParam,hNormalFont);
+                if (((DRAWITEMSTRUCT*)lParam)->hwndItem==hToolWindowDisplayTabHeading)
+                    drawStatic((DRAWITEMSTRUCT*)lParam,hBoldFont);                
+                else
+                    drawStatic((DRAWITEMSTRUCT*)lParam,hNormalFont);
             break; 
         case WM_COMMAND:
             //if(hupdate==(HWND)lParam)
@@ -1411,7 +1429,10 @@ LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, W
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
-                drawStatic((DRAWITEMSTRUCT*)lParam,hNormalFont);
+                if (((DRAWITEMSTRUCT*)lParam)->hwndItem==hToolWindowQueryTabHeading)
+                    drawStatic((DRAWITEMSTRUCT*)lParam,hBoldFont);                
+                else
+                    drawStatic((DRAWITEMSTRUCT*)lParam,hNormalFont);
             break; 
                         
         default:
@@ -1428,7 +1449,10 @@ LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, W
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
-                drawStatic((DRAWITEMSTRUCT*)lParam,hNormalFont);
+                if (((DRAWITEMSTRUCT*)lParam)->hwndItem==hToolWindowImageTabHeading)
+                    drawStatic((DRAWITEMSTRUCT*)lParam,hBoldFont);                
+                else
+                    drawStatic((DRAWITEMSTRUCT*)lParam,hNormalFont);
             break; 
                         
         default:
