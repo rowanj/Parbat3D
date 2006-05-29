@@ -151,8 +151,6 @@ int ImageTileSet::load_tile(int x, int y)
 {
 	#if DEBUG_IMAGE_TILESET
 	char buffer[256];
-	sprintf(buffer, "(II) ImageTileSet::load_tile(%d,%d)\n", x, y);
-	Console::write(buffer);
 	#endif
 	tile_ptr new_tile;
 	int tile_index, tile_index_x, tile_index_y;
@@ -167,7 +165,7 @@ int ImageTileSet::load_tile(int x, int y)
 	tile_index_y = y/tile_size;
 	tile_index = (columns * tile_index_y) + tile_index_x;
 	#if DEBUG_IMAGE_TILESET
-	sprintf(buffer, "(II) ImageTileSet::load_tile INDEX:%d (x_index %d, y_index %d)\n", tile_index, tile_index_x, tile_index_y);
+	sprintf(buffer, "(II) ImageTileSet::load_tile(%d,%d) INDEX:%d (x_index %d, y_index %d)\n", x, y, tile_index, tile_index_x, tile_index_y);
 	Console::write(buffer);
 	#endif
 	
@@ -219,15 +217,18 @@ int ImageTileSet::load_tile(int x, int y)
 		if (LOD!=-1) {
 			data_size_x = tile_size_x / MathUtils::ipow(2,LOD);
 			data_size_y = tile_size_y / MathUtils::ipow(2,LOD);
+			/* X & Y are now tile top-left position */
+			x = (x/tile_size) * tile_size;
+			y = (y/tile_size) * tile_size;
 			image_file->getRasterData(tile_size_x, tile_size_y, x, y, new_tile->data, data_size_x, data_size_y);
-			/* !! Shuffle data for edge tiles */
+			/* Shuffle data for edge tiles */
 			if (!((tile_size_y == tile_size) && (tile_size_x == tile_size))) {
 				align_tile(&(new_tile->data), tex_size, data_size_x, data_size_y);
 			}
 		} else {
 			data_size_x = tex_size;
 			data_size_y = tex_size;
-			image_file->getRasterData(tile_size_x, tile_size_y, x, y, new_tile->data, tex_size, tex_size);
+			image_file->getRasterData(tile_size_x, tile_size_y, 0, 0, new_tile->data, tex_size, tex_size);
 		}
 		
 		/* add index to list of allocated tiles */
@@ -238,30 +239,49 @@ int ImageTileSet::load_tile(int x, int y)
 	}
 }
 
-int* ImageTileSet::get_pixel_values(int x, int y)
+/* Coords are in image pixels */
+unsigned int* ImageTileSet::get_pixel_values(int x, int y)
 {
-	int* return_values = new int[num_bands];
-
-	int tmp;
-	for (tmp = 0; tmp < num_bands; tmp++) {
-		return_values[tmp] = tmp * 2;
+	unsigned int* return_values = new unsigned int[num_bands];
+	char *tmp_vals = new char[num_bands];
+	int tmp, tile_index, pixel_start;
+	char* tile_data;
+	
+	if ((x >= image_width) || (y >= image_height)) {
+		for (tmp = 0; tmp < num_bands; tmp++) {
+			return_values[tmp] = 0;
+			return return_values;
+		}
 	}
 	
-	/* !! Find values in block */
+	tile_index = load_tile(x,y);
+	tile_data = tiles[tile_index]->data;
+
+	/* Find index in tile */
+	x = (x / MathUtils::ipow(2,LOD)) % tex_size;
+	y = (y / MathUtils::ipow(2,LOD)) % tex_size;
+	
+	return_values[0] = x;
+	return_values[1] = y;
+	
+	pixel_start = (x + (y*tex_size)) * (num_bands * sample_size);
+	return_values[2] = pixel_start;
+	for (tmp = 0; tmp < num_bands; tmp++) {
+		return_values[tmp] = 0;
+		return_values[tmp] = (unsigned int)tile_data[pixel_start + tmp];
+		return_values[tmp] = return_values[tmp] & 0x000000FF;
+	}
+	
 	/* This finds values by image pixels */
 	return return_values;
 }
 
-int* ImageTileSet::get_pixel_values_LOD(int x, int y)
+unsigned int* ImageTileSet::get_pixel_values_LOD(int x, int y)
 {
-	int* return_values = new int[num_bands];
-	
-	int tmp;
-	for (tmp = 0; tmp < num_bands; tmp++) {
-		return_values[tmp] = tmp * 40;
-	}
-	/* Find value in block pixels */
-	return return_values;
+	/* Translate LOD coords to image coords */
+	x = x * MathUtils::ipow(2,LOD);
+	y = y * MathUtils::ipow(2,LOD);
+	return get_pixel_values(x,y);
 }
 
 /* !! tile_dimension will probably always be tex_size */
@@ -391,3 +411,11 @@ void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, i
     //replace the old tile with the new one
     *tile = temp_tile;
 }
+
+int ImageTileSet::get_tex_size(void) {return tex_size;}
+int ImageTileSet::get_columns(void) {return columns;}
+int ImageTileSet::get_rows(void) {return rows;}
+int ImageTileSet::get_tile_size(void) {return tile_size;}
+int ImageTileSet::get_LOD_width(void) {return LOD_width;}
+int ImageTileSet::get_LOD_height(void) {return LOD_height;}
+int ImageTileSet::get_LOD(void) {return LOD;}

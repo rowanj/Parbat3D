@@ -27,6 +27,7 @@ Yet they work. This may mean they could blow up if you try to put too much
 data into them. You have been warned!*/
 
 const char* makeMessage(std::string leader, int input);
+const char* makeMessage(std::string leader, unsigned int input);
 const char* makeMessage(std::string leader, double input);
 const char* makeMessage(std::string leader, char* input);
 std::string makeString(std::string leader, char* input);

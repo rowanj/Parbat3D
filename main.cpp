@@ -565,6 +565,7 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
 
         case WM_MOUSEMOVE:
             {
+				/* !! if image window */
                 if (image_handler) {
                     /* Get mouse screen position */
                     int mx = (short)LOWORD(lParam);
@@ -578,7 +579,7 @@ LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, 
                     int iy = (my + vy) * lod;
                     
                     /* Get band values */
-                    int* bv = image_handler->get_pixel_values(ix, iy);
+                    unsigned int* bv = image_handler->get_pixel_values_viewport(mx, my);
                     
                     string leader = "";
                     

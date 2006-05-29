@@ -37,8 +37,8 @@ public:
 	ImageProperties* get_image_properties(void);
 	BandInfo* get_band_info(int band_number);
 		/* free() pixel_values_ptr->values and pixel_values_ptr after use */
-	int* get_pixel_values(int x, int y);
-	int* get_pixel_values_viewport(int viewport_x_pos, int viewport_y_pos);
+	unsigned int* get_pixel_values(int x, int y);
+	unsigned int* get_pixel_values_viewport(int viewport_x_pos, int viewport_y_pos);
 	void get_geo_pos(geo_coords_ptr pos);
 	const char* get_info_string(void);
 	
@@ -86,6 +86,7 @@ private:
 	int texture_size, texture_size_overview;
 	int viewport_width, viewport_height, viewport_x, viewport_y;
 	int viewport_columns, viewport_rows;
+	int start_column, start_row;
 	
     /* Overview window texture */
 	ImageTileSet* overview_tileset;
@@ -94,8 +95,9 @@ private:
 	
 	/* Image window textures */
 	ImageTileSet* image_tileset;
-	int tex_rows, tex_columns, tex_count;
+	int image_rows, image_columns, tex_count;
 	GLuint *tex_base;
+	int tex_base_size;
 	int tile_size;
 	
 	/* Display lists */

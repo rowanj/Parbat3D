@@ -35,6 +35,17 @@ const char* makeMessage(std::string leader, int input)
 	buffer = leader + sinput;
 	return buffer.c_str();
 }
+const char* makeMessage(std::string leader, unsigned int input)
+{
+	std::string sinput;
+	std::string buffer;
+	std::stringstream s;
+	
+	s << input;
+	s >> sinput;
+	buffer = leader + sinput;
+	return buffer.c_str();
+}
 
 std::string makeString(std::string leader, int input)
 {

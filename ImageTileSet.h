@@ -19,15 +19,16 @@ public:
 	
 	/* Tile Data */
 	char* get_tile_RGB(int x, int y, int band_R, int band_G, int band_B);
-	int* get_pixel_values(int x, int y);
-	int* get_pixel_values_LOD(int x, int y);
+	unsigned int* get_pixel_values(int x, int y);
+	unsigned int* get_pixel_values_LOD(int x, int y);
 	
-	int get_tex_size(void)		{return tex_size;}
-	int get_columns(void)		{return columns;}
-	int get_rows(void)			{return rows;}
-	int get_tile_size(void)		{return tile_size;}
-	int get_LOD_width(void)		{return LOD_width;}
-	int get_LOD_height(void)	{return LOD_height;}
+	int get_tex_size(void);
+	int get_columns(void);
+	int get_rows(void);
+	int get_tile_size(void);
+	int get_LOD(void);
+	int get_LOD_width(void);
+	int get_LOD_height(void);
 	
 	void get_cache_stats(unsigned int* size_p,
 						 unsigned int* fill_p,
