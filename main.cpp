@@ -1083,15 +1083,15 @@ int setupToolWindow()
     
     /* create tab containers for each tab (a window that will be shown/hidden when user clicks on a tab) */
     /* Display tab container */
-	hToolWindowDisplayTabContainer =CreateWindowEx( 0, szStaticControl, "Channel Selection",
+	hToolWindowDisplayTabContainer =CreateWindowEx( 0, szStaticControl, "", //Channel Selection
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,
 		SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, 90 + (20 * bands), hToolWindowTabControl, NULL,
 		hThisInstance, NULL); 
            
 	/* Query tab container */
-    hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "Band Values",
+    hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "", //Band Values
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
-           SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, rect.bottom, hToolWindowTabControl,           /* The window is a childwindow of the tab control */
+           SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, 80 + (20 * (bands+1)), hToolWindowTabControl,           /* The window is a childwindow of the tab control */
            NULL, hThisInstance, NULL);
            
     /* Image tab container */
@@ -1108,7 +1108,6 @@ int setupToolWindow()
     hToolWindowScrollBar=CreateWindowEx(0, "SCROLLBAR", NULL,
 		WS_CHILD | WS_VISIBLE | SBS_RIGHTALIGN | SBS_VERT, 0, SCROLLBAR_TOP,
 		rect.right, rect.bottom-SCROLLBAR_TOP, hToolWindow, NULL, hThisInstance, NULL);           
-	EnableWindow(hToolWindowScrollBar,false);    
     
     /* modify tab containers' & scrollbar's window procedure address */
     oldDisplayTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowDisplayTabContainer,GWL_WNDPROC,(long)&ToolWindowDisplayTabContainerProcedure);
@@ -1443,7 +1442,10 @@ void showToolWindowTabContainer(int selectedTabId)
 {
     /* hide previously visible tab container window */
     if (hToolWindowCurrentTabContainer!=NULL)
-        ShowWindow(hToolWindowCurrentTabContainer,SW_HIDE);                              
+    {
+        scrollToolWindowToTop();
+        ShowWindow(hToolWindowCurrentTabContainer,SW_HIDE);
+    }
 
     /* update the handle to the current tab container window */        
     switch(selectedTabId)
@@ -1461,6 +1463,26 @@ void showToolWindowTabContainer(int selectedTabId)
 
     /* show new tab container window */
     ShowWindow(hToolWindowCurrentTabContainer,SW_SHOW);
+    
+    /* update scroll bar settings for the current tab */
+    updateToolWindowScrollbar();
+}    
+
+/* scrolls a window back to its orginal state */
+void scrollToolWindowToTop()
+{
+    SCROLLINFO info;
+    RECT rect;
+    int amount;
+    
+    /* get scroll bar settings */
+    info.cbSize=sizeof(SCROLLINFO);
+    info.fMask=SIF_POS;
+    GetScrollInfo(hToolWindowScrollBar,SB_VERT,&info);
+    
+    GetClientRect(hToolWindowCurrentTabContainer,&rect);
+    amount=info.nPos;
+    ScrollWindowEx(hToolWindowCurrentTabContainer,0,amount,NULL,NULL,NULL,&rect,SW_ERASE|SW_INVALIDATE|SW_SCROLLCHILDREN);    
 }    
 
 /* change the tool window's scrollbar settings based on the currently visible tab container */
@@ -1468,7 +1490,7 @@ void updateToolWindowScrollbar()
 {
     RECT rcontainer,rscrollbar;
     SCROLLINFO info;    
-    
+   
     /* get position of current container & scrollbar */
     GetWindowRect(hToolWindowCurrentTabContainer,&rcontainer);
     GetWindowRect(hToolWindowScrollBar,&rscrollbar);
@@ -1499,10 +1521,68 @@ void updateToolWindowScrollbar()
     
 }    
 
-void scrollToolWindow(int a)
+
+void scrollToolWindow(int msg)
 {
-    Console::write("scrollToolWindow()");
+    SCROLLINFO info;
+    RECT rect;
+    int prevPos;
+    int amount;
+    
+    /* get scroll bar settings */
+    info.cbSize=sizeof(SCROLLINFO);
+    info.fMask=SIF_POS|SIF_RANGE|SIF_TRACKPOS|SIF_PAGE;
+    GetScrollInfo(hToolWindowScrollBar,SB_VERT,&info);
+    prevPos=info.nPos;
+
+    /* calculate new scroll bar position */
+    switch (LOWORD(msg))
+    {
+        case SB_LINEUP:
+            info.nPos--;
+            break;
+            
+        case SB_LINEDOWN:
+            info.nPos++;
+            break;
+            
+        case SB_PAGEUP:
+            info.nPos+=info.nPage;
+            break;
+            
+        case SB_PAGEDOWN:
+            info.nPos-=info.nPage;
+            break;
+            
+        case SB_THUMBTRACK:
+            info.nPos=info.nTrackPos;
+            break;
+        default:
+            return;
+    }
+    if (info.nPos<info.nMin)
+        info.nPos=info.nMin;
+    if (info.nPos>info.nMax)
+        info.nPos=info.nMax;
+    
+    // update scroll bar settings    
+    info.fMask=SIF_POS;
+    SetScrollInfo(hToolWindowScrollBar,SB_VERT,&info,true);
+    
+    // scroll window
+    GetClientRect(hToolWindowCurrentTabContainer,&rect);
+    amount=prevPos-info.nPos;
+    ScrollWindowEx(hToolWindowCurrentTabContainer,0,amount,NULL,NULL,NULL,&rect,SW_ERASE|SW_INVALIDATE|SW_SCROLLCHILDREN);
+
+    //if (amount<0)
+    //    rect.bottom=rect.top+amount;
+    //else
+     //   rect.top=rect.bottom-amount;    
+
+    //InvalidateRect(hToolWindowCurrentTabContainer,&rect,true);
+    UpdateWindow(hToolWindowCurrentTabContainer);
 }    
+
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -1601,7 +1681,7 @@ LRESULT CALLBACK ToolWindowScrollBarProcedure(HWND hwnd, UINT message, WPARAM wP
     /* handle the messages */    
     switch (message)
     {
-        case WM_VSCROLL:
+        case WM_VSCROLL:          
             scrollToolWindow(wParam);
             return 0;
                         

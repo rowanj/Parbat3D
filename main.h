@@ -95,5 +95,6 @@ int toggleMenuItemTick(HMENU hMenu,int itemId);
 void updateImageScrollbar();
 void updateImageWindowTitle();
 void updateToolWindowScrollbar();
+void scrollToolWindowToTop();
 
 #endif
