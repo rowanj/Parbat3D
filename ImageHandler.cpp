@@ -202,7 +202,7 @@ void ImageHandler::redraw(void)
 	
 	/* On to the main window */
 	gl_image->make_current();
-	glClearColor(0.3f, 0.1f, 0.1f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -436,7 +436,8 @@ int ImageHandler::set_LOD(int level_of_detail)
 	/* Set up as in set_viewport */
 	start_column = viewport_x / texture_size;
 	start_row = viewport_y / texture_size;
-	
+	if (start_column < 0) start_column = 0;
+	if (start_row < 0) start_row = 0;
 	LOD = level_of_detail;
 	make_textures();
 	redraw();
@@ -448,6 +449,8 @@ void ImageHandler::set_viewport(int x, int y)
 	viewport_y = y;
 	start_column = x / texture_size;
 	start_row = y / texture_size;
+	if (start_column < 0) start_column = 0;
+	if (start_row < 0) start_row = 0;
 	make_textures();
 	redraw();
 }
