@@ -183,9 +183,31 @@ void ImageHandler::redraw(void)
 		glTexCoord2f(0.0, 1.0);
 		glVertex3f(-0.5,-0.5, 0.0);
 	glEnd();
+	glDisable(GL_TEXTURE_2D);
+
+	/* Draw window box in overview window */
+	#if TRUE
+	glTranslatef(-0.5, 0.5, 0.0);
+	glScalef(1.0/(GLfloat)image_tileset->get_LOD_width(), 1.0/(GLfloat)image_tileset->get_LOD_height(), 1.0);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBegin(GL_LINE_LOOP);
+	{
+		glColor4f(1.0, 0.0, 0.0, 0.8);
+		/* top left */
+		glVertex3f((GLfloat)viewport_x, -(GLfloat)viewport_y, 0.0);
+		/* top right */
+		glVertex3f((GLfloat)(viewport_x + viewport_width), -(GLfloat)viewport_y, 0.0);
+		/* bottom right */
+		glVertex3f((GLfloat)(viewport_x + viewport_width), -(GLfloat)(viewport_y + viewport_height), 0.0);
+		/* bottom left */
+		glVertex3f((GLfloat)viewport_x, -(GLfloat)(viewport_y + viewport_height), 0.0);
+	}
+	glEnd();
+	glDisable(GL_BLEND);
+	#endif
 	
 	glPopMatrix(); // Restore model transform
-	glDisable(GL_TEXTURE_2D);
 	
 #if DEBUG_IMAGE_REDRAW
 	/* draw rotating line to visualize redraw frequency */
