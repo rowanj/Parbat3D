@@ -2,7 +2,8 @@
 //#include "TestUtils.h"
 #include <gl/gl.h>
 #include <gl/glu.h>
-#include <math.h>
+//#include <math.h>
+#include "MathUtils.h"
 
 #define PI 3.14159265
 
@@ -33,6 +34,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	viewport_y = 0;
 	tex_base_size = 0;
 	tex_base = NULL;
+	LOD = 1;
 	
 	// Check for lazily unspecified (NULL argument) parameters
 	if (!overview_hwnd) {
@@ -96,7 +98,8 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 
 	/* Initialize viewports */
 	this->resize_window();
-    this->set_LOD(1);
+	this->set_viewport(0,0);
+//    this->set_LOD(1);
 }
 
 ImageHandler::~ImageHandler(void)
@@ -350,14 +353,14 @@ void ImageHandler::make_textures(void)
 	
 	/* !! remove duplicates of this */
 	if (!image_tileset) {
-		image_tileset = new ImageTileSet(LOD, image_file, texture_size, 32 * 1024 * 1024);
+		image_tileset = new ImageTileSet(LOD, image_file, texture_size, 96 * 1024 * 1024);
 		image_columns = image_tileset->get_columns();
 		image_rows = image_tileset->get_rows();
 	}
 	
 	if (image_tileset->get_LOD() != LOD) {
 		delete image_tileset;
-		image_tileset = new ImageTileSet(LOD, image_file, texture_size, 32 * 1024 * 1024);
+		image_tileset = new ImageTileSet(LOD, image_file, texture_size, 96 * 1024 * 1024);
 		image_columns = image_tileset->get_columns();
 		image_rows = image_tileset->get_rows();
 	}
@@ -366,19 +369,15 @@ void ImageHandler::make_textures(void)
 	tex_count = viewport_columns * viewport_rows;
 	gl_image->make_current();
 
-	if (tex_base_size != tex_count) {
-		if (tex_base_size != 0) {
-			/* De-allocate textures */
-			glDeleteTextures(tex_base_size, tex_base);
-			/* Re-allocate indexes */
-			delete[] tex_base;
-		}
+	/* If textures were allocated, delete them */
+	if (tex_base_size) {
+		glDeleteTextures(tex_base_size, tex_base);
+		delete[] tex_base;
 	}
-	if (tex_base == NULL) {
-		tex_base = new GLuint[tex_count];
-		glGenTextures(tex_count, tex_base);
-		tex_base_size = tex_count;
-	}
+
+	tex_base = new GLuint[tex_count];
+	glGenTextures(tex_count, tex_base);
+	tex_base_size = tex_count;
 
 	for (ty = 0; ty < viewport_rows; ty++){
 		for (tx = 0; tx < viewport_columns; tx++) {
@@ -420,6 +419,23 @@ int ImageHandler::set_LOD(int level_of_detail)
 	sprintf(buffer, "(II) ImageHandler::set_LOD(%d) - Current: %d\n", level_of_detail, LOD);
 	Console::write(buffer);
 	#endif
+	
+	int previous_center_x, previous_center_y;
+	
+	/* In old-LOD coords*/
+	previous_center_x = viewport_x + (viewport_width/2);
+	previous_center_y = viewport_y + (viewport_height/2);
+	
+	if (level_of_detail < LOD) {
+		viewport_x = ((previous_center_x * MathUtils::ipow(2,LOD - level_of_detail))-(viewport_width/2));
+		viewport_y = ((previous_center_y * MathUtils::ipow(2,LOD - level_of_detail))-(viewport_height/2));
+	} else {
+		viewport_x = ((previous_center_x / MathUtils::ipow(2,level_of_detail-LOD))-(viewport_width/2));
+		viewport_y = ((previous_center_y / MathUtils::ipow(2,level_of_detail-LOD))-(viewport_height/2));
+	}
+	/* Set up as in set_viewport */
+	start_column = viewport_x / texture_size;
+	start_row = viewport_y / texture_size;
 	
 	LOD = level_of_detail;
 	make_textures();
