@@ -83,20 +83,22 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	char message[256];
 	int pix, piy, size;
 	
+	/* Make room to put texture in */
+	size = tex_size * tex_size * 3;
+	out_tile = new char[size];
 	#if DEBUG_IMAGE_TILESET
 	Console::write("(II) ImageTileset::get_tile_RGB\n");
 	#endif
 	/* Check if tile is loaded, load if not */
-	tile_index = load_tile(x,y);
+	
 	#if DEBUG_IMAGE_TILESET
 	sprintf(message, "(II) ImageTileset::get_tile_RGB - tile cache: hits=%d, misses=%d.\n", cache_hits, cache_misses);
 	Console::write(message);
 	#endif
+	tile_index = this->load_tile(x,y);
 	tile = tiles[tile_index]->data;
 
-	/* Make room to put texture in */
-	size = tex_size * tex_size * 3;
-	out_tile = new char[size];
+	
 
 	/* Prevent bug on single channel images */
 	if(band_R>num_bands) band_R = num_bands;
