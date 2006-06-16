@@ -1,0 +1,17 @@
+Parbat3D was designed and developed by a team of 5 3rd-year Bachelor of Computing students at the University of Tasmania's Hobart campus during 2006.
+
+It was created to fulfil the requirements of Dr. Arko Lucieer, to display and visualize data from satellite imagery.
+
+Dr. Lucieer's concept implementation, Parbat - was developed in Java some two years earlier, and is hosted at
+http://www.parbat.net/
+
+Team Imagery
+============
+School of Computing
+University of Tasmania
+
+Damian Brockie		<dbrockie@utas.edu.au>
+Rowan James		<rowanjames@users.sourceforge.net>
+Shane Kingston		<shanek@utas.edu.au>
+Matt McKellar-Spence	<mtms@utas.edu.au>
+Dafydd Williams		<pipeline@atmos.com.au>

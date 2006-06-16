@@ -1,0 +1,4 @@
+2006-06-16  Rowan James  <rowanjames@users.sourceforge.net>
+
+	* AUTHORS.txt: Added inital text
+	* SubVersion: Tagged release-1 and re-structured heirachy
