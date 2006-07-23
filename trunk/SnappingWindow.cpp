@@ -85,7 +85,7 @@ void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RE
     int moveLeftOffset=newRect->left-oldRect->left;
     int moveTopOffset=newRect->top-oldRect->top;
     if (moveImageWindow)
-        moveWindowByOffset(hImageWindow,prevImageWindowRect,moveLeftOffset,moveTopOffset);
+        moveWindowByOffset(ImageWindow::hImageWindow,prevImageWindowRect,moveLeftOffset,moveTopOffset);
     if (moveToolWindow)
         moveWindowByOffset(hToolWindow,prevToolWindowRect,moveLeftOffset,moveTopOffset);
 }

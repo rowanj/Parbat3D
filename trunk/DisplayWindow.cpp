@@ -69,7 +69,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
         case WM_MOUSEMOVE:
             {
                 /* check if image is open, mouse has moved on image window & the query tab is displayed in the tool window */
-                if ((image_handler)&&(hwnd==hImageWindowDisplay)&&(hToolWindowCurrentTabContainer==hToolWindowQueryTabContainer)) {
+                if ((image_handler)&&(hwnd==ImageWindow::hImageWindowDisplay)&&(hToolWindowCurrentTabContainer==hToolWindowQueryTabContainer)) {
                     /* Get mouse screen position */
                     int mx = (short)LOWORD(lParam);
                     int my = (short)HIWORD(lParam);

@@ -51,12 +51,12 @@ int OverviewWindow::setupWindow()
     RECT rect;
     
     /* get co-ords of image window */
-    GetWindowRect(hImageWindow,&rect);
+    GetWindowRect(ImageWindow::hImageWindow,&rect);
         
     /* Create overview window */
     OverviewWindow::hOverviewWindow = CreateWindowEx(0, szOverviewWindowClassName, "Parbat3D",
 		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, rect.left-OverviewWindow::OVERVIEW_WINDOW_WIDTH, rect.top, OVERVIEW_WINDOW_WIDTH, 296,
-		hImageWindow, NULL, hThisInstance, NULL);
+		ImageWindow::hImageWindow, NULL, hThisInstance, NULL);
     if (!hOverviewWindow)
         return false;                        
 
@@ -149,9 +149,9 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                           
              	case IDM_IMAGEWINDOW:
                     if (toggleMenuItemTick(hMainMenu,IDM_IMAGEWINDOW))
-                        ShowWindow(hImageWindow,SW_SHOW);                        
+                        ShowWindow(ImageWindow::hImageWindow,SW_SHOW);                        
                     else
-                        ShowWindow(hImageWindow,SW_HIDE);
+                        ShowWindow(ImageWindow::hImageWindow,SW_HIDE);
                     return 0;
              
                 case IDM_TOOLSWINDOW:
@@ -191,15 +191,15 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                      
                 /* record current window positions */
                 GetWindowRect(hwnd,&prevOverviewWindowRect);  
-                GetWindowRect(hImageWindow,&prevImageWindowRect); 
+                GetWindowRect(ImageWindow::hImageWindow,&prevImageWindowRect); 
                 GetWindowRect(hToolWindow,&prevToolWindowRect);
                
                 /* find out which windows are connected & which are in a normal state */
-                imageNormalState=isWindowInNormalState(hImageWindow);
+                imageNormalState=isWindowInNormalState(ImageWindow::hImageWindow);
                 toolNormalState=isWindowInNormalState(hToolWindow);
-                imageAndMainSnapped=(isWindowSnapped(hOverviewWindow,hImageWindow));
+                imageAndMainSnapped=(isWindowSnapped(hOverviewWindow,ImageWindow::hImageWindow));
                 toolAndMainSnapped=(isWindowSnapped(hOverviewWindow,hToolWindow));
-                toolAndImageSnapped=(isWindowSnapped(hToolWindow,hImageWindow));
+                toolAndImageSnapped=(isWindowSnapped(hToolWindow,ImageWindow::hImageWindow));
 
                 /* calculate whether the image window should be moved */
                 if (imageNormalState)
@@ -241,7 +241,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             snapInsideWindowByMoving(hDesktop,(RECT*)lParam);
 
             if (!moveImageWindow)
-                snapWindowByMoving(hImageWindow,(RECT*)lParam); 
+                snapWindowByMoving(ImageWindow::hImageWindow,(RECT*)lParam); 
 
             /* snap main window to tool window, if near it, if it's not already snapped */
             if (!moveToolWindow)

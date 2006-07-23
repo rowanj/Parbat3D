@@ -10,8 +10,8 @@
 #include "ImageHandler.h"
 #include "ImageWindow.h"
 
-HWND hImageWindow=NULL;
-HWND hImageWindowDisplay;
+HWND ImageWindow::hImageWindow=NULL;
+HWND ImageWindow::hImageWindowDisplay;
 
 char szImageWindowClassName[] = "Parbat3D Image Window";
 
@@ -19,14 +19,14 @@ char szImageWindowClassName[] = "Parbat3D Image Window";
 /* Image Window Functions */
 
 /* register image window class */
-int registerImageWindow()
+int ImageWindow::registerImageWindow()
 {
     WNDCLASSEX wincl;  /* Datastructure for the windowclass */
 
     /* The Window structure */
     wincl.hInstance = hThisInstance;                /* process's instance handle */
     wincl.lpszClassName = szImageWindowClassName;   /* our unique name for this class */
-    wincl.lpfnWndProc = ImageWindowProcedure;      /* This function is called by windows */
+    wincl.lpfnWndProc = ImageWindow::ImageWindowProcedure;      /* This function is called by windows */
     wincl.style = CS_DBLCLKS; /* Ctach double-clicks */
     wincl.cbSize = sizeof(WNDCLASSEX);
 
@@ -45,7 +45,7 @@ int registerImageWindow()
 }
 
 /* create the image window */
-int setupImageWindow()
+int ImageWindow::setupImageWindow()
 {   
     RECT rect;
     int mx,my;
@@ -87,7 +87,7 @@ int setupImageWindow()
 }
 
 /* display image information in image window's title bar */
-void updateImageWindowTitle()
+void ImageWindow::updateImageWindowTitle()
 {
     /* Display the file name & zoom level on the image window title bar */
     string leader = "Image - ";
@@ -98,7 +98,7 @@ void updateImageWindowTitle()
 }
 
 /* update image window's scroll bar display settings  */
-void updateImageScrollbar()
+void ImageWindow::updateImageScrollbar()
 {
     int LOD_width,LOD_height;
 
@@ -149,7 +149,7 @@ void updateImageScrollbar()
 }
 
 /* scroll image window horizontally */
-void scrollImageX(int scrollMsg)
+void ImageWindow::scrollImageX(int scrollMsg)
 {
     SCROLLINFO info;
 
@@ -197,7 +197,7 @@ void scrollImageX(int scrollMsg)
 }
 
 /* scroll image window vertically */
-void scrollImageY(int scrollMsg)
+void ImageWindow::scrollImageY(int scrollMsg)
 {
     SCROLLINFO info;
 
@@ -245,7 +245,7 @@ void scrollImageY(int scrollMsg)
 }
 
 /* zoom the image in/out */
-void zoomImage(int nlevels)
+void ImageWindow::zoomImage(int nlevels)
 {
     const int MAX_LOD=6;
     int LOD;
@@ -266,7 +266,7 @@ void zoomImage(int nlevels)
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
 /* All messages/events related to the image window (or it's controls) are sent to this procedure */
-LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static POINT moveMouseOffset;     /* mouse offset relative to window, used for snapping */
     static POINT sizeMousePosition;   /* mouse position, used for sizing window */

@@ -57,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 
     
     /* Register window classes */
-    if ((!registerMainWindow()) || (!registerToolWindow()) || (!registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
+    if ((!registerMainWindow()) || (!registerToolWindow()) || (!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
     {
         /* report error if window classes could not be registered */
         MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
@@ -67,7 +67,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Setup main & image windows */
     //  note: image window must be created before main window
     //  note: tool window is only setup when an image is loaded
-    if ((!setupMainWindow()) || (!setupImageWindow()) || (!OverviewWindow::setupWindow()))
+    if ((!setupMainWindow()) || (!ImageWindow::setupImageWindow()) || (!OverviewWindow::setupWindow()))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
@@ -88,8 +88,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 void orderWindows()
 {
     //SetWindowPos(hOverviewWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);        
-    SetWindowPos(hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
-    SetWindowPos(hImageWindow,OverviewWindow::hOverviewWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(ImageWindow::hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(ImageWindow::hImageWindow,OverviewWindow::hOverviewWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
 
 
 }    
@@ -116,7 +116,7 @@ void loadFile()
 		// Clean up any previous instance
 		closeFile();
 
-	    image_handler = new ImageHandler::ImageHandler(OverviewWindow::hOverviewWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
+	    image_handler = new ImageHandler::ImageHandler(OverviewWindow::hOverviewWindowDisplay, ImageWindow::hImageWindowDisplay, ofn.lpstrFile);
 	    if (image_handler) {
 			if (image_handler->status > 0) {
 				// An error occurred instantiaing the image handler class.
@@ -129,20 +129,20 @@ void loadFile()
     			{
                     // update image window settings
                     filename=(char*)image_handler->get_image_properties()->getFileName();
-                    updateImageWindowTitle();              
-                    updateImageScrollbar();      
+                    ImageWindow::updateImageWindowTitle();              
+                    ImageWindow::updateImageScrollbar();      
 
                     // re-create tool window
                     setupToolWindow();
                     
                     // show tool & image windows
                     ShowWindow(hToolWindow,SW_SHOW);
-                    ShowWindow(hImageWindow,SW_SHOW);    
+                    ShowWindow(ImageWindow::hImageWindow,SW_SHOW);    
                     orderWindows();                    
 
                     // update opengl displays
                     RedrawWindow(OverviewWindow::hOverviewWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
-                    RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
+                    RedrawWindow(ImageWindow::hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
 
                     // enable window menu items
                     EnableMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,false);
@@ -171,9 +171,9 @@ void closeFile()
         hToolWindow=NULL;
     }    
     
-    if (hImageWindow)
+    if (ImageWindow::hImageWindow)
     {
-        ShowWindow(hImageWindow,SW_HIDE);
+        ShowWindow(ImageWindow::hImageWindow,SW_HIDE);
     }
 
     /* disable menu items */

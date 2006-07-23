@@ -85,7 +85,7 @@ int setupToolWindow()
     /* The class is registered, lets create the program*/
     hToolWindow =CreateWindowEx(0, szToolWindowClassName, "Tools",
            WS_POPUP+WS_CAPTION+WS_SYSMENU, rect.left, rect.bottom,
-           250, 300, hImageWindow, NULL, hThisInstance, NULL);
+           250, 300, ImageWindow::hImageWindow, NULL, hThisInstance, NULL);
 
     if (hToolWindow==NULL)
         return false;
@@ -705,7 +705,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             
             /* if new position is near main window, snap to it */    
             snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
-            snapWindowByMoving(hImageWindow,(RECT*)lParam);
+            snapWindowByMoving(ImageWindow::hImageWindow,(RECT*)lParam);
             break;
         
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
