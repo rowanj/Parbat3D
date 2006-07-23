@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include "Settings.h"
+#include "DisplayWindow.h"
 #include "ImageHandler.h"
 #include "ToolWindow.h"
 #include "ImageWindow.h"

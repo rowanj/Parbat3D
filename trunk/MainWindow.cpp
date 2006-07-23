@@ -3,6 +3,7 @@
 #include "ImageWindow.h"
 #include "OverviewWindow.h"
 #include "ToolWindow.h"
+#include "MainWindow.h"
 
 HWND hMainWindow=NULL;
 

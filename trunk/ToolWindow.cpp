@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <Commctrl.h>
+#include "ToolWindow.h"
 #include "main.h"
 #include "OverviewWindow.h"
 #include "ImageWindow.h"

@@ -8,6 +8,7 @@
 #include "ToolWindow.h"
 #include "Settings.h"
 #include "ImageHandler.h"
+#include "ImageWindow.h"
 
 HWND hImageWindow=NULL;
 HWND hImageWindowDisplay;
