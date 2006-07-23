@@ -1,9 +1,10 @@
 
 #include <Windows.h>
-#include "settings.h"
 #include "main.h"
 #include "SnappingWindow.h"
-#include "console.h"
+#include "ImageWindow.h"
+#include "ToolWindow.h"
+//#include "console.h"
 
 /* calculates window's new position based on the location of the mouse cursor */
 void setNewWindowPosition(RECT* newPos,POINT *mouseOffset)

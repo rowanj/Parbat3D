@@ -1,58 +1,19 @@
 #ifndef _PARBAT_MAIN_H
 #define _PARBAT_MAIN_H
 
-#define ID_MENU             501
+#include "resources.h"
+#include "Settings.h"
+#include "ImageHandler.h"
 
-#define IDM_FILEOPEN        201
-#define IDM_FILESAVE        202
-#define IDM_FILESAVEAS      203
-#define IDM_FILECLOSE       205
-#define IDM_FILEEXIT        207
-
-#define IDM_IMAGEWINDOW     210
-#define IDM_TOOLSWINDOW     211
-
-#define IDM_HELPCONTENTS    215
-#define IDM_HELPABOUT       218
-
-/* global variable declarations
-    -added these so main.cpp can be split up into multiple files -shane */
-extern char szMainWindowClassName[];
-extern char szImageWindowClassName[];
-extern char szToolWindowClassName[];
-extern char szDisplayClassName[];
+extern ImageHandler::ImageHandler* image_handler;
 extern char szStaticControl[];
 extern HINSTANCE hThisInstance;
-extern HWND hRed, hBlue, hGreen;
-extern HWND hMainWindow,hImageWindow, hToolWindow, hDesktop;
-extern HMENU hMainMenu;
-extern HWND hToolWindowTabControl, hToolWindowDisplayTabContainer;
-extern HWND hToolWindowQueryTabContainer, hToolWindowImageTabContainer;
-extern HWND hRedRadioButton1, hRedRadioButton2;
-extern HWND hGreenRadioButton1, hGreenRadioButton2;
-extern HWND hBlueRadioButton1, hBlueRadioButton2;
-extern HWND hImageWindowDisplay;
-extern HWND hMainWindowDisplay;
-extern HWND hupdate;
-
-extern int bands;
-extern HWND *redRadiobuttons;
-extern HWND *greenRadiobuttons;
-extern HWND *blueRadiobuttons;
-extern int imageWindowIsSnapped;
-extern int toolWindowIsSnapped;
-
-/* Define id numbers for the tab's in the tool window */
-//enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID};
-
-/* Used for loading and saving window position and sizes */
+extern HWND hDesktop;
 extern settings winPos;
+extern char *filename;
+enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID};
 
-/* objects used for painting/drawing */
-extern HFONT hBoldFont,hNormalFont,hHeadingFont;
-extern HPEN hTabPen;
-extern HBRUSH hTabBrush;
-extern WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc;
+
 
 /* function declarations */
 

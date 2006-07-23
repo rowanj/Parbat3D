@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include "main.h"
+#include "resources.h"
 
 501 MENU 
 BEGIN
