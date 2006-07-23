@@ -6,16 +6,16 @@
 #include "ImageWindow.h"
 #include "main.h"
 
-char szDisplayClassName[] = "Parbat3D Display Window";
+char DisplayWindow::szDisplayClassName[] = "Parbat3D Display Window";
 
-int registerDisplayWindow()
+int DisplayWindow::registerWindow()
 {
     WNDCLASSEX wincl;
     
     /* Create window class for the display control windows */
     wincl.hInstance = hThisInstance;
     wincl.lpszClassName = szDisplayClassName;
-    wincl.lpfnWndProc = DisplayWindowProcedure;  /* This function is called by windows */
+    wincl.lpfnWndProc = DisplayWindow::WindowProcedure;  /* This function is called by windows */
     wincl.style = CS_DBLCLKS;  /* Ctach double-clicks */
     wincl.cbSize = sizeof(WNDCLASSEX);
     /* Use default icon and mousepointer */
@@ -32,7 +32,7 @@ int registerDisplayWindow()
 
 /* This function is called by the Windows function DispatchMessage( ) */
 /* All messages/events related to one of the display windows are sent to this procedure */
-LRESULT CALLBACK DisplayWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static PAINTSTRUCT ps;
     static HDC hdc;

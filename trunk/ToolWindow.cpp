@@ -80,7 +80,7 @@ int setupToolWindow()
 
     
     /* Get Main Window Location for image window alignment*/
-    GetWindowRect(hOverviewWindow,&rect);
+    GetWindowRect(OverviewWindow::hOverviewWindow,&rect);
     
     /* The class is registered, lets create the program*/
     hToolWindow =CreateWindowEx(0, szToolWindowClassName, "Tools",
@@ -704,7 +704,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
             snapInsideWindowByMoving(hDesktop,(RECT*)lParam);  
             
             /* if new position is near main window, snap to it */    
-            snapWindowByMoving(hOverviewWindow,(RECT*)lParam);
+            snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
             snapWindowByMoving(hImageWindow,(RECT*)lParam);
             break;
         
@@ -725,9 +725,9 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
             if (wParam)
-                CheckMenuItem(hMainMenu,IDM_TOOLSWINDOW,MF_CHECKED|MF_BYCOMMAND);            
+                CheckMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,MF_CHECKED|MF_BYCOMMAND);            
             else
-                CheckMenuItem(hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
+                CheckMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
                 
         /* WM_CLOSE: system or user has requested to close the window/application */              
@@ -738,7 +738,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
         /* WM_DESTORY: system is destroying our window */                
         case WM_DESTROY:
-            CheckMenuItem(hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
+            CheckMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             return 0;
 
         default: 

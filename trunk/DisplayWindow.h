@@ -1,8 +1,10 @@
 
-extern int registerDisplayWindow();
+class DisplayWindow
+{
+    public:
+    static int registerWindow();
+    static char szDisplayClassName[];
+    static CALLBACK LRESULT WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+};
 
-extern char szDisplayClassName[];
-
-int registerDisplayWindow();
-LRESULT CALLBACK DisplayWindowProcedure(HWND, UINT, WPARAM, LPARAM);
 

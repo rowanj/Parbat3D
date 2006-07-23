@@ -7,9 +7,9 @@
 #include "DisplayWindow.h"
 #include "MainWindow.h"
 
-HMENU hMainMenu;
-HWND hOverviewWindowDisplay;
-HWND hOverviewWindow=NULL;
+HMENU OverviewWindow::hMainMenu;
+HWND OverviewWindow::hOverviewWindowDisplay;
+HWND OverviewWindow::hOverviewWindow=NULL;
 
 char szOverviewWindowClassName[] = "Parbat3D Overview Window";
 
@@ -17,14 +17,14 @@ char szOverviewWindowClassName[] = "Parbat3D Overview Window";
 /* Overview Window Functions */
 
 /* register overview window's class */
-int registerOverviewWindow()
+int OverviewWindow::registerWindow()
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
         
     /* The Window structure */
     wincl.hInstance = hThisInstance;
     wincl.lpszClassName = szOverviewWindowClassName;
-    wincl.lpfnWndProc = OverviewWindowProcedure; /* This function is called by windows */
+    wincl.lpfnWndProc = OverviewWindow::WindowProcedure; /* This function is called by windows */
     wincl.style = CS_DBLCLKS;  /* Ctach double-clicks */
     wincl.cbSize = sizeof(WNDCLASSEX);
 
@@ -45,7 +45,7 @@ int registerOverviewWindow()
 
 
 /* setup overview window */
-int setupOverviewWindow()
+int OverviewWindow::setupWindow()
 {
 
     RECT rect;
@@ -54,8 +54,8 @@ int setupOverviewWindow()
     GetWindowRect(hImageWindow,&rect);
         
     /* Create overview window */
-    hOverviewWindow = CreateWindowEx(0, szOverviewWindowClassName, "Parbat3D",
-		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, rect.left-OVERVIEW_WINDOW_WIDTH, rect.top, OVERVIEW_WINDOW_WIDTH, 296,
+    OverviewWindow::hOverviewWindow = CreateWindowEx(0, szOverviewWindowClassName, "Parbat3D",
+		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, rect.left-OverviewWindow::OVERVIEW_WINDOW_WIDTH, rect.top, OVERVIEW_WINDOW_WIDTH, 296,
 		hImageWindow, NULL, hThisInstance, NULL);
     if (!hOverviewWindow)
         return false;                        
@@ -70,28 +70,28 @@ int setupOverviewWindow()
     EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);    
 
     /* get client area of image window */
-    GetClientRect(hOverviewWindow,&rect);
+    GetClientRect(OverviewWindow::hOverviewWindow,&rect);
 
     /* setup font objects */
-    HDC hdc=GetDC(hOverviewWindow);      
+    HDC hdc=GetDC(OverviewWindow::hOverviewWindow);      
     hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
     hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
     hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
-    ReleaseDC(hOverviewWindow,hdc);    
+    ReleaseDC(OverviewWindow::hOverviewWindow,hdc);    
 
     /* create a child window that will be used by OpenGL */
-    hOverviewWindowDisplay=CreateWindowEx( 0, szDisplayClassName, NULL, WS_CHILD|WS_VISIBLE,
+    hOverviewWindowDisplay=CreateWindowEx( 0, DisplayWindow::szDisplayClassName, NULL, WS_CHILD|WS_VISIBLE,
 		rect.left, rect.top, rect.right, rect.bottom, hOverviewWindow, NULL, hThisInstance, NULL);
    
     /* Make the window visible on the screen */
-    ShowWindow(hOverviewWindow, SW_SHOW);
+    ShowWindow(OverviewWindow::hOverviewWindow, SW_SHOW);
     
     return true;
 }
 
 /* toggles a menu item between a checked & unchecked state */
 /* returns true if new state is checked, else false if unchecked */
-int toggleMenuItemTick(HMENU hMenu,int itemId)
+int OverviewWindow::toggleMenuItemTick(HMENU hMenu,int itemId)
 {
     int menuState=GetMenuState(hMenu,itemId,MF_BYCOMMAND);
     if (menuState&MF_CHECKED)
@@ -109,7 +109,7 @@ int toggleMenuItemTick(HMENU hMenu,int itemId)
 
 /* This function is called by the Windows function DispatchMessage( ) */
 /* All messages/events related to the main window (or it's controls) are sent to this procedure */
-LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     /* static variables used for snapping windows */
     static POINT snapMouseOffset;           /* mouse co-ords relative to position of window */
@@ -256,8 +256,8 @@ LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam,
         case WM_SIZE:
                 
             /* resize display/opengl window to fit new size */
-            GetClientRect(hOverviewWindow,&rect);
-            MoveWindow(hOverviewWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
+            GetClientRect(OverviewWindow::hOverviewWindow,&rect);
+            MoveWindow(OverviewWindow::hOverviewWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
             return 0;
                    
         /* WM_SYSCOMMAND: a system-related command associated with window needs to be executed */    
@@ -275,7 +275,7 @@ LRESULT CALLBACK OverviewWindowProcedure(HWND hwnd, UINT message, WPARAM wParam,
         case WM_CLOSE:
             // Shut down the image file and OpenGL
 			if (image_handler) { // Was instantiated
-                if (MessageBox(hOverviewWindow,"Are you sure you wish quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
+                if (MessageBox(OverviewWindow::hOverviewWindow,"Are you sure you wish quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
                     return 0;
                 closeFile();
 			}

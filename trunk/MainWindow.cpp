@@ -79,7 +79,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                         ShowWindow(hImageWindow,imageWindowState);
                     if (toolWindowState!=0)
                         ShowWindow(hToolWindow,toolWindowState);
-                    ShowWindow(hOverviewWindow,SW_SHOW);
+                    ShowWindow(OverviewWindow::hOverviewWindow,SW_SHOW);
                     break;
 
                 case SIZE_MINIMIZED:
@@ -112,7 +112,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                     /* hide the child windows */     
                     ShowWindow(hImageWindow,SW_HIDE);            
                     ShowWindow(hToolWindow,SW_HIDE);                    
-                    ShowWindow(hOverviewWindow,SW_HIDE);                    
+                    ShowWindow(OverviewWindow::hOverviewWindow,SW_HIDE);                    
                     break;
 		    }    
   	       return 0;

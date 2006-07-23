@@ -57,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 
     
     /* Register window classes */
-    if ((!registerMainWindow()) || (!registerToolWindow()) || (!registerImageWindow()) || (!registerOverviewWindow()) || (!registerDisplayWindow()))
+    if ((!registerMainWindow()) || (!registerToolWindow()) || (!registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
     {
         /* report error if window classes could not be registered */
         MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
@@ -67,7 +67,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Setup main & image windows */
     //  note: image window must be created before main window
     //  note: tool window is only setup when an image is loaded
-    if ((!setupMainWindow()) || (!setupImageWindow()) || (!setupOverviewWindow()))
+    if ((!setupMainWindow()) || (!setupImageWindow()) || (!OverviewWindow::setupWindow()))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
@@ -89,7 +89,7 @@ void orderWindows()
 {
     //SetWindowPos(hOverviewWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);        
     SetWindowPos(hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
-    SetWindowPos(hImageWindow,hOverviewWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(hImageWindow,OverviewWindow::hOverviewWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
 
 
 }    
@@ -102,7 +102,7 @@ void loadFile()
     ZeroMemory(&ofn, sizeof(ofn));
 
     ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW - which note?
-    ofn.hwndOwner = hOverviewWindow;
+    ofn.hwndOwner = OverviewWindow::hOverviewWindow;
     ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tif;*.j2k;*.jp2\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPEG (*.jpg)\0*.jpg\0JPEG 2000 (*.j2k,*.jp2)\0*.j2k;*.jp2\0TIFF / GeoTIFF (*.tif)\0*.tif\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile = szFileName;
     ofn.nMaxFile = MAX_PATH;
@@ -116,7 +116,7 @@ void loadFile()
 		// Clean up any previous instance
 		closeFile();
 
-	    image_handler = new ImageHandler::ImageHandler(hOverviewWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
+	    image_handler = new ImageHandler::ImageHandler(OverviewWindow::hOverviewWindowDisplay, hImageWindowDisplay, ofn.lpstrFile);
 	    if (image_handler) {
 			if (image_handler->status > 0) {
 				// An error occurred instantiaing the image handler class.
@@ -141,17 +141,13 @@ void loadFile()
                     orderWindows();                    
 
                     // update opengl displays
-                    //InvalidateRect(hOverviewWindowDisplay,0,true);
-                    //UpdateWindow(hOverviewWindowDisplay);
-                    //InvalidateRect(hImageWindowDisplay,0,true);
-                    //UpdateWindow(hImageWindowDisplay);
-                    RedrawWindow(hOverviewWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
+                    RedrawWindow(OverviewWindow::hOverviewWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
                     RedrawWindow(hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
 
                     // enable window menu items
-                    EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,false);
-                    EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,false);
-                    EnableMenuItem(hMainMenu,IDM_FILECLOSE,false);
+                    EnableMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,false);
+                    EnableMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,false);
+                    EnableMenuItem(OverviewWindow::hMainMenu,IDM_FILECLOSE,false);
                             
                 }				
 			}
@@ -181,10 +177,10 @@ void closeFile()
     }
 
     /* disable menu items */
-    EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,true);
-    EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
-    EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);    
+    EnableMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,true);
+    EnableMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,true);
+    EnableMenuItem(OverviewWindow::hMainMenu,IDM_FILECLOSE,true);    
     
-    InvalidateRect(hOverviewWindowDisplay,0,true);  /* repaint main window */		
-    UpdateWindow(hOverviewWindowDisplay);
+    InvalidateRect(OverviewWindow::hOverviewWindowDisplay,0,true);  /* repaint main window */		
+    UpdateWindow(OverviewWindow::hOverviewWindowDisplay);
 }

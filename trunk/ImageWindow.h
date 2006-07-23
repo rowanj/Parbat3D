@@ -1,4 +1,9 @@
 
+class ImageWindow
+{
+    
+};
+
 extern HWND hImageWindow;
 extern HWND hImageWindowDisplay;
 

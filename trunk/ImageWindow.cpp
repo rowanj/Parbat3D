@@ -59,8 +59,8 @@ int setupImageWindow()
     mx = atoi(winPos.getSetting("OverviewX").c_str());
 	my = atoi(winPos.getSetting("OverviewY").c_str());
 	if ((mx <= 0) || (mx >= rect.right))
-        mx = (rect.right /2) - ((IMAGE_WINDOW_WIDTH+OVERVIEW_WINDOW_WIDTH) /2);         /* default x position to center windows */
-    mx+=OVERVIEW_WINDOW_WIDTH;                                                          /* leave room for overview window */
+        mx = (rect.right /2) - ((IMAGE_WINDOW_WIDTH+OverviewWindow::OVERVIEW_WINDOW_WIDTH) /2);         /* default x position to center windows */
+    mx+=OverviewWindow::OVERVIEW_WINDOW_WIDTH;                                                          /* leave room for overview window */
 	       
 	if ((my <= 0) || (my >= rect.bottom))
        my = (rect.bottom /2) - (IMAGE_WINDOW_HEIGHT/2);                                 /* default y position to center windows */
@@ -76,7 +76,7 @@ int setupImageWindow()
     GetClientRect(hImageWindow,&rect);
 
     /* create a child window that will be used by OpenGL */
-    hImageWindowDisplay=CreateWindowEx( 0, szDisplayClassName, NULL, WS_CHILD+WS_VISIBLE,
+    hImageWindowDisplay=CreateWindowEx( 0, DisplayWindow::szDisplayClassName, NULL, WS_CHILD+WS_VISIBLE,
 		rect.left, rect.top, rect.right, rect.bottom, hImageWindow, NULL, hThisInstance, NULL);
 
     if (hImageWindow==NULL)
@@ -313,7 +313,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
 
             /* snap the window to other windows if in range */
             snapInsideWindowByMoving(hDesktop,(RECT*)lParam);      
-            snapWindowByMoving(hOverviewWindow,(RECT*)lParam);
+            snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
             snapWindowByMoving(hToolWindow,(RECT*)lParam);            
             break;
     
@@ -327,7 +327,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
             snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
                         
             /* snap the window the main window (if near it) */
-            snapWindowBySizing(hOverviewWindow,(RECT*)lParam,(int)wParam);           
+            snapWindowBySizing(OverviewWindow::hOverviewWindow,(RECT*)lParam,(int)wParam);           
             break;
 
         /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            
@@ -345,9 +345,9 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
             if (wParam)
-                CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_CHECKED|MF_BYCOMMAND);            
+                CheckMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,MF_CHECKED|MF_BYCOMMAND);            
             else
-                CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
+                CheckMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
 
         case WM_HSCROLL:
@@ -371,7 +371,7 @@ LRESULT CALLBACK ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LP
 
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
-            CheckMenuItem(hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
+            CheckMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             return 0;
             
         default:
