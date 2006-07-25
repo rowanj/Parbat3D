@@ -16,14 +16,22 @@ ImageFile::ImageFile(char* theFilename)
 	GDALAllRegister();
 	
 	ifDataset = (GDALDataset *) GDALOpen(filename , GA_ReadOnly);
-	
-	properties = new ImageProperties(ifDataset, filename);
-	coordInfo = new CoordinateInfo(ifDataset);
-	
-	for (i=0;i<properties->getNumBands();i++)
+	if (ifDataset != NULL) //if we've not got a valid file
 	{
-		theBands.push_back(new BandInfo( (GDALRasterBand*) GDALGetRasterBand(ifDataset, i+1)));
-	}
+    	properties = new ImageProperties(ifDataset, filename);
+    	coordInfo = new CoordinateInfo(ifDataset);
+    	
+    	for (i=0;i<properties->getNumBands();i++)
+    	{
+    		theBands.push_back(new BandInfo( (GDALRasterBand*) GDALGetRasterBand(ifDataset, i+1)));
+    	}
+    }
+    else
+    {
+        properties = NULL;
+        coordInfo = NULL;
+		MessageBox (NULL, "This is not a valid image file!", "Parbat3D :: ImageFile", 0);
+    }
 }
 
 /*Closes the handles to our dataset.*/
