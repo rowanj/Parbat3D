@@ -204,6 +204,25 @@ void ImageHandler::redraw(void)
 		glVertex3f((GLfloat)viewport_x, -(GLfloat)(viewport_y + viewport_height), 0.0);
 	}
 	glEnd();
+	
+	/* Draw cross-hairs, for locating box when small */
+	glBegin(GL_LINES);
+	{
+		glColor4f(1.0, 0.0, 0.0, 0.2);
+		/* Left line */
+		glVertex3f(0.0, -(GLfloat)(viewport_y + (viewport_height/2)), 0.0);
+		glVertex3f((GLfloat)viewport_x, -(GLfloat)(viewport_y + (viewport_height/2)), 0.0);
+		/* Right line */
+		glVertex3f((GLfloat)image_width, -(GLfloat)(viewport_y + (viewport_height/2)), 0.0);
+		glVertex3f((GLfloat)(viewport_x + viewport_width), -(GLfloat)(viewport_y + (viewport_height/2)), 0.0);
+		/* Top line */
+		glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), 0.0, 0.0);
+		glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), -(GLfloat)viewport_y, 0.0);
+		/* Bottom line */
+		glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), -(GLfloat)image_height, 0.0);
+		glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), -(GLfloat)(viewport_y + viewport_height), 0.0);
+	}
+	glEnd();
 	glDisable(GL_BLEND);
 	#endif
 	
