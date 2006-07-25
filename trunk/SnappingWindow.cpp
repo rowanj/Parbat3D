@@ -7,7 +7,7 @@
 //#include "console.h"
 
 /* calculates window's new position based on the location of the mouse cursor */
-void setNewWindowPosition(RECT* newPos,POINT *mouseOffset)
+void SnappingWindow::setNewWindowPosition(RECT* newPos,POINT *mouseOffset)
 {
     POINT mouse;    /* mouse co-ords */
     
@@ -26,7 +26,7 @@ void setNewWindowPosition(RECT* newPos,POINT *mouseOffset)
 }
 
 /* calculates window's new size based on location of the mouse cursor */
-void setNewWindowSize(RECT* newPos,RECT* oldPos,POINT* oldMouse,int whichDirection)
+void SnappingWindow::setNewWindowSize(RECT* newPos,RECT* oldPos,POINT* oldMouse,int whichDirection)
 {
     POINT newMouse;    /* mouse co-ords */
     SIZE size;
@@ -74,13 +74,13 @@ void setNewWindowSize(RECT* newPos,RECT* oldPos,POINT* oldMouse,int whichDirecti
 }    
 
 /* move a window by a certain amount of pixels */
-void moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset)
+void SnappingWindow::moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int topOffset)
 {
     MoveWindow(hwnd,rect->left+leftOffset,rect->top+topOffset,rect->right-rect->left,rect->bottom-rect->top,true);
 }
 
 /* move snapped windows with the main window */
-void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RECT *prevToolWindowRect,int moveImageWindow,int moveToolWindow)
+void SnappingWindow::moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RECT *prevToolWindowRect,int moveImageWindow,int moveToolWindow)
 {
     int moveLeftOffset=newRect->left-oldRect->left;
     int moveTopOffset=newRect->top-oldRect->top;
@@ -91,7 +91,7 @@ void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RE
 }
 
 /* checks whether a window is in normal state (not hidden, minimized, or maximized) */
-int isWindowInNormalState(HWND hwnd)
+int SnappingWindow::isWindowInNormalState(HWND hwnd)
 {
     /* check if window is hidden,  maximized, or minimized */
     if ((!IsWindowVisible(hwnd)) || (IsZoomed(hwnd)) || (IsIconic(hwnd)))
@@ -100,7 +100,7 @@ int isWindowInNormalState(HWND hwnd)
     return true;
 }    
 
-int snapInsideWindowByMoving(HWND snapToWin,RECT *rect)
+int SnappingWindow::snapInsideWindowByMoving(HWND snapToWin,RECT *rect)
 {
     const int SNAP_PIXEL_RANGE=10;
     RECT snapToRect;
@@ -160,7 +160,7 @@ int snapInsideWindowByMoving(HWND snapToWin,RECT *rect)
 /* snap a window to another window (by moving it) if it is range */
 /* snapToWin=handle of window to snap to, rect=cords of window to be moved */
 /* returns: true if window has been snapped, false if not */
-int snapWindowByMoving(HWND snapToWin,RECT *rect)
+int SnappingWindow::snapWindowByMoving(HWND snapToWin,RECT *rect)
 {   
     const int SNAP_PIXEL_RANGE=10;
     RECT snapToRect;
@@ -221,7 +221,7 @@ int snapWindowByMoving(HWND snapToWin,RECT *rect)
 /* snap a window to another window (by resizing it) if it is range */
 /*  snapToWin=handle of window to snap to, rect=cords of window to be resized */
 /* returns: true if window has been snapped, false if not */
-int snapWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
+int SnappingWindow::snapWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
 {
     const int SNAP_PIXEL_RANGE=10;
     RECT snapToRect;
@@ -297,7 +297,7 @@ int snapWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
 }
 
 
-int snapInsideWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
+int SnappingWindow::snapInsideWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
 {
     const int SNAP_PIXEL_RANGE=10;
     RECT snapToRect;
@@ -365,7 +365,7 @@ int snapInsideWindowBySizing(HWND snapToWin,RECT *rect,int whichDirection)
 
 
 //calculate mouse co-ords relative to position of window
-void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
+void SnappingWindow::getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
 {
     RECT win;
     GetWindowRect(hwnd,&win);
@@ -375,7 +375,7 @@ void getMouseWindowOffset(HWND hwnd,int mx,int my,POINT *mouseOffset)
 
 
 /* calculates whether a window is connected to another by its border */
-int isWindowSnapped(HWND main,HWND sticky)
+int SnappingWindow::isWindowSnapped(HWND main,HWND sticky)
 {
     RECT rmain,rsticky;
     

@@ -693,7 +693,7 @@ LRESULT CALLBACK ToolWindow::ToolWindowProcedure(HWND hwnd, UINT message, WPARAM
             if(wParam == HTCAPTION)
             {
                /* get the mouse co-ords relative to the window */
-                getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
+                SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
             }
             /* also let windows handle this message */
             return DefWindowProc(hwnd, message, wParam, lParam); 
@@ -701,14 +701,14 @@ LRESULT CALLBACK ToolWindow::ToolWindowProcedure(HWND hwnd, UINT message, WPARAM
         /* WM_MOVING: the window is about to be moved to a new location */
         case WM_MOVING:
             /* set new window position based on position of mouse */
-            setNewWindowPosition((RECT*)lParam,&snapMouseOffset);
+            SnappingWindow::setNewWindowPosition((RECT*)lParam,&snapMouseOffset);
 
             /* if new position is near desktop edge, snap to it */
-            snapInsideWindowByMoving(hDesktop,(RECT*)lParam);  
+            SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);  
             
             /* if new position is near main window, snap to it */    
-            snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
-            snapWindowByMoving(ImageWindow::hImageWindow,(RECT*)lParam);
+            SnappingWindow::snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
+            SnappingWindow::snapWindowByMoving(ImageWindow::hImageWindow,(RECT*)lParam);
             break;
         
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */

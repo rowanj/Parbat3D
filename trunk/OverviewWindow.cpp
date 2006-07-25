@@ -187,7 +187,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             {
 
                 /* record mouse position relative to window position */
-                getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
+                SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
                      
                 /* record current window positions */
                 GetWindowRect(hwnd,&prevOverviewWindowRect);  
@@ -195,11 +195,11 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 GetWindowRect(ToolWindow::hToolWindow,&prevToolWindowRect);
                
                 /* find out which windows are connected & which are in a normal state */
-                imageNormalState=isWindowInNormalState(ImageWindow::hImageWindow);
-                toolNormalState=isWindowInNormalState(ToolWindow::hToolWindow);
-                imageAndMainSnapped=(isWindowSnapped(hOverviewWindow,ImageWindow::hImageWindow));
-                toolAndMainSnapped=(isWindowSnapped(hOverviewWindow,ToolWindow::hToolWindow));
-                toolAndImageSnapped=(isWindowSnapped(ToolWindow::hToolWindow,ImageWindow::hImageWindow));
+                imageNormalState=SnappingWindow::isWindowInNormalState(ImageWindow::hImageWindow);
+                toolNormalState=SnappingWindow::isWindowInNormalState(ToolWindow::hToolWindow);
+                imageAndMainSnapped=(SnappingWindow::isWindowSnapped(hOverviewWindow,ImageWindow::hImageWindow));
+                toolAndMainSnapped=(SnappingWindow::isWindowSnapped(hOverviewWindow,ToolWindow::hToolWindow));
+                toolAndImageSnapped=(SnappingWindow::isWindowSnapped(ToolWindow::hToolWindow,ImageWindow::hImageWindow));
 
                 /* calculate whether the image window should be moved */
                 if (imageNormalState)
@@ -235,21 +235,21 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
         case WM_MOVING:
 
             /* set new window position based on position of mouse */
-            setNewWindowPosition((RECT*)lParam,&snapMouseOffset);            
+            SnappingWindow::setNewWindowPosition((RECT*)lParam,&snapMouseOffset);            
             
             /* snap main window to edge of desktop */           
-            snapInsideWindowByMoving(hDesktop,(RECT*)lParam);
+            SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);
 
             if (!moveImageWindow)
-                snapWindowByMoving(ImageWindow::hImageWindow,(RECT*)lParam); 
+                SnappingWindow::snapWindowByMoving(ImageWindow::hImageWindow,(RECT*)lParam); 
 
             /* snap main window to tool window, if near it, if it's not already snapped */
             if (!moveToolWindow)
-                snapWindowByMoving(ToolWindow::hToolWindow,(RECT*)lParam);
+                SnappingWindow::snapWindowByMoving(ToolWindow::hToolWindow,(RECT*)lParam);
             
             /* move the snapped windows relative to main window's new position */
             /* only moves the windows that were already snapped to the main window */
-            moveSnappedWindows((RECT*)lParam,&prevOverviewWindowRect,&prevImageWindowRect,&prevToolWindowRect,moveImageWindow,moveToolWindow);
+            SnappingWindow::moveSnappedWindows((RECT*)lParam,&prevOverviewWindowRect,&prevImageWindowRect,&prevToolWindowRect,moveImageWindow,moveToolWindow);
             return 0;
 
         /* WM_SIZE: the window has been re-sized, minimized, maximised or restored */

@@ -283,7 +283,7 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
                 /* HTCAPTION: mouse button was pressed down on the window title bar */                            
                 case HTCAPTION:
                     /* get the mouse co-ords relative to the window */
-                    getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&moveMouseOffset);               
+                    SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&moveMouseOffset);               
                     break;
 
                 /* HTLEFT...HTBOTTOMRIGHT: mouse button was pressed down on the sizing border of window */  
@@ -309,25 +309,25 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
         case WM_MOVING:
 
             /* set new window position based on position of mouse */
-            setNewWindowPosition((RECT*)lParam,&moveMouseOffset);
+            SnappingWindow::setNewWindowPosition((RECT*)lParam,&moveMouseOffset);
 
             /* snap the window to other windows if in range */
-            snapInsideWindowByMoving(hDesktop,(RECT*)lParam);      
-            snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
-            snapWindowByMoving(ToolWindow::hToolWindow,(RECT*)lParam);            
+            SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);      
+            SnappingWindow::snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
+            SnappingWindow::snapWindowByMoving(ToolWindow::hToolWindow,(RECT*)lParam);            
             break;
     
         /* WM_SIZING: the window size is about to change */
         case WM_SIZING:
 
             /* set new window size based on position of mouse */
-            setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
+            SnappingWindow::setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
 
             /* snap the window to the edge of the desktop (if near it) */
-            snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
+            SnappingWindow::snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
                         
             /* snap the window the main window (if near it) */
-            snapWindowBySizing(OverviewWindow::hOverviewWindow,(RECT*)lParam,(int)wParam);           
+            SnappingWindow::snapWindowBySizing(OverviewWindow::hOverviewWindow,(RECT*)lParam,(int)wParam);           
             break;
 
         /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            
