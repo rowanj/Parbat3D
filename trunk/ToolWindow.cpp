@@ -652,11 +652,6 @@ void ToolWindow::scrollToolWindow(int msg)
     amount=prevPos-info.nPos;
     ScrollWindowEx(hToolWindowCurrentTabContainer,0,amount,NULL,NULL,NULL,&rect,SW_ERASE|SW_INVALIDATE|SW_SCROLLCHILDREN);
 
-    //if (amount<0)
-    //    rect.bottom=rect.top+amount;
-    //else
-     //   rect.top=rect.bottom-amount;    
-
     //InvalidateRect(hToolWindowCurrentTabContainer,&rect,true);
     UpdateWindow(hToolWindowCurrentTabContainer);
 }    
@@ -672,11 +667,12 @@ LRESULT CALLBACK ToolWindow::ToolWindowProcedure(HWND hwnd, UINT message, WPARAM
     switch (message)                  /* handle the messages */
     {
         case WM_CREATE:
-            setupDrawingObjects(hwnd);    /* setup fonts, brushes, etc */
+            /* setup fonts, brushes, etc */
+            setupDrawingObjects(hwnd);    
             break;                
         
-        /* WM_NOTIFY: notification of certain events related to controls */
         case WM_NOTIFY:
+            /* handle change in tab selection  */
             nmhdr=(NMHDR*)lParam;
             switch(nmhdr->code)
             {                   
@@ -686,10 +682,8 @@ LRESULT CALLBACK ToolWindow::ToolWindowProcedure(HWND hwnd, UINT message, WPARAM
             }    
             break;
 
-        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
         case WM_NCLBUTTONDOWN:
-            /* HTCAPTION: mouse button was pressed down on the window title bar
-                         (occurs when user starts to move the window)              */            
+            /* check if the mouse has been clicked on the title bar */
             if(wParam == HTCAPTION)
             {
                /* get the mouse co-ords relative to the window */
@@ -698,15 +692,14 @@ LRESULT CALLBACK ToolWindow::ToolWindowProcedure(HWND hwnd, UINT message, WPARAM
             /* also let windows handle this message */
             return DefWindowProc(hwnd, message, wParam, lParam); 
             
-        /* WM_MOVING: the window is about to be moved to a new location */
         case WM_MOVING:
             /* set new window position based on position of mouse */
             SnappingWindow::setNewWindowPosition((RECT*)lParam,&snapMouseOffset);
 
-            /* if new position is near desktop edge, snap to it */
+            /* if new position is near desktop edge, move to the egde */
             SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);  
             
-            /* if new position is near main window, snap to it */    
+            /* if new position is near another window, move to other the window */    
             SnappingWindow::snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
             SnappingWindow::snapWindowByMoving(ImageWindow::hImageWindow,(RECT*)lParam);
             break;
