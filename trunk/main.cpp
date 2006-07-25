@@ -57,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 
     
     /* Register window classes */
-    if ((!registerMainWindow()) || (!ToolWindow::registerToolWindow()) || (!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
+    if ((!MainWindow::registerMainWindow()) || (!ToolWindow::registerToolWindow()) || (!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
     {
         /* report error if window classes could not be registered */
         MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
@@ -67,7 +67,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Setup main & image windows */
     //  note: image window must be created before main window
     //  note: tool window is only setup when an image is loaded
-    if ((!setupMainWindow()) || (!ImageWindow::setupImageWindow()) || (!OverviewWindow::setupWindow()))
+    if ((!MainWindow::setupMainWindow()) || (!ImageWindow::setupImageWindow()) || (!OverviewWindow::setupWindow()))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);

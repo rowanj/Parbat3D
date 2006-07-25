@@ -5,15 +5,15 @@
 #include "ToolWindow.h"
 #include "MainWindow.h"
 
-HWND hMainWindow=NULL;
+HWND MainWindow::hMainWindow=NULL;
 
-char szMainWindowClassName[] = "Parbat3D Main Window";
+char MainWindow::szMainWindowClassName[] = "Parbat3D Main Window";
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Main Window Functions */
 
 
-int registerMainWindow()
+int MainWindow::registerMainWindow()
 {
     WNDCLASSEX wincl;        /* Datastructure for the windowclass */
         
@@ -39,7 +39,7 @@ int registerMainWindow()
 }
 
 /* create main window */
-int setupMainWindow()
+int MainWindow::setupMainWindow()
 {
     /* Create main window */
     hMainWindow = CreateWindowEx(0, szMainWindowClassName, "Parbat3D",
@@ -54,7 +54,7 @@ int setupMainWindow()
 }
 
 /* handle events related to the main window */
-LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK MainWindow::MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static WINDOWPLACEMENT imageWindowPlacement;        // recorded state of image window when minimised
     static WINDOWPLACEMENT toolWindowPlacement;         // recorded state of tool window when minimised
