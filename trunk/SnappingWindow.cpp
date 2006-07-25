@@ -87,7 +87,7 @@ void moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RE
     if (moveImageWindow)
         moveWindowByOffset(ImageWindow::hImageWindow,prevImageWindowRect,moveLeftOffset,moveTopOffset);
     if (moveToolWindow)
-        moveWindowByOffset(hToolWindow,prevToolWindowRect,moveLeftOffset,moveTopOffset);
+        moveWindowByOffset(ToolWindow::hToolWindow,prevToolWindowRect,moveLeftOffset,moveTopOffset);
 }
 
 /* checks whether a window is in normal state (not hidden, minimized, or maximized) */

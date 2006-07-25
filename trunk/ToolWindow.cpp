@@ -7,44 +7,46 @@
 #include "console.h"
 #include "SnappingWindow.h"
 
-HWND hToolWindow=NULL;
+HWND ToolWindow::hToolWindow=NULL;
 
-HWND hToolWindowTabControl;
-HWND hToolWindowDisplayTabContainer;
-HWND hToolWindowQueryTabContainer;
-HWND hToolWindowImageTabContainer;
-HWND hToolWindowCurrentTabContainer;
-HWND hToolWindowDisplayTabHeading;
-HWND hToolWindowImageTabHeading;
-HWND hToolWindowQueryTabHeading;
-HWND hToolWindowScrollBar;
+HWND ToolWindow::hToolWindowTabControl;
+HWND ToolWindow::hToolWindowDisplayTabContainer;
+HWND ToolWindow::hToolWindowQueryTabContainer;
+HWND ToolWindow::hToolWindowImageTabContainer;
+HWND ToolWindow::hToolWindowCurrentTabContainer;
+HWND ToolWindow::hToolWindowDisplayTabHeading;
+HWND ToolWindow::hToolWindowImageTabHeading;
+HWND ToolWindow::hToolWindowQueryTabHeading;
+HWND ToolWindow::hToolWindowScrollBar;
 
-HWND hRed, hBlue, hGreen;
-HWND *redRadiobuttons;                // band radio buttons
-HWND *greenRadiobuttons;
-HWND *blueRadiobuttons;
-HWND *imageBandValues;                // values displayed under query tab
+HWND ToolWindow::hRed, ToolWindow::hBlue, ToolWindow::hGreen;
+HWND *ToolWindow::redRadiobuttons;                // band radio buttons
+HWND *ToolWindow::greenRadiobuttons;
+HWND *ToolWindow::blueRadiobuttons;
+HWND *ToolWindow::imageBandValues;                // values displayed under query tab
 
-HWND cursorXPos, cursorYPos;          // position of cursor in image
-HWND hupdate;
-int bands = 0;                        // for use with radio buttons
+HWND ToolWindow::cursorXPos, ToolWindow::cursorYPos;          // position of cursor in image
+HWND ToolWindow::hupdate;
+
+int ToolWindow::bands = 0;                        // for use with radio buttons
 
 /* objects used for painting/drawing */
-HFONT hBoldFont,hNormalFont,hHeadingFont;
-HPEN hTabPen;
-HBRUSH hTabBrush;
+HFONT ToolWindow::hBoldFont,ToolWindow::hNormalFont,ToolWindow::hHeadingFont;
+HPEN ToolWindow::hTabPen;
+HBRUSH ToolWindow::hTabBrush;
 
 /* variables used to store addresses to window procedures */
-WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc,oldScrollBarContainerProc;
+WNDPROC ToolWindow::oldTabControlProc,ToolWindow::oldDisplayTabContainerProc,ToolWindow::oldQueryTabContainerProc;
+WNDPROC ToolWindow::oldImageTabContainerProc,ToolWindow::oldScrollBarContainerProc;
 
 
-char szToolWindowClassName[] = "Parbat3D Tool Window";
+char ToolWindow::szToolWindowClassName[] = "Parbat3D Tool Window";
 
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Tools Window Functions */
 
-int registerToolWindow()
+int ToolWindow::registerToolWindow()
 {
     WNDCLASSEX wincl;       /* Datastructure for the windowclass */
     
@@ -70,7 +72,7 @@ int registerToolWindow()
 }    
 
 /* create tool window */
-int setupToolWindow()
+int ToolWindow::setupToolWindow()
 {
     TCITEM tie;  /* datastructure for tabs */
     RECT rect;
@@ -324,7 +326,7 @@ int setupToolWindow()
 
 
 /* draw a static text control on the screen */
-inline void drawStatic(DRAWITEMSTRUCT *dis, HFONT hfont)
+void ToolWindow::drawStatic(DRAWITEMSTRUCT *dis, HFONT hfont)
 {   
     char str[255];
     int len,x,y;
@@ -343,7 +345,7 @@ inline void drawStatic(DRAWITEMSTRUCT *dis, HFONT hfont)
 }
 
 /* draw a tab on the screen */
-inline void drawTab(DRAWITEMSTRUCT *dis)
+void ToolWindow::drawTab(DRAWITEMSTRUCT *dis)
 {   
     char *str;
     int len,x,y;
@@ -373,7 +375,7 @@ inline void drawTab(DRAWITEMSTRUCT *dis)
 }
 
 /* calculate the size of a tab */
-inline void measureTab(MEASUREITEMSTRUCT *mis)
+void ToolWindow::measureTab(MEASUREITEMSTRUCT *mis)
 {
     const int TEXT_MARGIN=5;
     SIZE size;
@@ -387,7 +389,7 @@ inline void measureTab(MEASUREITEMSTRUCT *mis)
 }
 
 /* setup up tool window's fonts & brushes for drawing */
-inline void setupDrawingObjects(HWND hwnd)
+void ToolWindow::setupDrawingObjects(HWND hwnd)
 {
     HDC hdc;
     
@@ -398,7 +400,7 @@ inline void setupDrawingObjects(HWND hwnd)
 }    
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
-LRESULT CALLBACK ToolWindowTabControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ToolWindow::ToolWindowTabControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)                  /* handle the messages */
     {
@@ -415,7 +417,7 @@ LRESULT CALLBACK ToolWindowTabControlProcedure(HWND hwnd, UINT message, WPARAM w
 }
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
-LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ToolWindow::ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)                  /* handle the messages */
     {
@@ -473,7 +475,7 @@ LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message,
 }
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
-LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ToolWindow::ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)                  /* handle the messages */
     {
@@ -493,7 +495,7 @@ LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, W
 }
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
-LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ToolWindow::ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)                  /* handle the messages */
     {
@@ -513,7 +515,7 @@ LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, W
 }
 
 /* show the correct tab container window for the selected tab */
-void showToolWindowTabContainer(int selectedTabId)
+void ToolWindow::showToolWindowTabContainer(int selectedTabId)
 {
     /* hide previously visible tab container window */
     if (hToolWindowCurrentTabContainer!=NULL)
@@ -544,7 +546,7 @@ void showToolWindowTabContainer(int selectedTabId)
 }    
 
 /* scrolls a window back to its orginal state */
-void scrollToolWindowToTop()
+void ToolWindow::scrollToolWindowToTop()
 {
     SCROLLINFO info;
     RECT rect;
@@ -561,7 +563,8 @@ void scrollToolWindowToTop()
 }    
 
 /* change the tool window's scrollbar settings based on the currently visible tab container */
-void updateToolWindowScrollbar()
+
+void ToolWindow::updateToolWindowScrollbar()
 {
     RECT rcontainer,rscrollbar;
     SCROLLINFO info;    
@@ -597,7 +600,7 @@ void updateToolWindowScrollbar()
 }    
 
 
-void scrollToolWindow(int msg)
+void ToolWindow::scrollToolWindow(int msg)
 {
     SCROLLINFO info;
     RECT rect;
@@ -660,7 +663,7 @@ void scrollToolWindow(int msg)
 
 
 /* This function is called by the Windowsfunction DispatchMessage( ) */
-LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ToolWindow::ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static POINT snapMouseOffset;     /* mouse offset relative to window, used for snapping */
     NMHDR *nmhdr;                     /* structure used for WM_NOTIFY events */
@@ -751,7 +754,7 @@ LRESULT CALLBACK ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
 /* This function is called by the Windows function DispatchMessage( ) */
 /* All messages/events related to one of the display windows are sent to this procedure */
-LRESULT CALLBACK ToolWindowScrollBarProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ToolWindow::ToolWindowScrollBarProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     /* handle the messages */    
     switch (message)

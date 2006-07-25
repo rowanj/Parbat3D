@@ -57,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 
     
     /* Register window classes */
-    if ((!registerMainWindow()) || (!registerToolWindow()) || (!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
+    if ((!registerMainWindow()) || (!ToolWindow::registerToolWindow()) || (!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
     {
         /* report error if window classes could not be registered */
         MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
@@ -88,7 +88,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 void orderWindows()
 {
     //SetWindowPos(hOverviewWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);        
-    SetWindowPos(ImageWindow::hImageWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(ImageWindow::hImageWindow,ToolWindow::hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
     SetWindowPos(ImageWindow::hImageWindow,OverviewWindow::hOverviewWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
 
 
@@ -138,10 +138,10 @@ void loadFile()
                     ImageWindow::updateImageScrollbar();      
 
                     // re-create tool window
-                    setupToolWindow();
+                    ToolWindow::setupToolWindow();
                     
                     // show tool & image windows
-                    ShowWindow(hToolWindow,SW_SHOW);
+                    ShowWindow(ToolWindow::hToolWindow,SW_SHOW);
                     ShowWindow(ImageWindow::hImageWindow,SW_SHOW);    
                     orderWindows();                    
 
@@ -170,10 +170,10 @@ void closeFile()
 	if (image_handler) delete image_handler;
     image_handler=NULL;
 	
-    if (hToolWindow)
+    if (ToolWindow::hToolWindow)
     {
-        DestroyWindow(hToolWindow);
-        hToolWindow=NULL;
+        DestroyWindow(ToolWindow::hToolWindow);
+        ToolWindow::hToolWindow=NULL;
     }    
     
     if (ImageWindow::hImageWindow)

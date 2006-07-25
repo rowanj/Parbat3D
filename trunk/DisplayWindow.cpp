@@ -49,7 +49,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
             /* init variables used for painting "No Image Loaded" message */
             hbrush=CreateSolidBrush(0);
             hdc=GetDC(hwnd);                                                                      /* get device context (drawing) object */
-            SelectObject(hdc,hNormalFont);                                                   /* set font that will be used for drawing text */    
+            SelectObject(hdc,ToolWindow::hNormalFont);                                                   /* set font that will be used for drawing text */    
             GetTextExtentPoint32(hdc,text,textLen,&textSize); /* get width & height of string in pixels */   
             ReleaseDC(hwnd,hdc);
             break;
@@ -69,7 +69,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
         case WM_MOUSEMOVE:
             {
                 /* check if image is open, mouse has moved on image window & the query tab is displayed in the tool window */
-                if ((image_handler)&&(hwnd==ImageWindow::hImageWindowDisplay)&&(hToolWindowCurrentTabContainer==hToolWindowQueryTabContainer)) {
+                if ((image_handler)&&(hwnd==ImageWindow::hImageWindowDisplay)&&(ToolWindow::hToolWindowCurrentTabContainer==ToolWindow::hToolWindowQueryTabContainer)) {
                     /* Get mouse screen position */
                     int mx = (short)LOWORD(lParam);
                     int my = (short)HIWORD(lParam);
@@ -87,13 +87,13 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                     string leader = "";
                     
                     /* Update display of cursor position */
-                    SetWindowText(cursorXPos, (char *) makeMessage(leader, ix));
-                    SetWindowText(cursorYPos, (char *) makeMessage(leader, iy));
+                    SetWindowText(ToolWindow::cursorXPos, (char *) makeMessage(leader, ix));
+                    SetWindowText(ToolWindow::cursorYPos, (char *) makeMessage(leader, iy));
 
                     /* Update display of pixel values under query tab */                    
                     if (bv) { /* make sure the band values were returned */
-                        for (int i=1; i<=bands; i++)
-                            SetWindowText(imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
+                        for (int i=1; i<=ToolWindow::bands; i++)
+                            SetWindowText(ToolWindow::imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
                     }
                     
                     delete[] bv;
@@ -111,7 +111,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 /* Display "No Image Loaded" on black background */
                 SelectObject(hdc,hbrush);
                 Rectangle(hdc,0,0,rect.right,rect.bottom);
-                SelectObject(hdc,hNormalFont);
+                SelectObject(hdc,ToolWindow::hNormalFont);
                 SetTextColor(hdc,RGB(255,255,255));
                 SetBkColor(hdc,0);
                 TextOut(hdc,textPos.x,textPos.y,text,textLen);

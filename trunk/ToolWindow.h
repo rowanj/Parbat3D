@@ -1,24 +1,53 @@
 
-extern HWND hToolWindow;
-extern HFONT hBoldFont,hNormalFont,hHeadingFont;
+class ToolWindow
+{
+      private:
+      static HWND hRed, hBlue, hGreen;
+      static HWND *redRadiobuttons;                // band radio buttons
+      static HWND *greenRadiobuttons;
+      static HWND *blueRadiobuttons;
+      static HWND hupdate;
+      static HPEN hTabPen;
+      static HBRUSH hTabBrush;
+      static WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc,oldScrollBarContainerProc;
+      static char szToolWindowClassName[];
+      static void drawStatic(DRAWITEMSTRUCT *dis, HFONT hfont);
+      static void drawTab(DRAWITEMSTRUCT *dis);
+      static void measureTab(MEASUREITEMSTRUCT *mis);
+      static void setupDrawingObjects(HWND hwnd);
+      static void scrollToolWindowToTop();
+      static void updateToolWindowScrollbar();
+      static void scrollToolWindow(int msg);
+      static HWND hToolWindowTabControl;
+      static HWND hToolWindowDisplayTabHeading;
+      static HWND ToolWindow::hToolWindowImageTabHeading;
+      static HWND ToolWindow::hToolWindowQueryTabHeading;
+      static HWND ToolWindow::hToolWindowScrollBar;
+      
+      public:
+      static HWND hToolWindow;
+      static HFONT hBoldFont,hNormalFont,hHeadingFont;
 
-extern HWND hToolWindowCurrentTabContainer;
-extern HWND hToolWindowDisplayTabContainer;
-extern HWND hToolWindowQueryTabContainer;
-extern HWND hToolWindowImageTabContainer;
+      static HWND hToolWindowCurrentTabContainer;
+      static HWND hToolWindowDisplayTabContainer;
+      static HWND hToolWindowQueryTabContainer;
+      static HWND hToolWindowImageTabContainer;
 
-extern HWND cursorXPos, cursorYPos;
-extern int bands;
-extern HWND *imageBandValues;
+      static HWND cursorXPos, cursorYPos;
+      static int bands;
+      static HWND *imageBandValues;
 
-LRESULT CALLBACK ToolWindowProcedure(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK ToolWindowTabControlProcedure(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK ToolWindowScrollBarProcedure(HWND, UINT, WPARAM, LPARAM);
-int registerToolWindow();
-int setupToolWindow();
-void showToolWindowTabContainer(int);
+      static LRESULT CALLBACK ToolWindowProcedure(HWND, UINT, WPARAM, LPARAM);
+      static LRESULT CALLBACK ToolWindowTabControlProcedure(HWND, UINT, WPARAM, LPARAM);
+      static LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
+      static LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
+      static LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
+      static LRESULT CALLBACK ToolWindowScrollBarProcedure(HWND, UINT, WPARAM, LPARAM);
+      static int registerToolWindow();
+      static int setupToolWindow();
+      static void showToolWindowTabContainer(int);      
+};
+
+
 
 

@@ -74,9 +74,9 @@ int OverviewWindow::setupWindow()
 
     /* setup font objects */
     HDC hdc=GetDC(OverviewWindow::hOverviewWindow);      
-    hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
-    hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
-    hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
+    ToolWindow::hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
+    ToolWindow::hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
+    ToolWindow::hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
     ReleaseDC(OverviewWindow::hOverviewWindow,hdc);    
 
     /* create a child window that will be used by OpenGL */
@@ -156,9 +156,9 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
              
                 case IDM_TOOLSWINDOW:
                     if (toggleMenuItemTick(hMainMenu,IDM_TOOLSWINDOW))
-                        ShowWindow(hToolWindow,SW_SHOW);                        
+                        ShowWindow(ToolWindow::hToolWindow,SW_SHOW);                        
                     else
-                        ShowWindow(hToolWindow,SW_HIDE);
+                        ShowWindow(ToolWindow::hToolWindow,SW_HIDE);
                     return 0;
 
                 case IDM_HELPCONTENTS:
@@ -192,14 +192,14 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 /* record current window positions */
                 GetWindowRect(hwnd,&prevOverviewWindowRect);  
                 GetWindowRect(ImageWindow::hImageWindow,&prevImageWindowRect); 
-                GetWindowRect(hToolWindow,&prevToolWindowRect);
+                GetWindowRect(ToolWindow::hToolWindow,&prevToolWindowRect);
                
                 /* find out which windows are connected & which are in a normal state */
                 imageNormalState=isWindowInNormalState(ImageWindow::hImageWindow);
-                toolNormalState=isWindowInNormalState(hToolWindow);
+                toolNormalState=isWindowInNormalState(ToolWindow::hToolWindow);
                 imageAndMainSnapped=(isWindowSnapped(hOverviewWindow,ImageWindow::hImageWindow));
-                toolAndMainSnapped=(isWindowSnapped(hOverviewWindow,hToolWindow));
-                toolAndImageSnapped=(isWindowSnapped(hToolWindow,ImageWindow::hImageWindow));
+                toolAndMainSnapped=(isWindowSnapped(hOverviewWindow,ToolWindow::hToolWindow));
+                toolAndImageSnapped=(isWindowSnapped(ToolWindow::hToolWindow,ImageWindow::hImageWindow));
 
                 /* calculate whether the image window should be moved */
                 if (imageNormalState)
@@ -245,7 +245,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 
             /* snap main window to tool window, if near it, if it's not already snapped */
             if (!moveToolWindow)
-                snapWindowByMoving(hToolWindow,(RECT*)lParam);
+                snapWindowByMoving(ToolWindow::hToolWindow,(RECT*)lParam);
             
             /* move the snapped windows relative to main window's new position */
             /* only moves the windows that were already snapped to the main window */

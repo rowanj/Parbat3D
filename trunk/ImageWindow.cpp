@@ -314,7 +314,7 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
             /* snap the window to other windows if in range */
             snapInsideWindowByMoving(hDesktop,(RECT*)lParam);      
             snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
-            snapWindowByMoving(hToolWindow,(RECT*)lParam);            
+            snapWindowByMoving(ToolWindow::hToolWindow,(RECT*)lParam);            
             break;
     
         /* WM_SIZING: the window size is about to change */

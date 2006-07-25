@@ -78,7 +78,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                     if (imageWindowState!=0)
                         ShowWindow(ImageWindow::hImageWindow,imageWindowState);
                     if (toolWindowState!=0)
-                        ShowWindow(hToolWindow,toolWindowState);
+                        ShowWindow(ToolWindow::hToolWindow,toolWindowState);
                     ShowWindow(OverviewWindow::hOverviewWindow,SW_SHOW);
                     break;
 
@@ -97,9 +97,9 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
                         imageWindowState=0;
                     }
 
-                    if (hToolWindow!=NULL)
+                    if (ToolWindow::hToolWindow!=NULL)
                     {
-                        if (!IsWindowVisible(hToolWindow))
+                        if (!IsWindowVisible(ToolWindow::hToolWindow))
                             toolWindowState=0;
                         else
                             toolWindowState=SW_SHOW;                        
@@ -111,7 +111,7 @@ LRESULT CALLBACK MainWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPA
 
                     /* hide the child windows */     
                     ShowWindow(ImageWindow::hImageWindow,SW_HIDE);            
-                    ShowWindow(hToolWindow,SW_HIDE);                    
+                    ShowWindow(ToolWindow::hToolWindow,SW_HIDE);                    
                     ShowWindow(OverviewWindow::hOverviewWindow,SW_HIDE);                    
                     break;
 		    }    
