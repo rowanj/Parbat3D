@@ -111,11 +111,10 @@ void loadFile()
 
     if(GetOpenFileName(&ofn))
     {
-        // Do something usefull with the filename stored in szFileName 
-
 		// Clean up any previous instance
 		closeFile();
 
+        // load image & setup windows
 	    image_handler = new ImageHandler::ImageHandler(OverviewWindow::hOverviewWindowDisplay, ImageWindow::hImageWindowDisplay, ofn.lpstrFile);
 	    if (image_handler) {
 			if (image_handler->status > 0) {
@@ -128,7 +127,13 @@ void loadFile()
     			else
     			{
                     // update image window settings
-                    filename=(char*)image_handler->get_image_properties()->getFileName();
+                    const char *newfilename=image_handler->get_image_properties()->getFileName();
+                    int newfilename_length=strlen(newfilename);
+                    if (filename!=NULL)
+                       delete(filename);
+                    filename=new char[newfilename_length+1];
+                    strcpy(filename,newfilename);
+                    
                     ImageWindow::updateImageWindowTitle();              
                     ImageWindow::updateImageScrollbar();      
 
