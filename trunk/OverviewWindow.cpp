@@ -149,23 +149,21 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                           
              	case IDM_IMAGEWINDOW:
                     if (toggleMenuItemTick(hMainMenu,IDM_IMAGEWINDOW))
-                        ShowWindow(ImageWindow::hImageWindow,SW_SHOW);                        
+                        ShowWindow(ImageWindow::hImageWindow,SW_SHOW);
                     else
                         ShowWindow(ImageWindow::hImageWindow,SW_HIDE);
                     return 0;
              
                 case IDM_TOOLSWINDOW:
                     if (toggleMenuItemTick(hMainMenu,IDM_TOOLSWINDOW))
-                        ShowWindow(ToolWindow::hToolWindow,SW_SHOW);                        
+                        ShowWindow(ToolWindow::hToolWindow,SW_SHOW);
                     else
                         ShowWindow(ToolWindow::hToolWindow,SW_HIDE);
                     return 0;
 
                 case IDM_HELPCONTENTS:
-                     ShellExecute(NULL, "open", "\\help\\index.htm", NULL, "help", SW_SHOW);
-					
-					//WinHelp( hwnd, (LPSTR) "help/index.htm",
-                           //HELP_CONTENTS, 0L );
+                     //Bug - When image open root directory is changed
+                     ShellExecute(NULL, "open", "\\help\\index.htm", NULL, "help", SW_SHOWNORMAL);
                     return 0;
 
                 case IDM_FILEEXIT:
