@@ -34,6 +34,7 @@ int DisplayWindow::registerWindow()
 /* Handle messages/events related to the display window */
 LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    // static variables used for drawing no image loaded message on the window
     static PAINTSTRUCT ps;
     static HDC hdc;
     static RECT rect;
