@@ -101,11 +101,11 @@ const char* inttocstring(int input)
 }
 
 
-char* copyString(char *oldstr)
+char* copyString(const char *oldstr)
 {
     char *newstr;
     int str_length=strlen(oldstr);
     newstr=new char[str_length+1];
-    strcpy(oldstr,newstr);
+    strcpy((char*)oldstr,newstr);
     return newstr;
 }
