@@ -323,6 +323,12 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
             /* set new window size based on position of mouse */
             SnappingWindow::setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
 
+            /* prevent window from being resized too small */
+            if ( (((RECT*)lParam)->bottom) - (((RECT*)lParam)->top)  <100)
+                (((RECT*)lParam)->bottom) = (((RECT*)lParam)->top) + 100;
+            if ( (((RECT*)lParam)->right) - (((RECT*)lParam)->left)  <100)
+                (((RECT*)lParam)->right) = (((RECT*)lParam)->left) + 100;
+            
             /* snap the window to the edge of the desktop (if near it) */
             SnappingWindow::snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
                         
