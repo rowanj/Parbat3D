@@ -5,11 +5,15 @@ const char* makeMessage(std::string leader, double input)
 	std::string sinput;
 	std::string buffer;
 	std::stringstream s;
+	char* final;
 	
 	s << input;
 	s >> sinput;
 	buffer = leader + sinput;
-	return buffer.c_str();
+	
+	final = new char[buffer.length()+1];
+    strcpy(final, buffer.c_str());
+	return (const char*) final;
 }
 
 std::string makeString(std::string leader, double input)
@@ -21,7 +25,8 @@ std::string makeString(std::string leader, double input)
 	s << input;
 	s >> sinput;
 	buffer = leader + sinput;
-	return buffer;
+
+    return buffer;
 }
 
 const char* makeMessage(std::string leader, int input)
@@ -29,22 +34,30 @@ const char* makeMessage(std::string leader, int input)
 	std::string sinput;
 	std::string buffer;
 	std::stringstream s;
+	char* final;
 	
 	s << input;
 	s >> sinput;
 	buffer = leader + sinput;
-	return buffer.c_str();
+	
+	final = new char[buffer.length()+1];
+    strcpy(final, buffer.c_str());
+	return (const char*) final;
 }
 const char* makeMessage(std::string leader, unsigned int input)
 {
 	std::string sinput;
 	std::string buffer;
 	std::stringstream s;
+	char* final;
 	
 	s << input;
 	s >> sinput;
 	buffer = leader + sinput;
-	return buffer.c_str();
+	
+	final = new char[buffer.length()+1];
+    strcpy(final, buffer.c_str());
+	return (const char*) final;
 }
 
 std::string makeString(std::string leader, int input)
@@ -56,6 +69,7 @@ std::string makeString(std::string leader, int input)
 	s << input;
 	s >> sinput;
 	buffer = leader + sinput;
+	
 	return buffer;
 }
 
@@ -63,10 +77,14 @@ const char* makeMessage(std::string leader, char* input)
 {
 	std::string sinput;
 	std::string buffer;
+	char* final;
 	
 	sinput = input;
 	buffer = leader + sinput;
-	return buffer.c_str();
+	
+	final = new char[buffer.length()+1];
+    strcpy(final, buffer.c_str());
+	return (const char*) final;
 }
 
 std::string makeString(std::string leader, char* input)
@@ -76,6 +94,7 @@ std::string makeString(std::string leader, char* input)
 	
 	sinput = input;
 	buffer = leader + sinput;
+	
 	return buffer;
 }
 
@@ -83,21 +102,29 @@ const char* catcstrings(char* input1, char* input2)
 {
 	std::string sinput1, sinput2;
 	std::string buffer;
+	char* final;
 	
 	sinput1 = input1;
 	sinput2 = input2;
 	buffer = sinput1 + sinput2;
-	return buffer.c_str();
+	
+	final = new char[buffer.length()+1];
+    strcpy(final, buffer.c_str());
+	return (const char*) final;
 }
 
 const char* inttocstring(int input)
 {
     std::string sinput;
 	std::stringstream s;
+	char* final;
 	
 	s << input;
 	s >> sinput;
-	return sinput.c_str();
+	
+	final = new char[sinput.length()+1];
+    strcpy(final, sinput.c_str());
+	return (const char*) final;
 }
 
 
