@@ -28,8 +28,6 @@ ImageFile::ImageFile(char* theFilename)
     }
     else
     {
-        properties = NULL;
-        coordInfo = NULL;
 		MessageBox (NULL, "This is not a valid image file!", "Parbat3D :: ImageFile", 0);
     }
 }

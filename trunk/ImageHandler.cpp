@@ -71,8 +71,9 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		
 	// Initialize image file (could be threaded)
 	image_file = new ImageFile(filename);
-	if (!image_file) {
+	if (image_file->getImageProperties() == NULL) {
 		status = 5;
+		MessageBox (NULL, "ImageFile object is NULL", "Parbat3D :: ImageHandler", 0);
 		error_text = "Could not create ImageFile object.";
 	} else {
 		image_properties = image_file->getImageProperties();
