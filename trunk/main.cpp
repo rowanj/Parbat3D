@@ -127,8 +127,6 @@ void loadFile()
     			else
     			{
                     // update image window settings
-                    if (filename!=NULL)
-                       delete(filename);
                     filename=copyString(image_handler->get_image_properties()->getFileName());
                     
                     ImageWindow::updateImageWindowTitle();              
@@ -163,6 +161,9 @@ void loadFile()
 
 void closeFile()
 {
+    
+    if (filename!=NULL) delete(filename);
+    filename=NULL;
     
 	if (image_handler) delete image_handler;
     image_handler=NULL;
