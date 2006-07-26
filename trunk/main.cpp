@@ -180,6 +180,7 @@ void closeFile()
     EnableMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,true);
     EnableMenuItem(OverviewWindow::hMainMenu,IDM_FILECLOSE,true);    
     
-    InvalidateRect(OverviewWindow::hOverviewWindowDisplay,0,true);  /* repaint main window */		
+    /* repaint main window */
+    InvalidateRect(OverviewWindow::hOverviewWindowDisplay,0,true);  
     UpdateWindow(OverviewWindow::hOverviewWindowDisplay);
 }
