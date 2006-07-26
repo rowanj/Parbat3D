@@ -99,4 +99,13 @@ const char* inttocstring(int input)
 	s >> sinput;
 	return sinput.c_str();
 }
-    
+
+
+char* copyString(char *oldstr)
+{
+    char *newstr;
+    int str_length=strlen(oldstr);
+    newstr=new char[str_length+1];
+    strcpy(oldstr,newstr);
+    return newstr;
+}
