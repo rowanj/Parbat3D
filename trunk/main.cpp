@@ -22,19 +22,13 @@ using namespace std;
 
 ImageHandler::ImageHandler* image_handler = NULL;	// Instance handle ptr
 
-/* Unique class names for our main windows */
+char szStaticControl[] = "static";  /* classname of static text control */
 
-/* pre-defined class names for controls */
-char szStaticControl[] = "static";  /* static text control */
+HINSTANCE hThisInstance;            /* a handle that identifies our process */
 
-/* a handle that identifies our process */
-HINSTANCE hThisInstance;
+HWND hDesktop;                      /* handle to desktop window (used for snapping) */
 
-/* global variables to store handles to our windows */
-HWND hDesktop;
-
-/* Used for loading and saving window position and sizes */
-settings winPos ("settings.ini");
+settings winPos ("settings.ini");   /* Used for loading and saving window position and sizes */
 
 
 char *filename=NULL;                    // currently open image filename
@@ -43,7 +37,7 @@ char *filename=NULL;                    // currently open image filename
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 {
- 	MSG messages;     /* Here messages to the application is saved */
+ 	MSG messages;     
   
 
     InitCommonControls();           /* load window classes for common controls */    
@@ -55,7 +49,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     Console::write("testing1!\n");
     Console::write(new string("testing2!\n"));
 
-    
+   
     /* Register window classes */
     if ((!MainWindow::registerMainWindow()) || (!ToolWindow::registerToolWindow()) || (!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
     {
@@ -66,7 +60,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
         
     /* Setup main & image windows */
     //  note: image window must be created before main window
-    //  note: tool window is only setup when an image is loaded
+    //  note: tool window is only created when an image is loaded
     if ((!MainWindow::setupMainWindow()) || (!ImageWindow::setupImageWindow()) || (!OverviewWindow::setupWindow()))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
@@ -161,19 +155,21 @@ void loadFile()
 
 void closeFile()
 {
-    
+    /* deallocate variables */
     if (filename!=NULL) delete(filename);
     filename=NULL;
     
 	if (image_handler) delete image_handler;
     image_handler=NULL;
 	
+	/* destroy tool window */
     if (ToolWindow::hToolWindow)
     {
         DestroyWindow(ToolWindow::hToolWindow);
         ToolWindow::hToolWindow=NULL;
     }    
     
+    /* hide image window */
     if (ImageWindow::hImageWindow)
     {
         ShowWindow(ImageWindow::hImageWindow,SW_HIDE);
