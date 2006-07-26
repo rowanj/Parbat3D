@@ -249,11 +249,11 @@ unsigned int* ImageTileSet::get_pixel_values(int x, int y)
 	int tmp, tile_index, pixel_start;
 	char* tile_data;
 	
-	if ((x >= image_width) || (y >= image_height)) {
+	if ((x >= image_width) || (y >= image_height) || (x < 0) || (y < 0)) {
 		for (tmp = 0; tmp < num_bands; tmp++) {
 			return_values[tmp] = 0;
-			return return_values;
 		}
+		return return_values;
 	}
 	
 	tile_index = load_tile(x,y);
