@@ -106,6 +106,6 @@ char* copyString(const char *oldstr)
     char *newstr;
     int str_length=strlen(oldstr);
     newstr=new char[str_length+1];
-    strcpy((char*)oldstr,newstr);
+    strcpy(newstr,(char*)oldstr);
     return newstr;
 }
