@@ -9,6 +9,7 @@
 
 using namespace std;
 
+// display console window
 void Console::open()
 {
     #if TMP_USE_CONSOLE           
@@ -16,14 +17,16 @@ void Console::open()
     //hstdout=GetStdHandle(STD_OUTPUT_HANDLE);        
     #endif
 }
-    
+
+// hide console window    
 void Console::close()
 {
     #if TMP_USE_CONSOLE         
     FreeConsole();
     #endif
 }
-    
+
+// write string to console window
 void Console::write(char *msg)
 {
     #if TMP_USE_CONSOLE        
@@ -33,6 +36,7 @@ void Console::write(char *msg)
     #endif
 }
 
+// write string to console window
 void Console::write(string *msg)
 {
     #if TMP_USE_CONSOLE        
@@ -42,6 +46,7 @@ void Console::write(string *msg)
     #endif
 }
 
+// write integer to console window
 void Console::write(int msg)
 {
     #if TMP_USE_CONSOLE        
