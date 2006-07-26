@@ -8,6 +8,7 @@
 
 char DisplayWindow::szDisplayClassName[] = "Parbat3D Display Window";
 
+/* register a class that can be used to create a display window */
 int DisplayWindow::registerWindow()
 {
     WNDCLASSEX wincl;
@@ -30,8 +31,7 @@ int DisplayWindow::registerWindow()
     return RegisterClassEx(&wincl);
 }    
 
-/* This function is called by the Windows function DispatchMessage( ) */
-/* All messages/events related to one of the display windows are sent to this procedure */
+/* Handle messages/events related to the display window */
 LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static PAINTSTRUCT ps;
