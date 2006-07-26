@@ -11,6 +11,11 @@ HMENU OverviewWindow::hMainMenu;
 HWND OverviewWindow::hOverviewWindowDisplay;
 HWND OverviewWindow::hOverviewWindow=NULL;
 
+// Used for directory path query
+#define MAXMODULE 50
+char module[MAXMODULE];
+
+
 char szOverviewWindowClassName[] = "Parbat3D Overview Window";
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
@@ -162,9 +167,26 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     return 0;
 
                 case IDM_HELPCONTENTS:
-                     //Bug - When image open root directory is changed
-                     //getcwd()
+
+                     //Get full path of exe
+                     GetModuleFileName(NULL, (LPTSTR)module, MAXMODULE);
+                     //test
+                     MessageBox(0,module,"Parbat3D Error",MB_OK);
                      
+                     
+                     
+                     /*
+                    DWORD len = ::GetCurrentDirectory(0, 0);
+					TCHAR *str = new TCHAR[len];
+
+					for(int i = 0; i < strlen(str); i++)
+  						module[i] = (CHAR) str[i];
+
+					MessageBox(0,module,"Parbat3D Error",MB_OK);
+					*/
+
+				       
+				       
                      
                      ShellExecute(NULL, "open", "\\help\\index.htm", NULL, "help", SW_SHOWNORMAL);
                     return 0;

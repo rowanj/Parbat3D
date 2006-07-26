@@ -16,7 +16,7 @@
 // Declare some packages as optional during initial implementation.
 //  This is to allow other packages to build for testing.
 #define TMP_USE_SETTINGS 0
-#define TMP_USE_CONSOLE 0 //turn console window on/off
+#define TMP_USE_CONSOLE 1 //turn console window on/off
 
 // Platform-specific portions of code should test for the relevant PLATFORM_ define
 #ifdef WIN32 // !! may not be defined by all compilers - Rowan
