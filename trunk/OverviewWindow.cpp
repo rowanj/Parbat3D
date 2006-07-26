@@ -163,7 +163,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 
                 case IDM_HELPCONTENTS:
                      //Bug - When image open root directory is changed
-                     getcwd()
+                     //getcwd()
                      
                      
                      ShellExecute(NULL, "open", "\\help\\index.htm", NULL, "help", SW_SHOWNORMAL);
