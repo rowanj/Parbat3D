@@ -10,13 +10,11 @@
 #include "ImageHandler.h"
 #include "ImageWindow.h"
 
-HWND ImageWindow::hImageWindow=NULL;
-HWND ImageWindow::hImageWindowDisplay;
+HWND ImageWindow::hImageWindow=NULL;    // handle to image window
+HWND ImageWindow::hImageWindowDisplay;  // handle to child window that contains opengl content
 
 char szImageWindowClassName[] = "Parbat3D Image Window";
 
-/* ------------------------------------------------------------------------------------------------------------------------ */
-/* Image Window Functions */
 
 /* register image window class */
 int ImageWindow::registerImageWindow()
@@ -94,7 +92,7 @@ void ImageWindow::updateImageWindowTitle()
     string title  = makeMessage(leader,filename);
     title+=makeString(" (",int(100.0 / pow((double)2,(double)image_handler->get_LOD())));
     title+="%)";
-	SetWindowText(hImageWindow, (char*) title.c_str());    
+	SetWindowText(hImageWindow, (char*) title.c_str());
 }
 
 /* update image window's scroll bar display settings  */
