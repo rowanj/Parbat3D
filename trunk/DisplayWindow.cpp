@@ -81,6 +81,13 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                     int ix = (mx + vx) * lod;
                     int iy = (my + vy) * lod;
                     
+                    /* if cursor is outside of image bounds then display 0,0 as coordinates */
+                    ImageProperties* ip = image_handler->get_image_properties();
+                    if (ix<0 || iy<0 || ix>(ip->getWidth()) || iy>=(ip->getHeight())) {
+                        ix = 0;
+                        iy = 0;
+                    }
+                    
                     /* Get band values */
                     unsigned int* bv = image_handler->get_pixel_values_viewport(mx, my);
                     
