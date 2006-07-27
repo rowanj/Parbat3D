@@ -402,6 +402,16 @@ void ToolWindow::setupDrawingObjects(HWND hwnd)
     ReleaseDC(hToolWindowTabControl,hdc);            
 }    
 
+/* free all drawing objects */
+void ToolWindow::freeDrawingObjects()
+{
+    DeleteObject(hNormalFont);
+    DeleteObject(hBoldFont);
+    DeleteObject(hHeadingFont);
+    DeleteObject(hTabBrush);
+    DeleteObject(hTabPen);    
+}  
+
 /* handle tab control messages/events */
 LRESULT CALLBACK ToolWindow::ToolWindowTabControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -741,6 +751,7 @@ LRESULT CALLBACK ToolWindow::ToolWindowProcedure(HWND hwnd, UINT message, WPARAM
         /* WM_DESTORY: system is destroying our window */                
         case WM_DESTROY:
             CheckMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
+            freeDrawingObjects();
             return 0;
 
         default: 

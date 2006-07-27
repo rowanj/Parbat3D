@@ -23,6 +23,7 @@ class ToolWindow
       static HWND ToolWindow::hToolWindowImageTabHeading;
       static HWND ToolWindow::hToolWindowQueryTabHeading;
       static HWND ToolWindow::hToolWindowScrollBar;
+      static void freeDrawingObjects();
       
       public:
       static HWND hToolWindow;
