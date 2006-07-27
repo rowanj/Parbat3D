@@ -11,6 +11,7 @@ HMENU OverviewWindow::hMainMenu;
 HWND OverviewWindow::hOverviewWindowDisplay;
 HWND OverviewWindow::hOverviewWindow=NULL;
 
+
 // Used for directory path query
 #define MAXMODULE 50
 char module[MAXMODULE];
@@ -78,11 +79,12 @@ int OverviewWindow::setupWindow()
     GetClientRect(OverviewWindow::hOverviewWindow,&rect);
 
     /* setup font objects */
-    HDC hdc=GetDC(OverviewWindow::hOverviewWindow);      
-    ToolWindow::hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
-    ToolWindow::hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
-    ToolWindow::hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
-    ReleaseDC(OverviewWindow::hOverviewWindow,hdc);    
+//    HDC hdc=GetDC(OverviewWindow::hOverviewWindow);      
+//    hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
+//    ToolWindow::hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
+//    ToolWindow::hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
+//    ToolWindow::hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
+//    ReleaseDC(OverviewWindow::hOverviewWindow,hdc);    
 
     /* create a child window that will be used by OpenGL */
     hOverviewWindowDisplay=CreateWindowEx( 0, DisplayWindow::szDisplayClassName, NULL, WS_CHILD|WS_VISIBLE,

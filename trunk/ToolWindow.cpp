@@ -28,6 +28,7 @@ HWND *ToolWindow::imageBandValues;                // values displayed under quer
 HWND ToolWindow::cursorXPos, ToolWindow::cursorYPos;          // position of cursor in image
 HWND ToolWindow::hupdate;
 
+
 int ToolWindow::bands = 0;                        // for use with radio buttons
 
 /* objects used for painting/drawing */
@@ -101,7 +102,7 @@ int ToolWindow::setupToolWindow()
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | TCS_OWNERDRAWFIXED, 0, 0,
 		rect.right, rect.bottom, hToolWindow, NULL, hThisInstance, NULL);
 
-    /* modify tab control's window procedure address */
+    /* force Windows to send us messages/events related to the tab control */
     oldTabControlProc=(WNDPROC)SetWindowLong(hToolWindowTabControl,GWL_WNDPROC,(long)&ToolWindowTabControlProcedure);
 
     /* add tabs to tab-control */
@@ -132,7 +133,7 @@ int ToolWindow::setupToolWindow()
     rect.bottom-=SPACING_FOR_TAB_HEIGHT+SPACING_FOR_BOARDER;
     rect.right-=SPACING_FOR_BOARDER+SPACING_FOR_BOARDER;
     
-    /* create tab containers for each tab (a window that will be shown/hidden when user clicks on a tab) */
+    /* create tab containers for each tab (a child window that will be shown/hidden when user clicks on a tab) */
     /* Display tab container */
 	hToolWindowDisplayTabContainer =CreateWindowEx( 0, szStaticControl, "", 
 		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,
@@ -176,7 +177,7 @@ int ToolWindow::setupToolWindow()
 		WS_CHILD | WS_VISIBLE | SBS_RIGHTALIGN | SBS_VERT, 0, SCROLLBAR_TOP,
 		rect.right, rect.bottom-SCROLLBAR_TOP, hToolWindow, NULL, hThisInstance, NULL);           
     
-    /* modify tab containers' & scrollbar's window procedure address */
+    /* force Windows to notify us of messages/events related to these controls */
     oldDisplayTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowDisplayTabContainer,GWL_WNDPROC,(long)&ToolWindowDisplayTabContainerProcedure);
     oldQueryTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowQueryTabContainer,GWL_WNDPROC,(long)&ToolWindowQueryTabContainerProcedure);
     oldImageTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowImageTabContainer,GWL_WNDPROC,(long)&ToolWindowImageTabContainerProcedure);
@@ -392,20 +393,22 @@ void ToolWindow::measureTab(MEASUREITEMSTRUCT *mis)
 void ToolWindow::setupDrawingObjects(HWND hwnd)
 {
     HDC hdc;
-    
+    hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
+    hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
+    hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma   
     hTabPen=CreatePen(PS_SOLID,1,GetSysColor(COLOR_3DFACE));          
     hdc=GetDC(hToolWindowTabControl);             
     hTabBrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
     ReleaseDC(hToolWindowTabControl,hdc);            
 }    
 
-/* This function is called by the Windowsfunction DispatchMessage( ) */
+/* handle tab control messages/events */
 LRESULT CALLBACK ToolWindow::ToolWindowTabControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)                  /* handle the messages */
     {
-        /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
+            /* draw window's owner-drawn static text controls using our custom font */
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 drawStatic((DRAWITEMSTRUCT*)lParam,hHeadingFont);
             break; 
@@ -413,16 +416,17 @@ LRESULT CALLBACK ToolWindow::ToolWindowTabControlProcedure(HWND hwnd, UINT messa
         default:
             break;
     }        
+    // let Windows perform the default operation for the message recevied
     return CallWindowProc(oldTabControlProc,hwnd,message,wParam,lParam);
 }
 
-/* This function is called by the Windowsfunction DispatchMessage( ) */
+/* handle tab control messages/events */
 LRESULT CALLBACK ToolWindow::ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)                  /* handle the messages */
+    switch (message) 
     {
-        /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
+            /* draw window's owner-drawn static text controls using our custom fonts */
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 if (((DRAWITEMSTRUCT*)lParam)->hwndItem==hToolWindowDisplayTabHeading)
                     drawStatic((DRAWITEMSTRUCT*)lParam,hBoldFont);                
@@ -471,15 +475,16 @@ LRESULT CALLBACK ToolWindow::ToolWindowDisplayTabContainerProcedure(HWND hwnd, U
         default:
             break;
     }        
+    // let Windows perform the default operation for the message recevied
     return CallWindowProc(oldDisplayTabContainerProc,hwnd,message,wParam,lParam);
 }
 
-/* This function is called by the Windowsfunction DispatchMessage( ) */
+/* handle query tab container's messages/events */
 LRESULT CALLBACK ToolWindow::ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)                  /* handle the messages */
+    switch (message)
     {
-        /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
+        /* draw window's owner-drawn static text controls using our custom fonts */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 if (((DRAWITEMSTRUCT*)lParam)->hwndItem==hToolWindowQueryTabHeading)
@@ -491,15 +496,16 @@ LRESULT CALLBACK ToolWindow::ToolWindowQueryTabContainerProcedure(HWND hwnd, UIN
         default:
             break;
     }        
+    // let Windows perform the default operation for the message recevied
     return CallWindowProc(oldQueryTabContainerProc,hwnd,message,wParam,lParam);
 }
 
-/* This function is called by the Windowsfunction DispatchMessage( ) */
+/* handle query tab container's messages/events */
 LRESULT CALLBACK ToolWindow::ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)                  /* handle the messages */
     {
-        /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
+        /* draw window's owner-drawn static text controls using our custom fonts */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 if (((DRAWITEMSTRUCT*)lParam)->hwndItem==hToolWindowImageTabHeading)
@@ -511,6 +517,7 @@ LRESULT CALLBACK ToolWindow::ToolWindowImageTabContainerProcedure(HWND hwnd, UIN
         default:
             break;
     }        
+    // let Windows perform the default operation for the message recevied    
     return CallWindowProc(oldImageTabContainerProc,hwnd,message,wParam,lParam);
 }
 
@@ -524,7 +531,7 @@ void ToolWindow::showToolWindowTabContainer(int selectedTabId)
         ShowWindow(hToolWindowCurrentTabContainer,SW_HIDE);
     }
 
-    /* update the handle to the current tab container window */        
+    /* record the new active tab container window */        
     switch(selectedTabId)
     {
         case DISPLAY_TAB_ID:
@@ -563,7 +570,6 @@ void ToolWindow::scrollToolWindowToTop()
 }    
 
 /* change the tool window's scrollbar settings based on the currently visible tab container */
-
 void ToolWindow::updateToolWindowScrollbar()
 {
     RECT rcontainer,rscrollbar;
@@ -657,7 +663,7 @@ void ToolWindow::scrollToolWindow(int msg)
 }    
 
 
-/* This function is called by the Windowsfunction DispatchMessage( ) */
+/* handles messages/events related to the tool window */
 LRESULT CALLBACK ToolWindow::ToolWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static POINT snapMouseOffset;     /* mouse offset relative to window, used for snapping */
@@ -668,7 +674,7 @@ LRESULT CALLBACK ToolWindow::ToolWindowProcedure(HWND hwnd, UINT message, WPARAM
     {
         case WM_CREATE:
             /* setup fonts, brushes, etc */
-            setupDrawingObjects(hwnd);    
+            setupDrawingObjects(hwnd);
             break;                
         
         case WM_NOTIFY:
@@ -745,11 +751,9 @@ LRESULT CALLBACK ToolWindow::ToolWindowProcedure(HWND hwnd, UINT message, WPARAM
     return 0;
 }
 
-/* This function is called by the Windows function DispatchMessage( ) */
-/* All messages/events related to one of the display windows are sent to this procedure */
+/* handle events related to tool window's scroll bar */
 LRESULT CALLBACK ToolWindow::ToolWindowScrollBarProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    /* handle the messages */    
     switch (message)
     {
         case WM_VSCROLL:          
@@ -759,6 +763,7 @@ LRESULT CALLBACK ToolWindow::ToolWindowScrollBarProcedure(HWND hwnd, UINT messag
         default:
             break;
     }        
+    // let Windows perform the default operation for the message recevied        
     return CallWindowProc(oldTabControlProc,hwnd,message,wParam,lParam);
 }
 

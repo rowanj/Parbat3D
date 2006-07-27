@@ -2,7 +2,6 @@
 class OverviewWindow
 {
     public:
-       
     static HMENU hMainMenu;
     static HWND hOverviewWindow;
     static HWND hOverviewWindowDisplay;

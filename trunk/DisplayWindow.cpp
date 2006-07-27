@@ -6,6 +6,9 @@
 #include "ImageWindow.h"
 #include "main.h"
 
+/* DisplayWindow functions are used to display the opengl content inside the image & overview windows,
+   as well as displaying the "No Image Loaded" message on the overview window  */
+
 char DisplayWindow::szDisplayClassName[] = "Parbat3D Display Window";
 
 /* register a class that can be used to create a display window */
@@ -38,7 +41,8 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
     static PAINTSTRUCT ps;
     static HDC hdc;
     static RECT rect;
-    static HBRUSH hbrush;
+    static HBRUSH hbrush=NULL;
+    static HFONT hNormalFont=NULL;    
     static SIZE textSize;
     static POINT textPos;
     static char text[]="No Image Loaded";
@@ -48,10 +52,14 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
     {
         case WM_CREATE:
             /* init variables used for painting "No Image Loaded" message */
-            hbrush=CreateSolidBrush(0);
-            hdc=GetDC(hwnd);                                                                      /* get device context (drawing) object */
-            SelectObject(hdc,ToolWindow::hNormalFont);                                                   /* set font that will be used for drawing text */    
-            GetTextExtentPoint32(hdc,text,textLen,&textSize); /* get width & height of string in pixels */   
+            if (hbrush==NULL)
+                hbrush=CreateSolidBrush(0);
+            hdc=GetDC(hwnd);                                                                 /* get device context (drawing) object */
+            if (hNormalFont==NULL)
+                hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma                
+           
+            SelectObject(hdc,hNormalFont);                                                   /* set font that will be used for drawing text */    
+            GetTextExtentPoint32(hdc,text,textLen,&textSize);                                /* get width & height of string in pixels */          
             ReleaseDC(hwnd,hdc);
             break;
             
@@ -119,7 +127,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 /* Display "No Image Loaded" on black background */
                 SelectObject(hdc,hbrush);
                 Rectangle(hdc,0,0,rect.right,rect.bottom);
-                SelectObject(hdc,ToolWindow::hNormalFont);
+                SelectObject(hdc,hNormalFont);
                 SetTextColor(hdc,RGB(255,255,255));
                 SetBkColor(hdc,0);
                 TextOut(hdc,textPos.x,textPos.y,text,textLen);

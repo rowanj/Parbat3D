@@ -1,6 +1,7 @@
 
 class DisplayWindow
 {
+   
     public:
     static int registerWindow();
     static char szDisplayClassName[];
