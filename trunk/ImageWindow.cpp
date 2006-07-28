@@ -54,8 +54,8 @@ int ImageWindow::setupImageWindow()
     GetWindowRect(hDesktop,&rect);
 
     /* Get the stored window position or use defaults if there's a problem */
-    mx = atoi(winPos.getSetting("OverviewX").c_str());
-	my = atoi(winPos.getSetting("OverviewY").c_str());
+    mx = atoi(winPos.getSetting("overview window", "x").c_str());
+	my = atoi(winPos.getSetting("overview window", "y").c_str());
 	if ((mx <= 0) || (mx >= rect.right))
         mx = (rect.right /2) - ((IMAGE_WINDOW_WIDTH+OverviewWindow::OVERVIEW_WINDOW_WIDTH) /2);         /* default x position to center windows */
     mx+=OverviewWindow::OVERVIEW_WINDOW_WIDTH;                                                          /* leave room for overview window */

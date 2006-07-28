@@ -24,6 +24,13 @@ class iniFile {
         */
         string getDataFromLine (string);
         
+        
+        /**
+            Returns the line number of where the section starts in the file
+        */
+        int sectionStartsAt (string section);
+        
+        
     public:
         /**
             Stores the filename to be used in future calls.
@@ -44,7 +51,7 @@ class iniFile {
             Searches to find if the key provided as a parameter exists in the file. If the
             key is in the file then true is returned, otherwise it is false.
         */
-        bool parse (string);
+        bool parse (string, string);
         
         /**
             Returns the value of the specified key in the file. If the key does not exist,
@@ -52,13 +59,13 @@ class iniFile {
             If open() worked correctly, if read occured after parse then the file would not
             have to be searched again. - Matt
         */
-        string read (string);
+        string read (string, string);
         
         /**
             Updates the key in the file with the specified value. If the key does not exist,
             then it is added to the file with the value.
         */
-        void update (string, string);
+        void update (string, string, string);
         
         
         /**

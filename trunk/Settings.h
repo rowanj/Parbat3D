@@ -30,19 +30,19 @@ class settings {
             Returns a string containing the value of the key. If the key does not exist in
             the file then an empty string is returned.
         */
-        string getSetting (string);
+        string getSetting (string, string);
 
         /**
             Adds the setting to the file.
         */
-        void setSetting (string, string);
+        void setSetting (string, string, string);
 
         /**
             Adds the setting to the file. Since the file can only be updated using text,
             the integer is first converted into a string using stringstream before updating
             the file.
         */
-        void setSetting (string, int);
+        void setSetting (string, string, int);
 };
 
 #endif
