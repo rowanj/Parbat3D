@@ -6,6 +6,7 @@
 #include "ToolWindow.h"
 #include "DisplayWindow.h"
 #include "MainWindow.h"
+#include "console.h"
 
 HMENU OverviewWindow::hMainMenu;
 HWND OverviewWindow::hOverviewWindowDisplay;
@@ -13,9 +14,9 @@ HWND OverviewWindow::hOverviewWindow=NULL;
 
 
 // Used for directory path query
-#define MAXMODULE 50
-char module[MAXMODULE];
-
+#define MAXMODULE 50        //note: not currently used
+char module[MAXMODULE];     //note: not currently used
+char *modulePath;
 
 char szOverviewWindowClassName[] = "Parbat3D Overview Window";
 
@@ -114,6 +115,35 @@ int OverviewWindow::toggleMenuItemTick(HMENU hMenu,int itemId)
 }
 
 
+void GetModulePath()
+{
+    //Get full path of exe
+    int moduleSize=256;
+    int lasterror=0;
+    int result;
+    do
+    {
+        modulePath=new char[moduleSize];                 
+        result=GetModuleFileName(NULL, (LPTSTR)modulePath, moduleSize);
+        // check if whole string was copied succesfully
+        if ((result>0)&&(result<moduleSize))
+            break;
+        delete(modulePath);
+        modulePath=NULL;
+        moduleSize*=2;
+    } while (result!=0);   // if no error occured, try again
+
+    MessageBox(0,modulePath,"Parbat3D Error",MB_OK);                     
+    // "remove" the process filename from the string
+    if (module!=0)
+    {
+        char *p;
+        for (p=modulePath+strlen(modulePath)-1;(p>=modulePath)&&(*p!='\\');p--);
+        *p=0;
+    }
+    MessageBox(0,modulePath,"Parbat3D Error",MB_OK);                         
+}
+
 /* This function is called by the Windows function DispatchMessage( ) */
 /* All messages/events related to the main window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -170,10 +200,9 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 
                 case IDM_HELPCONTENTS:
 
-                     //Get full path of exe
-                     GetModuleFileName(NULL, (LPTSTR)module, MAXMODULE);
+                     GetModulePath();
                      //test
-                     MessageBox(0,module,"Parbat3D Error",MB_OK);
+                     //MessageBox(0,module,"Parbat3D Error",MB_OK);
                      
                      
                      
@@ -189,7 +218,6 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 
 				       
 				       
-                     
                      ShellExecute(NULL, "open", "\\help\\index.htm", NULL, "help", SW_SHOWNORMAL);
                     return 0;
 

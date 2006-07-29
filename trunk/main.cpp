@@ -44,6 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     
     hThisInstance=hInstance;        /* record this process's instance handle */
     hDesktop=GetDesktopWindow();    /* record handle to desktop window */    
+
     
     Console::open();
     Console::write("testing1!\n");
