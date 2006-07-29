@@ -33,6 +33,7 @@ settings winPos ("settings.ini");   /* Used for loading and saving window positi
 
 char *filename=NULL;                    // currently open image filename
 
+char *modulePath=NULL;                  /* used to store the path to this executable's directory */
 
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)

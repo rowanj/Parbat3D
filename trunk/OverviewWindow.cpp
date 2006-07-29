@@ -16,7 +16,7 @@ HWND OverviewWindow::hOverviewWindow=NULL;
 // Used for directory path query
 #define MAXMODULE 50        //note: not currently used
 char module[MAXMODULE];     //note: not currently used
-char *modulePath;
+
 
 char szOverviewWindowClassName[] = "Parbat3D Overview Window";
 
