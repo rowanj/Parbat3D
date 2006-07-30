@@ -12,11 +12,8 @@ HMENU OverviewWindow::hMainMenu;
 HWND OverviewWindow::hOverviewWindowDisplay;
 HWND OverviewWindow::hOverviewWindow=NULL;
 
-
-// Used for directory path query
-#define MAXMODULE 50        //note: not currently used
-char module[MAXMODULE];     //note: not currently used
-
+// Used for accessing the help folder
+const char *helpPath;
 
 char szOverviewWindowClassName[] = "Parbat3D Overview Window";
 
@@ -115,35 +112,6 @@ int OverviewWindow::toggleMenuItemTick(HMENU hMenu,int itemId)
 }
 
 
-void GetModulePath()
-{
-    //Get full path of exe
-    int moduleSize=256;
-    int lasterror=0;
-    int result;
-    do
-    {
-        modulePath=new char[moduleSize];                 
-        result=GetModuleFileName(NULL, (LPTSTR)modulePath, moduleSize);
-        // check if whole string was copied succesfully
-        if ((result>0)&&(result<moduleSize))
-            break;
-        delete(modulePath);
-        modulePath=NULL;
-        moduleSize*=2;
-    } while (result!=0);   // if no error occured, try again
-
-    MessageBox(0,modulePath,"Parbat3D Error",MB_OK);                     
-    // "remove" the process filename from the string
-    if (module!=0)
-    {
-        char *p;
-        for (p=modulePath+strlen(modulePath)-1;(p>=modulePath)&&(*p!='\\');p--);
-        *p=0;
-    }
-    MessageBox(0,modulePath,"Parbat3D Error",MB_OK);                         
-}
-
 /* This function is called by the Windows function DispatchMessage( ) */
 /* All messages/events related to the main window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -199,27 +167,12 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     return 0;
 
                 case IDM_HELPCONTENTS:
+					 // get path to help folder
+                     helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");
 
-                     GetModulePath();
-                     //test
-                     //MessageBox(0,module,"Parbat3D Error",MB_OK);
-                     
-                     
-                     
-                     /*
-                    DWORD len = ::GetCurrentDirectory(0, 0);
-					TCHAR *str = new TCHAR[len];
-
-					for(int i = 0; i < strlen(str); i++)
-  						module[i] = (CHAR) str[i];
-
-					MessageBox(0,module,"Parbat3D Error",MB_OK);
-					*/
-
-				       
-				       
-                     ShellExecute(NULL, "open", "\\help\\index.htm", NULL, "help", SW_SHOWNORMAL);
-                    return 0;
+				     // launch default browser
+                     ShellExecute(NULL, "open", helpPath, NULL, "help", SW_SHOWNORMAL);
+                     return 0;
 
                 case IDM_FILEEXIT:
                     SendMessage( hwnd, WM_CLOSE, 0, 0L );

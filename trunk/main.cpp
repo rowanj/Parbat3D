@@ -35,10 +35,42 @@ char *filename=NULL;                    // currently open image filename
 
 char *modulePath=NULL;                  /* used to store the path to this executable's directory */
 
+void GetModulePath()
+{
+    //Get full path of exe
+    int moduleSize=256;
+    int lasterror=0;
+    int result;
+    do
+    {
+        modulePath=new char[moduleSize];                 
+        result=GetModuleFileName(NULL, (LPTSTR)modulePath, moduleSize);
+        // check if whole string was copied succesfully
+        if ((result>0)&&(result<moduleSize))
+            break;
+        delete(modulePath);
+        modulePath=NULL;
+        moduleSize*=2;
+    } while (result!=0);   // if no error occured, try again
+
+    // "remove" the process filename from the string
+    if (modulePath!=0)
+    {
+        char *p;
+        for (p=modulePath+strlen(modulePath)-1;(p>=modulePath)&&(*p!='\\');p--);
+        *p=0;
+    }
+    
+	MessageBox(0,catcstrings( (char*) "The install folder is: ", (char*) modulePath),"Parbat3D Error",MB_OK);                         
+}
+
 /* program entry point */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 {
- 	MSG messages;     
+ 	 // Set global variable for application directory string
+	 GetModulePath();
+	 
+	 MSG messages;     
   
 
     InitCommonControls();           /* load window classes for common controls */    
@@ -80,6 +112,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* End program */
     return messages.wParam;
 }
+
+
 
 void orderWindows()
 {
