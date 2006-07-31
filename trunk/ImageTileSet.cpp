@@ -136,7 +136,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 				out_tile[pix+1] = 0;
 			}
 			if (band_B) {
-				out_tile[pix+2] = tile[piy+band_B];
+				out_tile[pix+2] = tile[piy+band_B-1];
 			} else {
 				out_tile[pix+2] = 0;
 			}
