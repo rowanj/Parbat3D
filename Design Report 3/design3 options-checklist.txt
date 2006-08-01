@@ -5,13 +5,8 @@ Scenario (0.5 each x 10 = Max5)
 - UC15_User_Defines_ROI
 - UC18_User_Saves_ROI
 - UC19_User_Loads_ROI
-- UC21_User_Invokes_3D_DEM_View (Release 3)
-- UC22_User_Navigates_3D_DEM_View (Release 3)
-- UC23_User_Loads_DEM (Release 3)
-- UC25_User_Defines_ROI_in_3D_DEM_View (Release 3)
 - UC27_User_Invokes_Feature_Space_View
 - UC30_User_Scales_Feature_Space
-- UC31_User_Invokes_Isosurface_Display (Release 3)
 - UC33_User_Selects_ROI_Colour
 - UC34_User_Selects_Feature_space_Points
 - UC37_User_Performs_Channel_Operations
@@ -26,24 +21,23 @@ OO Diagrams (0.5 each - Max x 6 = 3) - Should be able to get the max from this
 -- UC15_User_Defines_ROI
 -- UC18_User_Saves_ROI
 -- UC19_User_Loads_ROI
--- UC21_User_Invokes_3D_DEM_View (Release 3)
--- UC22_User_Navigates_3D_DEM_View (Release 3)
--- UC23_User_Loads_DEM (Release 3)
--- UC25_User_Defines_ROI_in_3D_DEM_View (Release 3)
 -- UC27_User_Invokes_Feature_Space_View
 -- UC30_User_Scales_Feature_Space
--- UC31_User_Invokes_Isosurface_Display (Release 3)
 -- UC33_User_Selects_ROI_Colour
 -- UC34_User_Selects_Feature_space_Points
 -- UC37_User_Performs_Channel_Operations
 -- UC40_User_Operates_Filter
 
 GUI Prototype report ((5 stages per gui = 1 mark) x 8 = max 8) - should be
-able to get at least 2 marks here
+able to get at least 2 - 3 marks here
 - Feature space GUI
-- ROI tab in tools window (eg- selection for image, controls for feature space)
-- Updated main window
-- update image window (eg- progress bar etc.)
+-- Scatterplot
+- Preferences
+-- Tools tab or window for cache size, memory use, default bands, key bindings etc
+- ROI Selection
+-- Tools tab or window for selection tool, new & load & save, colour
+- Feature space creation tab or window
+-- bands selection
 
 Story board report (0.5/5 slides - Max x 6 = 3) - This is an option
 
