@@ -28,7 +28,7 @@ HINSTANCE hThisInstance;            /* a handle that identifies our process */
 
 HWND hDesktop;                      /* handle to desktop window (used for snapping) */
 
-settings winPos ("settings.ini");   /* Used for loading and saving window position and sizes */
+settings winPos;                    /* Used for loading and saving window position and sizes */
 
 
 char *filename=NULL;                    // currently open image filename
@@ -68,9 +68,12 @@ void GetModulePath()
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)
 {
  	 // Set global variable for application directory string
-	 GetModulePath();
+    GetModulePath();
+    
+    string settings_path (catcstrings(modulePath, "\\settings.ini"));
+    winPos.open(settings_path);
 	 
-	 MSG messages;     
+    MSG messages;     
   
 
     InitCommonControls();           /* load window classes for common controls */    
