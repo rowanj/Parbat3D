@@ -28,7 +28,7 @@ HINSTANCE hThisInstance;            /* a handle that identifies our process */
 
 HWND hDesktop;                      /* handle to desktop window (used for snapping) */
 
-settings winPos;                    /* Used for loading and saving window position and sizes */
+settings settingsFile;              /* Used for loading and saving window position and sizes */
 
 
 char *filename=NULL;                    // currently open image filename
@@ -71,11 +71,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     GetModulePath();
     
     string settings_path (catcstrings(modulePath, "\\settings.ini"));
-    winPos.open(settings_path);
-	 
-    MSG messages;     
-  
-
+    settingsFile.open(settings_path);
+    
+    MSG messages;
+    
+    
     InitCommonControls();           /* load window classes for common controls */    
     
     hThisInstance=hInstance;        /* record this process's instance handle */

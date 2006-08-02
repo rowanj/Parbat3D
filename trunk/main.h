@@ -9,7 +9,7 @@ extern ImageHandler::ImageHandler* image_handler;
 extern char szStaticControl[];
 extern HINSTANCE hThisInstance;
 extern HWND hDesktop;
-extern settings winPos;
+extern settings settingsFile;
 extern char *filename;
 extern char *modulePath;
 enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID};
