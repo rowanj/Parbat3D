@@ -393,13 +393,13 @@ void ToolWindow::measureTab(MEASUREITEMSTRUCT *mis)
 void ToolWindow::setupDrawingObjects(HWND hwnd)
 {
     HDC hdc;
-    hdc=GetDC(hToolWindowTabControl);                 
+    hdc=GetDC(hwnd);                 //hToolWindowTabControl
     hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
     hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
     hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma   
     hTabPen=CreatePen(PS_SOLID,1,GetSysColor(COLOR_3DFACE));          
     hTabBrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
-    ReleaseDC(hToolWindowTabControl,hdc);            
+    ReleaseDC(hwnd,hdc);            
 }    
 
 /* free all drawing objects */

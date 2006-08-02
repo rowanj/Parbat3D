@@ -134,7 +134,7 @@ void loadFile()
 
     ZeroMemory(&ofn, sizeof(ofn));
 
-    ofn.lStructSize = sizeof(ofn); // SEE NOTE BELOW - which note?
+    ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = OverviewWindow::hOverviewWindow;
     ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tif;*.j2k;*.jp2\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPEG (*.jpg)\0*.jpg\0JPEG 2000 (*.j2k,*.jp2)\0*.j2k;*.jp2\0TIFF / GeoTIFF (*.tif)\0*.tif\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile = szFileName;
