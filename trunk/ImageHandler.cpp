@@ -175,11 +175,11 @@ void ImageHandler::redraw(void)
 	/* Set up aspect transform */
 	glPushMatrix(); // Use matrix copy so we only squash the overview polygon
 	/* squash square we draw to the correct aspect ratio */
-	if (image_width >= image_height) {
+/*	if (image_width >= image_height) {
 		glScalef(1.0, (GLfloat)image_height/(GLfloat)image_width, 1.0);
 	} else {
 		glScalef((GLfloat)image_width/(GLfloat)image_height, 1.0, 1.0);
-	}
+	} */
 
 	/* draw textured quad for overview image */
 	glBegin(GL_QUADS);
@@ -360,19 +360,18 @@ void ImageHandler::resize_window(void)
 unsigned int* ImageHandler::get_pixel_values(int x, int y)
 {
 	if (image_tileset) {
+		/* this function works entirely in image pixels (starting at 0,0) */
 		return image_tileset->get_pixel_values(x,y);
 	} else {
 		return NULL;
 	}
 }
 
+/* Half of pixel query nonsense was here */
 unsigned int* ImageHandler::get_pixel_values_viewport(int viewport_x_pos, int viewport_y_pos)
 {
-	if (image_tileset) {
-		return image_tileset->get_pixel_values_LOD(viewport_x_pos + viewport_x, viewport_y_pos + viewport_x);
-	} else {
-		return NULL;
-	}
+	/* !! map screen to image coordinates */
+	return this->get_pixel_values(viewport_x_pos, viewport_y_pos);
 }
 
 void ImageHandler::get_geo_pos(geo_coords_ptr pos)

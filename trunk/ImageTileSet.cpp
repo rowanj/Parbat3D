@@ -40,13 +40,17 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	
 	/* special case for overview window */
 	if (LOD == -1) {
-		tile_size = tex_size;
-		LOD_width = tex_size;
-		LOD_height = tex_size;
 		columns = 1;
 		rows = 1;
 		last_column_width = image_width;
 		last_row_height = image_height;
+		while ( (last_column_width > tex_size) || (last_row_height > tex_size) ) {
+			last_column_width /= 2;
+			last_row_height /= 2;       
+		}
+		LOD_width = last_column_width;
+		LOD_height = last_row_height;
+		tile_size = tex_size; /* must be non-zero */
 	} else {
 		/* (width in tiles is width/tiles rounded up) */
 		int LOD_temp = MathUtils::ipow(2,LOD);
@@ -60,6 +64,8 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 		if (image_width % tile_size) last_column_width = (image_width % tile_size);
 		if (image_height % tile_size) last_row_height = (image_height % tile_size);
 	}
+	sprintf(buffer, "(II) LOD_width = %d, LOD_height = %d\n", LOD_width, LOD_height);
+	Console::write(buffer);
 }
 
 ImageTileSet::~ImageTileSet(void)
@@ -149,6 +155,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	return out_tile;
 }
 
+/* Return index of tile containing *IMAGE* pixel x, y */
 int ImageTileSet::load_tile(int x, int y)
 {
 	#if DEBUG_IMAGE_TILESET
@@ -214,7 +221,7 @@ int ImageTileSet::load_tile(int x, int y)
 		} else {
 			tile_size_y = tile_size;
 		}
-		
+
                                         
 		if (LOD!=-1) {
 			data_size_x = tile_size_x / MathUtils::ipow(2,LOD);
@@ -230,7 +237,10 @@ int ImageTileSet::load_tile(int x, int y)
 		} else {
 			data_size_x = tex_size;
 			data_size_y = tex_size;
-			image_file->getRasterData(tile_size_x, tile_size_y, 0, 0, new_tile->data, tex_size, tex_size);
+			image_file->getRasterData(image_width, image_height, 0, 0, new_tile->data, LOD_width, LOD_height);
+			if (!((LOD_height == tex_size) && (LOD_width == tex_size))) {
+				align_tile(&(new_tile->data), tex_size, LOD_width, LOD_height);
+			}
 		}
 		
 		/* add index to list of allocated tiles */
@@ -278,15 +288,7 @@ unsigned int* ImageTileSet::get_pixel_values(int x, int y)
 	return return_values;
 }
 
-unsigned int* ImageTileSet::get_pixel_values_LOD(int x, int y)
-{
-	/* Translate LOD coords to image coords */
-	x = x * MathUtils::ipow(2,LOD);
-	y = y * MathUtils::ipow(2,LOD);
-	return get_pixel_values(x,y);
-}
-
-/* !! tile_dimension will probably always be tex_size */
+/* !! tile_dimension will always be tex_size */
 void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, int data_height)
 {
     char* temp_tile;        //our working space
