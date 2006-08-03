@@ -97,10 +97,12 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 	adfMinMax[0] = GDALGetRasterMinimum(theBand, &bGotMin);
 	adfMinMax[1] = GDALGetRasterMaximum(theBand, &bGotMax);
 	
+	//This function takes many minutes for most files, so it's disabled
 	/*if( !(bGotMin && bGotMax) )
 	{
 		GDALComputeRasterMinMax(band, TRUE, adfMinMax);
 	}*/
+	
 	#if DEBUG_BANDS
 	leader = "BandInfo - Min value: ";
 	message = makeMessage(leader, adfMinMax[0]);
