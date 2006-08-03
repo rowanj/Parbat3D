@@ -10,7 +10,7 @@
 #define DEBUG_IMAGE_PROPERTIES 0
 #define DEBUG_IMAGE_REDRAW 0
 #define DEBUG_OPENGL 0
-#define DEBUG_BANDS 0
+#define DEBUG_BANDS 1
 #define DEBUG_IMAGE_DATA 0
 
 // Declare some packages as optional during initial implementation.

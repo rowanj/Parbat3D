@@ -36,22 +36,25 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 	
 	bandNumber = GDALGetBandNumber(theBand);
 	#if DEBUG_BANDS
-	leader = "Band Number: ";
+	leader = "BandInfo - Band Number: ";
 	message = makeMessage(leader, bandNumber);
-	MessageBox (NULL, message, "Parbat3D :: BandInfo", 0);
+	Console::write((char*) message);
+	Console::write("\n");
 	#endif //DEBUG_BANDS
 	
 	rasterDataType = GDALGetDataTypeName(GDALGetRasterDataType(band));
 	#if DEBUG_BANDS
 	if (rasterDataType != NULL)
 	{
-		leader = "Raster Data Type: ";
+		leader = "BandInfo - Raster Data Type: ";
 		message = makeMessage(leader, (char*) rasterDataType);
-		MessageBox (NULL, message, "Parbat3D :: BandInfo", 0);
+		Console::write((char*) message);
+		Console::write("\n");
 	}
 	else
 	{
-		MessageBox (NULL, "No raster data type", "Parbat3D :: BandInfo", 0);
+		Console::write("BandInfo - No raster data type");
+		Console::write("\n");
 	}
 	#endif //DEBUG_BANDS
 
@@ -70,21 +73,24 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 	#if DEBUG_BANDS
 	if (colourInterpretationName != NULL)
 	{
-		leader = "Color Name: ";
+		leader = "BandInfo - Color Name: ";
 		message = makeMessage(leader, (char*) colourInterpretationName);
-		MessageBox (NULL, message, "Parbat3D :: BandInfo", 0);
+		Console::write((char*) message);
+		Console::write("\n");
 	}
 	else
 	{
-		MessageBox (NULL, "No colour name", "Parbat3D :: BandInfo", 0);
+		Console::write("BandInfo - No colour name");
+		Console::write("\n");
 	}
 	#endif //DEBUG_BANDS
 		
 	overviewCount = GDALGetOverviewCount(band);
 	#if DEBUG_BANDS
-	leader = "Overviews: ";
+	leader = "BandInfo - Overviews: ";
 	message = makeMessage(leader, overviewCount);
-	MessageBox (NULL, message, "Parbat3D :: BandInfo", 0);
+	Console::write((char*) message);
+	Console::write("\n");
 	#endif //DEBUG_BANDS
 		
 	GDALGetBlockSize(band, &blockXSize, &blockYSize); 
@@ -96,12 +102,14 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 		GDALComputeRasterMinMax(band, TRUE, adfMinMax);
 	}*/
 	#if DEBUG_BANDS
-	leader = "Min value: ";
+	leader = "BandInfo - Min value: ";
 	message = makeMessage(leader, adfMinMax[0]);
-	MessageBox (NULL, message, "Parbat3D :: BandInfo", 0);
-	leader = "Max value: ";
+	Console::write((char*) message);
+	Console::write("\n");
+	leader = "BandInfo - Max value: ";
 	message = makeMessage(leader, adfMinMax[1]);
-	MessageBox (NULL, message, "Parbat3D :: BandInfo", 0);
+	Console::write((char*) message);
+	Console::write("\n");
 	#endif //DEBUG_BANDS
 }
 

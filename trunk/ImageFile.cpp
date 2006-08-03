@@ -43,7 +43,7 @@ ImageFile::ImageFile(char* theFilename)
     #if DEBUG_IMAGE_FILE
     else
     {
-		Console::write("ImageFile - This is not a valid image file!");
+		Console::write("ImageFile - This is not a valid image file!\n");
     }
     #endif
 }
@@ -59,7 +59,7 @@ ImageFile::~ImageFile(void)
 	if (ifDataset != NULL)
 	{
 		#if DEBUG_IMAGE_FILE
-		Console::write("ImageFile - Closing image file.");
+		Console::write("ImageFile - Closing image file.\n");
 		#endif
 		GDALClose(ifDataset);
 	}
@@ -96,7 +96,7 @@ BandInfo* ImageFile::getBandInfo(int bandNumber)
 	else
 	{
 	#if DEBUG_IMAGE_FILE
-		Console::write("ImageFile - Band could not be retrieved: index out of range!");
+		Console::write("ImageFile - Band could not be retrieved: index out of range!\n");
 	#endif
 		return NULL;
 	}
@@ -143,7 +143,7 @@ const char* ImageFile::getInfoString(void)
 	else
 	{
 		#if DEBUG_IMAGE_FILE
-		Console::write("ImageFile - Cannot get info; dataset was not loaded!");
+		Console::write("ImageFile - Cannot get info; dataset was not loaded!\n");
 		#endif
 		return NULL;
 	}
@@ -169,7 +169,7 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 	{
 	    MessageBox (NULL, "RasterIO failed!!", "Parbat3D :: ImageFile", 0);
 		#if DEBUG_IMAGE_FILE
-		Console::write("ImageFile - RasterIO failed!!");
+		Console::write("ImageFile - RasterIO failed!!\n");
 		#endif
 	}
 }
