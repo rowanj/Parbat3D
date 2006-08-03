@@ -168,6 +168,8 @@ int ImageTileSet::load_tile(int x, int y)
 	int p_in, p_out, p_length;
 	int tile_check;
 	int tile_memory_size;
+
+	tile_memory_size = tex_size * tex_size * num_bands * sample_size;
 	
 	/* Calculate tile index */
 	tile_index_x = x/tile_size;

@@ -27,7 +27,7 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=0000000000001000000000
+CompilerSettings=0000000000000001000000
 
 [Unit3]
 FileName=ImageGLView.cpp
@@ -490,7 +490,7 @@ BuildCmd=
 [Unit45]
 FileName=ImageOverview.cpp
 CompileCpp=1
-Folder=
+Folder=Image_Manipulation_PKG
 Compile=1
 Link=1
 Priority=1000
