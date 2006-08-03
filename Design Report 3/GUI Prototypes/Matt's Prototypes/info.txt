@@ -1,0 +1,11 @@
+matt_fs_1
+Feature Space (window and dialog box)
+Based on Damian's Feature Space prototype 1
+
+matt_pref_1
+Preferences window
+Based on none
+
+matt_roi_1
+ROI toolbar (for image window)
+Based on none
