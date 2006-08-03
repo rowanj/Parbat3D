@@ -1,3 +1,5 @@
+#ifndef _CONSOLE_H
+#define _CONSOLE_H
 #include <Windows.h>
 #include <string>
 
@@ -15,3 +17,4 @@ class Console
     static void write(string *msg);
     static void write(int msg);
 };
+#endif

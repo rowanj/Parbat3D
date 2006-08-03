@@ -9,6 +9,8 @@
 #include <gdal_priv.h>
 
 #include "config.h"
+#include "StringUtils.h"
+#include "console.h"
 #include <string>
 #include <iostream>
 #if PLATFORM_W32

@@ -1,8 +1,22 @@
 #include "config.h"
 #include "ImageFile.h"
 
+/*
+ImageFile
 
-/*Constructor for ImageFile. Takes a filename, and instantiates a new
+=========
+
+ImageFile is the main store and interface to the file we're using.
+It is also the wrapper for the GDAL dataset that is returned by the
+GDAL library.
+
+
+*/
+
+/*
+ImageFile::ImageFile
+
+Constructor for ImageFile. Takes a filename, and instantiates a new
 GDALDataset. Also registers all GDAL drivers, and gets info about
 the new dataset*/
 ImageFile::ImageFile(char* theFilename)
@@ -26,20 +40,26 @@ ImageFile::ImageFile(char* theFilename)
     		theBands.push_back(new BandInfo( (GDALRasterBand*) GDALGetRasterBand(ifDataset, i+1)));
     	}
     }
+    #if DEBUG_IMAGE_FILE
     else
     {
-		MessageBox (NULL, "This is not a valid image file!", "Parbat3D :: ImageFile", 0);
+		Console::write("ImageFile - This is not a valid image file!");
     }
+    #endif
 }
 
-/*Closes the handles to our dataset.*/
+/*
+ImageFile::~ImageFile
+
+Deconstructor for ImageFile, which closes the handles to our dataset.
+*/
 ImageFile::~ImageFile(void)
 {
 	int i;
 	if (ifDataset != NULL)
 	{
 		#if DEBUG_IMAGE_FILE
-		MessageBox (NULL, "Closing image file.", "Parbat3D :: ImageFile", 0);
+		Console::write("ImageFile - Closing image file.");
 		#endif
 		GDALClose(ifDataset);
 	}
@@ -52,11 +72,21 @@ ImageFile::~ImageFile(void)
 	}
 }
 
+/*
+ImageFile::getImageProperties
+
+Returns the properties object of the ImageFile.
+*/
 ImageProperties* ImageFile::getImageProperties(void)
 {
 	return properties;
 }
 
+/*
+ImageFile::getBandInfo
+
+Gets the BandInfo object for a given band ID number.
+*/
 BandInfo* ImageFile::getBandInfo(int bandNumber)
 {
 	if ((bandNumber <= properties->getNumBands()) && (bandNumber > 0))
@@ -65,13 +95,19 @@ BandInfo* ImageFile::getBandInfo(int bandNumber)
 	}
 	else
 	{
-		MessageBox (NULL, "Band could not be retrieved: index out of range!", "Parbat3D :: ImageFile", 0);
+	#if DEBUG_IMAGE_FILE
+		Console::write("ImageFile - Band could not be retrieved: index out of range!");
+	#endif
 		return NULL;
 	}
 }
 
-/*Prints some basic info about the dataset: driver, driver long name, x size, y size
-and the number of raster bands.*/
+/*
+ImageFile::getInfoString
+
+Prints some basic info about the dataset: driver, driver long name, x size, y size
+and the number of raster bands.
+*/
 const char* ImageFile::getInfoString(void)
 {
 	const char* message1;
@@ -106,11 +142,18 @@ const char* ImageFile::getInfoString(void)
 	}
 	else
 	{
-		MessageBox (NULL, "Cannot get info; dataset was not loaded!", "Parbat3D :: ImageFile", 0);
+		#if DEBUG_IMAGE_FILE
+		Console::write("ImageFile - Cannot get info; dataset was not loaded!");
+		#endif
 		return NULL;
 	}
 }
 
+/*
+ImageFile::getRasterData
+
+Fill a buffer with raster data from the file, as specified.
+*/
 void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* buffer, int outWidth, int outHeight)
 {
     CPLErr myErr;
@@ -121,9 +164,12 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
     
     myErr = GDALDatasetRasterIO(ifDataset, GF_Read, xpos, ypos, width, height, buffer, outWidth, outHeight, GDT_Byte,
     					bands, NULL, bands, bands*outWidth, 1);
-
+	
 	if (myErr == CE_Failure)
 	{
 	    MessageBox (NULL, "RasterIO failed!!", "Parbat3D :: ImageFile", 0);
+		#if DEBUG_IMAGE_FILE
+		Console::write("ImageFile - RasterIO failed!!");
+		#endif
 	}
 }

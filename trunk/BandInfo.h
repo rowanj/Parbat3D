@@ -12,10 +12,11 @@
 #include "config.h"
 #include <string>
 #include "StringUtils.h"
+
+#include "console.h"
 #if PLATFORM_W32
 #include <windows.h>
 #endif //PLATFORM_W32
-
 
 class BandInfo
 {

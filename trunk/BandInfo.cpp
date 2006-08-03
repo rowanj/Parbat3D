@@ -16,6 +16,7 @@ Many of the GDAL calls do not produce any output for many file types. Things lik
 Colour Interpretation Name, for example, do not seem to produce results.
 */
 
+
 /*
 BandInfo::BandInfo
 
@@ -53,8 +54,7 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 		MessageBox (NULL, "No raster data type", "Parbat3D :: BandInfo", 0);
 	}
 	#endif //DEBUG_BANDS
-	
-	//theColourInterpretation = band->GetColorInterpretation(); //this is not working
+
 	theColourInterpretation = GDALGetRasterColorInterpretation(band);
 	
 
