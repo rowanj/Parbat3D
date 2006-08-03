@@ -29,7 +29,6 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	band_green = 2;
 	band_blue = 3;
 	texture_size = 256; /* !! Could load from Settings */
-	texture_size_overview = 256; /* !! Could load from Settings */
 	viewport_x = 0;
 	viewport_y = 0;
 	tex_base_size = 0;
@@ -49,16 +48,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		status = 3;
 		error_text = "No filename given.";
 	}
-	
-	/* Initialize OpenGL*/
-	gl_overview = new ImageGLView(overview_hwnd);
-	if (!gl_overview) {
-		status = 4;
-		error_text = "Could not create ImageGLView for overview window.";
-	} else {
-		Console::write("(II) ImageHandler::Created ImageGLView for overview window.\n");
-	}
-	
+		
 	gl_image = new ImageGLView(image_hwnd);
 	if (!gl_image) {
 		status = 4;
@@ -91,13 +81,8 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 	this->GLinit();
    
     if (status <= 0) {
-	    #if DEBUG_IMAGE_HANDLER
-   	 	Console::write("(II) ImageHandler::Creating tileset for overview\n");
-   	 	#endif
-   		overview_tileset = new ImageTileSet(-1, image_file, texture_size_overview, 0);
-		this->make_overview_texture();
-
 		/* Initialize viewports */
+		image_overview = new ImageOverview(overview_hwnd, image_file);
 		this->resize_window();
 		this->set_viewport(0,0);
 	}
@@ -106,10 +91,9 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 ImageHandler::~ImageHandler(void)
 {
 	Console::write("(II) ImageHandler shutting  down...\n");
-	delete overview_tileset;
 	delete image_tileset;
 	delete[] tex_base;
-	delete gl_overview;
+	delete image_overview;
 	delete gl_image;
 	delete image_file;
 }
@@ -122,9 +106,6 @@ void ImageHandler::GLinit(void)
 	Console::write("\n");
 	#endif
 	/* Initialize OpenGL machine */
-    gl_overview->make_current();
-    glShadeModel(GL_FLAT);
-    glDisable(GL_DEPTH_TEST);
     gl_image->make_current();
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
@@ -154,123 +135,6 @@ void ImageHandler::redraw(void)
 	GLenum errorcode;
 	int tile_id;
 	int tile_x, tile_y;
-	
-	// Overview window
-	gl_overview->make_current();
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	/* Set up texture for overview image */
-	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
-
-	/* Set up view transform */
-	/* We look 'down' at the origin, from high enough above it that one unit fills
-		both horizontal and vertical dimensions */
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0.0,0.0,(0.5/tan(PI/6.0)),0.0,0.0,0.0,0.0,1.0,0.0);
-
-	/* Set up aspect transform */
-	glPushMatrix(); // Use matrix copy so we only squash the overview polygon
-	/* squash square we draw to the correct aspect ratio */
-/*	if (image_width >= image_height) {
-		glScalef(1.0, (GLfloat)image_height/(GLfloat)image_width, 1.0);
-	} else {
-		glScalef((GLfloat)image_width/(GLfloat)image_height, 1.0, 1.0);
-	} */
-
-	/* draw textured quad for overview image */
-	glBegin(GL_QUADS);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(-0.5, 0.5, 0.0);
-		glTexCoord2f(1.0, 0.0);
-		glVertex3f( 0.5, 0.5, 0.0);
-		glTexCoord2f(1.0, 1.0);
-		glVertex3f( 0.5,-0.5, 0.0);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f(-0.5,-0.5, 0.0);
-	glEnd();
-	/* No more texturing in overview window */
-	glDisable(GL_TEXTURE_2D);
-
-	/* Draw window box in overview window */
-	{
-		GLfloat box_top, box_bottom, box_left, box_right;
-		GLfloat box_vert_max, box_horiz_max;
-		
-		box_vert_max = (GLfloat)image_tileset->get_LOD_height();
-		box_horiz_max = (GLfloat)image_tileset->get_LOD_width();
-
-		/* Move drawing such that origin is top-left pixel of overview image */
-		glTranslatef(-0.5, 0.5, 0.0);
-		/* Scale to work in LOD pixels, x increases to right, y increases to bottom */
-		glScalef(1.0/box_horiz_max, -1.0/box_vert_max, 1.0);
-
-		/* We'll be using translucent lines */
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-		/* !! These could be global, recalc triggered on resize/zoom... */
-		box_top = viewport_y;
-		box_bottom = viewport_y + viewport_height;
-		box_left = viewport_x;
-		box_right = viewport_x + viewport_width;
-		if (box_top < 0.0) box_top = 0.0;
-		if (box_bottom > box_vert_max) box_bottom = box_vert_max;
-		if (box_left < 0.0) box_left = 0.0;
-		if (box_right > box_horiz_max) box_right = box_horiz_max;
-		
-		glBegin(GL_LINE_LOOP);
-		{
-			glColor4f(1.0, 0.0, 0.0, 0.8);
-			/* top left */
-			glVertex3f(box_left, box_top, 0.0);
-			/* top right */
-			glVertex3f(box_right, box_top, 0.0);
-			/* bottom right */
-			glVertex3f(box_right, box_bottom, 0.0);
-			/* bottom left */
-			glVertex3f(box_left, box_bottom, 0.0);
-		}
-		glEnd();
-	
-		/* Draw cross-hairs, for locating box when small */
-		glBegin(GL_LINES);
-		{
-			glColor4f(1.0, 0.0, 0.0, 0.2);
-			/* Left line */
-			glVertex3f(0.0, (GLfloat)(viewport_y + (viewport_height/2)), 0.0);
-			glVertex3f((GLfloat)viewport_x, (GLfloat)(viewport_y + (viewport_height/2)), 0.0);
-			/* Right line */
-			glVertex3f(box_horiz_max, (GLfloat)(viewport_y + (viewport_height/2)), 0.0);
-			glVertex3f((GLfloat)(viewport_x + viewport_width), (GLfloat)(viewport_y + (viewport_height/2)), 0.0);
-			/* Top line */
-			glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), 0.0, 0.0);
-			glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), (GLfloat)viewport_y, 0.0);
-			/* Bottom line */
-			glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), box_vert_max, 0.0);
-			glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), (GLfloat)(viewport_y + viewport_height), 0.0);
-		}
-		glEnd();
-		glDisable(GL_BLEND);
-	}
-	
-	glPopMatrix(); // Restore model transform
-	
-#if DEBUG_IMAGE_REDRAW
-	/* draw rotating line to visualize redraw frequency */
-	glRotatef(redraw_rotz, 0.0,0.0,1.0);
-	redraw_rotz-=1.0;
-	if(redraw_rotz < -360.0) redraw_rotz+=360.0;
-	glBegin(GL_LINES);
-		glColor3f(1.0,1,0);
-		glVertex3f(0.0,0.0,0.0);
-		glVertex3f(0.0,0.25,0.0);
-	glEnd();
-#endif
-	gl_overview->GLswap();
 	
 	/* On to the main window */
 	gl_image->make_current();
@@ -342,17 +206,15 @@ void ImageHandler::resize_window(void)
 	#if DEBUG_IMAGE_HANDLER
     Console::write("(II) ImageHandler::Window resize triggered.\n");
     #endif
-	gl_overview->GLresize();
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	
-	gluPerspective(60.0, (GLfloat) gl_overview->width()/(GLfloat) gl_overview->height(), 0.1, 2.0);
-	
 	gl_image->GLresize();
 	viewport_width = gl_image->width();
 	viewport_height = gl_image->height();
 	viewport_columns = (viewport_width / texture_size) + ((viewport_width % texture_size)!=0) + 1;
 	viewport_rows = (viewport_height / texture_size) + ((viewport_height % texture_size)!=0) + 1;
+	
+	/* !! This sholud be in image pixels */
+	image_overview->resize_viewport(viewport_width, viewport_height);
+	
 	this->make_textures();
 	this->redraw();
 }
@@ -383,34 +245,6 @@ const char* ImageHandler::get_info_string(void)
 {
     return image_file->getInfoString();
 }    
-
-void ImageHandler::make_overview_texture(void)
-{
-	#if DEBUG_IMAGE_HANDLER
-	Console::write("(II) ImageHandler::make_overview_texture()\n");
-	#endif
-	// Get texture data	
-	tex_overview = overview_tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
-	#if DEBUG_IMAGE_HANDLER
-	Console::write("(II) ImageHandler::Successfully got overview texture from tileset.\n");
-	#endif
-
-	/* Make texture from data */
-	gl_overview->make_current();
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	if (!tex_overview_id) glGenTextures(1, &tex_overview_id);
-	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size_overview, texture_size_overview, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
-	/* We don't need the RGB data here anymore */
-	delete(tex_overview);
-	#if DEBUG_IMAGE_HANDLER
-	Console::write("(II) ImageHandler::Successfully created overview texture.\n");
-	#endif
-}
 
 void ImageHandler::make_textures(void)
 {
@@ -477,7 +311,7 @@ void ImageHandler::set_bands(int band_R, int band_G, int band_B)
 	band_red = band_R;
 	band_green = band_G;
 	band_blue = band_B;
-	make_overview_texture();
+	image_overview->set_bands(band_red, band_green, band_blue);
 	make_textures();
 	redraw();
 }

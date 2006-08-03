@@ -9,6 +9,7 @@
 #include "ImageFile.h"
 #include "ImageTileSet.h"
 #include "ImageProperties.h"
+#include "ImageOverview.h"
 #include "ImageGLView.h"
 
 #include "config.h"
@@ -69,9 +70,8 @@ public:
 private:
 	/* Sub-objects */
 	ImageFile* image_file;
-
-	ImageGLView* gl_overview;
 	ImageGLView* gl_image;
+	ImageOverview* image_overview;
 
 	/* Internal Functions */
 	void make_overview_texture(void);
@@ -83,15 +83,10 @@ private:
 	int image_width, image_height;
     int max_texture_size;
     int band_red, band_green, band_blue;
-	int texture_size, texture_size_overview;
+	int texture_size;
 	int viewport_width, viewport_height, viewport_x, viewport_y;
 	int viewport_columns, viewport_rows;
 	int start_column, start_row;
-	
-    /* Overview window texture */
-	ImageTileSet* overview_tileset;
-	char *tex_overview;
-	GLuint tex_overview_id;
 	
 	/* Image window textures */
 	ImageTileSet* image_tileset;
