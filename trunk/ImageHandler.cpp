@@ -136,6 +136,9 @@ void ImageHandler::redraw(void)
 	int tile_id;
 	int tile_x, tile_y;
 	
+	/* redraw overview window (shane) */
+	image_overview->redraw();
+	
 	/* On to the main window */
 	gl_image->make_current();
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

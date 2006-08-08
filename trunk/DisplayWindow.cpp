@@ -5,6 +5,7 @@
 #include "ToolWindow.h"
 #include "ImageWindow.h"
 #include "main.h"
+#include "console.h"
 
 /* DisplayWindow functions are used to display the opengl content inside the image & overview windows,
    as well as displaying the "No Image Loaded" message on the overview window  */
@@ -116,10 +117,17 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 }
             }
             break;
+
+        case WM_DESTROY:
+            DeleteObject(hNormalFont);
+            break;
             
 		case WM_PAINT:
+            static int p;
             hdc=BeginPaint(hwnd,&ps);
-			if (image_handler)
+            Console::write((char*)makeMessage("DislayWindow wm_paint ",p++));
+            Console::write("\n");
+			if (image_handler!=NULL)
     			/* Re-draw OpenGL stuff */
                 image_handler->redraw();
             else
