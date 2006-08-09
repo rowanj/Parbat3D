@@ -418,7 +418,15 @@ void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, i
     *tile = temp_tile;
 }
 
-int ImageTileSet::get_tex_size(void) {return tex_size;}
+void ImageTileSet::get_cache_stats(unsigned int* size_p, unsigned int* fill_p, unsigned int* hits_p, unsigned int* misses_p)
+{
+	if (size_p) *size_p = cache_size;
+	if (fill_p) *fill_p = cache_fill;
+	if (hits_p) *hits_p = cache_hits;
+	if (misses_p) *misses_p = cache_misses;
+}
+
+int ImageTileSet::get_texture_size(void) {return tex_size;}
 int ImageTileSet::get_columns(void) {return columns;}
 int ImageTileSet::get_rows(void) {return rows;}
 int ImageTileSet::get_tile_size(void) {return tile_size;}

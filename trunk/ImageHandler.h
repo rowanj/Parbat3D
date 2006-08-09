@@ -9,7 +9,7 @@
 #include "ImageFile.h"
 #include "ImageTileSet.h"
 #include "ImageProperties.h"
-#include "ImageOverview.h"
+#include "OverviewGL.h"
 #include "ImageGLView.h"
 
 #include "config.h"
@@ -71,7 +71,7 @@ private:
 	/* Sub-objects */
 	ImageFile* image_file;
 	ImageGLView* gl_image;
-	ImageOverview* image_overview;
+	OverviewGL* overview_gl;
 
 	/* Internal Functions */
 	void make_overview_texture(void);

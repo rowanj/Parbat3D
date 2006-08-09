@@ -82,7 +82,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
    
     if (status <= 0) {
 		/* Initialize viewports */
-		image_overview = new ImageOverview(overview_hwnd, image_file);
+		overview_gl = new OverviewGL(overview_hwnd, image_file);
 		this->resize_window();
 		this->set_viewport(0,0);
 	}
@@ -93,7 +93,7 @@ ImageHandler::~ImageHandler(void)
 	Console::write("(II) ImageHandler shutting  down...\n");
 	delete image_tileset;
 	delete[] tex_base;
-	delete image_overview;
+	delete overview_gl;
 	delete gl_image;
 	delete image_file;
 }
@@ -136,8 +136,8 @@ void ImageHandler::redraw(void)
 	int tile_id;
 	int tile_x, tile_y;
 	
-	/* redraw overview window (shane) */
-	image_overview->redraw();
+	/* redraw overview window */
+	overview_gl->redraw();
 	
 	/* On to the main window */
 	gl_image->make_current();
@@ -216,7 +216,7 @@ void ImageHandler::resize_window(void)
 	viewport_rows = (viewport_height / texture_size) + ((viewport_height % texture_size)!=0) + 1;
 	
 	/* !! This sholud be in image pixels */
-	image_overview->resize_viewport(viewport_width, viewport_height);
+	overview_gl->resize_viewport(viewport_width, viewport_height);
 	
 	this->make_textures();
 	this->redraw();
@@ -314,7 +314,7 @@ void ImageHandler::set_bands(int band_R, int band_G, int band_B)
 	band_red = band_R;
 	band_green = band_G;
 	band_blue = band_B;
-	image_overview->set_bands(band_red, band_green, band_blue);
+	overview_gl->set_bands(band_red, band_green, band_blue);
 	make_textures();
 	redraw();
 }

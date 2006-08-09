@@ -478,7 +478,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit44]
-FileName=ImageOverview.h
+FileName=OverviewGL.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG
 Compile=1
@@ -488,7 +488,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit45]
-FileName=ImageOverview.cpp
+FileName=OverviewGL.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
 Compile=1

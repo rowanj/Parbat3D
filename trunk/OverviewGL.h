@@ -5,11 +5,11 @@
 #include "ImageFile.h"
 #include "ImageTileSet.h"
 
-class ImageOverview
+class OverviewGL
 {
   public:
-	ImageOverview(HWND window_hwnd, ImageFile* image_file);
-	virtual ~ImageOverview(void);
+	OverviewGL(HWND window_hwnd, ImageFile* image_file);
+	virtual ~OverviewGL(void);
 	
 	void set_bands(int band_R, int band_G, int band_B);
 	void redraw(void);

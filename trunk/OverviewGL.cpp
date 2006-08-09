@@ -1,7 +1,7 @@
-#include "ImageOverview.h"
+#include "OverviewGL.h"
 #include <stdlib.h>
 
-ImageOverview::ImageOverview(HWND window_hwnd, ImageFile* image_file)
+OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 {
 	ImageProperties* image_properties;
 	image_properties = image_file->getImageProperties();
@@ -37,13 +37,13 @@ ImageOverview::ImageOverview(HWND window_hwnd, ImageFile* image_file)
 }
 
 
-ImageOverview::~ImageOverview()
+OverviewGL::~OverviewGL()
 {
 	delete gl_overview;
 	delete tileset;
 }
 
-void ImageOverview::redraw(void)
+void OverviewGL::redraw(void)
 {
 		// Overview window
 	gl_overview->make_current();
@@ -165,7 +165,7 @@ void ImageOverview::redraw(void)
 }
 
 
-void ImageOverview::set_bands(int band_R, int band_G, int band_B)
+void OverviewGL::set_bands(int band_R, int band_G, int band_B)
 {
 	band_red = band_R;
 	band_green = band_G;
@@ -174,7 +174,7 @@ void ImageOverview::set_bands(int band_R, int band_G, int band_B)
 	redraw();
 }
 
-void ImageOverview::make_texture(void)
+void OverviewGL::make_texture(void)
 {
 	#if DEBUG_IMAGE_HANDLER
 	Console::write("(II) ImageHandler::make_overview_texture()\n");
@@ -202,13 +202,13 @@ void ImageOverview::make_texture(void)
 	#endif
 }
 
-void ImageOverview::resize_viewport(int new_width, int new_height)
+void OverviewGL::resize_viewport(int new_width, int new_height)
 {
 	viewport_width = new_width;
 	viewport_height = new_height;
 	redraw();
 }
-void ImageOverview::move_viewport(int new_x, int new_y)
+void OverviewGL::move_viewport(int new_x, int new_y)
 {
 	viewport_x = new_x;
 	viewport_y = new_y;

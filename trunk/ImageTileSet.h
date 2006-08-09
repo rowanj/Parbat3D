@@ -21,7 +21,7 @@ public:
 	char* get_tile_RGB(int x, int y, int band_R, int band_G, int band_B);
 	unsigned int* get_pixel_values(int x, int y);
 	
-	int get_tex_size(void);
+	int get_texture_size(void);
 	int get_columns(void);
 	int get_rows(void);
 	int get_tile_size(void);
