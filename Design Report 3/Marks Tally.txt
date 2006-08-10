@@ -2,12 +2,13 @@ Needed: 10
 
 Aim: 12
 
-So far: 5+3+4ish=12ish
+So far: 5 + 3 + 4.8 + 0.5 + 0.5 = 13.8h
 
 Documents (almost) completed:
 
 10 scenarios =5
 6? OO Diagrams =3
-around 24 Gui Prototypes stages = 4 or 5
+around 24 Gui Prototypes stages = 4.8
 text file report = ? (probably 0.5ish)
+Release Schedule = 0.5
 
