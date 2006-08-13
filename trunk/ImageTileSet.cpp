@@ -83,6 +83,8 @@ ImageTileSet::~ImageTileSet(void)
 
 char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_B)
 {
+	int band_R_min = 255, band_G_min = 255, band_B_min = 255;
+	int band_R_max = 0, band_G_max = 0, band_B_max = 0;
 	int tile_index;
 	char* tile;
 	char* out_tile;
@@ -111,6 +113,11 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	if(band_G>num_bands) band_G = num_bands;
 	if(band_B>num_bands) band_B = num_bands;
 	
+	/* Check for unused bands, and set min/max accordingly */
+	if(!band_R) band_R_min = 0;
+	if(!band_G) band_G_min = 0;
+	if(!band_B) band_B_min = 0;
+	
 	/* Convert color space */
  
 	/* Convert band packing */
@@ -123,8 +130,14 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 		band_B--;
 		while (pix < size) {
 			out_tile[pix]   = tile[piy+band_R];
+			if (out_tile[pix] < band_R_min) band_R_min = out_tile[pix];
+			if (out_tile[pix] > band_R_max) band_R_max = out_tile[pix];
 			out_tile[pix+1] = tile[piy+band_G];
+			if (out_tile[pix+1] < band_G_min) band_G_min = out_tile[pix+1];
+			if (out_tile[pix+1] > band_G_max) band_G_max = out_tile[pix+1];
 			out_tile[pix+2] = tile[piy+band_B];
+			if (out_tile[pix+2] < band_B_min) band_B_min = out_tile[pix+2];
+			if (out_tile[pix+2] > band_B_max) band_B_max = out_tile[pix+2];
 			pix = pix + 3;
 			piy = piy + num_bands;
 		}
@@ -133,16 +146,22 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 		while (pix < size) {
 			if (band_R) {
 				out_tile[pix]   = tile[piy+band_R-1];
+				if (out_tile[pix] < band_R_min) band_R_min = out_tile[pix];
+				if (out_tile[pix] > band_R_max) band_R_max = out_tile[pix];
 			} else {
 				out_tile[pix]   = 0;
 			}
 			if (band_G) {
 				out_tile[pix+1] = tile[piy+band_G-1];
+				if (out_tile[pix+1] < band_G_min) band_G_min = out_tile[pix+1];
+				if (out_tile[pix+1] > band_G_max) band_G_max = out_tile[pix+1];
 			} else {
 				out_tile[pix+1] = 0;
 			}
 			if (band_B) {
 				out_tile[pix+2] = tile[piy+band_B-1];
+				if (out_tile[pix+2] < band_B_min) band_B_min = out_tile[pix+2];
+				if (out_tile[pix+2] > band_B_max) band_B_max = out_tile[pix+2];
 			} else {
 				out_tile[pix+2] = 0;
 			}
