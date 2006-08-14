@@ -25,13 +25,17 @@ class OverviewGL
 	int viewport_width, viewport_height;
 	int viewport_x, viewport_y;
 	
+	/* General OpenGL stuff */
+	GLfloat scalefactor_tile, scalefactor_lines;
+	unsigned int list_tile; // display list for textured tile
+		
    	/* Overview window texture */
 	ImageTileSet* tileset;
 	GLint texture_size;
-	int LOD_height, LOD_width;
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 	char *tex_overview;
 	GLuint tex_overview_id;
-	unsigned int list_tile; // display list for textured tile
 };
 
 #endif

@@ -30,9 +30,6 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 	LOD_width = tileset->get_LOD_width();
 	
 	gl_overview->GLresize();
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	
 
 	/* compile display list for textured tile */
 	list_tile = glGenLists(1);
@@ -54,6 +51,9 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 	glEndList();
 
 
+	/* Set up view transform */
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 	/* glOrtho(Left, Right, Bottom, Top, Near-clip, Far-clip) */
 #if TRUE
 	/* Orthagonal projection, clamped to 1 unit, top-left origin,
@@ -64,6 +64,16 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 	glOrtho(-1.0, 2.0, 2.0, -1.0, 1.0, -1.0);
 #endif
 
+	/* Set up initial model transform */
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
+	/* Scale such that image fills overview window in largest dimension */
+	scalefactor_tile = (GLfloat)texture_size / (GLfloat) max(LOD_width,LOD_height);
+	glScalef(scalefactor_tile, scalefactor_tile, scalefactor_tile);
+	
+	/* Find scale factor for lines */
+	scalefactor_lines = 1.0 / (GLfloat) max(image_width, image_height);
 	set_bands(1, 2, 3);
 }
 
@@ -87,56 +97,33 @@ void OverviewGL::redraw(void)
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
 
-	/* Set up view transform */
-	/* We look 'down' at the origin, from high enough above it that one unit fills
-		both horizontal and vertical dimensions */
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	
-	/* Scale such that image fills overview window in largest dimension */
-	// !! could be done in init
-	GLfloat factor;
-	if (LOD_width > LOD_height) {
-		/* Scale width to fit */
-		factor = (GLfloat)texture_size / (GLfloat)LOD_width;
-	} else {
-		/* Scale height to fit */
-		factor = (GLfloat)texture_size / (GLfloat)LOD_height;
-	}
-	glScalef(factor,factor,factor);
-
 	/* draw textured quad for overview image */
 	glCallList(list_tile);
 
 	/* No more texturing in overview window */
 	glDisable(GL_TEXTURE_2D);
 
+
 	/* Draw window box in overview window */
 	{
-		GLfloat box_top, box_bottom, box_left, box_right;
-		GLfloat box_vert_max, box_horiz_max;
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix(); /* Don't destroy tile transform */
+		/* Scale to work in image pixels */
+		glScalef(scalefactor_lines, scalefactor_lines, scalefactor_lines);
+
+		GLfloat box_top = viewport_y;
+		GLfloat box_bottom = viewport_y + viewport_height;
+		GLfloat box_left = viewport_x;
+		GLfloat box_right = viewport_x + viewport_width;
 		
-		box_vert_max = image_height;
-		box_horiz_max = image_width;
-
-		/* Move drawing such that origin is top-left pixel of overview image */
-		glTranslatef(-0.5, 0.5, 0.0);
-		/* Scale to work in LOD pixels, x increases to right, y increases to bottom */
-//		glScalef(1.0/box_horiz_max, -1.0/box_vert_max, 1.0);
-
+		if (box_top < 0.0) box_top = 0.0;
+		if (box_bottom > image_height) box_bottom = image_height;
+		if (box_left < 0.0) box_left = 0.0;
+		if (box_right > box_horiz_max) box_right = image_width;
+		
 		/* We'll be using translucent lines */
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-		/* !! These could be global, recalc triggered on resize/zoom... */
-		box_top = viewport_y;
-		box_bottom = viewport_y + viewport_height;
-		box_left = viewport_x;
-		box_right = viewport_x + viewport_width;
-		if (box_top < 0.0) box_top = 0.0;
-		if (box_bottom > box_vert_max) box_bottom = box_vert_max;
-		if (box_left < 0.0) box_left = 0.0;
-		if (box_right > box_horiz_max) box_right = box_horiz_max;
 		
 		glBegin(GL_LINE_LOOP);
 		{
@@ -155,22 +142,27 @@ void OverviewGL::redraw(void)
 		/* Draw cross-hairs, for locating box when small */
 		glBegin(GL_LINES);
 		{
+			GLfloat halfway_point_x = (GLfloat)(viewport_x + viewport_width/2);
+			GLfloat halfway_point_y = (GLfloat)(viewport_y + viewport_height/2);
 			glColor4f(1.0, 0.0, 0.0, 0.2);
 			/* Left line */
-			glVertex3f(0.0, (GLfloat)(viewport_y + (viewport_height/2)), 0.0);
-			glVertex3f((GLfloat)viewport_x, (GLfloat)(viewport_y + (viewport_height/2)), 0.0);
+			glVertex3f(0.0, halfway_point_y, 0.0);
+			glVertex3f((GLfloat)viewport_x, halfway_point_y, 0.0);
 			/* Right line */
-			glVertex3f(box_horiz_max, (GLfloat)(viewport_y + (viewport_height/2)), 0.0);
-			glVertex3f((GLfloat)(viewport_x + viewport_width), (GLfloat)(viewport_y + (viewport_height/2)), 0.0);
+			glVertex3f((GLfloat)image_width, halfway_point_y, 0.0);
+			glVertex3f((GLfloat)(viewport_x + viewport_width), halfway_point_y, 0.0);
 			/* Top line */
-			glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), 0.0, 0.0);
-			glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), (GLfloat)viewport_y, 0.0);
+			glVertex3f(halfway_point_x, 0.0, 0.0);
+			glVertex3f(halfway_point_x, (GLfloat)viewport_y, 0.0);
 			/* Bottom line */
-			glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), box_vert_max, 0.0);
-			glVertex3f((GLfloat)(viewport_x + (viewport_width/2)), (GLfloat)(viewport_y + viewport_height), 0.0);
+			glVertex3f(halfway_point_x, box_vert_max, 0.0);
+			glVertex3f(halfway_point_x, (GLfloat)(viewport_y + viewport_height), 0.0);
 		}
 		glEnd();
+		
 		glDisable(GL_BLEND);
+		
+		glPopMatrix(); /* Restore tile transform */
 	}
 	
 	gl_overview->GLswap();
