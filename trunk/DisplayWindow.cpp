@@ -125,8 +125,6 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
 		case WM_PAINT:
             static int p;
             hdc=BeginPaint(hwnd,&ps);
-            Console::write((char*)makeMessage("DislayWindow wm_paint ",p++));
-            Console::write("\n");
 			if (image_handler!=NULL)
     			/* Re-draw OpenGL stuff */
                 image_handler->redraw();
