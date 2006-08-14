@@ -1,5 +1,5 @@
 #include "config.h"
-#include "ImageGLView.h"
+#include "GLView.h"
 
 // pfd structure aproximated from public domain code at nehe.gamedev.net
 static	PIXELFORMATDESCRIPTOR gl_pfd={	// pfd Tells Windows How We Want Things To Be
@@ -23,7 +23,7 @@ static	PIXELFORMATDESCRIPTOR gl_pfd={	// pfd Tells Windows How We Want Things To
 		0, 0, 0							// Layer Masks Ignored
 };
 
-ImageGLView::ImageGLView(HWND hWindow)
+GLView::GLView(HWND hWindow)
 {
 	status = 0; // No error
 	error_text = "No error.";
@@ -67,14 +67,14 @@ ImageGLView::ImageGLView(HWND hWindow)
 	this->GLresize();
 }
 
-ImageGLView::~ImageGLView()
+GLView::~GLView()
 {
 	wglMakeCurrent(NULL, NULL);
 	wglDeleteContext(rendering_context);
 	ReleaseDC(window_handle, device_context);
 }
 
-void ImageGLView::GLresize(void)
+void GLView::GLresize(void)
 {
 	GLuint width, height;
 	LPRECT window_rect;
@@ -92,24 +92,23 @@ void ImageGLView::GLresize(void)
 	glViewport(0,0,width,height);
 }
 
-void ImageGLView::make_current()
+void GLView::make_current()
 {
 	wglMakeCurrent(device_context, rendering_context);
 }
 
-void ImageGLView::GLswap()
+void GLView::GLswap()
 {
 	this->make_current();
 	SwapBuffers(device_context);
 }
 
-int ImageGLView::height()
+int GLView::height()
 {
 	return window_height;
 }
 
-int ImageGLView::width()
+int GLView::width()
 {
 	return window_width;
 }
-

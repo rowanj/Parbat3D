@@ -1,15 +1,15 @@
-#ifndef _IMAGE_GL_VIEW_H
-#define _IMAGE_GL_VIEW_H
+#ifndef _GL_VIEW_H
+#define _GL_VIEW_H
 
 #include <windows.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
 
-class ImageGLView
+class GLView
 {
 public:
-	ImageGLView(HWND hWindow);		/* Creates OpenGL rendering context */
-	virtual ~ImageGLView(void);		/* Deletes OpenGL rendering context
+	GLView(HWND hWindow);		/* Creates OpenGL rendering context */
+	virtual ~GLView(void);		/* Deletes OpenGL rendering context
 										and frees up resources */
 	void make_current(void);		/* Selects this rendering context for
 										use.  Only necessary if multiple

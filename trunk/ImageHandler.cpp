@@ -49,12 +49,12 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		error_text = "No filename given.";
 	}
 		
-	gl_image = new ImageGLView(image_hwnd);
+	gl_image = new GLView(image_hwnd);
 	if (!gl_image) {
 		status = 4;
-		error_text = "Could not create ImageGLView for image window.";
+		error_text = "Could not create GLView for image window.";
 	} else {
-		Console::write("(II) ImageHandler::Created ImageGLView for image window.\n");
+		Console::write("(II) ImageHandler::Created GLView for image window.\n");
 		viewport_width = gl_image->width();
 		viewport_height = gl_image->height();
 	}
@@ -216,7 +216,7 @@ void ImageHandler::resize_window(void)
 	viewport_rows = (viewport_height / texture_size) + ((viewport_height % texture_size)!=0) + 1;
 	
 	/* !! This sholud be in image pixels */
-	overview_gl->resize_viewport(viewport_width, viewport_height);
+	overview_gl->update_viewport(viewport_x, viewport_y, viewport_width, viewport_height);
 	
 	this->make_textures();
 	this->redraw();
@@ -355,6 +355,7 @@ void ImageHandler::set_viewport(int x, int y)
 {
 	viewport_x = x;
 	viewport_y = y;
+	overview_gl->update_viewport(viewport_x, viewport_y, viewport_width, viewport_height);
 	start_column = x / texture_size;
 	start_row = y / texture_size;
 	if (start_column < 0) start_column = 0;

@@ -29,28 +29,8 @@ SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000001000000
 
-[Unit3]
-FileName=ImageGLView.cpp
-CompileCpp=1
-Folder=Image_Manipulation_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit4]
-FileName=ImageHandler.h
-CompileCpp=1
-Folder=Image_Manipulation_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit5]
-FileName=ImageFile.cpp
+FileName=BandInfo.cpp
 CompileCpp=1
 Folder=Image_File_PKG
 Compile=1
@@ -59,10 +39,10 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit2]
-FileName=ImageGLView.h
+[Unit5]
+FileName=ImageProperties.cpp
 CompileCpp=1
-Folder=Image_Manipulation_PKG
+Folder=Image_File_PKG
 Compile=1
 Link=1
 Priority=1000
@@ -88,26 +68,6 @@ ProductVersion=
 AutoIncBuildNr=0
 
 [Unit6]
-FileName=BandInfo.cpp
-CompileCpp=1
-Folder=Image_File_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit7]
-FileName=ImageProperties.cpp
-CompileCpp=1
-Folder=Image_File_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit8]
 FileName=CoordinateInfo.cpp
 CompileCpp=1
 Folder=Image_File_PKG
@@ -117,7 +77,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit9]
+[Unit7]
 FileName=ImageTileSet.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -127,7 +87,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit10]
+[Unit8]
 FileName=ImageTileSet.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -137,7 +97,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit11]
+[Unit9]
 FileName=Settings.cpp
 CompileCpp=1
 Folder=Settings_PKG
@@ -147,7 +107,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit12]
+[Unit10]
 FileName=Settings.h
 CompileCpp=1
 Folder=Settings_PKG
@@ -157,7 +117,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit13]
+[Unit11]
 FileName=IniFile.cpp
 CompileCpp=1
 Folder=Settings_PKG
@@ -167,7 +127,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit14]
+[Unit12]
 FileName=IniFile.h
 CompileCpp=1
 Folder=Settings_PKG
@@ -177,7 +137,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit15]
+[Unit13]
 FileName=CoordinateInfo.h
 CompileCpp=1
 Folder=Image_File_PKG
@@ -187,7 +147,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit16]
+[Unit14]
 FileName=ImageFile.h
 CompileCpp=1
 Folder=Image_File_PKG
@@ -197,17 +157,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit21]
-FileName=config.h
-CompileCpp=1
-Folder=
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit17]
+[Unit15]
 FileName=ImageProperties.h
 CompileCpp=1
 Folder=Image_File_PKG
@@ -217,7 +167,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit18]
+[Unit16]
 FileName=BandInfo.h
 CompileCpp=1
 Folder=Image_File_PKG
@@ -227,7 +177,17 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit19]
+[Unit21]
+FileName=StringUtils.h
+CompileCpp=1
+Folder=Utils
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit17]
 FileName=main.h
 CompileCpp=1
 Folder=View_PKG
@@ -237,7 +197,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit20]
+[Unit18]
 FileName=rsrc.rc
 CompileCpp=1
 Folder=View_PKG
@@ -247,7 +207,17 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit22]
+[Unit19]
+FileName=config.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit20]
 FileName=StringUtils.cpp
 CompileCpp=1
 Folder=Utils
@@ -257,47 +227,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit23]
-FileName=StringUtils.h
-Folder=Utils
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-CompileCpp=1
-
-[Unit28]
-FileName=console.cpp
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit25]
-FileName=TestUtils.cpp
-CompileCpp=1
-Folder=Utils
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit26]
-FileName=SnappingWindow.cpp
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit24]
+[Unit22]
 FileName=TestUtils.h
 CompileCpp=1
 Folder=Utils
@@ -307,17 +237,17 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit27]
-FileName=SnappingWindow.h
-CompileCpp=1
-Folder=View_PKG
+[Unit23]
+FileName=TestUtils.cpp
+Folder=Utils
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=1
 
-[Unit30]
+[Unit28]
 FileName=MathUtils.h
 CompileCpp=1
 Folder=Utils
@@ -327,7 +257,37 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit29]
+[Unit25]
+FileName=SnappingWindow.h
+CompileCpp=1
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit26]
+FileName=console.cpp
+CompileCpp=1
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit24]
+FileName=SnappingWindow.cpp
+CompileCpp=1
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit27]
 FileName=console.h
 CompileCpp=1
 Folder=View_PKG
@@ -337,17 +297,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit31]
-FileName=MathUtils.cpp
-CompileCpp=1
-Folder=Utils
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit32]
+[Unit30]
 FileName=MainWindow.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -357,7 +307,17 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit33]
+[Unit29]
+FileName=MathUtils.cpp
+CompileCpp=1
+Folder=Utils
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit31]
 FileName=main.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -367,7 +327,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit34]
+[Unit32]
 FileName=OverviewWindow.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -377,7 +337,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit35]
+[Unit33]
 FileName=ImageWindow.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -387,7 +347,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit36]
+[Unit34]
 FileName=DisplayWindow.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -397,8 +357,28 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit37]
+[Unit35]
 FileName=ToolWindow.cpp
+CompileCpp=1
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit36]
+FileName=ToolWindow.h
+CompileCpp=1
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit37]
+FileName=OverviewWindow.h
 CompileCpp=1
 Folder=View_PKG
 Compile=1
@@ -418,26 +398,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit38]
-FileName=ToolWindow.h
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit39]
-FileName=OverviewWindow.h
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit40]
 FileName=ImageWindow.h
 CompileCpp=1
 Folder=View_PKG
@@ -447,7 +407,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit41]
+[Unit39]
 FileName=MainWindow.h
 CompileCpp=1
 Folder=View_PKG
@@ -457,7 +417,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit42]
+[Unit40]
 FileName=DisplayWindow.h
 CompileCpp=1
 Folder=View_PKG
@@ -467,7 +427,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit43]
+[Unit41]
 FileName=resources.h
 CompileCpp=1
 Folder=
@@ -477,7 +437,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit44]
+[Unit42]
 FileName=OverviewGL.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -487,10 +447,50 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit45]
+[Unit43]
 FileName=OverviewGL.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit44]
+FileName=GLView.h
+CompileCpp=1
+Folder=Image_Manipulation_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit45]
+FileName=GLView.cpp
+CompileCpp=1
+Folder=Image_Manipulation_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit2]
+FileName=ImageHandler.h
+CompileCpp=1
+Folder=Image_Manipulation_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit3]
+FileName=ImageFile.cpp
+CompileCpp=1
+Folder=Image_File_PKG
 Compile=1
 Link=1
 Priority=1000

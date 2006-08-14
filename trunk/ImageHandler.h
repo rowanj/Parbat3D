@@ -10,7 +10,7 @@
 #include "ImageTileSet.h"
 #include "ImageProperties.h"
 #include "OverviewGL.h"
-#include "ImageGLView.h"
+#include "GLView.h"
 
 #include "config.h"
 
@@ -70,7 +70,7 @@ public:
 private:
 	/* Sub-objects */
 	ImageFile* image_file;
-	ImageGLView* gl_image;
+	GLView* gl_image;
 	OverviewGL* overview_gl;
 
 	/* Internal Functions */

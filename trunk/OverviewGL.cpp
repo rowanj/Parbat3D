@@ -11,28 +11,59 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 	viewport_y = 0;
 	viewport_width = 100;
 	viewport_height = 100;
-	
+		
 	/* Initialize OpenGL*/
-	gl_overview = new ImageGLView(window_hwnd);
+	gl_overview = new GLView(window_hwnd);
 
 	/* Initialize OpenGL machine */
     gl_overview->make_current();
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
     
-    /* Use large textures if appropriate */
+    /* Use larger texture if appropriate */
     GLint max_texture_size;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
 	texture_size = (((max_texture_size)<(512))?(max_texture_size):(512));
 
 	tileset = new ImageTileSet(-1, image_file, texture_size, 0);
+	LOD_height = tileset->get_LOD_height();
+	LOD_width = tileset->get_LOD_width();
 	
 	gl_overview->GLresize();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	
-	gluPerspective(60.0, (GLfloat) gl_overview->width()/(GLfloat) gl_overview->height(), 0.1, 2.0);
-	
+
+	/* compile display list for textured tile */
+	list_tile = glGenLists(1);
+    glNewList(list_tile,GL_COMPILE);
+    {
+		glBegin(GL_QUADS);
+		{
+			glTexCoord2i(0, 0);
+			glVertex2i(0, 0);
+			glTexCoord2i(1, 0);
+			glVertex2i(1, 0);
+			glTexCoord2i(1, 1);
+			glVertex2i(1, 1);
+			glTexCoord2i(0, 1);
+			glVertex2i(0, 1);
+		}
+		glEnd();
+	}
+	glEndList();
+
+
+	/* glOrtho(Left, Right, Bottom, Top, Near-clip, Far-clip) */
+#if TRUE
+	/* Orthagonal projection, clamped to 1 unit, top-left origin,
+		all visible co-ordinates positive */
+	glOrtho(0.0, 1.0, 1.0, 0.0, 1.0, -1.0);
+#else
+	/* Show one more unit on all sides for debugging */
+	glOrtho(-1.0, 2.0, 2.0, -1.0, 1.0, -1.0);
+#endif
+
 	set_bands(1, 2, 3);
 }
 
@@ -43,9 +74,10 @@ OverviewGL::~OverviewGL()
 	delete tileset;
 }
 
+
+/* Re-draw our overview window */
 void OverviewGL::redraw(void)
 {
-		// Overview window
 	gl_overview->make_current();
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -60,29 +92,22 @@ void OverviewGL::redraw(void)
 		both horizontal and vertical dimensions */
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	#define PI 3.14159265
-	gluLookAt(0.0,0.0,(0.5/tan(PI/6.0)),0.0,0.0,0.0,0.0,1.0,0.0);
-
-	/* Set up aspect transform */
-	glPushMatrix(); // Use matrix copy so we only squash the overview polygon
-	/* squash square we draw to the correct aspect ratio */
-/*	if (image_width >= image_height) {
-		glScalef(1.0, (GLfloat)image_height/(GLfloat)image_width, 1.0);
+	
+	/* Scale such that image fills overview window in largest dimension */
+	// !! could be done in init
+	GLfloat factor;
+	if (LOD_width > LOD_height) {
+		/* Scale width to fit */
+		factor = (GLfloat)texture_size / (GLfloat)LOD_width;
 	} else {
-		glScalef((GLfloat)image_width/(GLfloat)image_height, 1.0, 1.0);
-	} */
+		/* Scale height to fit */
+		factor = (GLfloat)texture_size / (GLfloat)LOD_height;
+	}
+	glScalef(factor,factor,factor);
 
 	/* draw textured quad for overview image */
-	glBegin(GL_QUADS);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(-0.5, 0.5, 0.0);
-		glTexCoord2f(1.0, 0.0);
-		glVertex3f( 0.5, 0.5, 0.0);
-		glTexCoord2f(1.0, 1.0);
-		glVertex3f( 0.5,-0.5, 0.0);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f(-0.5,-0.5, 0.0);
-	glEnd();
+	glCallList(list_tile);
+
 	/* No more texturing in overview window */
 	glDisable(GL_TEXTURE_2D);
 
@@ -97,7 +122,7 @@ void OverviewGL::redraw(void)
 		/* Move drawing such that origin is top-left pixel of overview image */
 		glTranslatef(-0.5, 0.5, 0.0);
 		/* Scale to work in LOD pixels, x increases to right, y increases to bottom */
-		glScalef(1.0/box_horiz_max, -1.0/box_vert_max, 1.0);
+//		glScalef(1.0/box_horiz_max, -1.0/box_vert_max, 1.0);
 
 		/* We'll be using translucent lines */
 		glEnable(GL_BLEND);
@@ -148,22 +173,17 @@ void OverviewGL::redraw(void)
 		glDisable(GL_BLEND);
 	}
 	
-	glPopMatrix(); // Restore model transform
-	
-#if DEBUG_IMAGE_REDRAW
-	/* draw rotating line to visualize redraw frequency */
-	glRotatef(redraw_rotz, 0.0,0.0,1.0);
-	redraw_rotz-=1.0;
-	if(redraw_rotz < -360.0) redraw_rotz+=360.0;
-	glBegin(GL_LINES);
-		glColor3f(1.0,1,0);
-		glVertex3f(0.0,0.0,0.0);
-		glVertex3f(0.0,0.25,0.0);
-	glEnd();
-#endif
 	gl_overview->GLswap();
 }
 
+void OverviewGL::update_viewport(int x, int y, int width, int height)
+{
+	viewport_x = x;
+	viewport_y = y;
+	viewport_width = width;
+	viewport_height = height;
+	redraw();
+}
 
 void OverviewGL::set_bands(int band_R, int band_G, int band_B)
 {
@@ -176,14 +196,8 @@ void OverviewGL::set_bands(int band_R, int band_G, int band_B)
 
 void OverviewGL::make_texture(void)
 {
-	#if DEBUG_IMAGE_HANDLER
-	Console::write("(II) ImageHandler::make_overview_texture()\n");
-	#endif
 	// Get texture data	
 	tex_overview = tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
-	#if DEBUG_IMAGE_HANDLER
-	Console::write("(II) ImageHandler::Successfully got overview texture from tileset.\n");
-	#endif
 
 	/* Make texture from data */
 	gl_overview->make_current();
@@ -195,22 +209,7 @@ void OverviewGL::make_texture(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
-	/* We don't need the RGB data here anymore */
+	/* remember to free the RGB memory */
 	delete(tex_overview);
-	#if DEBUG_IMAGE_HANDLER
-	Console::write("(II) ImageHandler::Successfully created overview texture.\n");
-	#endif
 }
 
-void OverviewGL::resize_viewport(int new_width, int new_height)
-{
-	viewport_width = new_width;
-	viewport_height = new_height;
-	redraw();
-}
-void OverviewGL::move_viewport(int new_x, int new_y)
-{
-	viewport_x = new_x;
-	viewport_y = new_y;
-	redraw();
-}
