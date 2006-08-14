@@ -55,7 +55,7 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	/* glOrtho(Left, Right, Bottom, Top, Near-clip, Far-clip) */
-#if TRUE
+#if FALSE
 	/* Orthagonal projection, clamped to 1 unit, top-left origin,
 		all visible co-ordinates positive */
 	glOrtho(0.0, 1.0, 1.0, 0.0, 1.0, -1.0);
@@ -119,7 +119,7 @@ void OverviewGL::redraw(void)
 		if (box_top < 0.0) box_top = 0.0;
 		if (box_bottom > image_height) box_bottom = image_height;
 		if (box_left < 0.0) box_left = 0.0;
-		if (box_right > box_horiz_max) box_right = image_width;
+		if (box_right > image_width) box_right = image_width;
 		
 		/* We'll be using translucent lines */
 		glEnable(GL_BLEND);
@@ -142,21 +142,21 @@ void OverviewGL::redraw(void)
 		/* Draw cross-hairs, for locating box when small */
 		glBegin(GL_LINES);
 		{
-			GLfloat halfway_point_x = (GLfloat)(viewport_x + viewport_width/2);
-			GLfloat halfway_point_y = (GLfloat)(viewport_y + viewport_height/2);
+			GLfloat halfway_point_x = (GLfloat)((box_left - box_right)/2);
+			GLfloat halfway_point_y = (GLfloat)((box_top - box_bottom)/2);
 			glColor4f(1.0, 0.0, 0.0, 0.2);
 			/* Left line */
 			glVertex3f(0.0, halfway_point_y, 0.0);
-			glVertex3f((GLfloat)viewport_x, halfway_point_y, 0.0);
+			glVertex3f((GLfloat)box_left, halfway_point_y, 0.0);
 			/* Right line */
 			glVertex3f((GLfloat)image_width, halfway_point_y, 0.0);
-			glVertex3f((GLfloat)(viewport_x + viewport_width), halfway_point_y, 0.0);
+			glVertex3f((GLfloat)box_right, halfway_point_y, 0.0);
 			/* Top line */
 			glVertex3f(halfway_point_x, 0.0, 0.0);
-			glVertex3f(halfway_point_x, (GLfloat)viewport_y, 0.0);
+			glVertex3f(halfway_point_x, (GLfloat)box_top, 0.0);
 			/* Bottom line */
-			glVertex3f(halfway_point_x, box_vert_max, 0.0);
-			glVertex3f(halfway_point_x, (GLfloat)(viewport_y + viewport_height), 0.0);
+			glVertex3f(halfway_point_x, image_height, 0.0);
+			glVertex3f(halfway_point_x, (GLfloat)box_bottom, 0.0);
 		}
 		glEnd();
 		
@@ -204,4 +204,3 @@ void OverviewGL::make_texture(void)
 	/* remember to free the RGB memory */
 	delete(tex_overview);
 }
-

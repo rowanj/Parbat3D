@@ -32,8 +32,7 @@ class OverviewGL
    	/* Overview window texture */
 	ImageTileSet* tileset;
 	GLint texture_size;
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	int LOD_height, LOD_width;
 	char *tex_overview;
 	GLuint tex_overview_id;
 };
