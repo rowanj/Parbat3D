@@ -172,4 +172,45 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 		Console::write("ImageFile - RasterIO failed!!\n");
 		#endif
 	}
+	else
+	{
+		char* xposstring;
+		char* yposstring;
+		char* heightstring;
+		char* widthstring;
+		char* outheightstring;
+		char* outwidthstring;
+		char* finalstring;
+		
+		xposstring = (char*)inttocstring(xpos);
+		yposstring = (char*)inttocstring(ypos);
+		heightstring = (char*)inttocstring(height);
+		widthstring = (char*)inttocstring(width);
+		outheightstring = (char*)inttocstring(outHeight);
+		outwidthstring = (char*)inttocstring(outWidth);
+		
+		finalstring = (char*)catcstrings("ImageFile - Got data of width ", widthstring);
+		finalstring = (char*)catcstrings(finalstring, " and height ");
+		finalstring = (char*)catcstrings(finalstring, heightstring);
+		finalstring = (char*)catcstrings(finalstring, "\n");
+		Console::write(finalstring);
+		finalstring = (char*)catcstrings("ImageFile - At location X = ", xposstring);
+		finalstring = (char*)catcstrings(finalstring, ", Y = ");
+		finalstring = (char*)catcstrings(finalstring, yposstring);
+		finalstring = (char*)catcstrings(finalstring, "\n");
+		Console::write(finalstring);
+		finalstring = (char*)catcstrings("ImageFile - Output width = ", outwidthstring);
+		finalstring = (char*)catcstrings(finalstring, ", output height = ");
+		finalstring = (char*)catcstrings(finalstring, outheightstring);
+		finalstring = (char*)catcstrings(finalstring, "\n");
+		Console::write(finalstring);
+		
+		delete(xposstring);
+		delete(yposstring);
+		delete(heightstring);
+		delete(widthstring);
+		delete(outheightstring);
+		delete(outwidthstring);
+		delete(finalstring);
+	}
 }

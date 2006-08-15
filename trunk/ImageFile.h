@@ -22,7 +22,6 @@
 #include "CoordinateInfo.h"
 #include "BandInfo.h"
 #include "StringUtils.h"
-#include <string>
 #if PLATFORM_W32
 #include <windows.h>
 #endif
