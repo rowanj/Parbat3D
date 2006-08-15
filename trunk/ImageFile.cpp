@@ -156,12 +156,15 @@ Fill a buffer with raster data from the file, as specified.
 */
 void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* buffer, int outWidth, int outHeight)
 {
+	Console::write("ImageFile - Entering getRasterData\n");
     CPLErr myErr;
     
     int bands;
 	
+	Console::write("ImageFile - Getting number of bands\n");
 	bands = properties->getNumBands();
     
+    Console::write("ImageFile - Fetching raster data\n");
     myErr = GDALDatasetRasterIO(ifDataset, GF_Read, xpos, ypos, width, height, buffer, outWidth, outHeight, GDT_Byte,
     					bands, NULL, bands, bands*outWidth, 1);
 	
@@ -213,4 +216,5 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 		delete(outwidthstring);
 		delete(finalstring);
 	}
+	Console::write("ImageFile - Exiting getRasterData\n");
 }
