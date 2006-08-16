@@ -84,9 +84,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 
     
     Console::open();
-    Console::write("testing1!\n");
-    Console::write(new string("testing2!\n"));
-
+    CONSOLE_SCREEN_BUFFER_INFO myInfo;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &myInfo);
+    int consoleColumns = myInfo.dwSize.X;
+    int consoleRows = myInfo.dwSize.Y;
+    Console::write("Console columns: ");
+    Console::write((char*)inttocstring(consoleColumns));
+    Console::write("\n");
+    Console::write("Console rows: ");
+	Console::write((char*)inttocstring(consoleRows));
+	Console::write("\n");
+	
    
     /* Register window classes */
     if ((!MainWindow::registerMainWindow()) || (!ToolWindow::registerToolWindow()) || (!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))

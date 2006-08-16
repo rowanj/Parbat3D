@@ -12,8 +12,13 @@ using namespace std;
 // display console window
 void Console::open()
 {
+	//COORD myBufferSize()
     #if TMP_USE_CONSOLE           
     AllocConsole();
+    COORD mySize;
+    mySize.X = 80;
+    mySize.Y = 2000;
+    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), mySize);
     //hstdout=GetStdHandle(STD_OUTPUT_HANDLE);        
     #endif
 }

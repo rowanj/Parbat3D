@@ -160,26 +160,18 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 	int endTime = 0;
 	float elapsedTime = 0.0;
 	
-	Console::write("ImageFile - Entering getRasterData\n");
     CPLErr myErr;
     
     int bands;
 	
-	Console::write("ImageFile - Getting number of bands\n");
 	bands = properties->getNumBands();
 	
-    Console::write("ImageFile - Informing driver of upcoming read\n");
     myErr = GDALDatasetAdviseRead(ifDataset, xpos, ypos, width, height, outWidth, outHeight, GDT_Byte, bands, NULL, NULL);
     if (myErr == CE_Failure)
 	{
-		Console::write("ImageFile - Failed to inform driver\n");
+		Console::write("ImageFile - Failed to inform driver of upcoming read!\n");
 	}
-	else
-	{
-		Console::write("ImageFile - Informed driver\n");
-	}	
 	
-    Console::write("ImageFile - Fetching raster data\n");
     startTime = GetTickCount();
     myErr = GDALDatasetRasterIO(ifDataset, GF_Read, xpos, ypos, width, height, buffer, outWidth, outHeight, GDT_Byte,
     					bands, NULL, bands, bands*outWidth, 1);
@@ -228,7 +220,7 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 		finalstring = (char*)catcstrings(finalstring, "\n");
 		Console::write(finalstring);
 		finalstring = (char*)catcstrings("ImageFile - Elapsed time was ", timeString);
-		finalstring = (char*)catcstrings(finalstring, " seconds\n");
+		finalstring = (char*)catcstrings(finalstring, " seconds\n\n");
 		Console::write(finalstring);
 		
 		delete(xposstring);
@@ -239,5 +231,4 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 		delete(outwidthstring);
 		delete(finalstring);
 	}
-	Console::write("ImageFile - Exiting getRasterData\n");
 }
