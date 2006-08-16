@@ -93,27 +93,23 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                     
                     /* if cursor is outside of image bounds then display 0,0 as coordinates */
                     ImageProperties* ip = image_handler->get_image_properties();
-                    if (ix<0 || iy<0 || ix>(ip->getWidth()) || iy>=(ip->getHeight())) {
-                        ix = 0;
-                        iy = 0;
+                    if (ix>=0 && iy>=0 && ix<(ip->getWidth()) && iy<(ip->getHeight())) {
+                        unsigned int* bv = image_handler->get_pixel_values_viewport(ix, iy);  /* Get band values */
+                        
+                        string leader = "";
+                        
+                        /* Update display of cursor position */
+                        SetWindowText(ToolWindow::cursorXPos, (char *) makeMessage(leader, ix));
+                        SetWindowText(ToolWindow::cursorYPos, (char *) makeMessage(leader, iy));
+                        
+                        /* Update display of pixel values under query tab */                    
+                        if (bv && (ix!=0 || iy!=0)) { /* make sure the band values were returned */
+                            for (int i=1; i<=ToolWindow::bands; i++)
+                                SetWindowText(ToolWindow::imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
+                        }
+                        
+                        delete[] bv;
                     }
-                    
-                    /* Get band values */
-                    unsigned int* bv = image_handler->get_pixel_values_viewport(ix, iy);
-                    
-                    string leader = "";
-                    
-                    /* Update display of cursor position */
-                    SetWindowText(ToolWindow::cursorXPos, (char *) makeMessage(leader, ix));
-                    SetWindowText(ToolWindow::cursorYPos, (char *) makeMessage(leader, iy));
-
-                    /* Update display of pixel values under query tab */                    
-                    if (bv) { /* make sure the band values were returned */
-                        for (int i=1; i<=ToolWindow::bands; i++)
-                            SetWindowText(ToolWindow::imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
-                    }
-                    
-                    delete[] bv;
                 }
             }
             break;
