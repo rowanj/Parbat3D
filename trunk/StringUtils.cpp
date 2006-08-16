@@ -127,6 +127,21 @@ const char* inttocstring(int input)
 	return (const char*) final;
 }
 
+const char* floattocstring(float input)
+{
+    std::string sinput;
+	std::stringstream s;
+	char* final;
+	
+	fixed(s);
+	s.precision(4);
+	s << input;
+	s >> sinput;
+	
+	final = new char[sinput.length()+1];
+    strcpy(final, sinput.c_str());
+	return (const char*) final;
+}
 
 char* copyString(const char *oldstr)
 {

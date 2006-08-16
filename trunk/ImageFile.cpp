@@ -156,6 +156,10 @@ Fill a buffer with raster data from the file, as specified.
 */
 void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* buffer, int outWidth, int outHeight)
 {
+	int startTime = 0;
+	int endTime = 0;
+	float elapsedTime = 0.0;
+	
 	Console::write("ImageFile - Entering getRasterData\n");
     CPLErr myErr;
     
@@ -163,10 +167,24 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 	
 	Console::write("ImageFile - Getting number of bands\n");
 	bands = properties->getNumBands();
-    
+	
+    Console::write("ImageFile - Informing driver of upcoming read\n");
+    myErr = GDALDatasetAdviseRead(ifDataset, xpos, ypos, width, height, outWidth, outHeight, GDT_Byte, bands, NULL, NULL);
+    if (myErr == CE_Failure)
+	{
+		Console::write("ImageFile - Failed to inform driver\n");
+	}
+	else
+	{
+		Console::write("ImageFile - Informed driver\n");
+	}	
+	
     Console::write("ImageFile - Fetching raster data\n");
+    startTime = GetTickCount();
     myErr = GDALDatasetRasterIO(ifDataset, GF_Read, xpos, ypos, width, height, buffer, outWidth, outHeight, GDT_Byte,
     					bands, NULL, bands, bands*outWidth, 1);
+	endTime = GetTickCount();
+	elapsedTime = (float)(endTime - startTime) / 1000.0;
 	
 	if (myErr == CE_Failure)
 	{
@@ -183,6 +201,7 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 		char* widthstring;
 		char* outheightstring;
 		char* outwidthstring;
+		char* timeString;
 		char* finalstring;
 		
 		xposstring = (char*)inttocstring(xpos);
@@ -191,21 +210,25 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 		widthstring = (char*)inttocstring(width);
 		outheightstring = (char*)inttocstring(outHeight);
 		outwidthstring = (char*)inttocstring(outWidth);
+		timeString = (char*)floattocstring(elapsedTime);
 		
-		finalstring = (char*)catcstrings("ImageFile - Got data of width ", widthstring);
-		finalstring = (char*)catcstrings(finalstring, " and height ");
-		finalstring = (char*)catcstrings(finalstring, heightstring);
-		finalstring = (char*)catcstrings(finalstring, "\n");
-		Console::write(finalstring);
-		finalstring = (char*)catcstrings("ImageFile - At location X = ", xposstring);
+		finalstring = (char*)catcstrings("ImageFile - Got data at location X = ", xposstring);
 		finalstring = (char*)catcstrings(finalstring, ", Y = ");
 		finalstring = (char*)catcstrings(finalstring, yposstring);
+		finalstring = (char*)catcstrings(finalstring, "\n");
+		Console::write(finalstring);
+		finalstring = (char*)catcstrings("ImageFile - Data width = ", widthstring);
+		finalstring = (char*)catcstrings(finalstring, ", height = ");
+		finalstring = (char*)catcstrings(finalstring, heightstring);
 		finalstring = (char*)catcstrings(finalstring, "\n");
 		Console::write(finalstring);
 		finalstring = (char*)catcstrings("ImageFile - Output width = ", outwidthstring);
 		finalstring = (char*)catcstrings(finalstring, ", output height = ");
 		finalstring = (char*)catcstrings(finalstring, outheightstring);
 		finalstring = (char*)catcstrings(finalstring, "\n");
+		Console::write(finalstring);
+		finalstring = (char*)catcstrings("ImageFile - Elapsed time was ", timeString);
+		finalstring = (char*)catcstrings(finalstring, " seconds\n");
 		Console::write(finalstring);
 		
 		delete(xposstring);

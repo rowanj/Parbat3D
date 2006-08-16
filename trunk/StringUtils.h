@@ -1,6 +1,7 @@
 #ifndef _STRING_UTILS_H
 #define _STRING_UTILS_H
 
+using namespace std;
 #include <cstdio>
 #include <cstring>
 #include <sstream>
@@ -35,6 +36,7 @@ std::string makeString(std::string leader, int input);
 std::string makeString(std::string leader, double input);
 const char* catcstrings(char* input1, char* input2);
 const char* inttocstring(int input);
+const char* floattocstring(float input);
 char* copyString(const char *oldstr);
 
 #endif
