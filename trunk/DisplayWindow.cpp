@@ -99,7 +99,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                     }
                     
                     /* Get band values */
-                    unsigned int* bv = image_handler->get_pixel_values_viewport(mx, my);
+                    unsigned int* bv = image_handler->get_pixel_values_viewport(ix, iy);
                     
                     string leader = "";
                     
