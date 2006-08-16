@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <Commctrl.h>
 #include <iostream>
+#include <cassert>
 #include "config.h"
 
 #include "ImageProperties.h"

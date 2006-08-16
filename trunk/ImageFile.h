@@ -30,20 +30,22 @@ using std::vector;
 
 class ImageFile
 {
-public:
-	ImageFile(char* theFilename);
-	virtual ~ImageFile(void);
-	ImageProperties* getImageProperties(void);
-	BandInfo* getBandInfo(int bandNumber);
-	const char* getInfoString(void);
-	void getRasterData(int width, int height, int xpos, int ypos, char* buffer, int outWidth, int outHeight);
-	
-private:
-	GDALDataset* ifDataset;
-	char* filename;
-	ImageProperties* properties;
-	CoordinateInfo* coordInfo;
-	vector<BandInfo*> theBands; 
+	public:
+		ImageFile(char* theFilename);
+		int getifErr(void);
+		virtual ~ImageFile(void);
+		ImageProperties* getImageProperties(void);
+		BandInfo* getBandInfo(int bandNumber);
+		const char* getInfoString(void);
+		void getRasterData(int width, int height, int xpos, int ypos, char* buffer, int outWidth, int outHeight);
+		
+	private:
+		int ifErr;
+		GDALDataset* ifDataset;
+		char* filename;
+		ImageProperties* properties;
+		CoordinateInfo* coordInfo;
+		vector<BandInfo*> theBands; 
 };
 
 #endif

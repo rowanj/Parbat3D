@@ -30,22 +30,26 @@ ImageFile::ImageFile(char* theFilename)
 	GDALAllRegister();
 	
 	ifDataset = (GDALDataset *) GDALOpen(filename , GA_ReadOnly);
-	if (ifDataset != NULL) //if we've not got a valid file
+	
+	if (ifDataset == NULL) //if we've not got a valid file
 	{
-    	properties = new ImageProperties(ifDataset, filename);
-    	coordInfo = new CoordinateInfo(ifDataset);
-    	
-    	for (i=0;i<properties->getNumBands();i++)
-    	{
-    		theBands.push_back(new BandInfo( (GDALRasterBand*) GDALGetRasterBand(ifDataset, i+1)));
-    	}
-    }
-    #if DEBUG_IMAGE_FILE
-    else
-    {
-		Console::write("ImageFile - This is not a valid image file!\n");
-    }
-    #endif
+		ifErr = 1;
+	}
+	else
+	{
+		properties = new ImageProperties(ifDataset, filename);
+		coordInfo = new CoordinateInfo(ifDataset);
+		
+		for (i=0;i<properties->getNumBands();i++)
+		{
+			theBands.push_back(new BandInfo( (GDALRasterBand*) GDALGetRasterBand(ifDataset, i+1)));
+		}
+	}
+}
+
+int ImageFile::getifErr(void)
+{
+	return ifErr;
 }
 
 /*

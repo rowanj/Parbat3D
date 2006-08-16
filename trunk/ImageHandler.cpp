@@ -61,7 +61,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		
 	// Initialize image file (could be threaded)
 	image_file = new ImageFile(filename);
-	if (image_file->getImageProperties() == NULL) {
+	if (image_file->getifErr()) {
 		status = 5;
 		error_text = "Could not create ImageFile object.";
 	} else {

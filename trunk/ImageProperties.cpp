@@ -58,7 +58,6 @@ const char* ImageProperties::getDriverLongName(void)
 
 ImageProperties::~ImageProperties(void)
 {
-	return;	
 }
 
 /* Returns a string containing the file name, without path */

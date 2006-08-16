@@ -223,15 +223,16 @@ int ToolWindow::setupToolWindow()
 		const char* name;
 		if (i>0) { 
     		/* add band names to radio buttons*/
-    		name = image_handler->get_band_info(i)->getColourInterpretationName();
+    		name = "";
+    		//name = image_handler->get_band_info(i)->getColourInterpretationName();
     		
     		/* If Colour name unknown change band name*/
-    		const char *altName ="No colour name";
+    		/*const char *altName ="No colour name";
     		if (strcmp(name, "Unknown")==0)
-              name = altName;
+              name = altName;*/
                 
             /* Add band number to band name */
-            name = catcstrings( (char*) " - ", (char*) name);
+            //name = catcstrings( (char*) " - ", (char*) name);
             name = catcstrings( (char*) inttocstring(i), (char*) name);
             name = catcstrings( (char*) "Band ", (char*) name);
         } else
@@ -239,7 +240,7 @@ int ToolWindow::setupToolWindow()
 
         /* Display band name in tool window */
 		CreateWindowEx(0, szStaticControl, name,
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40 + (20 * i), 100, 18,
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 60, 40 + (20 * i), 100, 18,
 			hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
            
 		/* Insert 'Update' button under radio buttons. Location based on band number */

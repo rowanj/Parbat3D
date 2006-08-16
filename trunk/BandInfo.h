@@ -23,7 +23,7 @@ class BandInfo
 	public:
 		BandInfo(GDALRasterBand* theBand);
 		const char* getRasterDataType(void);
-		const char* getColourInterpretationName(void);
+		//const char* getColourInterpretationName(void);
 		double getDataMin(void);
 		double getDataMax(void);
 		int getBlockXSize(void);
@@ -35,7 +35,7 @@ class BandInfo
 		
 	private:
 		const char* rasterDataType;
-		const char* colourInterpretationName;
+		//const char* colourInterpretationName;
 		int bandNumber;
 		int overviewCount;
 		int blockXSize;

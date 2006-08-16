@@ -30,9 +30,9 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 	const char* message;
 	string leader;
 	#endif //DEBUG_BANDS
-	GDALColorInterp theColourInterpretation;
+	//GDALColorInterp theColourInterpretation;
 	
-	band = (GDALRasterBand*) theBand;
+	band = theBand;
 	
 	bandNumber = GDALGetBandNumber(theBand);
 	#if DEBUG_BANDS
@@ -58,7 +58,7 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 	}
 	#endif //DEBUG_BANDS
 
-	theColourInterpretation = GDALGetRasterColorInterpretation(band);
+	/*theColourInterpretation = GDALGetRasterColorInterpretation(band);
 	
 
 	if (theColourInterpretation > -1)
@@ -84,7 +84,8 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 		Console::write("\n");
 	}
 	#endif //DEBUG_BANDS
-		
+	*/
+	
 	overviewCount = GDALGetOverviewCount(band);
 	#if DEBUG_BANDS
 	leader = "BandInfo - Overviews: ";
@@ -130,10 +131,10 @@ BandInfo::getColourInterpretationName
 
 Returns the colour interpretation name of the band.
 */
-const char* BandInfo::getColourInterpretationName(void)
+/*const char* BandInfo::getColourInterpretationName(void)
 {
 	return colourInterpretationName;
-}
+}*/
 
 /*
 BandInfo::getDataMin
@@ -212,5 +213,4 @@ Deconstructor; currently does nothing.
 */
 BandInfo::~BandInfo(void)
 {
-	return;
 }

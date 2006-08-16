@@ -55,7 +55,7 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	/* glOrtho(Left, Right, Bottom, Top, Near-clip, Far-clip) */
-#if FALSE
+#if TRUE
 	/* Orthagonal projection, clamped to 1 unit, top-left origin,
 		all visible co-ordinates positive */
 	glOrtho(0.0, 1.0, 1.0, 0.0, 1.0, -1.0);
