@@ -5,11 +5,7 @@
 // Enable global debug/trace mode
 #define DEBUG 0
 #define DEBUG_IMAGE_FILE 1
-#define DEBUG_IMAGE_HANDLER 0
-#define DEBUG_IMAGE_TILESET 0
 #define DEBUG_IMAGE_PROPERTIES 0
-#define DEBUG_IMAGE_REDRAW 0
-#define DEBUG_OPENGL 0
 #define DEBUG_BANDS 1
 #define DEBUG_IMAGE_DATA 0
 
