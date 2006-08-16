@@ -61,7 +61,8 @@ void GetModulePath()
         *p=0;
     }
     
-	MessageBox(0,catcstrings( (char*) "The install folder is: ", (char*) modulePath),"Parbat3D Error",MB_OK);                         
+    // this line was used for testing the current working path, remove it if no more testing on this is being done
+	//MessageBox(0,catcstrings( (char*) "The install folder is: ", (char*) modulePath),"Parbat3D Error",MB_OK);                         
 }
 
 /* program entry point */
