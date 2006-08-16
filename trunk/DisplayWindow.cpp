@@ -26,7 +26,7 @@ int DisplayWindow::registerWindow()
     /* Use default icon and mousepointer */
     wincl.hIcon = NULL;
     wincl.hIconSm = NULL;
-    wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wincl.hCursor = LoadCursor(NULL, IDC_CROSS);
     wincl.lpszMenuName = NULL; /* No menu */
     wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
     wincl.cbWndExtra = 0;                      /* structure or the window instance */
