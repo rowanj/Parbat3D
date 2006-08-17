@@ -8,8 +8,8 @@
 using namespace std;
 
 /**
-    Allows settings to be saved to and retrieved from an ini file. Access to the file is
-    handled by IniFile.cpp and its functions.
+    Allows settings to be saved to and retrieved from an ini file. Access to the
+    file is handled by IniFile.cpp and its functions.
 */
 class settings {
         iniFile openFile;  // reference to the ini file, all file operations go through this
@@ -33,8 +33,8 @@ class settings {
         
         
         /**
-            Returns a string containing the value of the key. If the key does not exist in
-            the file then an empty string is returned.
+            Returns a string containing the value of the key. If the key does
+            not exist in the file then an empty string is returned.
         */
         string getSetting (string, string);
         
@@ -44,9 +44,9 @@ class settings {
         void setSetting (string, string, string);
         
         /**
-            Adds the setting to the file. Since the file can only be updated using text,
-            the integer is first converted into a string using stringstream before updating
-            the file.
+            Adds the setting to the file. Since the file can only be updated
+            using text, the integer is first converted into a string using
+            stringstream before updating the file.
         */
         void setSetting (string, string, int);
 };
