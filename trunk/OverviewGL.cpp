@@ -1,5 +1,5 @@
 #include "OverviewGL.h"
-#include <stdlib.h>
+#include "config.h"
 
 OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 {
@@ -11,6 +11,7 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 	viewport_y = 0;
 	viewport_width = 100;
 	viewport_height = 100;
+	tex_overview_id = 0;
 		
 	/* Initialize OpenGL*/
 	gl_overview = new GLView(window_hwnd);
@@ -55,13 +56,13 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	/* glOrtho(Left, Right, Bottom, Top, Near-clip, Far-clip) */
-#if TRUE
-	/* Orthagonal projection, clamped to 1 unit, top-left origin,
-		all visible co-ordinates positive */
-	glOrtho(0.0, 1.0, 1.0, 0.0, 1.0, -1.0);
-#else
+#if DEBUG_OVERVIEW
 	/* Show one more unit on all sides for debugging */
 	glOrtho(-1.0, 2.0, 2.0, -1.0, 1.0, -1.0);
+#else
+   	/* Orthagonal projection, clamped to 1 unit, top-left origin,
+		all visible co-ordinates positive */
+	glOrtho(0.0, 1.0, 1.0, 0.0, 1.0, -1.0);
 #endif
 
 	/* Set up initial model transform */
@@ -189,18 +190,18 @@ void OverviewGL::set_bands(int band_R, int band_G, int band_B)
 void OverviewGL::make_texture(void)
 {
 	// Get texture data	
-	tex_overview = tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
+	char* tex_overview = tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
 
 	/* Make texture from data */
 	gl_overview->make_current();
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	if (!tex_overview_id) glGenTextures(1, &tex_overview_id);
+	if (!tex_overview_id) {glGenTextures(1, &tex_overview_id);}
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
 	/* remember to free the RGB memory */
-	delete(tex_overview);
+	delete[] tex_overview;
 }

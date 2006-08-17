@@ -33,7 +33,6 @@ class OverviewGL
 	ImageTileSet* tileset;
 	GLint texture_size;
 	int LOD_height, LOD_width;
-	char *tex_overview;
 	GLuint tex_overview_id;
 };
 
