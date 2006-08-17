@@ -170,11 +170,11 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 	
 	bands = properties->getNumBands();
 	
-    myErr = GDALDatasetAdviseRead(ifDataset, xpos, ypos, width, height, outWidth, outHeight, GDT_Byte, bands, NULL, NULL);
+    /*myErr = GDALDatasetAdviseRead(ifDataset, xpos, ypos, width, height, outWidth, outHeight, GDT_Byte, bands, NULL, NULL);
     if (myErr == CE_Failure)
 	{
 		Console::write("ImageFile - Failed to inform driver of upcoming read!\n");
-	}
+	}*/
 	
     startTime = GetTickCount();
     myErr = GDALDatasetRasterIO(ifDataset, GF_Read, xpos, ypos, width, height, buffer, outWidth, outHeight, GDT_Byte,
