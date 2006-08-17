@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cassert>
 #include "config.h"
+#include "window.h"
 
 #include "ImageProperties.h"
 #include "BandInfo.h"
@@ -31,6 +32,7 @@ HWND hDesktop;                      /* handle to desktop window (used for snappi
 
 settings settingsFile;              /* Used for loading and saving window position and sizes */
 
+MainWindow mainWindow;
 
 char *filename=NULL;                    // currently open image filename
 
@@ -96,9 +98,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 	Console::write((char*)inttocstring(consoleRows));
 	Console::write("\n");
 	
-   
+    mainWindow.Create(hInstance);
+    if (mainWindow.GetHandle()==NULL)
+    {
+        MessageBox(0,"handle is null","Parbat3D Error",MB_OK);
+        return 0;
+    }
+  
     /* Register window classes */
-    if ((!MainWindow::registerMainWindow()) || (!ToolWindow::registerToolWindow()) || (!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
+    if ((!ToolWindow::registerToolWindow()) || (!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
     {
         /* report error if window classes could not be registered */
         MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
@@ -108,12 +116,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Setup main & image windows */
     //  note: image window must be created before main window
     //  note: tool window is only created when an image is loaded
-    if ((!MainWindow::setupMainWindow()) || (!ImageWindow::setupImageWindow()) || (!OverviewWindow::setupWindow()))
+    if ((!ImageWindow::setupImageWindow()) || (!OverviewWindow::setupWindow()))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
         return 0;
     }
+  
+  	/*Window pwin;
+  	TestWindow win;
+  	pwin.Create(hInstance);
+  	pwin.Destroy();  	
+  	if (pwin.GetHandle()==NULL)
+  	{
+     	pwin.Create(hInstance);
+    }
+    win.Create(hInstance,pwin.GetHandle());
+  	
+//	win.CreateC(hInstance,pwin.GetHandle());*/
   
     /* Execute the message loop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))
@@ -151,6 +171,7 @@ void loadFile()
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
     ofn.lpstrDefExt = "txt";
+
 
     if(GetOpenFileName(&ofn))
     {

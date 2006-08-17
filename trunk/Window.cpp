@@ -45,7 +45,7 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
     if (hwindow!=NULL)
         DestroyWindow(hwindow);
         
-    hwindow=NULL;//CreateWindowEx(dwExStyle,lpClassName,lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,hMenu,hInstance,lpParam);
+    hwindow=CreateWindowEx(dwExStyle,lpClassName,lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,hMenu,hInstance,this);
     if (hwindow==NULL)
     {
         Console::write("Window::CreateWin CreateWindowEx failed first time\n");
@@ -111,7 +111,7 @@ int Window::Create(HINSTANCE hInstance)
 }
 
 
-int Window::CreateC(HINSTANCE hInstance,HWND parent)
+int TestWindow::Create(HINSTANCE hInstance,HWND parent)
 {
     int r=CreateWin(0,"static","Parbat test win",WS_CHILD, 10,10,100,100,parent,NULL,hInstance);
     if (r)
@@ -173,7 +173,15 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
     {
         // let someone else handle the messages while the window is still being created
         if (stPrevWindowProcedure!=NULL)
-            return CallWindowProc(win->prevWindowProcedure,hwnd,message,wParam,lParam);        
+            return CallWindowProc(stPrevWindowProcedure,hwnd,message,wParam,lParam);        
     }
     return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+
+LRESULT Window::DefaultProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    if (stPrevWindowProcedure!=NULL)
+        return CallWindowProc(stPrevWindowProcedure,hwnd,message,wParam,lParam);           
+    return DefWindowProc(hwnd, message, wParam, lParam);        
 }

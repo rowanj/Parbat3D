@@ -1,14 +1,16 @@
+#ifndef _PARBAT_MAINWINDOW_H
+#define _PARBAT_MAINWINDOW_H
 
-class MainWindow
+#include "Window.h"
+
+class MainWindow:public Window
 {
     private:
-    static char szMainWindowClassName[];
-
+    WNDPROC prevProc;
     public:
-    static HWND hMainWindow;
-    static LRESULT CALLBACK MainWindowProcedure(HWND, UINT, WPARAM, LPARAM);
-    static int registerMainWindow();
-    static int setupMainWindow();
+    virtual int Create(HINSTANCE hInstance);        
+    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 };
 
 
+#endif

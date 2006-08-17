@@ -272,7 +272,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             if (wParam==SC_MINIMIZE)
             {
                 /* cause the main window to minimised instead */
-                ShowWindow(MainWindow::hMainWindow,SW_MINIMIZE);
+                ShowWindow(mainWindow.GetHandle(),SW_MINIMIZE);
                 return 0;
             }            
             return DefWindowProc(hwnd, message, wParam, lParam);

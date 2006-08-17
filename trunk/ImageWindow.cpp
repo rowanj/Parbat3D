@@ -66,7 +66,7 @@ int ImageWindow::setupImageWindow()
     /* create image window */
     hImageWindow =CreateWindowEx(0, szImageWindowClassName, "Image Window",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
-	     mx, my, IMAGE_WINDOW_WIDTH, IMAGE_WINDOW_HEIGHT, MainWindow::hMainWindow, NULL, hThisInstance, NULL);
+	     mx, my, IMAGE_WINDOW_WIDTH, IMAGE_WINDOW_HEIGHT, mainWindow.GetHandle(), NULL, hThisInstance, NULL);
     if (!hImageWindow)
         return false;  
 

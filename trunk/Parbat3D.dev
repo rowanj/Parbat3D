@@ -297,16 +297,6 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit30]
-FileName=MainWindow.cpp
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit29]
 FileName=MathUtils.cpp
 CompileCpp=1
@@ -318,16 +308,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit31]
-FileName=main.cpp
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit32]
 FileName=OverviewWindow.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -337,7 +317,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit33]
+[Unit32]
 FileName=ImageWindow.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -347,7 +327,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit34]
+[Unit33]
 FileName=DisplayWindow.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -357,7 +337,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit35]
+[Unit34]
 FileName=ToolWindow.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -367,7 +347,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit36]
+[Unit35]
 FileName=ToolWindow.h
 CompileCpp=1
 Folder=View_PKG
@@ -377,8 +357,18 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit37]
+[Unit36]
 FileName=OverviewWindow.h
+CompileCpp=1
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit37]
+FileName=ImageWindow.h
 CompileCpp=1
 Folder=View_PKG
 Compile=1
@@ -398,16 +388,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit38]
-FileName=ImageWindow.h
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit39]
 FileName=MainWindow.h
 CompileCpp=1
 Folder=View_PKG
@@ -417,7 +397,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit40]
+[Unit39]
 FileName=DisplayWindow.h
 CompileCpp=1
 Folder=View_PKG
@@ -427,7 +407,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit41]
+[Unit40]
 FileName=resources.h
 CompileCpp=1
 Folder=
@@ -437,7 +417,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit42]
+[Unit41]
 FileName=OverviewGL.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -447,7 +427,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit43]
+[Unit42]
 FileName=OverviewGL.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -457,7 +437,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit44]
+[Unit43]
 FileName=GLView.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -467,10 +447,20 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit45]
+[Unit44]
 FileName=GLView.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit45]
+FileName=Window.h
+CompileCpp=1
+Folder=View_PKG
 Compile=1
 Link=1
 Priority=1000
@@ -498,16 +488,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit46]
-FileName=Window.h
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit47]
 FileName=Window.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -517,7 +497,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit48]
+[Unit47]
 FileName=RoI.h
 CompileCpp=1
 Folder=RoI_PKG
@@ -527,7 +507,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit49]
+[Unit48]
 FileName=RoISet.cpp
 CompileCpp=1
 Folder=RoI_PKG
@@ -537,10 +517,30 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit50]
+[Unit49]
 FileName=RoI.cpp
 CompileCpp=1
 Folder=RoI_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit50]
+FileName=MainWindow.cpp
+CompileCpp=1
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit30]
+FileName=main.cpp
+CompileCpp=1
+Folder=View_PKG
 Compile=1
 Link=1
 Priority=1000
