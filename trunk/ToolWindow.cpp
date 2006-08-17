@@ -21,7 +21,7 @@ int ToolWindow::Create(HINSTANCE hThisInstance)
 
   
     /* Get Main Window Location for image window alignment*/
-    GetWindowRect(OverviewWindow::hOverviewWindow,&rect);
+    GetWindowRect(overviewWindow.GetHandle(),&rect);
     
     /* The class is registered, lets create the program*/
     if (!CreateWin(0, "Parbat3D Tool Window", "Tools",
@@ -666,7 +666,7 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
             SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);  
             
             /* if new position is near another window, move to other the window */    
-            SnappingWindow::snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
+            SnappingWindow::snapWindowByMoving(overviewWindow.GetHandle(),(RECT*)lParam);
             SnappingWindow::snapWindowByMoving(ImageWindow::hImageWindow,(RECT*)lParam);
             break;
         
@@ -687,9 +687,9 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
             if (wParam)
-                CheckMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,MF_CHECKED|MF_BYCOMMAND);            
+                CheckMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,MF_CHECKED|MF_BYCOMMAND);            
             else
-                CheckMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
+                CheckMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
                 
         /* WM_CLOSE: system or user has requested to close the window/application */              
@@ -700,7 +700,7 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 
         /* WM_DESTORY: system is destroying our window */                
         case WM_DESTROY:
-            CheckMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
+            CheckMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             win->freeDrawingObjects();
             return 0;
 

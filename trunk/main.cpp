@@ -20,6 +20,8 @@
 #include "ToolWindow.h"
 #include "DisplayWindow.h"
 
+#include "RoI.h"
+
 using namespace std;
 
 ImageHandler::ImageHandler* image_handler = NULL;	// Instance handle ptr
@@ -34,6 +36,7 @@ settings settingsFile;              /* Used for loading and saving window positi
 
 MainWindow mainWindow;
 ToolWindow toolWindow;
+OverviewWindow overviewWindow;
 
 char *filename=NULL;                    // currently open image filename
 
@@ -98,16 +101,52 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     Console::write("Console rows: ");
 	Console::write((char*)inttocstring(consoleRows));
 	Console::write("\n");
-	
-    mainWindow.Create(hInstance);
-    if (mainWindow.GetHandle()==NULL)
+/*
+    coords c1,c2,c3,c4,c;
+    RoI roi;
+    RoIEntity en1,en2;
+   
+    c1.x=1;
+    c1.y=2;
+    c2.x=3;
+    c2.y=4;
+    c3.x=5;
+    c3.y=6;
+    c4.x=7;
+    c4.y=8;
+    en1.points.push_back(c1);
+    en1.points.push_back(c3);    
+    en2.points.push_back(c2);
+    en2.points.push_back(c4);    
+    roi.add_entity(&en1);
+    roi.add_entity(&en2);
+    vector<RoIEntity*> vres=roi.get_entities();
+    for (int i=0;i<vres.size();i++)
     {
-        MessageBox(0,"handle is null","Parbat3D Error",MB_OK);
+        Console::write("entity ");
+        Console::write(i);      
+        Console::write(":\n");        
+        RoIEntity* en=(RoIEntity*)vres.at(i);
+        for (int j=0;j<en->points.size();j++)
+        {
+            Console::write(" x=");
+            Console::write(en->points.at(j).x);
+            Console::write(" y=");
+            Console::write(en->points.at(j).y);        
+            Console::write("\n");        
+       }            
+    }*/
+    
+
+    
+	if (!mainWindow.Create(hInstance))
+    {
+        MessageBox(0,"Unable to create main window","Parbat3D Error",MB_OK);
         return 0;
     }
   
     /* Register window classes */
-    if ((!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
+    if ((!ImageWindow::registerImageWindow()) || (!DisplayWindow::registerWindow()))
     {
         /* report error if window classes could not be registered */
         MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
@@ -117,7 +156,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Setup main & image windows */
     //  note: image window must be created before main window
     //  note: tool window is only created when an image is loaded
-    if ((!ImageWindow::setupImageWindow()) || (!OverviewWindow::setupWindow()))
+
+    if ((!ImageWindow::setupImageWindow()) || (!overviewWindow.Create(hThisInstance)))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
@@ -153,7 +193,7 @@ void orderWindows()
 {
     //SetWindowPos(hOverviewWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);        
     SetWindowPos(ImageWindow::hImageWindow,toolWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
-    SetWindowPos(ImageWindow::hImageWindow,OverviewWindow::hOverviewWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(ImageWindow::hImageWindow,overviewWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
 
 
 }    
@@ -166,7 +206,7 @@ void loadFile()
     ZeroMemory(&ofn, sizeof(ofn));
 
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = OverviewWindow::hOverviewWindow;
+    ofn.hwndOwner = overviewWindow.GetHandle();
     ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tif;*.j2k;*.jp2\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPEG (*.jpg)\0*.jpg\0JPEG 2000 (*.j2k,*.jp2)\0*.j2k;*.jp2\0TIFF / GeoTIFF (*.tif)\0*.tif\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile = szFileName;
     ofn.nMaxFile = MAX_PATH;
@@ -180,7 +220,7 @@ void loadFile()
 		closeFile();
 
         // load image & setup windows
-	    image_handler = new ImageHandler::ImageHandler(OverviewWindow::hOverviewWindowDisplay, ImageWindow::hImageWindowDisplay, ofn.lpstrFile);
+	    image_handler = new ImageHandler::ImageHandler(overviewWindow.hOverviewWindowDisplay, ImageWindow::hImageWindowDisplay, ofn.lpstrFile);
 	    if (image_handler) {
 			if (image_handler->status > 0) {
 				// An error occurred instantiaing the image handler class.
@@ -206,13 +246,13 @@ void loadFile()
                     orderWindows();                    
 
                     // update opengl displays
-                    RedrawWindow(OverviewWindow::hOverviewWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
+                    RedrawWindow(overviewWindow.hOverviewWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
                     RedrawWindow(ImageWindow::hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
 
                     // enable window menu items
-                    EnableMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,false);
-                    EnableMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,false);
-                    EnableMenuItem(OverviewWindow::hMainMenu,IDM_FILECLOSE,false);
+                    EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,false);
+                    EnableMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,false);
+                    EnableMenuItem(overviewWindow.hMainMenu,IDM_FILECLOSE,false);
                             
                 }				
 			}
@@ -246,11 +286,11 @@ void closeFile()
     }
 
     /* disable menu items */
-    EnableMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,true);
-    EnableMenuItem(OverviewWindow::hMainMenu,IDM_TOOLSWINDOW,true);
-    EnableMenuItem(OverviewWindow::hMainMenu,IDM_FILECLOSE,true);    
+    EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,true);
+    EnableMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,true);
+    EnableMenuItem(overviewWindow.hMainMenu,IDM_FILECLOSE,true);    
     
     /* repaint main window */
-    InvalidateRect(OverviewWindow::hOverviewWindowDisplay,0,true);  
-    UpdateWindow(OverviewWindow::hOverviewWindowDisplay);
+    InvalidateRect(overviewWindow.hOverviewWindowDisplay,0,true);  
+    UpdateWindow(overviewWindow.hOverviewWindowDisplay);
 }

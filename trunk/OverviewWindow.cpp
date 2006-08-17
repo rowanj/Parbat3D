@@ -8,48 +8,13 @@
 #include "MainWindow.h"
 #include "console.h"
 
-HMENU OverviewWindow::hMainMenu;
-HWND OverviewWindow::hOverviewWindowDisplay;
-HWND OverviewWindow::hOverviewWindow=NULL;
 
 // Used for accessing the help folder
 const char *helpPath;
 
-char szOverviewWindowClassName[] = "Parbat3D Overview Window";
-
-/* ------------------------------------------------------------------------------------------------------------------------ */
-/* Overview Window Functions */
-
-/* register overview window's class */
-int OverviewWindow::registerWindow()
-{
-    WNDCLASSEX wincl;        /* Datastructure for the windowclass */
-        
-    /* The Window structure */
-    wincl.hInstance = hThisInstance;
-    wincl.lpszClassName = szOverviewWindowClassName;
-    wincl.lpfnWndProc = OverviewWindow::WindowProcedure; /* This function is called by windows */
-    wincl.style = CS_DBLCLKS;  /* Ctach double-clicks */
-    wincl.cbSize = sizeof(WNDCLASSEX);
-
-    /* Use default icon and mousepointer */
-    wincl.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-    wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wincl.lpszMenuName = NULL; /* No menu */
-    wincl.cbClsExtra = 0; /* No extra bytes after the window class */
-    wincl.cbWndExtra = 0; /* structure or the window instance */
-    /* Use lightgray as the background of the window */
-    wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
-
-    /* Register the window class, if fails return false */
-    return RegisterClassEx(&wincl);  
-
-}
-
 
 /* setup overview window */
-int OverviewWindow::setupWindow()
+int OverviewWindow::Create(HINSTANCE hThisInstance)
 {
 
     RECT rect;
@@ -58,38 +23,30 @@ int OverviewWindow::setupWindow()
     GetWindowRect(ImageWindow::hImageWindow,&rect);
         
     /* Create overview window */
-    OverviewWindow::hOverviewWindow = CreateWindowEx(0, szOverviewWindowClassName, "Parbat3D",
+    if (!CreateWin(0, "Parbat3D Overview Window", "Parbat3D",
 		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, rect.left-OverviewWindow::OVERVIEW_WINDOW_WIDTH, rect.top, OVERVIEW_WINDOW_WIDTH, 296,
-		ImageWindow::hImageWindow, NULL, hThisInstance, NULL);
-    if (!hOverviewWindow)
-        return false;                        
+		ImageWindow::hImageWindow, NULL, hThisInstance))
+        return false;
+    prevProc=SetWindowProcedure(&OverviewWindow::WindowProcedure);
 
     /* set menu to main windo */
 	hMainMenu = LoadMenu(hThisInstance, MAKEINTRESOURCE(ID_MENU));
-    SetMenu(hOverviewWindow, hMainMenu);    
+    SetMenu(GetHandle(), hMainMenu);
     
     /* Disable Window menu items. note: true appears to disable & false enables */
     EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,true);
     EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
-    EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);    
+    EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);
 
     /* get client area of image window */
-    GetClientRect(OverviewWindow::hOverviewWindow,&rect);
-
-    /* setup font objects */
-//    HDC hdc=GetDC(OverviewWindow::hOverviewWindow);      
-//    hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
-//    ToolWindow::hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
-//    ToolWindow::hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
-//    ToolWindow::hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
-//    ReleaseDC(OverviewWindow::hOverviewWindow,hdc);    
+    GetClientRect(OverviewWindow::GetHandle(),&rect);
 
     /* create a child window that will be used by OpenGL */
     hOverviewWindowDisplay=CreateWindowEx( 0, DisplayWindow::szDisplayClassName, NULL, WS_CHILD|WS_VISIBLE,
-		rect.left, rect.top, rect.right, rect.bottom, hOverviewWindow, NULL, hThisInstance, NULL);
+		rect.left, rect.top, rect.right, rect.bottom, GetHandle(), NULL, hThisInstance, NULL);
    
     /* Make the window visible on the screen */
-    ShowWindow(OverviewWindow::hOverviewWindow, SW_SHOW);
+    Show();
     
     return true;
 }
@@ -130,6 +87,8 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     static int toolNormalState=false;
     static RECT rect;                       /* for general use */
     
+    OverviewWindow* win=(OverviewWindow*)Window::GetWindowObject(hwnd);
+        
     switch (message)                  /* handle the messages */
     {
 			
@@ -144,7 +103,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 case IDM_FILESAVE:
                 case IDM_FILESAVEAS:
 					MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will say \"Where do you want to store such a big file?\"",
-                              (LPSTR) szOverviewWindowClassName,
+                              (LPSTR) "Overview Window",
                               MB_ICONINFORMATION | MB_OK );
                     return 0;
                 
@@ -153,17 +112,17 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     return 0;                    
                           
              	case IDM_IMAGEWINDOW:
-                    if (toggleMenuItemTick(hMainMenu,IDM_IMAGEWINDOW))
+                    if (win->toggleMenuItemTick(win->hMainMenu,IDM_IMAGEWINDOW))
                         ShowWindow(ImageWindow::hImageWindow,SW_SHOW);
                     else
                         ShowWindow(ImageWindow::hImageWindow,SW_HIDE);
                     return 0;
              
                 case IDM_TOOLSWINDOW:
-                    if (toggleMenuItemTick(hMainMenu,IDM_TOOLSWINDOW))
-                        ShowWindow(toolWindow.GetHandle(),SW_SHOW);
+                    if (win->toggleMenuItemTick(win->hMainMenu,IDM_TOOLSWINDOW))
+                        toolWindow.Show();
                     else
-                        ShowWindow(toolWindow.GetHandle(),SW_HIDE);
+                        toolWindow.Hide();
                     return 0;
 
                 case IDM_HELPCONTENTS:
@@ -203,8 +162,8 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 /* find out which windows are connected & which are in a normal state */
                 imageNormalState=SnappingWindow::isWindowInNormalState(ImageWindow::hImageWindow);
                 toolNormalState=SnappingWindow::isWindowInNormalState(toolWindow.GetHandle());
-                imageAndMainSnapped=(SnappingWindow::isWindowSnapped(hOverviewWindow,ImageWindow::hImageWindow));
-                toolAndMainSnapped=(SnappingWindow::isWindowSnapped(hOverviewWindow,toolWindow.GetHandle()));
+                imageAndMainSnapped=(SnappingWindow::isWindowSnapped(win->GetHandle(),ImageWindow::hImageWindow));
+                toolAndMainSnapped=(SnappingWindow::isWindowSnapped(win->GetHandle(),toolWindow.GetHandle()));
                 toolAndImageSnapped=(SnappingWindow::isWindowSnapped(toolWindow.GetHandle(),ImageWindow::hImageWindow));
 
                 /* calculate whether the image window should be moved */
@@ -262,8 +221,8 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
         case WM_SIZE:
                 
             /* resize display/opengl window to fit new size */
-            GetClientRect(OverviewWindow::hOverviewWindow,&rect);
-            MoveWindow(OverviewWindow::hOverviewWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
+            GetClientRect(win->GetHandle(),&rect);
+            MoveWindow(win->hOverviewWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
             return 0;
                    
         /* WM_SYSCOMMAND: a system-related command associated with window needs to be executed */    
@@ -281,7 +240,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
         case WM_CLOSE:
             // Shut down the image file and OpenGL
 			if (image_handler) { // Was instantiated
-                if (MessageBox(OverviewWindow::hOverviewWindow,"Are you sure you wish quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
+                if (MessageBox(hwnd,"Are you sure you wish quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
                     return 0;
                 closeFile();
 			}
@@ -300,11 +259,11 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             
             /* post a message that will cause WinMain to exit from the message loop */
             PostQuitMessage (0);
-            return 0;
+            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);
         
         default:                   /* for messages that we don't deal with */
             /* let windows peform the default operation based on the message */
-            return DefWindowProc(hwnd, message, wParam, lParam);
+              return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
     }
     return 0; 
 }

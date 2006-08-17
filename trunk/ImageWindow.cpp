@@ -311,7 +311,7 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
 
             /* snap the window to other windows if in range */
             SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);      
-            SnappingWindow::snapWindowByMoving(OverviewWindow::hOverviewWindow,(RECT*)lParam);
+            SnappingWindow::snapWindowByMoving(overviewWindow.GetHandle(),(RECT*)lParam);
             SnappingWindow::snapWindowByMoving(toolWindow.GetHandle(),(RECT*)lParam);            
             break;
     
@@ -331,7 +331,7 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
             SnappingWindow::snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
                         
             /* snap the window the main window (if near it) */
-            SnappingWindow::snapWindowBySizing(OverviewWindow::hOverviewWindow,(RECT*)lParam,(int)wParam);           
+            SnappingWindow::snapWindowBySizing(overviewWindow.GetHandle(),(RECT*)lParam,(int)wParam);           
             break;
 
         /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            
@@ -349,9 +349,9 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
             if (wParam)
-                CheckMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,MF_CHECKED|MF_BYCOMMAND);            
+                CheckMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,MF_CHECKED|MF_BYCOMMAND);            
             else
-                CheckMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
+                CheckMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
 
         case WM_HSCROLL:
@@ -375,7 +375,7 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
 
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
-            CheckMenuItem(OverviewWindow::hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
+            CheckMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             return 0;
             
         default:
