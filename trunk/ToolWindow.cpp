@@ -8,7 +8,14 @@
 #include "console.h"
 #include "SnappingWindow.h"
 
-
+int ToolTab::Create(HINSTANCE hInstance,HWND parent,RECT *parentRect)
+{
+    const int SCROLLBAR_WIDTH=13;
+	CreateWin( 0, szStaticControl, "", 
+		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, parentRect->left,
+		parentRect->top, parentRect->right-SCROLLBAR_WIDTH, getContainerHeight(), parent, NULL,
+		hInstance);
+}
 
 /* create tool window */
 int ToolWindow::Create(HINSTANCE hThisInstance)
@@ -69,6 +76,8 @@ int ToolWindow::Create(HINSTANCE hThisInstance)
     /* calculate the width & height for our tab container windows */
     const int SPACING_FOR_TAB_HEIGHT=30;    /* the height of the tabs + a bit of spacing */
     const int SPACING_FOR_BOARDER=5;        /* left & right margain + spacing for tab control's borders */
+    rect.left=SPACING_FOR_BOARDER; /**** new ****/
+    rect.top=SPACING_FOR_TAB_HEIGHT; /**** new ****/    
     rect.bottom-=SPACING_FOR_TAB_HEIGHT+SPACING_FOR_BOARDER;
     rect.right-=SPACING_FOR_BOARDER+SPACING_FOR_BOARDER;
     
@@ -82,7 +91,7 @@ int ToolWindow::Create(HINSTANCE hThisInstance)
 	hToolWindowDisplayTabHeading =CreateWindowEx( 0, szStaticControl, "Channel Selection", 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
 		0, rect.right-SCROLLBAR_WIDTH, 20, hToolWindowDisplayTabContainer, NULL,
-		hThisInstance, NULL); 		
+		hThisInstance, NULL);
            
 	/* Query tab container */
     hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "", 

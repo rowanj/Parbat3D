@@ -1,6 +1,19 @@
 #ifndef _PARBAT_TOOLWINDOW_H
 #define _PARBAT_TOOLWINDOW_H
 
+class ToolTab:public Window
+{
+    //private:
+    //WNDPROC prevProc;
+    public:
+    int Create(HINSTANCE hInstance,HWND parent,RECT *parentRect);
+    virtual char* GetTabName();
+    virtual int getContainerHeight();
+    //static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);    
+};
+
+
+
 class ToolWindow:public Window
 {
     private:
