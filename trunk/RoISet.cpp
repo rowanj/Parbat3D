@@ -37,7 +37,8 @@ void RoISet::backtrack (void) {
         vector<coords> *p;
         p = &(current_entity->points);
         if (!p->empty())
-            p->erase(p->end()-2, p->end()-1);
+            p->pop_back();
+//            p->erase(p->end()-2, p->end()-1);
     }
 }
 
@@ -45,7 +46,7 @@ void RoISet::backtrack (void) {
 /* Regions Of Interest ********************************************************/
 void RoISet::add_entity_to_current (void) {
     if (current_region!=NULL && current_entity!=NULL)
-        current_region->add_entity(current_entity);
+        current_region->add_entity(*current_entity);
 }
 
 
@@ -67,9 +68,9 @@ void RoISet::set_current (RoI* c) {
 
 void RoISet::set_current (string c) {
     for (int i=0; i<regions.size(); i++) {
-        RoI* r = regions.at(i);
-        if (r->get_name() == c) {
-            current_region = r;
+        RoI r = regions.at(i);
+        if (r.get_name() == c) {
+            current_region = &r;
             break;
         }
     }
@@ -79,14 +80,14 @@ void RoISet::set_current (string c) {
 /* Set ************************************************************************/
 void RoISet::add_current_to_set (void) {
     if (current_region!=NULL)
-        regions.push_back(current_region);
+        regions.push_back(*current_region);
 }
 
 
 void RoISet::remove_region (RoI* to_go) {
     for (int i=0; i<regions.size(); i++) {
-        RoI* r = regions.at(i);
-        if (r == to_go) {
+        RoI r = regions.at(i);
+        if (&r == to_go) {
             regions.erase(regions.begin()+i-1, regions.begin()+i);
             break;
         }
@@ -94,6 +95,6 @@ void RoISet::remove_region (RoI* to_go) {
 }
 
 
-vector<RoI*> RoISet::get_regions (void) {
+vector<RoI> RoISet::get_regions (void) {
     return regions;
 }

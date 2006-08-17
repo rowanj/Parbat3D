@@ -27,7 +27,7 @@ class RoI {
         int colour_green;
         int colour_blue;
         string name;
-        vector<RoIEntity*> entities;
+        vector<RoIEntity> entities;
         
     public:
         RoI (void);
@@ -44,15 +44,15 @@ class RoI {
         void get_colour (int*, int*, int*);
         void get_color (int*, int*, int*);
         
-        void add_entity (RoIEntity*);
+        void add_entity (RoIEntity);
         
-        vector<RoIEntity*> get_entities (void);
+        vector<RoIEntity> get_entities (void);
 };
 
 
 class RoISet {
     private:
-        vector<RoI*> regions;       // the set of all Regions of Interest
+        vector<RoI> regions;        // the set of all Regions of Interest
         RoI* current_region;        // the Region of Interest currently being worked on
         RoIEntity* current_entity;  // the shape currently being worked on
         
@@ -136,7 +136,7 @@ class RoISet {
         /**
             Returns a vector of all the Regions of Interest.
         */
-        vector<RoI*> get_regions (void);
+        vector<RoI> get_regions (void);
 };
 
 #endif

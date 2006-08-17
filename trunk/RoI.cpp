@@ -38,10 +38,10 @@ void RoI::get_colour (int* r, int* g, int* b) {
 }
 
 
-void RoI::add_entity (RoIEntity* e) {
+void RoI::add_entity (RoIEntity e) {
     entities.push_back(e);
 }
 
-vector<RoIEntity*> RoI::get_entities (void) {
+vector<RoIEntity> RoI::get_entities (void) {
     return entities;
 }
