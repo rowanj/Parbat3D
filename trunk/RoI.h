@@ -23,23 +23,25 @@ class RoIEntity {
 class RoI {
     private:
         bool active;
-        int color_red;
-        int color_green;
-        int color_blue;
+        int colour_red;
+        int colour_green;
+        int colour_blue;
         string name;
         vector<RoIEntity*> entities;
         
     public:
         RoI (void);
         
-        ~RoI (void);
+        virtual ~RoI (void);
         
         void set_name (string);
         
         string get_name (void);
         
+        void set_colour (int, int, int);
         void set_color (int, int, int);
         
+        void get_colour (int*, int*, int*);
         void get_color (int*, int*, int*);
         
         void add_entity (RoIEntity*);
@@ -50,44 +52,91 @@ class RoI {
 
 class RoISet {
     private:
-        vector<RoI*> regions;
-        RoI* current_region;
-        RoIEntity* new_entity;
+        vector<RoI*> regions;       // the set of all Regions of Interest
+        RoI* current_region;        // the Region of Interest currently being worked on
+        RoIEntity* current_entity;  // the shape currently being worked on
+        
         
     public:
-        RoISet (void);
+        RoISet ();
         
-        ~RoISet (void);
+        virtual ~RoISet (void);
         
         
         /**
-            Creates a new Region of Interest. If an old region exists, it is
-            deleted.
+            Creates a new shape that will be part of the Region of Interest. The
+            parameter passed in specifies what type of shape it will be - POINT,
+            RECT, POLY.
         */
-        void new_region (void);
+        void new_entity (string);
         
         /**
-            Creates a new Region of Interest, with a specified name. If an old
-            region exists, it is deleted.
+            Adds a point to the shape that is currently being created. If there
+            is no shape being creating, nothing happens.
         */
-        void new_region (string);
-        
-        
-        void start_new (string);
-        
         void add_point (int, int);
         
+        /**
+            Removes the last point added to the shape that is currently being
+            created. If there is no shape being creating or if no points have
+            been added, nothing happens.
+        */
         void backtrack (void);
         
-        void add_new_to_current (void);
         
-        vector<RoI*> get_regions (void);
+        /**
+            Adds the shape that was just created to the Region of Interest.
+        */
+        void add_entity_to_current (void);
         
+        
+        /**
+            Creates a new Region of Interest. If there is a region that is
+            currently be worked on, it is replaced by the new one.
+            Returns the newly created region.
+        */
+        RoI* new_region (void);
+        
+        /**
+            Creates a new Region of Interest, with a specified name. If there is
+            a region that is currently be worked on, it is replaced by the new
+            one.
+            Returns the newly created region.
+        */
+        RoI* new_region (string);
+        
+        
+        /**
+            Sets the Region of Interest to work on. The Region of Interest does
+            not have to be in the set.
+        */
         void set_current (RoI*);
         
+        /**
+            Sets the Region of Interest to work on, based on its name. The
+            region must already exist in the set otherwise nothing happens.
+        */
         void set_current (string);
         
-        void delete_region (RoI*);
+        
+        /**
+            Adds the current Region of Interest to the set of all Regions of
+            Interest. If there is no current Region of Interest then nothing is
+            done.
+        */
+        void add_current_to_set (void);
+        
+        
+        /**
+            Removes the specified Region of Interest from the set.
+        */
+        void remove_region (RoI*);
+        
+        
+        /**
+            Returns a vector of all the Regions of Interest.
+        */
+        vector<RoI*> get_regions (void);
 };
 
 #endif

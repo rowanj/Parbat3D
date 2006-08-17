@@ -3,64 +3,61 @@
 using namespace std;
 
 
-RoISet::RoISet (void) {
+RoISet::RoISet () {
     current_region = NULL;
-    new_entity = NULL;
+    current_entity = NULL;
 }
 
 RoISet::~RoISet (void) {
     delete &regions;
     delete current_region;
-    delete new_entity;
+    delete current_entity;
 }
 
 
-void RoISet::new_region (void) {
-    if (current_region!=NULL) delete current_region;
-    current_region = new RoI();
-}
-
-void RoISet::new_region (string n) {
-    if (current_region!=NULL) delete current_region;
-    current_region = new RoI();
-    current_region->set_name(n);
-}
-
-
-void RoISet::start_new (string t) {
-    if (new_entity!=NULL) delete new_entity;
-    new_entity = new RoIEntity();
-    new_entity->type = t;
+/* Entities *******************************************************************/
+void RoISet::new_entity (string t) {
+    if (current_entity!=NULL) delete current_entity;
+    current_entity = new RoIEntity();
+    current_entity->type = t;
 }
 
 
 void RoISet::add_point (int x, int y) {
-    if (new_entity!=NULL) {
+    if (current_entity!=NULL) {
         coords p;
         p.x = x;
         p.y = y;
-        (new_entity->points).push_back(p);
+        (current_entity->points).push_back(p);
     }
 }
 
 void RoISet::backtrack (void) {
-    if (new_entity!=NULL) {
+    if (current_entity!=NULL) {
         vector<coords> *p;
-        p = &(new_entity->points);
+        p = &(current_entity->points);
         if (!p->empty())
             p->erase(p->end()-2, p->end()-1);
     }
 }
 
 
-void RoISet::add_new_to_current (void) {
-    if (current_region!=NULL && new_entity!=NULL)
-        current_region->add_entity(new_entity);
+/* Regions Of Interest ********************************************************/
+void RoISet::add_entity_to_current (void) {
+    if (current_region!=NULL && current_entity!=NULL)
+        current_region->add_entity(current_entity);
 }
 
 
-vector<RoI*> RoISet::get_regions (void) {
-    return regions;
+RoI* RoISet::new_region (void) {
+    return new_region("default");
+}
+
+RoI* RoISet::new_region (string n) {
+    if (current_region!=NULL) delete current_region;
+    current_region = new RoI();
+    current_region->set_name(n);
+    return current_region;
 }
 
 
@@ -79,7 +76,14 @@ void RoISet::set_current (string c) {
 }
 
 
-void RoISet::delete_region (RoI* to_go) {
+/* Set ************************************************************************/
+void RoISet::add_current_to_set (void) {
+    if (current_region!=NULL)
+        regions.push_back(current_region);
+}
+
+
+void RoISet::remove_region (RoI* to_go) {
     for (int i=0; i<regions.size(); i++) {
         RoI* r = regions.at(i);
         if (r == to_go) {
@@ -87,4 +91,9 @@ void RoISet::delete_region (RoI* to_go) {
             break;
         }
     }
+}
+
+
+vector<RoI*> RoISet::get_regions (void) {
+    return regions;
 }
