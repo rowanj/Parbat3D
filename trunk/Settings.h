@@ -16,7 +16,7 @@ class settings {
         
     public:
         /**
-            Empty constructor
+            Creates a new settings object that can save settings to a file.
         */
         settings () {}
         
