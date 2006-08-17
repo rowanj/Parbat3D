@@ -115,7 +115,7 @@ int TestWindow::Create(HINSTANCE hInstance,HWND parent)
 {
     int r=CreateWin(0,"static","Parbat test win",WS_CHILD, 10,10,100,100,parent,NULL,hInstance);
     if (r)
-    	ShowWindow(hwindow,SW_SHOW);    
+    	Show();
     return r;
 }
 
@@ -123,6 +123,12 @@ int TestWindow::Create(HINSTANCE hInstance,HWND parent)
 WNDPROC Window::SetWindowProcedure(WNDPROC newproc)
 {
     return (WNDPROC)SetWindowLongPtr(hwindow,GWLP_WNDPROC,(LONG)newproc);
+}
+
+void Window::SetWindowObject(HWND hwnd,Window* obj)
+{
+    SetWindowLong(hwnd,GWL_USERDATA,(long)obj);
+    //todo: check for err
 }
 
 Window* Window::GetWindowObject(HWND hwnd)
@@ -136,11 +142,6 @@ Window* Window::GetWindowObject(HWND hwnd)
 //    Console::write((int)win);
 //    Console::write("\n");
     return win;
-}
-
-void Window::SetWindowObject(HWND hwnd,Window* obj)
-{
-    SetWindowLong(hwnd,GWL_USERDATA,(int)obj);
 }
 
 

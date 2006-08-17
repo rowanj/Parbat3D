@@ -15,7 +15,7 @@ int MainWindow::Create(HINSTANCE hInstance)
 {
     /* Create main window */
     if (!CreateWin(0, "parbat3d main win class", "Parbat3D",
-		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, -50, -50, 100, 100,
+		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, -50, -50, 1, 1,
 		NULL, NULL, hInstance))
         return false;                        
 
@@ -47,7 +47,7 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
                     if (imageWindowState!=0)
                         ShowWindow(ImageWindow::hImageWindow,imageWindowState);
                     if (toolWindowState!=0)
-                        ShowWindow(ToolWindow::hToolWindow,toolWindowState);
+                        ShowWindow(toolWindow.GetHandle(),toolWindowState);
                     ShowWindow(OverviewWindow::hOverviewWindow,SW_SHOW);
                     return 0;
 
@@ -66,9 +66,9 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
                         imageWindowState=0;
                     }
 
-                    if (ToolWindow::hToolWindow!=NULL)
+                    if (toolWindow.GetHandle()!=NULL)
                     {
-                        if (!IsWindowVisible(ToolWindow::hToolWindow))
+                        if (!IsWindowVisible(toolWindow.GetHandle()))
                             toolWindowState=0;
                         else
                             toolWindowState=SW_SHOW;                        
@@ -80,7 +80,7 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 
                     /* hide the child windows */     
                     ShowWindow(ImageWindow::hImageWindow,SW_HIDE);            
-                    ShowWindow(ToolWindow::hToolWindow,SW_HIDE);                    
+                    ShowWindow(toolWindow.GetHandle(),SW_HIDE);                    
                     ShowWindow(OverviewWindow::hOverviewWindow,SW_HIDE);                    
                     return 0;
 		    }    

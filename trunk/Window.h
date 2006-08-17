@@ -7,21 +7,20 @@ class Window
 {
     private:
     WNDPROC prevWindowProcedure;        
+    HWND hwindow;    
     protected:
-    HWND hwindow;
     static WNDPROC stPrevWindowProcedure;
     int CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,DWORD dwStyle,int x,int y,int nWidth,int nHeight,HWND hWndParent,HMENU hMenu,HINSTANCE hInstance);
-    static void Window::SetWindowObject(HWND hwnd,Window* obj);
     
     public:
-    char *testString;
     virtual int Create(HINSTANCE hInstance);
         
     Window::Window();
-    HWND GetHandle() {return hwindow;};
+    inline HWND GetHandle() {return hwindow;};
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
     static LRESULT DefaultProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
     static Window* GetWindowObject(HWND);
+    static void SetWindowObject(HWND,Window*);    
     static int RegisterWinClass(WNDCLASSEX*);
     WNDPROC SetWindowProcedure(WNDPROC);
     inline void Destroy() {DestroyWindow(hwindow);};

@@ -33,6 +33,7 @@ HWND hDesktop;                      /* handle to desktop window (used for snappi
 settings settingsFile;              /* Used for loading and saving window position and sizes */
 
 MainWindow mainWindow;
+ToolWindow toolWindow;
 
 char *filename=NULL;                    // currently open image filename
 
@@ -106,7 +107,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     }
   
     /* Register window classes */
-    if ((!ToolWindow::registerToolWindow()) || (!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
+    if ((!ImageWindow::registerImageWindow()) || (!OverviewWindow::registerWindow()) || (!DisplayWindow::registerWindow()))
     {
         /* report error if window classes could not be registered */
         MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
@@ -151,7 +152,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 void orderWindows()
 {
     //SetWindowPos(hOverviewWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);        
-    SetWindowPos(ImageWindow::hImageWindow,ToolWindow::hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(ImageWindow::hImageWindow,toolWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
     SetWindowPos(ImageWindow::hImageWindow,OverviewWindow::hOverviewWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
 
 
@@ -197,10 +198,10 @@ void loadFile()
                     ImageWindow::updateImageScrollbar();      
 
                     // re-create tool window
-                    ToolWindow::setupToolWindow();
+                    toolWindow.Create(hThisInstance);
                     
                     // show tool & image windows
-                    ShowWindow(ToolWindow::hToolWindow,SW_SHOW);
+                    ShowWindow(toolWindow.GetHandle(),SW_SHOW);
                     ShowWindow(ImageWindow::hImageWindow,SW_SHOW);    
                     orderWindows();                    
 
@@ -233,10 +234,9 @@ void closeFile()
     image_handler=NULL;
 	
 	/* destroy tool window */
-    if (ToolWindow::hToolWindow)
+    if (toolWindow.GetHandle()!=NULL)
     {
-        DestroyWindow(ToolWindow::hToolWindow);
-        ToolWindow::hToolWindow=NULL;
+        toolWindow.Destroy();
     }    
     
     /* hide image window */

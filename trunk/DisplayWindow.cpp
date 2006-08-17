@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include "Window.h"
 #include "Settings.h"
 #include "DisplayWindow.h"
 #include "ImageHandler.h"
@@ -79,7 +80,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
         case WM_MOUSEMOVE:
             {
                 /* check if image is open, mouse has moved on image window & the query tab is displayed in the tool window */
-                if ((image_handler)&&(hwnd==ImageWindow::hImageWindowDisplay)&&(ToolWindow::hToolWindowCurrentTabContainer==ToolWindow::hToolWindowQueryTabContainer)) {
+                if ((image_handler)&&(hwnd==ImageWindow::hImageWindowDisplay)&&(toolWindow.hToolWindowCurrentTabContainer==toolWindow.hToolWindowQueryTabContainer)) {
                     /* Get mouse screen position */
                     int mx = (short)LOWORD(lParam);
                     int my = (short)HIWORD(lParam);
@@ -99,13 +100,13 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                         string leader = "";
                         
                         /* Update display of cursor position */
-                        SetWindowText(ToolWindow::cursorXPos, (char *) makeMessage(leader, ix));
-                        SetWindowText(ToolWindow::cursorYPos, (char *) makeMessage(leader, iy));
+                        SetWindowText(toolWindow.cursorXPos, (char *) makeMessage(leader, ix));
+                        SetWindowText(toolWindow.cursorYPos, (char *) makeMessage(leader, iy));
                         
                         /* Update display of pixel values under query tab */                    
                         if (bv && (ix!=0 || iy!=0)) { /* make sure the band values were returned */
-                            for (int i=1; i<=ToolWindow::bands; i++)
-                                SetWindowText(ToolWindow::imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
+                            for (int i=1; i<=toolWindow.bands; i++)
+                                SetWindowText(toolWindow.imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
                         }
                         
                         delete[] bv;

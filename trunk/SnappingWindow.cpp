@@ -87,7 +87,7 @@ void SnappingWindow::moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevIm
     if (moveImageWindow)
         moveWindowByOffset(ImageWindow::hImageWindow,prevImageWindowRect,moveLeftOffset,moveTopOffset);
     if (moveToolWindow)
-        moveWindowByOffset(ToolWindow::hToolWindow,prevToolWindowRect,moveLeftOffset,moveTopOffset);
+        moveWindowByOffset(toolWindow.GetHandle(),prevToolWindowRect,moveLeftOffset,moveTopOffset);
 }
 
 /* checks whether a window is in normal state (not hidden, minimized, or maximized) */
