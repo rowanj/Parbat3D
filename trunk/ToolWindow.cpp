@@ -19,7 +19,7 @@ int ToolWindow::Create(HINSTANCE hThisInstance)
     const int SCROLLBAR_WIDTH=13;
     const int SCROLLBAR_TOP=25;
 
-    
+  
     /* Get Main Window Location for image window alignment*/
     GetWindowRect(OverviewWindow::hOverviewWindow,&rect);
     
@@ -28,6 +28,7 @@ int ToolWindow::Create(HINSTANCE hThisInstance)
            WS_POPUP+WS_CAPTION+WS_SYSMENU, rect.left, rect.bottom,
            250, 300, ImageWindow::hImageWindow, NULL, hThisInstance))
         return false;
+    setupDrawingObjects(GetHandle());
     prevProc=SetWindowProcedure(&ToolWindow::WindowProcedure);
 
 
@@ -635,10 +636,6 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
             
     switch (message)                  /* handle the messages */
     {
-        case WM_CREATE:
-            /* setup fonts, brushes, etc */
-            win->setupDrawingObjects(hwnd);
-            break;                
         
         case WM_NOTIFY:
             /* handle change in tab selection  */
