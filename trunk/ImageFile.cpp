@@ -37,6 +37,7 @@ ImageFile::ImageFile(char* theFilename)
 	}
 	else
 	{
+        ifErr = 0;  /**** bug fix by shane ****/
 		properties = new ImageProperties(ifDataset, filename);
 		coordInfo = new CoordinateInfo(ifDataset);
 		
