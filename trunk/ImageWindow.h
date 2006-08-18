@@ -3,7 +3,7 @@ class ImageWindow
 {
     public:
     static HWND hImageWindow;
-    static HWND hImageWindowDisplay;
+    static DisplayWindow imageWindowDisplay;
 
     static LRESULT CALLBACK ImageWindowProcedure(HWND, UINT, WPARAM, LPARAM);
     static int registerImageWindow();

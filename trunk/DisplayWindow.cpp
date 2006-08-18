@@ -8,62 +8,50 @@
 #include "main.h"
 #include "console.h"
 
-/* DisplayWindow functions are used to display the opengl content inside the image & overview windows,
-   as well as displaying the "No Image Loaded" message on the overview window  */
-
-char DisplayWindow::szDisplayClassName[] = "Parbat3D Display Window";
-
-/* register a class that can be used to create a display window */
-int DisplayWindow::registerWindow()
+DisplayWindow::DisplayWindow()
 {
-    WNDCLASSEX wincl;
+    text="No Image Loaded";
+    textLen=15;
+}
+
+int DisplayWindow::Create(HINSTANCE hThisInstance,HWND hparent)
+{
+    RECT rect;
     
-    /* Create window class for the display control windows */
-    wincl.hInstance = hThisInstance;
-    wincl.lpszClassName = szDisplayClassName;
-    wincl.lpfnWndProc = DisplayWindow::WindowProcedure;  /* This function is called by windows */
-    wincl.style = CS_DBLCLKS;  /* Ctach double-clicks */
-    wincl.cbSize = sizeof(WNDCLASSEX);
-    /* Use default icon and mousepointer */
-    wincl.hIcon = NULL;
-    wincl.hIconSm = NULL;
-    wincl.hCursor = LoadCursor(NULL, IDC_CROSS);
-    wincl.lpszMenuName = NULL; /* No menu */
-    wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
-    wincl.cbWndExtra = 0;                      /* structure or the window instance */
-    wincl.hbrBackground = NULL;
-    /* Register the window class, if fails return false */
-    return RegisterClassEx(&wincl);
-}    
+    GetClientRect(hparent,&rect);    
+    CreateWin(0, "Parbat3D Display Window", NULL, WS_CHILD+WS_VISIBLE,
+		rect.left, rect.top, rect.right, rect.bottom, hparent, NULL, hThisInstance);    
+
+	SetDefaultCursor(LoadCursor(NULL, IDC_CROSS));
+	prevProc=SetWindowProcedure(&WindowProcedure);
+	
+    /* init variables used for painting "No Image Loaded" message */
+    hbrush=CreateSolidBrush(0);
+    HDC hdc=GetDC(GetHandle());                                                                 /* get device context (drawing) object */
+    hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma                
+    SelectObject(hdc,hNormalFont);                                                   /* set font that will be used for drawing text */    
+    GetTextExtentPoint32(hdc,text,textLen,&textSize);                                /* get width & height of string in pixels */          
+    ReleaseDC(GetHandle(),hdc);
+
+    GetClientRect(GetHandle(),&rect);
+    textPos.x=(rect.right-rect.left)/2 - textSize.cx/2;
+    textPos.y=(rect.bottom-rect.top)/2 - textSize.cy/2;            
+    
+	
+}
+
 
 /* Handle messages/events related to the display window */
 LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    // static variables used for drawing no image loaded message on the window
     static PAINTSTRUCT ps;
     static HDC hdc;
     static RECT rect;
-    static HBRUSH hbrush=NULL;
-    static HFONT hNormalFont=NULL;    
-    static SIZE textSize;
-    static POINT textPos;
-    static char text[]="No Image Loaded";
-    const int textLen=15;
+
+    DisplayWindow* win=(DisplayWindow*)Window::GetWindowObject(hwnd);
     
-    switch (message)                  /* handle the messages */
+    switch (message) 
     {
-        case WM_CREATE:
-            /* init variables used for painting "No Image Loaded" message */
-            if (hbrush==NULL)
-                hbrush=CreateSolidBrush(0);
-            hdc=GetDC(hwnd);                                                                 /* get device context (drawing) object */
-            if (hNormalFont==NULL)
-                hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma                
-           
-            SelectObject(hdc,hNormalFont);                                                   /* set font that will be used for drawing text */    
-            GetTextExtentPoint32(hdc,text,textLen,&textSize);                                /* get width & height of string in pixels */          
-            ReleaseDC(hwnd,hdc);
-            break;
             
         case WM_SIZE:           
             if (image_handler) {
@@ -72,15 +60,15 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
             } else {
                 /* re-position message */
                 GetClientRect(hwnd,&rect);
-                textPos.x=(rect.right-rect.left)/2 - textSize.cx/2;
-                textPos.y=(rect.bottom-rect.top)/2 - textSize.cy/2;            
+                win->textPos.x=(rect.right-rect.left)/2 - win->textSize.cx/2;
+                win->textPos.y=(rect.bottom-rect.top)/2 - win->textSize.cy/2;            
             }    
             break;
 
         case WM_MOUSEMOVE:
             {
                 /* check if image is open, mouse has moved on image window & the query tab is displayed in the tool window */
-                if ((image_handler)&&(hwnd==ImageWindow::hImageWindowDisplay)&&(toolWindow.hToolWindowCurrentTabContainer==toolWindow.hToolWindowQueryTabContainer)) {
+                if ((image_handler)&&(win==&ImageWindow::imageWindowDisplay)&&(toolWindow.hToolWindowCurrentTabContainer==toolWindow.hToolWindowQueryTabContainer)) {
                     /* Get mouse screen position */
                     int mx = (short)LOWORD(lParam);
                     int my = (short)HIWORD(lParam);
@@ -116,8 +104,9 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
             break;
 
         case WM_DESTROY:
-            DeleteObject(hNormalFont);
-            break;
+            DeleteObject(win->hNormalFont);
+            DeleteObject(win->hbrush); 
+            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
             
 		case WM_PAINT:
             static int p;
@@ -128,19 +117,20 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
             else
             {
                 /* Display "No Image Loaded" on black background */
-                SelectObject(hdc,hbrush);
+                GetClientRect(hwnd,&rect);                
+                SelectObject(hdc,win->hbrush);
                 Rectangle(hdc,0,0,rect.right,rect.bottom);
-                SelectObject(hdc,hNormalFont);
+                SelectObject(hdc,win->hNormalFont);
                 SetTextColor(hdc,RGB(255,255,255));
                 SetBkColor(hdc,0);
-                TextOut(hdc,textPos.x,textPos.y,text,textLen);
+                TextOut(hdc,win->textPos.x,win->textPos.y,win->text,win->textLen);
             }
 			EndPaint(hwnd,&ps);
 			break;
 
     default:                   /* for messages that we don't deal with */
             /* let windows peform the default operation based on the message */
-            return DefWindowProc(hwnd, message, wParam, lParam);
+            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
     }			
     /* return true to indicate that we have processed the message */    
     return 0; 

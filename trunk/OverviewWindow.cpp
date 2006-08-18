@@ -12,6 +12,7 @@
 // Used for accessing the help folder
 const char *helpPath;
 
+DisplayWindow overviewWindowDisplay;
 
 /* setup overview window */
 int OverviewWindow::Create(HINSTANCE hThisInstance)
@@ -38,12 +39,8 @@ int OverviewWindow::Create(HINSTANCE hThisInstance)
     EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
     EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);
 
-    /* get client area of image window */
-    GetClientRect(OverviewWindow::GetHandle(),&rect);
-
     /* create a child window that will be used by OpenGL */
-    hOverviewWindowDisplay=CreateWindowEx( 0, DisplayWindow::szDisplayClassName, NULL, WS_CHILD|WS_VISIBLE,
-		rect.left, rect.top, rect.right, rect.bottom, GetHandle(), NULL, hThisInstance, NULL);
+    overviewWindowDisplay.Create(hThisInstance,GetHandle());
    
     /* Make the window visible on the screen */
     Show();
@@ -222,7 +219,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 
             /* resize display/opengl window to fit new size */
             GetClientRect(win->GetHandle(),&rect);
-            MoveWindow(win->hOverviewWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
+            MoveWindow(win->overviewWindowDisplay.GetHandle(),rect.left,rect.top,rect.right,rect.bottom,true);
             return 0;
                    
         /* WM_SYSCOMMAND: a system-related command associated with window needs to be executed */    

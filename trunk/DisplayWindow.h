@@ -1,11 +1,21 @@
+#ifndef _PARBAT_DISPLAYWINDOW_H
+#define _PARBAT_DISPLAYWINDOW_H
 
-class DisplayWindow
+#include "Window.h"
+class DisplayWindow: public Window
 {
-   
+    private:
+    WNDPROC prevProc;
+    HBRUSH hbrush;
+    HFONT hNormalFont;    
+    SIZE textSize;
+    POINT textPos;
+    char *text;
+    int textLen;    
+    
     public:
-    static int registerWindow();
-    static char szDisplayClassName[];
-    static CALLBACK LRESULT WindowProcedure(HWND, UINT, WPARAM, LPARAM);
-};
+    DisplayWindow();
+    virtual int Create(HINSTANCE hInstance,HWND parent);        
+    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);};
 
-
+#endif

@@ -146,7 +146,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     }
   
     /* Register window classes */
-    if ((!ImageWindow::registerImageWindow()) || (!DisplayWindow::registerWindow()))
+    if ((!ImageWindow::registerImageWindow()))
     {
         /* report error if window classes could not be registered */
         MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
@@ -220,7 +220,7 @@ void loadFile()
 		closeFile();
 
         // load image & setup windows
-	    image_handler = new ImageHandler::ImageHandler(overviewWindow.hOverviewWindowDisplay, ImageWindow::hImageWindowDisplay, ofn.lpstrFile);
+	    image_handler = new ImageHandler::ImageHandler(overviewWindow.overviewWindowDisplay.GetHandle(), ImageWindow::imageWindowDisplay.GetHandle(), ofn.lpstrFile);
 	    if (image_handler) {
 			if (image_handler->status > 0) {
 				// An error occurred instantiaing the image handler class.
@@ -246,8 +246,8 @@ void loadFile()
                     orderWindows();                    
 
                     // update opengl displays
-                    RedrawWindow(overviewWindow.hOverviewWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);
-                    RedrawWindow(ImageWindow::hImageWindowDisplay,NULL,NULL,RDW_INTERNALPAINT);                
+                    RedrawWindow(overviewWindow.overviewWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);
+                    RedrawWindow(ImageWindow::imageWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);                
 
                     // enable window menu items
                     EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,false);
@@ -291,6 +291,5 @@ void closeFile()
     EnableMenuItem(overviewWindow.hMainMenu,IDM_FILECLOSE,true);    
     
     /* repaint main window */
-    InvalidateRect(overviewWindow.hOverviewWindowDisplay,0,true);  
-    UpdateWindow(overviewWindow.hOverviewWindowDisplay);
+    overviewWindow.overviewWindowDisplay.Repaint();
 }

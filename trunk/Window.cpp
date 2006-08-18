@@ -111,14 +111,6 @@ int Window::Create(HINSTANCE hInstance)
 }
 
 
-int TestWindow::Create(HINSTANCE hInstance,HWND parent)
-{
-    int r=CreateWin(0,"static","Parbat test win",WS_CHILD, 10,10,100,100,parent,NULL,hInstance);
-    if (r)
-    	Show();
-    return r;
-}
-
 
 WNDPROC Window::SetWindowProcedure(WNDPROC newproc)
 {
@@ -180,9 +172,3 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 }
 
 
-LRESULT Window::DefaultProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    if (stPrevWindowProcedure!=NULL)
-        return CallWindowProc(stPrevWindowProcedure,hwnd,message,wParam,lParam);           
-    return DefWindowProc(hwnd, message, wParam, lParam);        
-}

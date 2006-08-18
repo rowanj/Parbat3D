@@ -11,7 +11,8 @@
 #include "ImageWindow.h"
 
 HWND ImageWindow::hImageWindow=NULL;    // handle to image window
-HWND ImageWindow::hImageWindowDisplay;  // handle to child window that contains opengl content
+//HWND ImageWindow::hImageWindowDisplay;  // handle to child window that contains opengl content
+DisplayWindow ImageWindow::imageWindowDisplay;
 
 char szImageWindowClassName[] = "Parbat3D Image Window";
 
@@ -71,11 +72,11 @@ int ImageWindow::setupImageWindow()
         return false;  
 
     /* get client area of image window */
-    GetClientRect(hImageWindow,&rect);
+
 
     /* create a child window that will be used by OpenGL */
-    hImageWindowDisplay=CreateWindowEx( 0, DisplayWindow::szDisplayClassName, NULL, WS_CHILD+WS_VISIBLE,
-		rect.left, rect.top, rect.right, rect.bottom, hImageWindow, NULL, hThisInstance, NULL);
+    imageWindowDisplay.Create(hThisInstance,hImageWindow);
+
 
     if (hImageWindow==NULL)
         return false;
@@ -339,7 +340,7 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
            
             /* resize display/opengl window to fit new size */            
             GetClientRect(hImageWindow,&rect);
-            MoveWindow(hImageWindowDisplay,rect.left,rect.top,rect.right,rect.bottom,true);
+            MoveWindow(imageWindowDisplay.GetHandle(),rect.left,rect.top,rect.right,rect.bottom,true);
             
             /* update scroll bar settings */
             if (image_handler)

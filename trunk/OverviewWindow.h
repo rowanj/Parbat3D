@@ -2,6 +2,7 @@
 #define _PARBAT_OVERVIEWWINDOW_H
 
 #include "Window.h"
+#include "DisplayWindow.h"
 
 class OverviewWindow:public Window
 {
@@ -10,7 +11,7 @@ class OverviewWindow:public Window
         
     public:
     HMENU hMainMenu;
-    HWND hOverviewWindowDisplay;
+    DisplayWindow overviewWindowDisplay;
     static const int OVERVIEW_WINDOW_WIDTH=250;    /* width of the overview window in pixels */
 
     virtual int Create(HINSTANCE hInstance);        
