@@ -1,18 +1,23 @@
+#ifndef _PARBAT_IMAGEWINDOW_H
+#define _PARBAT_IMAGEWINDOW_H
 
-class ImageWindow
+#include "Window.h"
+
+class ImageWindow:public Window
 {
+    private:
+    WNDPROC prevProc;
+        
     public:
-    static HWND hImageWindow;
-    static DisplayWindow imageWindowDisplay;
+    DisplayWindow imageWindowDisplay;
 
-    static LRESULT CALLBACK ImageWindowProcedure(HWND, UINT, WPARAM, LPARAM);
-    static int registerImageWindow();
-    static int setupImageWindow();
-    static void updateImageWindowTitle();
-    static void updateImageScrollbar();
-    static void scrollImageX(int scrollMsg);
-    static void scrollImageY(int scrollMsg);    
-    static void zoomImage(int nlevels);
+    int Create(HINSTANCE hThisInstance,HWND parent);
+    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+    void updateImageWindowTitle();
+    void updateImageScrollbar();
+    void scrollImageX(int scrollMsg);
+    void scrollImageY(int scrollMsg);    
+    void zoomImage(int nlevels);
 };
 
-
+#endif

@@ -85,7 +85,7 @@ void SnappingWindow::moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevIm
     int moveLeftOffset=newRect->left-oldRect->left;
     int moveTopOffset=newRect->top-oldRect->top;
     if (moveImageWindow)
-        moveWindowByOffset(ImageWindow::hImageWindow,prevImageWindowRect,moveLeftOffset,moveTopOffset);
+        moveWindowByOffset(imageWindow.GetHandle(),prevImageWindowRect,moveLeftOffset,moveTopOffset);
     if (moveToolWindow)
         moveWindowByOffset(toolWindow.GetHandle(),prevToolWindowRect,moveLeftOffset,moveTopOffset);
 }

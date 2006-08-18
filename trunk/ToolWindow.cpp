@@ -33,7 +33,7 @@ int ToolWindow::Create(HINSTANCE hThisInstance)
     /* The class is registered, lets create the program*/
     if (!CreateWin(0, "Parbat3D Tool Window", "Tools",
            WS_POPUP+WS_CAPTION+WS_SYSMENU, rect.left, rect.bottom,
-           250, 300, ImageWindow::hImageWindow, NULL, hThisInstance))
+           250, 300, imageWindow.GetHandle(), NULL, hThisInstance))
         return false;
     setupDrawingObjects(GetHandle());
     prevProc=SetWindowProcedure(&ToolWindow::WindowProcedure);
@@ -676,7 +676,7 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
             
             /* if new position is near another window, move to other the window */    
             SnappingWindow::snapWindowByMoving(overviewWindow.GetHandle(),(RECT*)lParam);
-            SnappingWindow::snapWindowByMoving(ImageWindow::hImageWindow,(RECT*)lParam);
+            SnappingWindow::snapWindowByMoving(imageWindow.GetHandle(),(RECT*)lParam);
             break;
         
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */

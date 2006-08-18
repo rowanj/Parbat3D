@@ -10,42 +10,11 @@
 #include "ImageHandler.h"
 #include "ImageWindow.h"
 
-HWND ImageWindow::hImageWindow=NULL;    // handle to image window
-//HWND ImageWindow::hImageWindowDisplay;  // handle to child window that contains opengl content
-DisplayWindow ImageWindow::imageWindowDisplay;
-
-char szImageWindowClassName[] = "Parbat3D Image Window";
 
 
-/* register image window class */
-int ImageWindow::registerImageWindow()
+int ImageWindow::Create(HINSTANCE hThisInstance,HWND parent)
 {
-    WNDCLASSEX wincl;  /* Datastructure for the windowclass */
-
-    /* The Window structure */
-    wincl.hInstance = hThisInstance;                /* process's instance handle */
-    wincl.lpszClassName = szImageWindowClassName;   /* our unique name for this class */
-    wincl.lpfnWndProc = ImageWindow::ImageWindowProcedure;      /* This function is called by windows */
-    wincl.style = CS_DBLCLKS; /* Ctach double-clicks */
-    wincl.cbSize = sizeof(WNDCLASSEX);
-
-    /* Use default icon and mousepointer */
-    wincl.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-    wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wincl.lpszMenuName = NULL; /* No menu */
-    wincl.cbClsExtra = 0; /* No extra bytes after the window class */
-    wincl.cbWndExtra = 0; /* structure or the window instance */
-    /* Use lightgray as the background of the window */
-    wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH);
-
-    /* Register the window class, if fails return false */
-    return RegisterClassEx(&wincl);
-}
-
-/* create the image window */
-int ImageWindow::setupImageWindow()
-{   
+    
     RECT rect;
     int mx,my;
     const int IMAGE_WINDOW_WIDTH=700;
@@ -65,22 +34,15 @@ int ImageWindow::setupImageWindow()
        my = (rect.bottom /2) - (IMAGE_WINDOW_HEIGHT/2);                                 /* default y position to center windows */
 
     /* create image window */
-    hImageWindow =CreateWindowEx(0, szImageWindowClassName, "Image Window",
+    if (!CreateWin(0, "Parbat3D Image Window", "Image Window",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
-	     mx, my, IMAGE_WINDOW_WIDTH, IMAGE_WINDOW_HEIGHT, mainWindow.GetHandle(), NULL, hThisInstance, NULL);
-    if (!hImageWindow)
-        return false;  
+	     mx, my, IMAGE_WINDOW_WIDTH, IMAGE_WINDOW_HEIGHT, parent, NULL, hThisInstance))
+	    return false;
 
-    /* get client area of image window */
-
+    prevProc=SetWindowProcedure(&WindowProcedure);
 
     /* create a child window that will be used by OpenGL */
-    imageWindowDisplay.Create(hThisInstance,hImageWindow);
-
-
-    if (hImageWindow==NULL)
-        return false;
-
+    imageWindowDisplay.Create(hThisInstance,GetHandle());
 
     return true;
 }
@@ -93,7 +55,7 @@ void ImageWindow::updateImageWindowTitle()
     string title  = makeMessage(leader,filename);
     title+=makeString(" (",int(100.0 / pow((double)2,(double)image_handler->get_LOD())));
     title+="%)";
-	SetWindowText(hImageWindow, (char*) title.c_str());
+	SetWindowText(GetHandle(), (char*) title.c_str());
 }
 
 /* update image window's scroll bar display settings  */
@@ -142,8 +104,8 @@ void ImageWindow::updateImageScrollbar()
     info_x.fMask=SIF_ALL;
     info_y.cbSize=sizeof(SCROLLINFO);
     info_y.fMask=SIF_ALL;    
-    SetScrollInfo(hImageWindow,SB_HORZ,&info_x,true);
-    SetScrollInfo(hImageWindow,SB_VERT,&info_y,true);    
+    SetScrollInfo(GetHandle(),SB_HORZ,&info_x,true);
+    SetScrollInfo(GetHandle(),SB_VERT,&info_y,true);    
       
 }
 
@@ -155,7 +117,7 @@ void ImageWindow::scrollImageX(int scrollMsg)
     /* get current scroll position & range */    
     info.cbSize=sizeof(SCROLLINFO);
     info.fMask=SIF_ALL;
-    GetScrollInfo(hImageWindow,SB_HORZ,&info);
+    GetScrollInfo(GetHandle(),SB_HORZ,&info);
      
     Console::write("scrollImageX() ");
     switch(LOWORD(scrollMsg))
@@ -191,7 +153,7 @@ void ImageWindow::scrollImageX(int scrollMsg)
 
     // update scroll position
     info.fMask=SIF_POS;
-    SetScrollInfo(hImageWindow,SB_HORZ,&info,true);
+    SetScrollInfo(GetHandle(),SB_HORZ,&info,true);
     image_handler->set_viewport_x(info.nPos);
 }
 
@@ -203,7 +165,7 @@ void ImageWindow::scrollImageY(int scrollMsg)
     /* get current scroll position & range */    
     info.cbSize=sizeof(SCROLLINFO);
     info.fMask=SIF_ALL;
-    GetScrollInfo(hImageWindow,SB_VERT,&info);
+    GetScrollInfo(GetHandle(),SB_VERT,&info);
      
     Console::write("scrollImageY() ");
     switch(LOWORD(scrollMsg))
@@ -239,7 +201,7 @@ void ImageWindow::scrollImageY(int scrollMsg)
 
     // update scroll position
     info.fMask=SIF_POS;
-    SetScrollInfo(hImageWindow,SB_VERT,&info,true);
+    SetScrollInfo(GetHandle(),SB_VERT,&info,true);
     image_handler->set_viewport_y(info.nPos);
 }
 
@@ -263,14 +225,15 @@ void ImageWindow::zoomImage(int nlevels)
     updateImageScrollbar();
 }
 
-/* This function is called by the Windowsfunction DispatchMessage( ) */
 /* All messages/events related to the image window (or it's controls) are sent to this procedure */
-LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static POINT moveMouseOffset;     /* mouse offset relative to window, used for snapping */
     static POINT sizeMousePosition;   /* mouse position, used for sizing window */
     static RECT  sizeWindowPosition;  /* window position, used for sizing window */
     static RECT rect;                 /* for general use */
+
+    ImageWindow* win=(ImageWindow*)Window::GetWindowObject(hwnd);
     
     switch (message)                  /* handle the messages */
     {
@@ -302,7 +265,7 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
             }
 
             /* also let windows handle this event */
-            return DefWindowProc(hwnd, message, wParam, lParam); 
+            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 
         /* WM_MOVING: the window is about to be moved to a new location */
         case WM_MOVING:
@@ -339,12 +302,12 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
         case WM_SIZE:
            
             /* resize display/opengl window to fit new size */            
-            GetClientRect(hImageWindow,&rect);
-            MoveWindow(imageWindowDisplay.GetHandle(),rect.left,rect.top,rect.right,rect.bottom,true);
+            GetClientRect(hwnd,&rect);
+            MoveWindow(win->imageWindowDisplay.GetHandle(),rect.left,rect.top,rect.right,rect.bottom,true);
             
             /* update scroll bar settings */
             if (image_handler)
-                updateImageScrollbar();
+                win->updateImageScrollbar();
             return 0;
            
         case WM_SHOWWINDOW:
@@ -356,15 +319,15 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
             return 0;
 
         case WM_HSCROLL:
-            scrollImageX(wParam);
+            win->scrollImageX(wParam);
             return 0;
             
         case WM_VSCROLL:
-            scrollImageY(wParam);
+            win->scrollImageY(wParam);
             return 0;
             
         case WM_MOUSEWHEEL:
-            zoomImage(GET_WHEEL_DELTA_WPARAM(wParam)/WHEEL_DELTA);
+            win->zoomImage(GET_WHEEL_DELTA_WPARAM(wParam)/WHEEL_DELTA);
             return 0;
 
 
@@ -381,7 +344,7 @@ LRESULT CALLBACK ImageWindow::ImageWindowProcedure(HWND hwnd, UINT message, WPAR
             
         default:
             /* let windows handle any unknown messages */
-            return DefWindowProc(hwnd, message, wParam, lParam);
+            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
     }
     /* return 0 to indicate that we have processed the message */       
     return 0;

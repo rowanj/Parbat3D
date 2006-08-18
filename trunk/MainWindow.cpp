@@ -45,7 +45,7 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
                 case SIZE_RESTORED:
                     /* restore child windows to their previous state */
                     if (imageWindowState!=0)
-                        ShowWindow(ImageWindow::hImageWindow,imageWindowState);
+                        ShowWindow(imageWindow.GetHandle(),imageWindowState);
                     if (toolWindowState!=0)
                         ShowWindow(toolWindow.GetHandle(),toolWindowState);
                     ShowWindow(overviewWindow.GetHandle(),SW_SHOW);
@@ -53,9 +53,9 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 
                 case SIZE_MINIMIZED:
                     /* record the current state of the child windows */
-                    if (ImageWindow::hImageWindow!=NULL)
+                    if (imageWindow.GetHandle()!=NULL)
                     {
-                        if (!IsWindowVisible(ImageWindow::hImageWindow))
+                        if (!IsWindowVisible(imageWindow.GetHandle()))
                             imageWindowState=0;
                         else
                             imageWindowState=SW_SHOW;
@@ -79,7 +79,7 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
                     }
 
                     /* hide the child windows */     
-                    ShowWindow(ImageWindow::hImageWindow,SW_HIDE);            
+                    ShowWindow(imageWindow.GetHandle(),SW_HIDE);            
                     ShowWindow(toolWindow.GetHandle(),SW_HIDE);                    
                     ShowWindow(overviewWindow.GetHandle(),SW_HIDE);                    
                     return 0;

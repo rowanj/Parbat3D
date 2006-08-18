@@ -37,6 +37,7 @@ settings settingsFile;              /* Used for loading and saving window positi
 MainWindow mainWindow;
 ToolWindow toolWindow;
 OverviewWindow overviewWindow;
+ImageWindow imageWindow;
 
 char *filename=NULL;                    // currently open image filename
 
@@ -144,20 +145,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
         MessageBox(0,"Unable to create main window","Parbat3D Error",MB_OK);
         return 0;
     }
-  
-    /* Register window classes */
-    if ((!ImageWindow::registerImageWindow()))
-    {
-        /* report error if window classes could not be registered */
-        MessageBox(0,"Unable to register window class","Parbat3D Error",MB_OK);
-        return 0;
-    }
-        
+       
     /* Setup main & image windows */
     //  note: image window must be created before main window
     //  note: tool window is only created when an image is loaded
 
-    if ((!ImageWindow::setupImageWindow()) || (!overviewWindow.Create(hThisInstance)))
+    if ((!imageWindow.Create(hThisInstance,mainWindow.GetHandle())) || (!overviewWindow.Create(hThisInstance)))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
@@ -192,8 +185,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 void orderWindows()
 {
     //SetWindowPos(hOverviewWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);        
-    SetWindowPos(ImageWindow::hImageWindow,toolWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
-    SetWindowPos(ImageWindow::hImageWindow,overviewWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(imageWindow.GetHandle(),toolWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(imageWindow.GetHandle(),overviewWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
 
 
 }    
@@ -220,7 +213,7 @@ void loadFile()
 		closeFile();
 
         // load image & setup windows
-	    image_handler = new ImageHandler::ImageHandler(overviewWindow.overviewWindowDisplay.GetHandle(), ImageWindow::imageWindowDisplay.GetHandle(), ofn.lpstrFile);
+	    image_handler = new ImageHandler::ImageHandler(overviewWindow.overviewWindowDisplay.GetHandle(), imageWindow.imageWindowDisplay.GetHandle(), ofn.lpstrFile);
 	    if (image_handler) {
 			if (image_handler->status > 0) {
 				// An error occurred instantiaing the image handler class.
@@ -234,20 +227,20 @@ void loadFile()
                     // update image window settings
                     filename=copyString(image_handler->get_image_properties()->getFileName());
                     
-                    ImageWindow::updateImageWindowTitle();              
-                    ImageWindow::updateImageScrollbar();      
+                    imageWindow.updateImageWindowTitle();              
+                    imageWindow.updateImageScrollbar();      
 
                     // re-create tool window
                     toolWindow.Create(hThisInstance);
                     
                     // show tool & image windows
-                    ShowWindow(toolWindow.GetHandle(),SW_SHOW);
-                    ShowWindow(ImageWindow::hImageWindow,SW_SHOW);    
+                    toolWindow.Show();
+                    imageWindow.Show();
                     orderWindows();                    
 
                     // update opengl displays
                     RedrawWindow(overviewWindow.overviewWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);
-                    RedrawWindow(ImageWindow::imageWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);                
+                    RedrawWindow(imageWindow.imageWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);                
 
                     // enable window menu items
                     EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,false);
@@ -280,9 +273,9 @@ void closeFile()
     }    
     
     /* hide image window */
-    if (ImageWindow::hImageWindow)
+    if (imageWindow.GetHandle()!=NULL)
     {
-        ShowWindow(ImageWindow::hImageWindow,SW_HIDE);
+        imageWindow.Hide();
     }
 
     /* disable menu items */
