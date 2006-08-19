@@ -8,12 +8,177 @@
 #include "console.h"
 #include "SnappingWindow.h"
 
+// create tool tab container
 int ToolTab::Create(HWND parent,RECT *parentRect)
 {
     const int SCROLLBAR_WIDTH=13;
-	CreateWin( 0, szStaticControl, "", 
-		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, parentRect->left,
-		parentRect->top, parentRect->right-SCROLLBAR_WIDTH, getContainerHeight(), parent, NULL);
+	if (!CreateWin( 0, "Parbat3D ToolTab Container", "", 
+		WS_CHILD | WS_CHILDWINDOW | WS_VISIBLE | WS_CLIPSIBLINGS | SS_OWNERDRAW, parentRect->left,
+		parentRect->top, parentRect->right-SCROLLBAR_WIDTH, GetContainerHeight(), parent, NULL))
+		return false;
+    SetBackgroundBrush(toolWindow.hTabBrush);
+	prevProc=SetWindowProcedure(&WindowProcedure);
+
+	// create static control for heading
+    hHeading =CreateWindowEx( 0, szStaticControl, GetTabHeading(), 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
+		0, parentRect->right-SCROLLBAR_WIDTH, 20, GetHandle(), NULL,
+		GetAppInstance(), NULL);
+	return true;
+}
+
+LRESULT CALLBACK ToolTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    ToolTab* win=(ToolTab*)Window::GetWindowObject(hwnd);
+
+    Console::write("ToolTab::WindowProcedure win=");
+    Console::write((int)win->prevProc);
+    Console::write("\n");
+    switch (message) 
+    {
+        case WM_DRAWITEM:
+            Console::write("ToolTab::WindowProcedure WM_DRAWITEM: ");
+            Console::write((int)win->hHeading);
+            Console::write(" compared with ");            
+            Console::write((int)((DRAWITEMSTRUCT*)lParam)->hwndItem);            
+            Console::write("\n");
+            // draw window's owner-drawn static text controls using our custom fonts
+            if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
+                if (((DRAWITEMSTRUCT*)lParam)->hwndItem==win->hHeading)
+                    toolWindow.drawStatic((DRAWITEMSTRUCT*)lParam,toolWindow.hBoldFont);                
+                else
+                    toolWindow.drawStatic((DRAWITEMSTRUCT*)lParam,toolWindow.hNormalFont);
+            return 0;
+    }        
+    return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam); 
+}
+
+int DisplayTab::GetContainerHeight()
+{
+    return 90 + (20 * toolWindow.bands);
+}
+
+int DisplayTab::Create(HWND parent,RECT *parentRect)
+{
+    ToolTab::Create(parent,parentRect);
+    prevProc=SetWindowProcedure(&WindowProcedure);
+
+    hRed = CreateWindowEx(0, "BUTTON", "R", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 138, 25,
+		26, 20 + (20 * toolWindow.bands), GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	hGreen = CreateWindowEx(0, "BUTTON", "G", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 164, 25,
+		26, 20 + (20 * toolWindow.bands), GetHandle(), NULL, Window::GetAppInstance(), NULL);
+    hBlue = CreateWindowEx(0, "BUTTON", "B", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 190, 25,
+		26, 20 + (20 * toolWindow.bands), GetHandle(), NULL, Window::GetAppInstance(), NULL);
+
+	/* Dynamically add Radio buttons  */
+	redRadiobuttons=new HWND[toolWindow.bands];
+	greenRadiobuttons=new HWND[toolWindow.bands];
+	blueRadiobuttons=new HWND[toolWindow.bands];	
+
+    for (int i=0; i<toolWindow.bands; i++)  
+    {
+		redRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+			hRed, NULL, hThisInstance, NULL);
+			
+		greenRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+			hGreen, NULL, hThisInstance, NULL);
+			
+		blueRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
+		WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18, hBlue, NULL,
+			hThisInstance, NULL);
+		
+		const char* name;
+		if (i>0) { 
+    		// add band names to radio buttons
+    		name = "";
+    		//name = image_handler->get_band_info(i)->getColourInterpretationName();
+    		
+    		// If Colour name unknown change band name
+    		//const char *altName ="No colour name";
+    		//if (strcmp(name, "Unknown")==0)
+             // name = altName;
+                
+            // Add band number to band name
+            //name = catcstrings( (char*) " - ", (char*) name);
+            name = catcstrings( (char*) inttocstring(i), (char*) name);
+            name = catcstrings( (char*) "Band ", (char*) name);
+        } else
+               name = "NONE";
+
+        // Display band name in tool window 
+		CreateWindowEx(0, szStaticControl, name,
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 60, 40 + (20 * i), 100, 18,
+			GetHandle(), NULL, Window::GetAppInstance(), NULL);
+           
+		// Insert 'Update' button under radio buttons. Location based on band number 
+		hupdate =  CreateWindowEx(0, "BUTTON", "Update", WS_CHILD | WS_VISIBLE, 136,
+			50 + (20 * toolWindow.bands), 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
+
+	}    
+	
+	if (toolWindow.bands == 1) {
+    	SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(greenRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(blueRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    } else if (toolWindow.bands == 2) {
+        SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(greenRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(blueRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
+    } else {
+        SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(greenRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(blueRadiobuttons[3],BM_SETCHECK,BST_CHECKED,0);
+    }	
+}
+
+LRESULT CALLBACK DisplayTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    DisplayTab* win=(DisplayTab*)Window::GetWindowObject(hwnd);
+    
+    switch(message)
+    {
+            case WM_COMMAND:
+            //if(hupdate==(HWND)lParam)
+            {
+
+                // find out which bands are selected
+				int r, g, b;
+				for (int i=0; i<toolWindow.bands; i++)
+   				{
+					LRESULT state = SendMessageA(win->redRadiobuttons[i], BM_GETCHECK, 0, 0);
+					if(state==BST_CHECKED)
+						r = i;
+					
+					state = SendMessageA(win->greenRadiobuttons[i], BM_GETCHECK, 0, 0);
+					if(state==BST_CHECKED)
+						g = i;
+					
+					state = SendMessageA(win->blueRadiobuttons[i], BM_GETCHECK, 0, 0);
+					if(state==BST_CHECKED)
+						b = i;
+				}
+
+	    		// Temporary message
+	    		//const char *butNum = "selected bands are: "; 
+				//butNum = catcstrings( (char*) butNum, (char*) inttocstring(r) );
+				//butNum = catcstrings( (char*) butNum, (char*) ", " );
+				//butNum = catcstrings( (char*) butNum, (char*) inttocstring(g) );
+				//butNum = catcstrings( (char*) butNum, (char*) ", " );
+				//butNum = catcstrings( (char*) butNum, (char*) inttocstring(b) );
+				//MessageBox( hwnd, (LPSTR) butNum,
+                  //  (LPSTR) szOverviewWindowClassName,
+        		//	MB_ICONINFORMATION | MB_OK );
+        		// #define DEBUG_IMAGE_HANDLER to see these values printed in console window.
+				
+				// !! Insert band numbers (bands start at 1, not 0) here. - Rowan
+				// 0 now equals none - Damian
+            	if (image_handler) image_handler->set_bands(r,g,b);
+            }                
+            return 0;
+    }
+    return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }
 
 /* create tool window */
@@ -44,13 +209,14 @@ int ToolWindow::Create()
     /* create tab control */
     hToolWindowTabControl =CreateWindowEx(0, WC_TABCONTROL, "Tools",
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | TCS_OWNERDRAWFIXED, 0, 0,
-		rect.right, rect.bottom, GetHandle(), NULL, hThisInstance, NULL);
+		rect.right, rect.bottom, GetHandle(), NULL, Window::GetAppInstance(), NULL);
 
     /* force Windows to send us messages/events related to the tab control */
     SetWindowObject(hToolWindowTabControl,(Window*)this);
     oldTabControlProc=(WNDPROC)SetWindowLong(hToolWindowTabControl,GWL_WNDPROC,(long)&ToolWindowTabControlProcedure);
 
     /* add tabs to tab-control */
+    
     tie.mask=TCIF_TEXT+TCIF_PARAM;;
     tie.pszText="Display";
     tie.lParam=(DWORD)tie.pszText;
@@ -82,37 +248,31 @@ int ToolWindow::Create()
     
     /* create tab containers for each tab (a child window that will be shown/hidden when user clicks on a tab) */
     /* Display tab container */
-	hToolWindowDisplayTabContainer =CreateWindowEx( 0, szStaticControl, "", 
-		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,
-		SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, 90 + (20 * bands), hToolWindowTabControl, NULL,
-		hThisInstance, NULL); 
-
-	hToolWindowDisplayTabHeading =CreateWindowEx( 0, szStaticControl, "Channel Selection", 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
-		0, rect.right-SCROLLBAR_WIDTH, 20, hToolWindowDisplayTabContainer, NULL,
-		hThisInstance, NULL);
+    
+    displayTab.Create(hToolWindowTabControl,&rect);
+   
            
 	/* Query tab container */
     hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "", 
 		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
            SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, 80 + (20 * (bands+1)), hToolWindowTabControl,           /* The window is a childwindow of the tab control */
-           NULL, hThisInstance, NULL);
+           NULL, Window::GetAppInstance(), NULL);
 
 	hToolWindowQueryTabHeading =CreateWindowEx( 0, szStaticControl, "Band Values", 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
 		0, rect.right-SCROLLBAR_WIDTH, 20, hToolWindowQueryTabContainer, NULL,
-		hThisInstance, NULL); 		
+		Window::GetAppInstance(), NULL); 		
                       
     /* Image tab container */
     hToolWindowImageTabContainer =CreateWindowEx(0, szStaticControl, "",                            
            WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
            SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, rect.bottom, hToolWindowTabControl, NULL,                            /* No menu */
-           hThisInstance, NULL); 
+           Window::GetAppInstance(), NULL); 
 
 	hToolWindowImageTabHeading =CreateWindowEx( 0, szStaticControl, "Image Properties", 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
 		0, rect.right-SCROLLBAR_WIDTH, 20, hToolWindowImageTabContainer, NULL,
-		hThisInstance, NULL); 		
+		Window::GetAppInstance(), NULL); 		
 
            
     /* show display tab container */
@@ -122,11 +282,9 @@ int ToolWindow::Create()
     GetClientRect(GetHandle(),&rect);
     hToolWindowScrollBar=CreateWindowEx(0, "SCROLLBAR", NULL,
 		WS_CHILD | WS_VISIBLE | SBS_RIGHTALIGN | SBS_VERT, 0, SCROLLBAR_TOP,
-		rect.right, rect.bottom-SCROLLBAR_TOP, GetHandle(), NULL, hThisInstance, NULL);           
+		rect.right, rect.bottom-SCROLLBAR_TOP, GetHandle(), NULL, Window::GetAppInstance(), NULL);           
     
     /* force Windows to notify us of messages/events related to these controls */
-    SetWindowObject(hToolWindowDisplayTabContainer,(Window*)this);
-    oldDisplayTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowDisplayTabContainer,GWL_WNDPROC,(long)&ToolWindowDisplayTabContainerProcedure);
     SetWindowObject(hToolWindowQueryTabContainer,(Window*)this);    
     oldQueryTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowQueryTabContainer,GWL_WNDPROC,(long)&ToolWindowQueryTabContainerProcedure);
     SetWindowObject(hToolWindowImageTabContainer,(Window*)this);    
@@ -134,107 +292,54 @@ int ToolWindow::Create()
     SetWindowObject(hToolWindowScrollBar,(Window*)this);    
     oldScrollBarContainerProc=(WNDPROC)SetWindowLong(hToolWindowScrollBar,GWL_WNDPROC,(long)&ToolWindowScrollBarProcedure);
     
-   
-    /* Create group for R, G & B radio buttons based on band number */
-    hRed = CreateWindowEx(0, "BUTTON", "R", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 138, 25,
-		26, 20 + (20 * bands), hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
-	hGreen = CreateWindowEx(0, "BUTTON", "G", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 164, 25,
-		26, 20 + (20 * bands), hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
-    hBlue = CreateWindowEx(0, "BUTTON", "B", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 190, 25,
-		26, 20 + (20 * bands), hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
-	
 	/* Create container for band values */
 	HWND queryValueContainer = CreateWindowEx(0, "BUTTON", "Values",
 		WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 138, 45, 66, 20 + (20 * (bands-1)),
-		hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
-
-	/* Dynamically add Radio buttons */
-	redRadiobuttons=new HWND[bands];
-	greenRadiobuttons=new HWND[bands];
-	blueRadiobuttons=new HWND[bands];
+		hToolWindowQueryTabContainer, NULL, Window::GetAppInstance(), NULL);
 	
 	/* Dynamically add image band values */
 	imageBandValues = new HWND[bands];
-	
 
-    for (int i=0; i<bands; i++)  
+
+    for (int i=1; i<bands; i++)  
     {
-		redRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
-			hRed, NULL, hThisInstance, NULL);
-			
-		greenRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
-			hGreen, NULL, hThisInstance, NULL);
-			
-		blueRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
-		WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18, hBlue, NULL,
-			hThisInstance, NULL);
-		
+
 		const char* name;
-		if (i>0) { 
-    		/* add band names to radio buttons*/
-    		name = "";
-    		//name = image_handler->get_band_info(i)->getColourInterpretationName();
-    		
-    		/* If Colour name unknown change band name*/
-    		/*const char *altName ="No colour name";
-    		if (strcmp(name, "Unknown")==0)
-              name = altName;*/
-                
-            /* Add band number to band name */
-            //name = catcstrings( (char*) " - ", (char*) name);
-            name = catcstrings( (char*) inttocstring(i), (char*) name);
-            name = catcstrings( (char*) "Band ", (char*) name);
-        } else
-               name = "NONE";
+		// add band names to radio buttons
+		name = "";
+		//name = image_handler->get_band_info(i)->getColourInterpretationName();
+		
+		// If Colour name unknown change band name
+		//const char *altName ="No colour name";
+		//if (strcmp(name, "Unknown")==0)
+         // name = altName;
+            
+        // Add band number to band name
+        //name = catcstrings( (char*) " - ", (char*) name);
+        name = catcstrings( (char*) inttocstring(i), (char*) name);
+        name = catcstrings( (char*) "Band ", (char*) name);
 
-        /* Display band name in tool window */
-		CreateWindowEx(0, szStaticControl, name,
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 60, 40 + (20 * i), 100, 18,
-			hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);
-           
-		/* Insert 'Update' button under radio buttons. Location based on band number */
-		hupdate =  CreateWindowEx(0, "BUTTON", "Update", WS_CHILD | WS_VISIBLE, 136,
-			50 + (20 * bands), 80, 25, hToolWindowDisplayTabContainer, NULL, hThisInstance, NULL);     
+        // add channel names under the query tab
+        CreateWindowEx(0, szStaticControl, name,
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40 + (20 * i), 100, 18,
+			GetHandle(), NULL, Window::GetAppInstance(), NULL);
 
-        if (i>0) { 
-            /* add channel names under the query tab */
-            CreateWindowEx(0, szStaticControl, name,
-    			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40 + (20 * i), 100, 18,
-    			hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
-    
-    		/* add the band values to the value container under the query tab */
-            char tempBandValue[4] = "0"; // temporary storage for the band value
-            imageBandValues[i] = CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * (i-1)),
-    			50, 18, queryValueContainer, NULL, hThisInstance, NULL);
-        } 			
-	}
+		// add the band values to the value container under the query tab
+        char tempBandValue[4] = "0"; // temporary storage for the band value
+        imageBandValues[i] = CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * (i-1)),
+			50, 18, queryValueContainer, NULL, Window::GetAppInstance(), NULL);
+    }
+
 	
 	/* display cursor position under query tab */
 	CreateWindowEx(0, szStaticControl, "X", WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW,
-                 20, 60 + (20 * bands), 100, 18, hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
+                 20, 60 + (20 * bands), 100, 18, hToolWindowQueryTabContainer, NULL, Window::GetAppInstance(), NULL);
 	CreateWindowEx(0, szStaticControl, "Y", WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW,
-                 20, 60 + (20 * (bands+1)), 100, 18, hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);
+                 20, 60 + (20 * (bands+1)), 100, 18, hToolWindowQueryTabContainer, NULL, Window::GetAppInstance(), NULL);
     cursorXPos = CreateWindowEx(0, szStaticControl, "-", WS_CHILD | WS_VISIBLE,
-                 143, 60 + (20 * bands), 50, 18, hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);			
+                 143, 60 + (20 * bands), 50, 18, hToolWindowQueryTabContainer, NULL, Window::GetAppInstance(), NULL);			
     cursorYPos = CreateWindowEx(0, szStaticControl, "-", WS_CHILD | WS_VISIBLE,
-                 143, 60 + (20 * (bands+1)), 50, 18, hToolWindowQueryTabContainer, NULL, hThisInstance, NULL);			
-	
-	/* Default radio button selection */
-	if (bands == 1) {
-    	SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
-    	SendMessage(greenRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
-    	SendMessage(blueRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
-    } else if (bands == 2) {
-        SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
-    	SendMessage(greenRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
-    	SendMessage(blueRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
-    } else {
-        SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
-    	SendMessage(greenRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
-    	SendMessage(blueRadiobuttons[3],BM_SETCHECK,BST_CHECKED,0);
-    }
+                 143, 60 + (20 * (bands+1)), 50, 18, hToolWindowQueryTabContainer, NULL, Window::GetAppInstance(), NULL);			
 	
 	/* add the image property information under the image tab */
 	ImageProperties* ip=image_handler->get_image_properties();
@@ -264,11 +369,11 @@ int ToolWindow::Create()
 	for (int i=0; i<ipItems; i++) {
 		CreateWindowEx(0, szStaticControl, (char*) n[i].c_str(),
 			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40+(i*20), 50, 18,
-			hToolWindowImageTabContainer, NULL, hThisInstance, NULL);
+			hToolWindowImageTabContainer, NULL, Window::GetAppInstance(), NULL);
 		
 		CreateWindowEx(0, szStaticControl, (char*) v[i].c_str(),
 			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 78, 40+(i*20), 160, 18,
-			hToolWindowImageTabContainer, NULL, hThisInstance, NULL);
+			hToolWindowImageTabContainer, NULL, Window::GetAppInstance(), NULL);
     }
     
     /* setup tool window scrollbar */
@@ -384,66 +489,6 @@ LRESULT CALLBACK ToolWindow::ToolWindowTabControlProcedure(HWND hwnd, UINT messa
     return CallWindowProc(win->oldTabControlProc,hwnd,message,wParam,lParam);
 }
 
-/* handle tab control messages/events */
-LRESULT CALLBACK ToolWindow::ToolWindowDisplayTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    ToolWindow* win=(ToolWindow*)Window::GetWindowObject(hwnd);
-        
-    switch (message) 
-    {
-        case WM_DRAWITEM:
-            /* draw window's owner-drawn static text controls using our custom fonts */
-            if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
-                if (((DRAWITEMSTRUCT*)lParam)->hwndItem==win->hToolWindowDisplayTabHeading)
-                    win->drawStatic((DRAWITEMSTRUCT*)lParam,win->hBoldFont);                
-                else
-                    win->drawStatic((DRAWITEMSTRUCT*)lParam,win->hNormalFont);
-            break; 
-        case WM_COMMAND:
-            //if(hupdate==(HWND)lParam)
-            {
-
-                // find out which bands are selected
-				int r, g, b;
-				for (int i=0; i<win->bands; i++)
-   				{
-					LRESULT state = SendMessageA(win->redRadiobuttons[i], BM_GETCHECK, 0, 0);
-					if(state==BST_CHECKED)
-						r = i;
-					
-					state = SendMessageA(win->greenRadiobuttons[i], BM_GETCHECK, 0, 0);
-					if(state==BST_CHECKED)
-						g = i;
-					
-					state = SendMessageA(win->blueRadiobuttons[i], BM_GETCHECK, 0, 0);
-					if(state==BST_CHECKED)
-						b = i;
-				}
-
-	    		// Temporary message
-	    		/*const char *butNum = "selected bands are: "; 
-				butNum = catcstrings( (char*) butNum, (char*) inttocstring(r) );
-				butNum = catcstrings( (char*) butNum, (char*) ", " );
-				butNum = catcstrings( (char*) butNum, (char*) inttocstring(g) );
-				butNum = catcstrings( (char*) butNum, (char*) ", " );
-				butNum = catcstrings( (char*) butNum, (char*) inttocstring(b) );
-				MessageBox( hwnd, (LPSTR) butNum,
-                    (LPSTR) szOverviewWindowClassName,
-        			MB_ICONINFORMATION | MB_OK );*/
-        		// #define DEBUG_IMAGE_HANDLER to see these values printed in console window.
-				
-				// !! Insert band numbers (bands start at 1, not 0) here. - Rowan
-				// 0 now equals none - Damian
-            	if (image_handler) image_handler->set_bands(r,g,b);
-            }                
-            break;
-        
-        default:
-            break;
-    }        
-    // let Windows perform the default operation for the message recevied
-    return CallWindowProc(win->oldDisplayTabContainerProc,hwnd,message,wParam,lParam);
-}
 
 /* handle query tab container's messages/events */
 LRESULT CALLBACK ToolWindow::ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -505,7 +550,7 @@ void ToolWindow::showToolWindowTabContainer(int selectedTabId)
     switch(selectedTabId)
     {
         case DISPLAY_TAB_ID:
-                hToolWindowCurrentTabContainer=hToolWindowDisplayTabContainer;
+                hToolWindowCurrentTabContainer=displayTab.GetHandle();
                 break;
         case QUERY_TAB_ID:
                 hToolWindowCurrentTabContainer=hToolWindowQueryTabContainer;

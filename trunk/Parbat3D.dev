@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=50
+UnitCount=51
 Type=0
 Ver=1
 ObjFiles=
@@ -541,6 +541,16 @@ BuildCmd=
 FileName=main.cpp
 CompileCpp=1
 Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit51]
+FileName=DisplayTab.cpp
+CompileCpp=1
+Folder=
 Compile=1
 Link=1
 Priority=1000
