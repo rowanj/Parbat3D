@@ -12,7 +12,7 @@
 
 
 
-int ImageWindow::Create(HINSTANCE hThisInstance,HWND parent)
+int ImageWindow::Create(HWND parent)
 {
     
     RECT rect;
@@ -36,13 +36,13 @@ int ImageWindow::Create(HINSTANCE hThisInstance,HWND parent)
     /* create image window */
     if (!CreateWin(0, "Parbat3D Image Window", "Image Window",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
-	     mx, my, IMAGE_WINDOW_WIDTH, IMAGE_WINDOW_HEIGHT, parent, NULL, hThisInstance))
+	     mx, my, IMAGE_WINDOW_WIDTH, IMAGE_WINDOW_HEIGHT, parent, NULL))
 	    return false;
 
     prevProc=SetWindowProcedure(&WindowProcedure);
 
     /* create a child window that will be used by OpenGL */
-    imageWindowDisplay.Create(hThisInstance,GetHandle());
+    imageWindowDisplay.Create(GetHandle());
 
     return true;
 }

@@ -15,7 +15,7 @@ class DisplayWindow: public Window
     
     public:
     DisplayWindow();
-    virtual int Create(HINSTANCE hInstance,HWND parent);        
+    virtual int Create(HWND parent);        
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);};
 
 #endif

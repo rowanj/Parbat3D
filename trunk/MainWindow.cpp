@@ -11,12 +11,12 @@
 
 
 /* create main window */
-int MainWindow::Create(HINSTANCE hInstance)
+int MainWindow::Create()
 {
     /* Create main window */
     if (!CreateWin(0, "parbat3d main win class", "Parbat3D",
 		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, -50, -50, 1, 1,
-		NULL, NULL, hInstance))
+		NULL, NULL))
         return false;                        
 
     prevProc=SetWindowProcedure(&MainWindow::WindowProcedure);

@@ -14,7 +14,7 @@ class OverviewWindow:public Window
     DisplayWindow overviewWindowDisplay;
     static const int OVERVIEW_WINDOW_WIDTH=250;    /* width of the overview window in pixels */
 
-    virtual int Create(HINSTANCE hInstance);        
+    virtual int Create(HWND);        
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
     int toggleMenuItemTick(HMENU hMenu,int itemId);  
 };

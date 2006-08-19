@@ -11,7 +11,7 @@ class ImageWindow:public Window
     public:
     DisplayWindow imageWindowDisplay;
 
-    int Create(HINSTANCE hThisInstance,HWND parent);
+    int Create(HWND parent);
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
     void updateImageWindowTitle();
     void updateImageScrollbar();

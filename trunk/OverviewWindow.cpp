@@ -15,7 +15,7 @@ const char *helpPath;
 DisplayWindow overviewWindowDisplay;
 
 /* setup overview window */
-int OverviewWindow::Create(HINSTANCE hThisInstance)
+int OverviewWindow::Create(HWND parent)
 {
 
     RECT rect;
@@ -26,7 +26,7 @@ int OverviewWindow::Create(HINSTANCE hThisInstance)
     /* Create overview window */
     if (!CreateWin(0, "Parbat3D Overview Window", "Parbat3D",
 		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, rect.left-OverviewWindow::OVERVIEW_WINDOW_WIDTH, rect.top, OVERVIEW_WINDOW_WIDTH, 296,
-		imageWindow.GetHandle(), NULL, hThisInstance))
+		parent, NULL))
         return false;
     prevProc=SetWindowProcedure(&OverviewWindow::WindowProcedure);
 
@@ -40,7 +40,7 @@ int OverviewWindow::Create(HINSTANCE hThisInstance)
     EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);
 
     /* create a child window that will be used by OpenGL */
-    overviewWindowDisplay.Create(hThisInstance,GetHandle());
+    overviewWindowDisplay.Create(GetHandle());
    
     /* Make the window visible on the screen */
     Show();

@@ -79,6 +79,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
  	 // Set global variable for application directory string
     GetModulePath();
     
+    hThisInstance=hInstance;
+    Window::SetAppInstance(hInstance);
+    
     string settings_path (catcstrings(modulePath, "\\settings.ini"));
     settingsFile.open(settings_path);
     
@@ -87,7 +90,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     
     InitCommonControls();           /* load window classes for common controls */    
     
-    hThisInstance=hInstance;        /* record this process's instance handle */
     hDesktop=GetDesktopWindow();    /* record handle to desktop window */    
 
     
@@ -140,35 +142,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     
 
     
-	if (!mainWindow.Create(hInstance))
+	if (!mainWindow.Create())
     {
         MessageBox(0,"Unable to create main window","Parbat3D Error",MB_OK);
         return 0;
     }
        
     /* Setup main & image windows */
-    //  note: image window must be created before main window
-    //  note: tool window is only created when an image is loaded
+    //  note: image window must be created before overview window
 
-    if ((!imageWindow.Create(hThisInstance,mainWindow.GetHandle())) || (!overviewWindow.Create(hThisInstance)))
+    if ((!imageWindow.Create(mainWindow.GetHandle())) || (!overviewWindow.Create(imageWindow.GetHandle())))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
         return 0;
     }
-  
-  	/*Window pwin;
-  	TestWindow win;
-  	pwin.Create(hInstance);
-  	pwin.Destroy();  	
-  	if (pwin.GetHandle()==NULL)
-  	{
-     	pwin.Create(hInstance);
-    }
-    win.Create(hInstance,pwin.GetHandle());
-  	
-//	win.CreateC(hInstance,pwin.GetHandle());*/
-  
+    
     /* Execute the message loop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))
     {
@@ -184,11 +173,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 
 void orderWindows()
 {
-    //SetWindowPos(hOverviewWindow,hToolWindow,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE);        
     SetWindowPos(imageWindow.GetHandle(),toolWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
     SetWindowPos(imageWindow.GetHandle(),overviewWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
-
-
 }    
 
 void loadFile()
@@ -231,7 +217,7 @@ void loadFile()
                     imageWindow.updateImageScrollbar();      
 
                     // re-create tool window
-                    toolWindow.Create(hThisInstance);
+                    toolWindow.Create();
                     
                     // show tool & image windows
                     toolWindow.Show();

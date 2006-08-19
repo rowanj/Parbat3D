@@ -6,7 +6,7 @@ class ToolTab:public Window
     //private:
     //WNDPROC prevProc;
     public:
-    int Create(HINSTANCE hInstance,HWND parent,RECT *parentRect);
+    int Create(HWND parent,RECT *parentRect);
     virtual char* GetTabName();
     virtual int getContainerHeight();
     //static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);    
@@ -56,7 +56,7 @@ class ToolWindow:public Window
        int bands;
        HWND *imageBandValues;
 
-       virtual int Create(HINSTANCE hInstance);
+       virtual int Create();
        static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
        static LRESULT CALLBACK ToolWindowTabControlProcedure(HWND, UINT, WPARAM, LPARAM);
        static LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);

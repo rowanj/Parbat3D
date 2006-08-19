@@ -8,17 +8,16 @@
 #include "console.h"
 #include "SnappingWindow.h"
 
-int ToolTab::Create(HINSTANCE hInstance,HWND parent,RECT *parentRect)
+int ToolTab::Create(HWND parent,RECT *parentRect)
 {
     const int SCROLLBAR_WIDTH=13;
 	CreateWin( 0, szStaticControl, "", 
 		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, parentRect->left,
-		parentRect->top, parentRect->right-SCROLLBAR_WIDTH, getContainerHeight(), parent, NULL,
-		hInstance);
+		parentRect->top, parentRect->right-SCROLLBAR_WIDTH, getContainerHeight(), parent, NULL);
 }
 
 /* create tool window */
-int ToolWindow::Create(HINSTANCE hThisInstance)
+int ToolWindow::Create()
 {
     TCITEM tie;  /* datastructure for tabs */
     RECT rect;
@@ -33,7 +32,7 @@ int ToolWindow::Create(HINSTANCE hThisInstance)
     /* The class is registered, lets create the program*/
     if (!CreateWin(0, "Parbat3D Tool Window", "Tools",
            WS_POPUP+WS_CAPTION+WS_SYSMENU, rect.left, rect.bottom,
-           250, 300, imageWindow.GetHandle(), NULL, hThisInstance))
+           250, 300, imageWindow.GetHandle(), NULL))
         return false;
     setupDrawingObjects(GetHandle());
     prevProc=SetWindowProcedure(&ToolWindow::WindowProcedure);

@@ -8,7 +8,7 @@ class MainWindow:public Window
     private:
     WNDPROC prevProc;
     public:
-    virtual int Create(HINSTANCE hInstance);        
+    virtual int Create();        
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 };
 

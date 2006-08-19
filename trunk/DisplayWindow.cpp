@@ -14,13 +14,13 @@ DisplayWindow::DisplayWindow()
     textLen=15;
 }
 
-int DisplayWindow::Create(HINSTANCE hThisInstance,HWND hparent)
+int DisplayWindow::Create(HWND hparent)
 {
     RECT rect;
     
     GetClientRect(hparent,&rect);    
     CreateWin(0, "Parbat3D Display Window", NULL, WS_CHILD+WS_VISIBLE,
-		rect.left, rect.top, rect.right, rect.bottom, hparent, NULL, hThisInstance);    
+		rect.left, rect.top, rect.right, rect.bottom, hparent, NULL);    
 
 	SetDefaultCursor(LoadCursor(NULL, IDC_CROSS));
 	prevProc=SetWindowProcedure(&WindowProcedure);

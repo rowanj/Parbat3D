@@ -8,19 +8,21 @@ class Window
     private:
     WNDPROC prevWindowProcedure;        // pointer to previous window proecudure
     HWND hwindow;                       // window handle
+    static HINSTANCE hInstance;                // process instance handle
     
     protected:
     static WNDPROC stPrevWindowProcedure; // pointer to previous window proecudure, used during window creation
 
-    int CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,DWORD dwStyle,int x,int y,int nWidth,int nHeight,HWND hWndParent,HMENU hMenu,HINSTANCE hInstance);
-            // create window & associated it with this object
+    int CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,DWORD dwStyle,int x,int y,int nWidth,int nHeight,HWND hWndParent,HMENU hMenu);
+            // create window, register window class (if required) & associated it with this object
     
     public:
-    Window::Window();        
+    Window::Window();
 
     inline HWND GetHandle() {return hwindow;};      /* get object's window handle */
-    virtual int Create(HINSTANCE hInstance);        /* create this object's window - overwritten by subclasses */
-    
+    virtual int Create();        /* create this object's window - overwritten by subclasses */
+   
+    static void SetAppInstance(HINSTANCE hInst) {hInstance=hInst;};            /* set application's instance (called at startup) */
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
             // general window event/message handler
             
@@ -29,7 +31,7 @@ class Window
     static Window* GetWindowObject(HWND);           /* obtain "this" object from window handle */
     static void SetWindowObject(HWND,Window*);      /* associcate "this" object with window handle */
 
-    /* simple window api wrappers */
+    /* window api wrappers */
     inline void Destroy() {DestroyWindow(hwindow);};
     inline void Show() {ShowWindow(hwindow,SW_SHOW);};
     inline void Hide() {ShowWindow(hwindow,SW_HIDE);};    

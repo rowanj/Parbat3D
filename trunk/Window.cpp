@@ -2,12 +2,15 @@
 #include "Console.h"
 
 WNDPROC Window::stPrevWindowProcedure=NULL;
+HINSTANCE Window::hInstance=NULL;
 
 Window::Window()
 {
     hwindow=NULL;
     prevWindowProcedure=NULL; 
+    hInstance=NULL;
 }
+
 
 void ErrorExit(LPTSTR lpszFunction) 
 { 
@@ -38,7 +41,7 @@ void ErrorExit(LPTSTR lpszFunction)
 }
 
 
-int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,DWORD dwStyle,int x,int y,int nWidth,int nHeight,HWND hWndParent,HMENU hMenu,HINSTANCE hInstance)
+int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,DWORD dwStyle,int x,int y,int nWidth,int nHeight,HWND hWndParent,HMENU hMenu)
 {
     
     // if window already created, destroy it & re-create it
@@ -102,9 +105,9 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
     return true;
 }
 
-int Window::Create(HINSTANCE hInstance)
+int Window::Create()
 {
-    int r=CreateWin(0,"test class name","Parbat test win",WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, 10,10,200,200,NULL,NULL,hInstance);
+    int r=CreateWin(0,"test class name","Parbat test win",WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, 10,10,200,200,NULL,NULL);
     if (r)
     	ShowWindow(hwindow,SW_SHOW);    
     return r;
