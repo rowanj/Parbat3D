@@ -17,39 +17,41 @@ int ROIWindow::Create(HWND parent)
     
     RECT rect;
     int mx,my;
-    const int ROI_WINDOW_WIDTH=500;
-    const int ROI_WINDOW_HEIGHT=500;
+    const int ROI_WINDOW_WIDTH=250;
+    const int ROI_WINDOW_HEIGHT=300;
 
-    /* Get the width & height of the desktop window */
-    GetWindowRect(hDesktop,&rect);
-
-    /* Get the stored window position or use defaults if there's a problem */
-    
-    mx = atoi(settingsFile.getSetting("roi window", "x").c_str());
-	my = atoi(settingsFile.getSetting("roi window", "y").c_str());
-	
-	
-	//if ((mx <= 0) || (mx >= rect.right))
-    //    mx = (rect.right /2) - ((ROI_WINDOW_WIDTH+OverviewWindow::OVERVIEW_WINDOW_WIDTH) /2);         /* default x position to center windows */
-    //mx+=OverviewWindow::OVERVIEW_WINDOW_WIDTH;                                                          /* leave room for overview window */
-	       
-	//if ((my <= 0) || (my >= rect.bottom))
-    //   my = (rect.bottom /2) - (ROI_WINDOW_HEIGHT/2);   /* default y position to center windows */
-	mx = 200;
-	my = 200;
+    /* Get Main Window Location for ROI window alignment*/
+    GetWindowRect(overviewWindow.GetHandle(),&rect);
 
     /* create ROI window */
-    if (!CreateWin(0, "Parbat3D ROI Window", "ROI Window",
-	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_SIZEBOX,
-	     mx, my, ROI_WINDOW_WIDTH, ROI_WINDOW_HEIGHT, parent, NULL))
+    if (!CreateWin(0, "Parbat3D ROI Window", "Regions of Interest",
+	     WS_POPUP+WS_SYSMENU+WS_CAPTION,
+	     rect.left, rect.bottom+30, 250, 300, parent, NULL))
 	    return false;
 
     prevProc=SetWindowProcedure(&WindowProcedure);
+/*
+    roiBG =CreateWindowEx( 0, szStaticControl, NULL, 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0,
+		0, 250, 300, GetHandle(), NULL,
+		Window::GetAppInstance(), NULL);
+	*/
+	
+    roiGroup = CreateWindowEx(0, "BUTTON", NULL, WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 10, 10,
+		100, 100, GetHandle(), NULL, Window::GetAppInstance(), NULL);
 
-    /* create a child window that will be used by OpenGL */
-    roiWindowDisplay.Create(GetHandle());
-
-    return true;
+	roiTick =CreateWindowEx( 0, "BUTTON", "ROI name", 
+		BS_CHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
+		10, 100, 16, roiGroup, NULL,
+		Window::GetAppInstance(), NULL);
+		
+		
+	roiToolBar =CreateWindowEx( 0, szStaticControl, "Buttons go here", 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0,
+		230, 250, 70, GetHandle(), NULL,
+		Window::GetAppInstance(), NULL);
+	
+	return true;
 }
 
 /* All messages/events related to the ROI window (or it's controls) are sent to this procedure */
@@ -130,7 +132,7 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
            
             /* resize display/opengl window to fit new size */            
             GetClientRect(hwnd,&rect);
-            MoveWindow(win->roiWindowDisplay.GetHandle(),rect.left,rect.top,rect.right,rect.bottom,true);
+            //MoveWindow(win->roiWindowDisplay.GetHandle(),rect.left,rect.top,rect.right,rect.bottom,true);
             
             /* update scroll bar settings 
             if (roi_handler)
