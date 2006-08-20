@@ -4,6 +4,7 @@
 #include "SnappingWindow.h"
 #include "ImageWindow.h"
 #include "ToolWindow.h"
+#include "ROIWindow.h"
 //#include "console.h"
 
 /* calculates window's new position based on the location of the mouse cursor */
@@ -80,7 +81,7 @@ void SnappingWindow::moveWindowByOffset(HWND hwnd,RECT *rect,int leftOffset,int 
 }
 
 /* move snapped windows with the main window */
-void SnappingWindow::moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RECT *prevToolWindowRect,int moveImageWindow,int moveToolWindow)
+void SnappingWindow::moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevImageWindowRect,RECT *prevToolWindowRect,RECT *prevROIWindowRect,int moveImageWindow,int moveToolWindow,int moveROIWindow)
 {
     int moveLeftOffset=newRect->left-oldRect->left;
     int moveTopOffset=newRect->top-oldRect->top;
@@ -88,6 +89,8 @@ void SnappingWindow::moveSnappedWindows(RECT *newRect,RECT *oldRect,RECT *prevIm
         moveWindowByOffset(imageWindow.GetHandle(),prevImageWindowRect,moveLeftOffset,moveTopOffset);
     if (moveToolWindow)
         moveWindowByOffset(toolWindow.GetHandle(),prevToolWindowRect,moveLeftOffset,moveTopOffset);
+	if (moveROIWindow)
+        moveWindowByOffset(roiWindow.GetHandle(),prevROIWindowRect,moveLeftOffset,moveTopOffset);
 }
 
 /* checks whether a window is in normal state (not hidden, minimized, or maximized) */

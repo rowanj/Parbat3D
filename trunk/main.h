@@ -8,6 +8,7 @@
 #include "ToolWindow.h"
 #include "OverviewWindow.h"
 #include "ImageWindow.h"
+#include "ROIWindow.h"
 
 extern ImageHandler::ImageHandler* image_handler;
 extern char szStaticControl[];
@@ -20,6 +21,7 @@ extern MainWindow mainWindow;
 extern ToolWindow toolWindow;
 extern ImageWindow imageWindow;
 extern OverviewWindow overviewWindow;
+extern ROIWindow roiWindow;
 enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID};
 
 

@@ -5,6 +5,7 @@
 #include "ImageHandler.h"
 #include "ToolWindow.h"
 #include "ImageWindow.h"
+#include "ROIWindow.h"
 #include "main.h"
 #include "console.h"
 

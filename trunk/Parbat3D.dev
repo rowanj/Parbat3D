@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=51
+UnitCount=52
 Type=0
 Ver=1
 ObjFiles=
@@ -548,9 +548,19 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit51]
-FileName=DisplayTab.cpp
+FileName=ROIWindow.cpp
 CompileCpp=1
-Folder=
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit52]
+FileName=ROIWindow.h
+CompileCpp=1
+Folder=View_PKG
 Compile=1
 Link=1
 Priority=1000

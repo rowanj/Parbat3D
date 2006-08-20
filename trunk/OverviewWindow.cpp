@@ -7,6 +7,7 @@
 #include "DisplayWindow.h"
 #include "MainWindow.h"
 #include "console.h"
+#include "ROIWindow.h"
 
 
 // Used for accessing the help folder
@@ -37,6 +38,7 @@ int OverviewWindow::Create(HWND parent)
     /* Disable Window menu items. note: true appears to disable & false enables */
     EnableMenuItem(hMainMenu,IDM_IMAGEWINDOW,true);
     EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
+    EnableMenuItem(hMainMenu,IDM_ROIWINDOW,true);
     EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);
 
     /* create a child window that will be used by OpenGL */
@@ -75,13 +77,17 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     static RECT prevOverviewWindowRect;         /* main window position before it was moved */
     static RECT prevImageWindowRect;        /* image window position before it was moved */
     static RECT prevToolWindowRect;         /* tool window position before it was moved */
+    static RECT prevROIWindowRect;         /* tool window position before it was moved */
     static int moveToolWindow=false;       /* whether or not the tool window should be moved with the main window */
     static int moveImageWindow=false;      /* whether or not the image window should be moved with the main window */
+    static int moveROIWindow=false;      /* whether or not the image window should be moved with the main window */
     static int imageAndMainSnapped=false;
     static int toolAndMainSnapped=false;
+    static int roiAndMainSnapped=false;
     static int toolAndImageSnapped=false;
     static int imageNormalState=false;
     static int toolNormalState=false;
+    static int roiNormalState=false;
     static RECT rect;                       /* for general use */
     
     OverviewWindow* win=(OverviewWindow*)Window::GetWindowObject(hwnd);
@@ -122,6 +128,13 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                         toolWindow.Hide();
                     return 0;
 
+                case IDM_ROIWINDOW:
+                    if (win->toggleMenuItemTick(win->hMainMenu,IDM_ROIWINDOW))
+                        roiWindow.Show();
+                    else
+                        roiWindow.Hide();
+                    return 0;
+
                 case IDM_HELPCONTENTS:
 					 // get path to help folder
                      helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");
@@ -154,7 +167,9 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 /* record current window positions */
                 GetWindowRect(hwnd,&prevOverviewWindowRect);  
                 GetWindowRect(imageWindow.GetHandle(),&prevImageWindowRect); 
-                GetWindowRect(toolWindow.GetHandle(),&prevToolWindowRect);
+                GetWindowRect(roiWindow.GetHandle(),&prevToolWindowRect);
+                GetWindowRect(roiWindow.GetHandle(),&prevROIWindowRect);
+                
                
                 /* find out which windows are connected & which are in a normal state */
                 imageNormalState=SnappingWindow::isWindowInNormalState(imageWindow.GetHandle());
@@ -211,7 +226,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             
             /* move the snapped windows relative to main window's new position */
             /* only moves the windows that were already snapped to the main window */
-            SnappingWindow::moveSnappedWindows((RECT*)lParam,&prevOverviewWindowRect,&prevImageWindowRect,&prevToolWindowRect,moveImageWindow,moveToolWindow);
+            SnappingWindow::moveSnappedWindows((RECT*)lParam,&prevOverviewWindowRect,&prevImageWindowRect,&prevToolWindowRect,&prevROIWindowRect,moveImageWindow,moveToolWindow,moveROIWindow);
             return 0;
 
         /* WM_SIZE: the window has been re-sized, minimized, maximised or restored */

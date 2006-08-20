@@ -19,6 +19,7 @@
 #include "OverviewWindow.h"
 #include "ToolWindow.h"
 #include "DisplayWindow.h"
+#include "ROIWindow.h"
 
 #include "RoI.h"
 
@@ -38,6 +39,7 @@ MainWindow mainWindow;
 ToolWindow toolWindow;
 OverviewWindow overviewWindow;
 ImageWindow imageWindow;
+ROIWindow roiWindow;
 
 char *filename=NULL;                    // currently open image filename
 
@@ -175,6 +177,7 @@ void orderWindows()
 {
     SetWindowPos(imageWindow.GetHandle(),toolWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
     SetWindowPos(imageWindow.GetHandle(),overviewWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(imageWindow.GetHandle(),roiWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
 }    
 
 void loadFile()
@@ -216,12 +219,14 @@ void loadFile()
                     imageWindow.updateImageWindowTitle();              
                     imageWindow.updateImageScrollbar();      
 
-                    // re-create tool window
+                    // re-create tool & image window
                     toolWindow.Create();
+                    //roiWindow.Create();
                     
                     // show tool & image windows
                     toolWindow.Show();
                     imageWindow.Show();
+                    roiWindow.Show();
                     orderWindows();                    
 
                     // update opengl displays
@@ -231,6 +236,7 @@ void loadFile()
                     // enable window menu items
                     EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,false);
                     EnableMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,false);
+                    EnableMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,false);
                     EnableMenuItem(overviewWindow.hMainMenu,IDM_FILECLOSE,false);
                             
                 }				
@@ -263,10 +269,16 @@ void closeFile()
     {
         imageWindow.Hide();
     }
+	/* hide roi window */
+    if (roiWindow.GetHandle()!=NULL)
+    {
+        roiWindow.Hide();
+    }
 
     /* disable menu items */
     EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,true);
     EnableMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,true);
+    EnableMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,true);
     EnableMenuItem(overviewWindow.hMainMenu,IDM_FILECLOSE,true);    
     
     /* repaint main window */
