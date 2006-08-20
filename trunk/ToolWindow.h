@@ -72,7 +72,7 @@ class ToolWindow:public Window
 
        void drawStatic(DRAWITEMSTRUCT *dis, HFONT hfont);
 
-       virtual int Create();
+       virtual int Create(HWND);
        static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
        static LRESULT CALLBACK ToolWindowTabControlProcedure(HWND, UINT, WPARAM, LPARAM);
        static LRESULT CALLBACK ToolWindowDisplayTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);

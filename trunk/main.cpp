@@ -220,8 +220,8 @@ void loadFile()
                     imageWindow.updateImageScrollbar();      
 
                     // re-create tool & image window
-                    toolWindow.Create();
-                    //roiWindow.Create();
+                    toolWindow.Create(imageWindow.GetHandle());
+                    roiWindow.Create(imageWindow.GetHandle());
                     
                     // show tool & image windows
                     toolWindow.Show();
@@ -230,8 +230,10 @@ void loadFile()
                     orderWindows();                    
 
                     // update opengl displays
-                    RedrawWindow(overviewWindow.overviewWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);
-                    RedrawWindow(imageWindow.imageWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);                
+                    overviewWindow.Repaint();
+                    imageWindow.Repaint();
+                    //RedrawWindow(overviewWindow.overviewWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);
+                    //RedrawWindow(imageWindow.imageWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);                
 
                     // enable window menu items
                     EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,false);

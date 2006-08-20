@@ -182,7 +182,7 @@ LRESULT CALLBACK DisplayTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 }
 
 /* create tool window */
-int ToolWindow::Create()
+int ToolWindow::Create(HWND)
 {
     TCITEM tie;  /* datastructure for tabs */
     RECT rect;
