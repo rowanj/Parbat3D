@@ -30,21 +30,21 @@ int ROIWindow::Create(HWND parent)
 	    return false;
 
     prevProc=SetWindowProcedure(&WindowProcedure);
-/*
-    roiBG =CreateWindowEx( 0, szStaticControl, NULL, 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0,
-		0, 250, 300, GetHandle(), NULL,
-		Window::GetAppInstance(), NULL);
-	*/
 	
-    roiGroup = CreateWindowEx(0, "BUTTON", NULL, WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 10, 10,
-		100, 100, GetHandle(), NULL, Window::GetAppInstance(), NULL);
-
-	roiTick =CreateWindowEx( 0, "BUTTON", "ROI name", 
-		BS_CHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
-		10, 100, 16, roiGroup, NULL,
+    roiScrollbox =CreateWindowEx( 0, szStaticControl, NULL, 
+		WS_VSCROLL | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0,
+		0, 243, 230, GetHandle(), NULL,
 		Window::GetAppInstance(), NULL);
-		
+
+		roiTick=new HWND[20];	
+
+    for (int i=0; i<20; i++)  
+    {
+		roiTick[i] =CreateWindowEx( 0, "BUTTON", "ROI name", 
+		BS_CHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
+		10 + (20 * i), 100, 16, roiScrollbox, NULL,
+		Window::GetAppInstance(), NULL);
+	}
 		
 	roiToolBar =CreateWindowEx( 0, szStaticControl, "Buttons go here", 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0,
@@ -58,8 +58,8 @@ int ROIWindow::Create(HWND parent)
 LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static POINT moveMouseOffset;     /* mouse offset relative to window, used for snapping */
-    static POINT sizeMousePosition;   /* mouse position, used for sizing window */
-    static RECT  sizeWindowPosition;  /* window position, used for sizing window */
+    //static POINT sizeMousePosition;   /* mouse position, used for sizing window */
+    //static RECT  sizeWindowPosition;  /* window position, used for sizing window */
     static RECT rect;                 /* for general use */
 
     ROIWindow* win=(ROIWindow*)Window::GetWindowObject(hwnd);
@@ -78,18 +78,18 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
                     break;
 
                 /* HTLEFT...HTBOTTOMRIGHT: mouse button was pressed down on the sizing border of window */  
-                case HTLEFT:
+                /*case HTLEFT:
                 case HTRIGHT:
                 case HTTOP:
                 case HTBOTTOM:
                 case HTTOPLEFT:
                 case HTTOPRIGHT:
                 case HTBOTTOMLEFT:
-                case HTBOTTOMRIGHT:
+                case HTBOTTOMRIGHT:*/
                     /* record current window & mouse positions */
-                    GetWindowRect(hwnd,&sizeWindowPosition);
+                 /*   GetWindowRect(hwnd,&sizeWindowPosition);
                     sizeMousePosition.x=(int)(short)LOWORD(lParam);
-                    sizeMousePosition.y=(int)(short)HIWORD(lParam);                   
+                    sizeMousePosition.y=(int)(short)HIWORD(lParam);        */           
                     break;                   
             }
 
@@ -109,16 +109,16 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             break;
     
         /* WM_SIZING: the window size is about to change */
-        case WM_SIZING:
+        //case WM_SIZING:
 
             /* set new window size based on position of mouse */
-            SnappingWindow::setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
+            //SnappingWindow::setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
 
             /* prevent window from being resized too small */
-            if ( (((RECT*)lParam)->bottom) - (((RECT*)lParam)->top)  <100)
-                (((RECT*)lParam)->bottom) = (((RECT*)lParam)->top) + 100;
-            if ( (((RECT*)lParam)->right) - (((RECT*)lParam)->left)  <100)
-                (((RECT*)lParam)->right) = (((RECT*)lParam)->left) + 100;
+            //if ( (((RECT*)lParam)->bottom) - (((RECT*)lParam)->top)  <100)
+            //    (((RECT*)lParam)->bottom) = (((RECT*)lParam)->top) + 100;
+            //if ( (((RECT*)lParam)->right) - (((RECT*)lParam)->left)  <100)
+             //   (((RECT*)lParam)->right) = (((RECT*)lParam)->left) + 100;
             
             /* snap the window to the edge of the desktop (if near it) */
             SnappingWindow::snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   

@@ -7,9 +7,8 @@ class ROIWindow:public Window
 {
     private:
     WNDPROC prevProc;
-    HWND roiBG;
-    HWND roiTick;
-    HWND roiGroup;
+    HWND roiScrollbox;
+    HWND *roiTick;
     HWND roiToolBar;
     
         
@@ -18,11 +17,7 @@ class ROIWindow:public Window
 
     int Create(HWND parent);
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
-    //void updateImageWindowTitle();
-    //void updateImageScrollbar();
-    //void scrollImageX(int scrollMsg);
-    //void scrollImageY(int scrollMsg);    
-    //void zoomImage(int nlevels);
+
 };
 
 #endif
