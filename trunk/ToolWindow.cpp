@@ -8,6 +8,8 @@
 #include "console.h"
 #include "SnappingWindow.h"
 
+#include "config.h"
+
 // create tool tab container
 int ToolTab::Create(HWND parent,RECT *parentRect)
 {
@@ -31,17 +33,22 @@ LRESULT CALLBACK ToolTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam
 {
     ToolTab* win=(ToolTab*)Window::GetWindowObject(hwnd);
 
-    Console::write("ToolTab::WindowProcedure win=");
-    Console::write((int)win->prevProc);
-    Console::write("\n");
+// See config.h to toggle these debug statements
+#if DEBUG_TOOLWINDOW
+	Console::write("ToolTab::WindowProcedure win=");
+	Console::write((int)win->prevProc);
+	Console::write("\n");
+#endif
     switch (message) 
     {
         case WM_DRAWITEM:
+			#if DEBUG_TOOLWINDOW
             Console::write("ToolTab::WindowProcedure WM_DRAWITEM: ");
             Console::write((int)win->hHeading);
-            Console::write(" compared with ");            
-            Console::write((int)((DRAWITEMSTRUCT*)lParam)->hwndItem);            
+            Console::write(" compared with ");
+			Console::write((int)((DRAWITEMSTRUCT*)lParam)->hwndItem);            
             Console::write("\n");
+            #endif
             // draw window's owner-drawn static text controls using our custom fonts
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 if (((DRAWITEMSTRUCT*)lParam)->hwndItem==win->hHeading)

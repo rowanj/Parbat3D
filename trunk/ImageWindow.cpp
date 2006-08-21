@@ -11,7 +11,7 @@
 #include "ImageWindow.h"
 #include "ImageViewport.h"
 
-
+#include "config.h"
 
 int ImageWindow::Create(HWND parent)
 {
@@ -84,11 +84,8 @@ void ImageWindow::updateImageScrollbar()
     info_x.nPos=viewport->get_zoom_x();
     info_y.nPos=viewport->get_zoom_y();
     
+    #if DEBUG_SCROLLING
     Console::write("updateScrollbarSettings():\n");
-    Console::write("LOD_width=");
-    Console::write(LOD_width);
-    Console::write("\nLOD_height=");
-    Console::write(LOD_height);
     Console::write("\nviewport_width=");
     Console::write(info_x.nPage);
     Console::write("\nviewport_height=");
@@ -101,6 +98,7 @@ void ImageWindow::updateImageScrollbar()
     Console::write(info_x.nPos);
     Console::write("\nscroll_y=");
     Console::write(info_y.nPos);
+    #endif
     
     /* set scrollbar info */
     info_x.cbSize=sizeof(SCROLLINFO);

@@ -65,7 +65,7 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* i
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	/* glOrtho(Left, Right, Bottom, Top, Near-clip, Far-clip) */
-#if DEBUG_OVERVIEW
+#if DEBUG_GL
 	/* Show one more unit on all sides for debugging */
 	glOrtho(-1.0, 2.0, 2.0, -1.0, 1.0, -1.0);
 #else
@@ -97,7 +97,9 @@ OverviewGL::~OverviewGL()
 /* Re-draw our overview window */
 void OverviewGL::notify_viewport(void)
 {
+#if DEBUG_GL
 	Console::write("(II) OverviewGL redrawing...\n");
+#endif
 	gl_overview->make_current();
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -178,7 +180,9 @@ void OverviewGL::notify_viewport(void)
 
 void OverviewGL::notify_bands(void)
 {
+#if DEBUG_GL
 	Console::write("(II) OverviewGL re-texturing.\n");
+#endif
 	// Get texture data	
 	viewport->get_display_bands(&band_red, &band_green, &band_blue);
 	char* tex_overview = tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);

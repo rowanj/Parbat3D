@@ -1,6 +1,8 @@
 #include "Window.h"
 #include "Console.h"
 
+#include "config.h"
+
 WNDPROC Window::stPrevWindowProcedure=NULL;
 HINSTANCE Window::hInstance=NULL;
 
@@ -51,7 +53,9 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
     hwindow=CreateWindowEx(dwExStyle,lpClassName,lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,hMenu,hInstance,this);
     if (hwindow==NULL)
     {
+		#if DEBUG_WINDOW
         Console::write("Window::CreateWin CreateWindowEx failed first time\n");
+        #endif
         // attempt to register class (incase not already registered)
         WNDCLASSEX wincl;
         wincl.cbSize=sizeof(wincl);
@@ -84,7 +88,9 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
         }
         
     }
+    #if DEBUG_WINDOW
     Console::write("Window::CreateWin CreateWindowEx ok\n");    
+    #endif
 
     // add "this" object pointer to hwindow's internal structure
     SetWindowLong(hwindow,GWL_USERDATA,(int)this);
@@ -101,7 +107,9 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
         stPrevWindowProcedure=prevWindowProcedure;
     }
         
+    #if DEBUG_WINDOW
     Console::write("Window::CreateWin: ok\n");
+    #endif
     return true;
 }
 
@@ -131,7 +139,9 @@ Window* Window::GetWindowObject(HWND hwnd)
     Window* win=(Window*)GetWindowLong(hwnd,GWL_USERDATA);
     if (win==NULL)
     {
+		#if DEBUG_WINDOW
         Console::write("Window::GetWindowObject win=NULL\n");
+        #endif
     }
    // Console::write("Window::GetWindowObject win=\n");
 //    Console::write((int)win);

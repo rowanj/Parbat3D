@@ -8,7 +8,10 @@
 #define DEBUG_IMAGE_PROPERTIES 0
 #define DEBUG_BANDS 1
 #define DEBUG_IMAGE_DATA 0
-#define DEBUG_OVERVIEW 0
+#define DEBUG_GL 0
+#define DEBUG_TOOLWINDOW 0
+#define DEBUG_WINDOW 0
+#define DEBUG_SCROLLING 0
 
 // Declare some packages as optional during initial implementation.
 //  This is to allow other packages to build for testing.
