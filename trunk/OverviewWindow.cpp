@@ -266,8 +266,8 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             /* Save the window location */
             RECT r;
             GetWindowRect(hwnd,&r);
-            settingsFile.setSetting("overview window","x", r.left);
-            settingsFile.setSetting("overview window","y", r.top);
+            settingsFile->setSetting("overview window","x", r.left);
+            settingsFile->setSetting("overview window","y", r.top);
             
             /* post a message that will cause WinMain to exit from the message loop */
             PostQuitMessage (0);

@@ -33,7 +33,7 @@ HINSTANCE hThisInstance;            /* a handle that identifies our process */
 
 HWND hDesktop;                      /* handle to desktop window (used for snapping) */
 
-settings settingsFile;              /* Used for loading and saving window position and sizes */
+settings* settingsFile;             /* Used for loading and saving window position and sizes */
 
 MainWindow mainWindow;
 ToolWindow toolWindow;
@@ -85,7 +85,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     Window::SetAppInstance(hInstance);
     
     string settings_path (catcstrings(modulePath, "\\settings.ini"));
-    settingsFile.open(settings_path);
+    settingsFile = new settings(settings_path);
+//    settingsFile->open(settings_path);
     
     MSG messages;
     
@@ -106,42 +107,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     Console::write("Console rows: ");
 	Console::write((char*)inttocstring(consoleRows));
 	Console::write("\n");
-/*
-    coords c1,c2,c3,c4,c;
-    RoI roi;
-    RoIEntity en1,en2;
-   
-    c1.x=1;
-    c1.y=2;
-    c2.x=3;
-    c2.y=4;
-    c3.x=5;
-    c3.y=6;
-    c4.x=7;
-    c4.y=8;
-    en1.points.push_back(c1);
-    en1.points.push_back(c3);    
-    en2.points.push_back(c2);
-    en2.points.push_back(c4);    
-    roi.add_entity(&en1);
-    roi.add_entity(&en2);
-    vector<RoIEntity*> vres=roi.get_entities();
-    for (int i=0;i<vres.size();i++)
-    {
-        Console::write("entity ");
-        Console::write(i);      
-        Console::write(":\n");        
-        RoIEntity* en=(RoIEntity*)vres.at(i);
-        for (int j=0;j<en->points.size();j++)
-        {
-            Console::write(" x=");
-            Console::write(en->points.at(j).x);
-            Console::write(" y=");
-            Console::write(en->points.at(j).y);        
-            Console::write("\n");        
-       }            
-    }*/
-    
 
     
 	if (!mainWindow.Create())

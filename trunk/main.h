@@ -14,7 +14,7 @@ extern ImageHandler::ImageHandler* image_handler;
 extern char szStaticControl[];
 extern HINSTANCE hThisInstance;
 extern HWND hDesktop;
-extern settings settingsFile;
+extern settings* settingsFile;
 extern char *filename;
 extern char *modulePath;
 extern MainWindow mainWindow;
