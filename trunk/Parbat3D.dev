@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=58
+UnitCount=57
 Type=0
 Ver=1
 ObjFiles=
@@ -357,18 +357,8 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit36]
-FileName=OverviewWindow.h
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit37]
-FileName=ImageWindow.h
+FileName=MainWindow.h
 CompileCpp=1
 Folder=View_PKG
 Compile=1
@@ -388,16 +378,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit38]
-FileName=MainWindow.h
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit39]
 FileName=DisplayWindow.h
 CompileCpp=1
 Folder=View_PKG
@@ -407,7 +387,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit40]
+[Unit39]
 FileName=resources.h
 CompileCpp=1
 Folder=
@@ -417,7 +397,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit41]
+[Unit40]
 FileName=OverviewGL.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -427,7 +407,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit42]
+[Unit41]
 FileName=OverviewGL.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -437,7 +417,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit43]
+[Unit42]
 FileName=GLView.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -447,7 +427,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit44]
+[Unit43]
 FileName=GLView.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -457,8 +437,18 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit45]
+[Unit44]
 FileName=Window.h
+CompileCpp=1
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit45]
+FileName=Window.cpp
 CompileCpp=1
 Folder=View_PKG
 Compile=1
@@ -488,16 +478,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit46]
-FileName=Window.cpp
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit47]
 FileName=RoI.h
 CompileCpp=1
 Folder=RoI_PKG
@@ -507,7 +487,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit48]
+[Unit47]
 FileName=RoISet.cpp
 CompileCpp=1
 Folder=RoI_PKG
@@ -517,7 +497,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit49]
+[Unit48]
 FileName=RoI.cpp
 CompileCpp=1
 Folder=RoI_PKG
@@ -527,8 +507,18 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit50]
+[Unit49]
 FileName=MainWindow.cpp
+CompileCpp=1
+Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit50]
+FileName=ROIWindow.cpp
 CompileCpp=1
 Folder=View_PKG
 Compile=1
@@ -548,16 +538,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit51]
-FileName=ROIWindow.cpp
-CompileCpp=1
-Folder=View_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit52]
 FileName=ROIWindow.h
 CompileCpp=1
 Folder=View_PKG
@@ -567,7 +547,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit53]
+[Unit52]
 FileName=ImageGL.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -577,7 +557,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit54]
+[Unit53]
 FileName=ImageGL.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
@@ -587,8 +567,18 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
+[Unit54]
+FileName=ImageViewport.h
+CompileCpp=1
+Folder=Image_Manipulation_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
 [Unit55]
-FileName=H:\project\source\parbat3d_current\trunk\ViewportListener.cpp
+FileName=ViewportListener.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
 Compile=1
@@ -598,7 +588,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit56]
-FileName=H:\project\source\parbat3d_current\trunk\ViewportListener.h
+FileName=ImageViewport.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG
 Compile=1
@@ -608,7 +598,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit57]
-FileName=H:\project\source\parbat3d_current\trunk\ImageViewport.cpp
+FileName=ViewportListener.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG
 Compile=1
@@ -621,6 +611,16 @@ BuildCmd=
 FileName=H:\project\source\parbat3d_current\trunk\ImageViewport.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit36]
+FileName=ImageWindow.h
+CompileCpp=1
+Folder=View_PKG
 Compile=1
 Link=1
 Priority=1000
