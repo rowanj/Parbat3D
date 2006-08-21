@@ -558,7 +558,11 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit53]
+<<<<<<< .mine
+FileName=ViewportListener.cpp
+=======
 FileName=ImageGL.h
+>>>>>>> .r412
 CompileCpp=1
 Folder=Image_Manipulation_PKG
 Compile=1
@@ -568,7 +572,11 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit54]
+<<<<<<< .mine
+FileName=ViewportListener.h
+=======
 FileName=ImageViewport.h
+>>>>>>> .r412
 CompileCpp=1
 Folder=Image_Manipulation_PKG
 Compile=1
@@ -578,7 +586,11 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit55]
+<<<<<<< .mine
+FileName=ImageViewport.cpp
+=======
 FileName=ViewportListener.h
+>>>>>>> .r412
 CompileCpp=1
 Folder=Image_Manipulation_PKG
 Compile=1
@@ -588,7 +600,11 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit56]
+<<<<<<< .mine
+FileName=ImageViewport.h
+=======
 FileName=ImageViewport.cpp
+>>>>>>> .r412
 CompileCpp=1
 Folder=Image_Manipulation_PKG
 Compile=1
@@ -608,7 +624,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit58]
-FileName=H:\project\source\parbat3d_current\trunk\ImageViewport.h
+FileName=ImageViewport.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG
 Compile=1
