@@ -29,6 +29,7 @@ ImageFile::ImageFile(char* theFilename)
 	
 	GDALAllRegister();
 	
+	ifErr = 0;
 	ifDataset = (GDALDataset *) GDALOpen(filename , GA_ReadOnly);
 	
 	if (ifDataset == NULL) //if we've not got a valid file

@@ -360,8 +360,18 @@ int ToolWindow::Create(HWND)
 	} else
 	    finalname = fullname;
 	    
+	string drivername = ip->getDriverLongName();
+	string finaldrivname;
+	if (drivername.length() > 25) {
+		fname = drivername.substr(0, 12);
+		bname = drivername.substr(drivername.length()-12, drivername.length()-1);
+		finaldrivname = fname + "…" + bname;
+	} else
+	    finaldrivname = drivername;
+	
+	    
 	n[0]="File Name"; v[0]=makeMessage(leader, (char*) finalname.c_str());
-	n[1]="File Type"; v[1]=makeMessage(leader, (char*) ip->getDriverLongName());
+	n[1]="File Type"; v[1]=makeMessage(leader, (char*) finaldrivname.c_str());
 	n[2]="Width"; v[2]=makeMessage(leader, ip->getWidth());
 	n[3]="Height"; v[3]=makeMessage(leader, ip->getHeight());
 	n[4]="Bands"; v[4]=makeMessage(leader, ip->getNumBands());

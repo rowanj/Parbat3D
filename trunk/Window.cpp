@@ -62,7 +62,7 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
         wincl.hInstance=hInstance;
         wincl.hIcon = LoadIcon(NULL, IDI_APPLICATION);
         wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
-        wincl.hbrBackground = (HBRUSH) GetSysColor(COLOR_3DFACE); //GetStockObject(LTGRAY_BRUSH);
+        wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH); //GetSysColor(COLOR_3DFACE);
         wincl.lpszMenuName = NULL;
         wincl.lpszClassName=lpClassName;
         wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
