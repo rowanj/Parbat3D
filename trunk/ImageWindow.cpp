@@ -9,6 +9,7 @@
 #include "Settings.h"
 #include "ImageHandler.h"
 #include "ImageWindow.h"
+#include "ImageViewport.h"
 
 
 
@@ -53,7 +54,7 @@ void ImageWindow::updateImageWindowTitle()
     /* Display the file name & zoom level on the image window title bar */
     string leader = "Image - ";
     string title  = makeMessage(leader,filename);
-    title+=makeString(" (",int(100.0 / pow((double)2,(double)image_handler->get_LOD())));
+    title+=makeString(" (",image_handler->get_image_viewport()->get_zoom_level()*100.0);
     title+="%)";
 	SetWindowText(GetHandle(), (char*) title.c_str());
 }
@@ -62,14 +63,16 @@ void ImageWindow::updateImageWindowTitle()
 void ImageWindow::updateImageScrollbar()
 {
     int LOD_width,LOD_height;
+    ImageViewport* viewport;
+    viewport = image_handler->get_image_viewport();
 
     SCROLLINFO info_x,info_y;
 
     /* get window size and image size at current zoom level */   
-    info_x.nPage=image_handler->get_viewport_width();
-    info_y.nPage=image_handler->get_viewport_height();    
-    LOD_width=image_handler->get_LOD_width();
-    LOD_height=image_handler->get_LOD_height();
+    info_x.nPage=viewport->get_window_width();
+    info_y.nPage=viewport->get_window_height();    
+    LOD_width=viewport->get_zoom_image_width();
+    LOD_height=viewport->get_zoom_image_height();
     
     /* set scroll range */
     info_x.nMin=0;
@@ -78,8 +81,8 @@ void ImageWindow::updateImageScrollbar()
     info_y.nMax=LOD_height;// - info_y.nPage;
     
     /* set scroll position */
-    info_x.nPos=image_handler->get_viewport_x();
-    info_y.nPos=image_handler->get_viewport_y();
+    info_x.nPos=viewport->get_zoom_x();
+    info_y.nPos=viewport->get_zoom_y();
     
     Console::write("updateScrollbarSettings():\n");
     Console::write("LOD_width=");
@@ -113,7 +116,9 @@ void ImageWindow::updateImageScrollbar()
 void ImageWindow::scrollImageX(int scrollMsg)
 {
     SCROLLINFO info;
-
+	ImageViewport* viewport;
+    viewport = image_handler->get_image_viewport();
+    
     /* get current scroll position & range */    
     info.cbSize=sizeof(SCROLLINFO);
     info.fMask=SIF_ALL;
@@ -129,10 +134,10 @@ void ImageWindow::scrollImageX(int scrollMsg)
             info.nPos++;
             break;
         case SB_PAGEUP:
-            info.nPos-=image_handler->get_viewport_width();
+            info.nPos-=viewport->get_viewport_width();
             break;
         case SB_PAGEDOWN:
-            info.nPos+=image_handler->get_viewport_width();                
+            info.nPos+=viewport->get_viewport_width();                
             break;
         case SB_THUMBTRACK:
             info.nPos=info.nTrackPos;
@@ -154,14 +159,16 @@ void ImageWindow::scrollImageX(int scrollMsg)
     // update scroll position
     info.fMask=SIF_POS;
     SetScrollInfo(GetHandle(),SB_HORZ,&info,true);
-    image_handler->set_viewport_x(info.nPos);
+    viewport->set_zoom_x(info.nPos);
 }
 
 /* scroll image window vertically */
 void ImageWindow::scrollImageY(int scrollMsg)
 {
     SCROLLINFO info;
-
+	ImageViewport* viewport;
+    viewport = image_handler->get_image_viewport();
+    
     /* get current scroll position & range */    
     info.cbSize=sizeof(SCROLLINFO);
     info.fMask=SIF_ALL;
@@ -177,10 +184,10 @@ void ImageWindow::scrollImageY(int scrollMsg)
             info.nPos++;
             break;
         case SB_PAGEUP:
-            info.nPos-=image_handler->get_viewport_height();
+            info.nPos-=viewport->get_viewport_height();
             break;
         case SB_PAGEDOWN:
-            info.nPos+=image_handler->get_viewport_height();                
+            info.nPos+=viewport->get_viewport_height();                
             break;
         case SB_THUMBTRACK:
             info.nPos=info.nTrackPos;
@@ -202,28 +209,28 @@ void ImageWindow::scrollImageY(int scrollMsg)
     // update scroll position
     info.fMask=SIF_POS;
     SetScrollInfo(GetHandle(),SB_VERT,&info,true);
-    image_handler->set_viewport_y(info.nPos);
+    viewport->set_zoom_y(info.nPos);
 }
 
 /* zoom the image in/out */
 void ImageWindow::zoomImage(int nlevels)
 {
-    const int MAX_LOD=6;
-    int LOD;
+    float zoom;
  
     Console::write("zoomImage() nlevels=");   
     Console::write(nlevels);
     Console::write("\n");
-    LOD=image_handler->get_LOD();
-    LOD+=nlevels;
-    if (LOD<0)
-        LOD=0;
-    else if (LOD>MAX_LOD)
-        LOD=MAX_LOD;
-    image_handler->set_LOD(LOD);
+    zoom=image_handler->get_image_viewport()->get_zoom_level();
+    zoom+=nlevels/100.0;
+    if (zoom>1.0)
+        zoom=1.0;
+    else if (zoom<0.05)
+        zoom=0.05;
+    image_handler->get_image_viewport()->set_zoom_level(zoom);
     updateImageWindowTitle();
     updateImageScrollbar();
 }
+
 
 /* All messages/events related to the image window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)

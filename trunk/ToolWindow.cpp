@@ -174,7 +174,9 @@ LRESULT CALLBACK DisplayTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 				
 				// !! Insert band numbers (bands start at 1, not 0) here. - Rowan
 				// 0 now equals none - Damian
-            	if (image_handler) image_handler->set_bands(r,g,b);
+//            	if (image_handler) image_handler->set_bands(r,g,b);
+                assert(image_handler != NULL);
+                image_handler->get_image_viewport()->set_display_bands(r,g,b);
             }                
             return 0;
     }

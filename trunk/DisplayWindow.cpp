@@ -57,7 +57,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
         case WM_SIZE:           
             if (image_handler) {
                 /* Re-size OpenGL stuff */
-                image_handler->resize_window();
+                image_handler->resize_image_window();
             } else {
                 /* re-position message */
                 GetClientRect(hwnd,&rect);
@@ -73,21 +73,17 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                     /* Get mouse screen position */
                     int mx = (short)LOWORD(lParam);
                     int my = (short)HIWORD(lParam);
+                    int ix, iy;
+                    unsigned int* bv;
                     
-                    /* Convert screen position to image position */
-                    int vx = image_handler->get_viewport_x(); /* get top right corner of screen position in image */
-                    int vy = image_handler->get_viewport_y();
-                    int lod = (int)pow((double)2,(double)image_handler->get_LOD());
-                    int ix = (mx + vx) * lod;
-                    int iy = (my + vy) * lod;
+                    bv = image_handler->get_window_pixel_values(mx, my);
+                    image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
                     
                     /* if cursor is outside of image bounds then display 0,0 as coordinates */
                     ImageProperties* ip = image_handler->get_image_properties();
                     if (ix>=0 && iy>=0 && ix<(ip->getWidth()) && iy<(ip->getHeight())) {
-                        unsigned int* bv = image_handler->get_pixel_values_viewport(ix, iy);  /* Get band values */
-                        
                         string leader = "";
-                        
+
                         /* Update display of cursor position */
                         SetWindowText(toolWindow.cursorXPos, (char *) makeMessage(leader, ix));
                         SetWindowText(toolWindow.cursorYPos, (char *) makeMessage(leader, iy));
@@ -97,9 +93,8 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                             for (int i=1; i<=toolWindow.bands; i++)
                                 SetWindowText(toolWindow.imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
                         }
-                        
-                        delete[] bv;
                     }
+                    delete[] bv;
                 }
             }
             break;

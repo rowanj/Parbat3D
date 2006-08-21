@@ -7,25 +7,12 @@
 #endif
 
 #include "ImageFile.h"
-#include "ImageTileSet.h"
 #include "ImageProperties.h"
 #include "OverviewGL.h"
-#include "GLView.h"
+#include "ImageGL.h"
+#include "ImageViewport.h"
 
 #include "config.h"
-
-typedef struct pixel_values_t {
-	char number_bands;
-	int* values;
-} pixel_values, *pixel_values_ptr;
-
-typedef struct geo_coords_t {
-	int x;
-	int y;
-	float lattitude;
-	float longitude;
-} geo_coords, *geo_coords_ptr;
-
 
 class ImageHandler
 {
@@ -37,66 +24,35 @@ public:
 	/* Data Operators */
 	ImageProperties* get_image_properties(void);
 	BandInfo* get_band_info(int band_number);
-		/* free() pixel_values_ptr->values and pixel_values_ptr after use */
-	unsigned int* get_pixel_values(int x, int y);
-	unsigned int* get_pixel_values_viewport(int viewport_x_pos, int viewport_y_pos);
-	void get_geo_pos(geo_coords_ptr pos);
 	const char* get_info_string(void);
 	
-	/* Viewport Operators */
+	/* Window Operators */
 	void redraw(void);
-	void resize_window(void);
-	void set_viewport(int x, int y);
-	void set_viewport_x(int x);
-	void set_viewport_y(int y);
-	void set_bands(int band_R, int band_G, int band_B);
-	int get_viewport_x(void);
-	int get_viewport_y(void);
-	int get_viewport_width(void);
-	int get_viewport_height(void);
+	void resize_image_window(void);
+	ImageViewport* get_image_viewport(void);
 	
-	/* Control current zoom, 0 = 1:1, 1 = 2:1, 2 = 4:1, etc. */
-	int get_LOD(void);
-	int set_LOD(int level_of_detail);
-	
-	/* Image dimension (screen pixels) at current zoom */
-	int get_LOD_width(void);
-	int get_LOD_height(void);
-	
-	/* State Variables */
-	int status;
-	const char* error_text;
+	// get pixel values from window co-ordinates
+	unsigned int* get_window_pixel_values(int x, int y); // remember to delete[]
+	// get pixel values from absolute coordinates at this zoom level
+	unsigned int* get_zoom_pixel_values(int x, int y); // remember to delete[]
+    // get pixel values from absolute image coordinates (from displayed LOD)
+    unsigned int* get_image_pixel_values(int x, int y); // remember to delete[]
+       
+    /* Status operators */
+	int get_status(void);
+	const char* get_status_text(void);
 
 private:
 	/* Sub-objects */
 	ImageFile* image_file;
-	GLView* gl_image;
+	ImageProperties* image_properties;
+	ImageViewport* image_viewport;
+	ImageGL* image_gl;
 	OverviewGL* overview_gl;
 
-	/* Internal Functions */
-	void make_overview_texture(void);
-	void make_textures(void);
-	void GLinit(void);
-
 	/* State variables */
-	int LOD;
-	int image_width, image_height;
-    int max_texture_size;
-    int band_red, band_green, band_blue;
-	int texture_size;
-	int viewport_width, viewport_height, viewport_x, viewport_y;
-	int viewport_columns, viewport_rows;
-	int start_column, start_row;
-	
-	/* Image window textures */
-	ImageTileSet* image_tileset;
-	int image_rows, image_columns, tex_count;
-	GLuint *tex_base;
-	int tex_base_size;
-	int tile_size;
-	
-	/* Display lists */
-	unsigned int list_tile;
+	int status;
+	const char* status_text;
 };
 
 #endif

@@ -167,22 +167,28 @@ void loadFile()
 		closeFile();
 
         // load image & setup windows
+        int ih_status;
+        assert(image_handler == NULL);
 	    image_handler = new ImageHandler::ImageHandler(overviewWindow.overviewWindowDisplay.GetHandle(), imageWindow.imageWindowDisplay.GetHandle(), ofn.lpstrFile);
-	    if (image_handler) {
-			if (image_handler->status > 0) {
-				// An error occurred instantiaing the image handler class.
-				MessageBox (NULL, image_handler->error_text , "[error] Parbat3D :: ImageHandler", 0);
-			} else {
-				if (image_handler->status < 0) { // Error occurred, but was non-fatal
-					MessageBox (NULL, image_handler->error_text , "[warning] Parbat3D :: ImageHandler", 0);
-				}
-    			else
-    			{
-                    // update image window settings
-                    filename=copyString(image_handler->get_image_properties()->getFileName());
+	    assert(image_handler != NULL);
+	    ih_status = image_handler->get_status();
+		if (ih_status > 0) {
+		   // An error occurred instantiaing the image handler class.
+		   MessageBox (NULL, image_handler->get_status_text() , "[error] Parbat3D :: ImageHandler", 0);
+		   /*  !! Clean-up, when this returns we should be in 'clean' state,
+               identical to initial startup */
+               delete image_handler;
+               image_handler = NULL;
+		   return;
+		} else if (ih_status < 0) { // Error occurred, but was non-fatal
+		   MessageBox (NULL, image_handler->get_status_text() , "[warning] Parbat3D :: ImageHandler", 0);
+		}
+    	
+        // update image window settings
+        filename=copyString(image_handler->get_image_properties()->getFileName());
                     
-                    imageWindow.updateImageWindowTitle();              
-                    imageWindow.updateImageScrollbar();      
+        imageWindow.updateImageWindowTitle();              
+        imageWindow.updateImageScrollbar();      
 
                     // re-create tool & image window
                     toolWindow.Create(imageWindow.GetHandle());
@@ -200,19 +206,11 @@ void loadFile()
                     //RedrawWindow(overviewWindow.overviewWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);
                     //RedrawWindow(imageWindow.imageWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);                
 
-                    // enable window menu items
+        // enable window menu items
                     EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,false);
                     EnableMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,false);
                     EnableMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,false);
                     EnableMenuItem(overviewWindow.hMainMenu,IDM_FILECLOSE,false);
-                            
-                }				
-			}
-
-		} else { // Object wasn't created - this is probably terminal
-			MessageBox (NULL, "[error] Could not instantiate ImageHandler." , "Parbat3D :: ImageHandler", 0);
-			// !! Should probably die gracefully at this point - Rowan
-		}
     }
 }
 

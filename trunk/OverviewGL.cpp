@@ -1,16 +1,24 @@
 #include "OverviewGL.h"
 #include "config.h"
+#include "console.h"
 
-OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
+#include <cassert>
+
+OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* image_viewport_param)
 {
 	ImageProperties* image_properties;
+	
+	assert(image_file != NULL);
+	assert(image_viewport_param != NULL);
+	
+	viewport = image_viewport_param;
+	viewport->register_listener(this);
+	viewport->get_display_bands(&band_red, &band_green, &band_blue);
+	
 	image_properties = image_file->getImageProperties();
 	image_height = image_properties->getHeight();
 	image_width = image_properties->getWidth();
-	viewport_x = 0;
-	viewport_y = 0;
-	viewport_width = 100;
-	viewport_height = 100;
+	
 	tex_overview_id = 0;
 		
 	/* Initialize OpenGL*/
@@ -34,6 +42,7 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 
 	/* compile display list for textured tile */
 	list_tile = glGenLists(1);
+	assert(glIsList(list_tile) == GL_TRUE);
     glNewList(list_tile,GL_COMPILE);
     {
 		glBegin(GL_QUADS);
@@ -68,16 +77,16 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file)
 	/* Set up initial model transform */
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	
+		
 	/* Scale such that image fills overview window in largest dimension */
 	scalefactor_tile = (GLfloat)texture_size / (GLfloat) max(LOD_width,LOD_height);
 	glScalef(scalefactor_tile, scalefactor_tile, scalefactor_tile);
 	
+	/* !! Translate into middle of screen */
+
 	/* Find scale factor for lines */
 	scalefactor_lines = 1.0 / (GLfloat) max(image_width, image_height);
-	set_bands(1, 2, 3);
 }
-
 
 OverviewGL::~OverviewGL()
 {
@@ -85,14 +94,14 @@ OverviewGL::~OverviewGL()
 	delete tileset;
 }
 
-
 /* Re-draw our overview window */
-void OverviewGL::redraw(void)
+void OverviewGL::notify_viewport(void)
 {
+	Console::write("(II) OverviewGL redrawing...\n");
 	gl_overview->make_current();
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	/* Set up texture for overview image */
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -104,7 +113,6 @@ void OverviewGL::redraw(void)
 	/* No more texturing in overview window */
 	glDisable(GL_TEXTURE_2D);
 
-
 	/* Draw window box in overview window */
 	{
 		glMatrixMode(GL_MODELVIEW);
@@ -112,10 +120,10 @@ void OverviewGL::redraw(void)
 		/* Scale to work in image pixels */
 		glScalef(scalefactor_lines, scalefactor_lines, scalefactor_lines);
 
-		GLfloat box_top = viewport_y;
-		GLfloat box_bottom = viewport_y + viewport_height;
-		GLfloat box_left = viewport_x;
-		GLfloat box_right = viewport_x + viewport_width;
+		GLfloat box_top = viewport->get_image_y();
+		GLfloat box_bottom = viewport->get_image_y() + viewport->get_viewport_height();
+		GLfloat box_left = viewport->get_image_x();
+		GLfloat box_right = viewport->get_image_x() + viewport->get_viewport_width();
 		
 		if (box_top < 0.0) box_top = 0.0;
 		if (box_bottom > image_height) box_bottom = image_height;
@@ -165,31 +173,14 @@ void OverviewGL::redraw(void)
 		
 		glPopMatrix(); /* Restore tile transform */
 	}
-	
 	gl_overview->GLswap();
 }
 
-void OverviewGL::update_viewport(int x, int y, int width, int height)
+void OverviewGL::notify_bands(void)
 {
-	viewport_x = x;
-	viewport_y = y;
-	viewport_width = width;
-	viewport_height = height;
-	redraw();
-}
-
-void OverviewGL::set_bands(int band_R, int band_G, int band_B)
-{
-	band_red = band_R;
-	band_green = band_G;
-	band_blue = band_B;
-	make_texture();
-	redraw();
-}
-
-void OverviewGL::make_texture(void)
-{
+	Console::write("(II) OverviewGL re-texturing.\n");
 	// Get texture data	
+	viewport->get_display_bands(&band_red, &band_green, &band_blue);
 	char* tex_overview = tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
 
 	/* Make texture from data */
