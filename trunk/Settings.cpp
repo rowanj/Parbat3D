@@ -3,6 +3,20 @@
 using namespace std;
 
 
+settings::settings (string s) {
+    open(s);
+}
+
+settings::~settings () {
+    openFile.close();
+}
+
+
+void settings::open (string filename) {
+    openFile.open(filename);
+}
+
+
 string settings::getSetting (string section, string key) {
     string data = "";
     

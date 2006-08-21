@@ -74,7 +74,7 @@ class iniFile {
         /**
             Returns the name of the file that is being used.
         */
-        string getFileName () { return fileName; }
+        string getFileName ();
 };
 
 #endif

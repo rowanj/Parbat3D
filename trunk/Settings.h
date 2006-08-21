@@ -18,18 +18,18 @@ class settings {
         /**
             Creates a new settings object that can save settings to a file.
         */
-        settings () {}
+        settings (string s);
         
         /**
             Ends access to the file.
         */
-        ~settings () { openFile.close(); }
+        virtual ~settings ();
         
         
         /**
             Sets up access to the file using the filename given as a parameter.
         */
-        void open (string filename) { openFile.open(filename); }
+        void open (string filename);
         
         
         /**
