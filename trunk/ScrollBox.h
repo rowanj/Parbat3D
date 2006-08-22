@@ -10,6 +10,7 @@ class ScrollBox:public Window
 
     protected:
     int maxScrollHeight;
+    int pixelPosition;
 
     static BOOL CALLBACK ScrollBox::GetMaxScrollHeight(HWND hwnd, LPARAM lparam);
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);    

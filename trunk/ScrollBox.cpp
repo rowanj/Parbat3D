@@ -51,15 +51,16 @@ void ScrollBox::UpdateScrollBar()
     GetClientRect(GetHandle(),&rcscrollbox);    
 
     /* set scroll amount per unit of scroll position */   
-    info.nPage=1;
+    info.nPage=rcscrollbox.bottom;
     
     /* set scroll range */
     info.nMin=0;
-    info.nMax=maxScrollHeight-rcscrollbox.bottom+1;
+    info.nMax=maxScrollHeight;
     
     /* set scroll position */
     info.nPos=0;
     info.nTrackPos=0;
+    pixelPosition=0;
            
     /* set scrollbar info */
     info.cbSize=sizeof(SCROLLINFO);
@@ -85,19 +86,19 @@ void ScrollBox::Scroll(int msg)
     switch (LOWORD(msg))
     {
         case SB_LINEUP:
-            info.nPos--;
+            info.nPos-=10;
             break;
             
         case SB_LINEDOWN:
-            info.nPos++;
+            info.nPos+=10;
             break;
             
         case SB_PAGEUP:
-            info.nPos+=info.nPage;
+            info.nPos-=info.nPage;
             break;
             
         case SB_PAGEDOWN:
-            info.nPos-=info.nPage;
+            info.nPos+=info.nPage;
             break;
             
         case SB_THUMBTRACK:
@@ -106,10 +107,12 @@ void ScrollBox::Scroll(int msg)
         default:
             return;
     }
+
+    // check new position is within scroll range
     if (info.nPos<info.nMin)
         info.nPos=info.nMin;
-    if (info.nPos>info.nMax)
-        info.nPos=info.nMax;
+    else if (info.nPos>(info.nMax-info.nPage))
+        info.nPos=info.nMax-info.nPage;
     
     if (info.nPos!=prevPos)
     {
@@ -120,7 +123,7 @@ void ScrollBox::Scroll(int msg)
     
         // scroll window
         GetClientRect(GetHandle(),&rect);
-        amount=prevPos-info.nPos;
+        amount=(prevPos-info.nPos);        
         Console::write("amount=");
         Console::write(amount);
         Console::write(" prevPos=");

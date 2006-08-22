@@ -150,10 +150,6 @@ void ImageWindow::scrollImageX(int scrollMsg)
     else if (info.nPos>(info.nMax-info.nPage))
         info.nPos=info.nMax-info.nPage;
 
-    Console::write("xpos=");
-    Console::write(info.nPos);
-    Console::write("\n");
-
     // update scroll position
     info.fMask=SIF_POS;
     SetScrollInfo(GetHandle(),SB_HORZ,&info,true);
