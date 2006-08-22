@@ -13,7 +13,6 @@ Window::Window()
     hInstance=NULL;
 }
 
-
 void ErrorExit(LPTSTR lpszFunction) 
 { 
     LPVOID lpMsgBuf;
@@ -58,6 +57,7 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
         #endif
         // attempt to register class (incase not already registered)
         WNDCLASSEX wincl;
+        HBRUSH hbrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
         wincl.cbSize=sizeof(wincl);
         wincl.style = CS_DBLCLKS;
         wincl.lpfnWndProc=&WindowProcedure;        
@@ -66,7 +66,7 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
         wincl.hInstance=hInstance;
         wincl.hIcon = LoadIcon(NULL, IDI_APPLICATION);
         wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
-        wincl.hbrBackground = (HBRUSH) GetStockObject(LTGRAY_BRUSH); //GetSysColor(COLOR_3DFACE);
+        wincl.hbrBackground = (HBRUSH) hbrush; //GetStockObject(LTGRAY_BRUSH);
         wincl.lpszMenuName = NULL;
         wincl.lpszClassName=lpClassName;
         wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
@@ -77,6 +77,8 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
             Console::write("Window::CreateWin RegisterClassEx failed\n");            
             return false;  //(may fail if already registered)
         }
+
+        //DeleteObject(hbrush);
         
         // re-try creating window
         hwindow=CreateWindowEx(dwExStyle,lpClassName,lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,hMenu,hInstance,this);

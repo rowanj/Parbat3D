@@ -2,7 +2,6 @@
 #include "main.h"
 #include "Window.h"
 #include "ScrollBox.h"
-#include "Console.h"
 
 /* create scrollable window as a child of another window, with rect set to top-left & bottom-right corners of parent window */
 int ScrollBox::Create(HWND parentHandle,RECT *rect)
@@ -124,15 +123,6 @@ void ScrollBox::Scroll(int msg)
         // scroll window
         GetClientRect(GetHandle(),&rect);
         amount=(prevPos-info.nPos);        
-        Console::write("amount=");
-        Console::write(amount);
-        Console::write(" prevPos=");
-        Console::write(prevPos);        
-        Console::write(" info.nPos=");
-        Console::write(info.nPos);        
-        Console::write(" info.nMax=");
-        Console::write(info.nMax);        
-        Console::write("\n");
         ScrollWindowEx(GetHandle(),0,amount,NULL,NULL,NULL,&rect,SW_ERASE|SW_INVALIDATE|SW_SCROLLCHILDREN);
 
         //InvalidateRect(hToolWindowCurrentTabContainer,&rect,true);
