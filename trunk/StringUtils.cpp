@@ -1,5 +1,8 @@
 #include "StringUtils.h"
 
+#include <sstream>
+
+
 const char* makeMessage(std::string leader, double input)
 {
 	std::string sinput;
@@ -150,4 +153,21 @@ char* copyString(const char *oldstr)
     newstr=new char[str_length+1];
     strcpy(newstr,(char*)oldstr);
     return newstr;
+}
+
+
+int stringToInt (std::string str) {
+    int v;
+    stringstream ss;
+    ss << str;
+    ss >> v;
+    return v;
+}
+
+int stringToInt (char* str) {
+    int v;
+    stringstream ss;
+    ss << str;
+    ss >> v;
+    return v;
 }

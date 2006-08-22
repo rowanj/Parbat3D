@@ -39,4 +39,7 @@ const char* inttocstring(int input);
 const char* floattocstring(float input);
 char* copyString(const char *oldstr);
 
+int stringToInt (std::string);
+int stringToInt (char*);
+
 #endif

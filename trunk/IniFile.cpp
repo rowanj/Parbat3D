@@ -176,7 +176,7 @@ void iniFile::update (string section, string key, string data) {
         } else {
             ofstream filePtr (fileName.c_str(), ios::app);   // open the file, data is appended to it
             if (filePtr.is_open()) {
-                filePtr << "\n[" << section << ']' << '\n';  // add the new section to the file
+                filePtr << "[" << section << ']' << '\n';  // add the new section to the file
                 filePtr << key << '=' << data << '\n';       // add the new data to the file
                 filePtr.close();                             // close the file
             }
@@ -239,6 +239,55 @@ int iniFile::sectionStartsAt (string section) {
     
     if (exists) return lineAt;
     else return -1;
+}
+
+
+bool iniFile::sectionExists(string section) {
+    return (sectionStartsAt(section)>0);
+}
+
+
+void iniFile::removeSection(string section) {
+    removeSection(section, false);
+}
+
+void iniFile::removeSection(string section, bool keepTitle) {
+    string sectionLabel ('[' + section + ']');
+    string line;
+    int phase = 0;
+    
+    ifstream filePtrI (fileName.c_str());     // open the original file for reading
+    ofstream filePtrO (".temp", ios::trunc);  // create temp file, erase contents if any
+    
+    if (filePtrI.is_open() && filePtrO.is_open()) {
+        while (!filePtrI.eof()) {
+            getline(filePtrI, line);
+            
+            // enter the section to remove
+            if (phase==0 && line==sectionLabel) {
+                phase = 1;
+                if (keepTitle) filePtrO << line << '\n';
+                
+            // while inside the section
+            } else if (phase==1) {
+                // if the end of the section is reached
+                if (line[0]=='[') {
+                    phase = 2;
+                    filePtrO << line << '\n';
+                }
+                
+            // before and after the section
+            } else
+                filePtrO << line << '\n';
+        }
+            
+        filePtrI.close();  // close the reading file
+        filePtrO.close();  // close the writing file
+        
+        // replace the original file with the updated temp one
+        remove(fileName.c_str());
+        rename(".temp", fileName.c_str());
+    }
 }
 
 

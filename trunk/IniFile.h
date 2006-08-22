@@ -27,7 +27,7 @@ class iniFile {
         
         
         /**
-            Returns the line number of where the section starts in the file
+            Returns the line number of where the section starts in the file.
         */
         int sectionStartsAt (string section);
         
@@ -35,16 +35,11 @@ class iniFile {
     public:
         /**
             Stores the filename to be used in future calls.
-            This was hopefully going to open the file once so it didn't have to
-            be opened again in each of the other calls but I could not get it to
-            work. - Matt
         */
         void open (string);
         
         /**
             Deletes the filename so file calls cannot complete.
-            If open() worked correctly, this call would have closed the file as
-            well as deleting the filename. - Matt
         */
         void close ();
 
@@ -59,8 +54,6 @@ class iniFile {
         /**
             Returns the value of the specified key in the file. If the key does
             not exist, then an empty string is returned.
-            If open() worked correctly, if read occured after parse then the
-            file would not have to be searched again. - Matt
         */
         string read (string, string);
         
@@ -75,6 +68,27 @@ class iniFile {
             Returns the name of the file that is being used.
         */
         string getFileName ();
+        
+        
+        /**
+            Returns true if the section exists in the file.
+        */
+        bool sectionExists (string);
+        
+        
+        /**
+            Removes the entire section (and all its data) from the file.
+        */
+        void removeSection (string);
+        
+        /**
+            Removes the section data from the file but lets the user specify if
+            the section title is kept. If the second argument is true then the
+            section title is kept, but if it is false it is removed. This
+            allows the position of the section to be kept in the file if all
+            the data is being replaced.
+        */
+        void removeSection(string, bool);
 };
 
 #endif
