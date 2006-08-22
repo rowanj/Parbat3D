@@ -216,8 +216,8 @@ void ImageWindow::zoomImage(int nlevels)
     Console::write("\n");
     zoom=image_handler->get_image_viewport()->get_zoom_level();
     zoom+=nlevels/100.0;
-    if (zoom>1.0)
-        zoom=1.0;
+    if (zoom>2.0)
+        zoom=2.0;
     else if (zoom<0.05)
         zoom=0.05;
     image_handler->get_image_viewport()->set_zoom_level(zoom);

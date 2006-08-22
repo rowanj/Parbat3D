@@ -1,5 +1,8 @@
 #include "ImageGL.h"
 #include <stdlib.h>
+#include <cassert>
+#include "console.h"
+#include "config.h"
 
 ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* image_viewport_param)
 {
@@ -9,29 +12,30 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	image_properties = image_file->getImageProperties();
 	
 	viewport = image_viewport_param;
-	viewport->register_listener(this);
 	viewport->get_display_bands(&band_red, &band_green, &band_blue);
 	
 	image_height = image_properties->getHeight();
 	image_width = image_properties->getWidth();
-	viewport_x = 0;
-	viewport_y = 0;
-	viewport_width = 100;
-	viewport_height = 100;
-		
+	tileset = NULL;
+	LOD = -1; // local special value for un-initialized
+	cache_size = 128; // 128MB cache
+	textures = new GLuint[4];
+	
 	/* Initialize OpenGL*/
 	gl_image = new GLView(window_hwnd);
 
 	/* Initialize OpenGL machine */
     gl_image->make_current();
+    assert(glGetError() == GL_NO_ERROR);
+	glGenTextures(4, textures);
+
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
-    
+
     /* Use larger texture if appropriate */
     GLint max_texture_size;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
 	texture_size = (((max_texture_size)<(512))?(max_texture_size):(512));
-
 
 	gl_image->GLresize();
 
@@ -43,42 +47,31 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 		{
 			glTexCoord2i(0, 0);
 			glVertex2i(0, 0);
-			glTexCoord2i(1, 0);
-			glVertex2i(1, 0);
-			glTexCoord2i(1, 1);
-			glVertex2i(1, 1);
 			glTexCoord2i(0, 1);
-			glVertex2i(0, 1);
+			glVertex2i(0, texture_size);
+			glTexCoord2i(1, 1);
+			glVertex2i(texture_size, texture_size);
+			glTexCoord2i(1, 0);
+			glVertex2i(texture_size, 0);
 		}
 		glEnd();
 	}
 	glEndList();
 
 
-	/* Set up view transform */
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	/* glOrtho(Left, Right, Bottom, Top, Near-clip, Far-clip) */
-#if FALSE
-	/* Orthagonal projection, clamped to 1 unit, top-left origin,
-		all visible co-ordinates positive */
-	glOrtho(0.0, 1.0, 1.0, 0.0, 1.0, -1.0);
-#else
-	/* Show one more unit on all sides for debugging */
-	glOrtho(-1.0, 2.0, 2.0, -1.0, 1.0, -1.0);
-#endif
-
-	/* Set up initial model transform */
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	/* Test that we haven't already messed up... */
+	assert(glGetError() == GL_NO_ERROR);
 
 	/* Initial viewport size */
 	resize_window();
+	/* Start listening for events */
+	viewport->register_listener(this);
 }
 
 
 ImageGL::~ImageGL()
 {
+	delete[] textures;
 	delete gl_image;
 	delete tileset;
 }
@@ -87,66 +80,44 @@ ImageGL::~ImageGL()
 /* Re-draw our window */
 void ImageGL::notify_viewport(void)
 {
-#if FALSE
+	#if DEBUG_GL
+	Console::write("(II) ImageGL::notify_viewport()\n");
+	#endif
+
 	gl_image->make_current();
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_PROJECTION);
- 
-    glLoadIdentity();
-   	glOrtho(viewport_x, viewport_x + viewport_width,
-	   		-(viewport_y + viewport_height),-viewport_y,
-			0.1, 10.0);
-    glMatrixMode(GL_MODELVIEW);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	/* Set up view transform */
-	gluLookAt(0.0,0.0,(1.0/tan(PI/6.0)),0.0,0.0,0.0,0.0,1.0,0.0);
+	glOrtho(viewport->get_zoom_x(),viewport->get_zoom_x()+viewport->get_viewport_width(),
+			viewport->get_zoom_y()+viewport->get_viewport_height(),viewport->get_zoom_y(),
+			1.0,-1.0);
+		
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	
 
-	/* Draw all valid textures */
-	glTranslatef((GLfloat)texture_size * (GLfloat)start_column,
-				 -(GLfloat)texture_size * (GLfloat)start_row, 0.0);
-	for (tile_y = 0; tile_y < viewport_rows; tile_y++) {
-		glPushMatrix();
-		for (tile_x = 0; tile_x < viewport_columns; tile_x++) {
-			tile_id = tile_x + (tile_y * viewport_columns);
-			if ((tile_id < tex_base_size) &&
-					((tile_x + start_column) < image_columns) &&
-					((tile_y + start_row) < image_rows)) {
-				glBindTexture(GL_TEXTURE_2D, tex_base[tile_id]);
-				glCallList(list_tile);
-				glTranslatef((GLfloat)texture_size, 0.0, 0.0);
-			}
-		}
-		glPopMatrix();
-		glTranslatef(0.0, -(GLfloat)texture_size, 0.0);
+	/* Statically top-left four tiles */
+#if TRUE
+	glMatrixMode(GL_MODELVIEW);
+	for (short x = 0; x < 4; x++) {
+		glLoadIdentity();
+		assert(glIsTexture(textures[x]) == GL_TRUE);
+		glBindTexture(GL_TEXTURE_2D, textures[x]);
+		assert(glGetError() == GL_NO_ERROR);
+		glTranslatef((GLfloat)((x%2)*texture_size), (GLfloat)((x/2)*texture_size), 0.0);
+		glCallList(list_tile);
 	}
-
-	/* Statically draw first four tiles */
-	if (tex_base_size) {
-	glBindTexture(GL_TEXTURE_2D, tex_base[0]);
-	glCallList(list_tile);
-	glTranslatef((GLfloat)texture_size, 0.0, 0.0);
-	glBindTexture(GL_TEXTURE_2D, tex_base[1]);
-	glCallList(list_tile);
-	glTranslatef(-(GLfloat)texture_size, -(GLfloat)texture_size, 0.0);
-	glBindTexture(GL_TEXTURE_2D, tex_base[2]);
-	glCallList(list_tile);
-	glTranslatef((GLfloat)texture_size, 0.0, 0.0);
-	glBindTexture(GL_TEXTURE_2D, tex_base[3]);
-	glCallList(list_tile);
-	}
-	glDisable(GL_TEXTURE_2D);
 #endif
-	
+	glDisable(GL_TEXTURE_2D);
 	gl_image->GLswap();
 }
 
 
 void ImageGL::notify_bands()
 {
+	#if DEBUG_GL
+	Console::write("(II) ImageGL::notify_bands()\n");
+	#endif
 	viewport->get_display_bands(&band_red, &band_green, &band_blue);
 	make_texture();
 	notify_viewport();
@@ -154,61 +125,78 @@ void ImageGL::notify_bands()
 
 void ImageGL::make_texture(void)
 {
-#if FALSE
-//	tileset = new ImageTileSet(0, image_file, texture_size, 0);
-//	LOD_height = tileset->get_LOD_height();
-//	LOD_width = tileset->get_LOD_width();	unsigned int tmp_id;
-	int tx, ty;
-	char *tmp_tex;
-	
-	Console::write("(II) ImageHandler::Making image textures - LOD=");
-	Console::write(LOD);
-	Console::write("\n");
-	
-	/* !! remove duplicates of this */
-	if (!image_tileset) {
-		image_tileset = new ImageTileSet(LOD, image_file, texture_size, 96 * 1024 * 1024);
-		image_columns = image_tileset->get_columns();
-		image_rows = image_tileset->get_rows();
+	#if DEBUG_GL
+	Console::write("(II) ImageGL::make_texture()\n");
+	#endif
+	/* Find necessary tileset LOD */
+	float tmp_zoom = 1.0;
+	int needed_LOD = 0;
+	while (tmp_zoom >= viewport->get_zoom_level()) {
+		tmp_zoom = tmp_zoom/2.0;
+		needed_LOD++;
 	}
 	
-	if (image_tileset->get_LOD() != LOD) {
-		delete image_tileset;
-		image_tileset = new ImageTileSet(LOD, image_file, texture_size, 96 * 1024 * 1024);
-		image_columns = image_tileset->get_columns();
-		image_rows = image_tileset->get_rows();
+	/* Find needed grid of textures */
+	
+	/* Use current if available and correct */
+	if (needed_LOD == LOD) {
+		/* free any un-used textures */
+		return;
+	} else {
+		#if DEBUG_GL
+		Console::write("(II) ImageGL changing to LOD ");
+		Console::write(needed_LOD);
+		Console::write("\n");
+		#endif
+		/* Else (re-)create tileset and free all textures */
+		if(tileset != NULL) delete tileset;
+		LOD = needed_LOD;
+		tileset = new ImageTileSet(LOD, image_file, texture_size, cache_size);
 	}
-		
-	tile_size = image_tileset->get_tile_size();
-	tex_count = viewport_columns * viewport_rows;
+	
+	assert(tileset != NULL);
+	char* tex_data;
 	gl_image->make_current();
-
-	/* If textures were allocated, delete them */
-	if (tex_base_size) {
-		glDeleteTextures(tex_base_size, tex_base);
-		delete[] tex_base;
-	}
-
-	tex_base = new GLuint[tex_count];
-	glGenTextures(tex_count, tex_base);
-	tex_base_size = tex_count;
-
-	for (ty = 0; ty < viewport_rows; ty++){
-		for (tx = 0; tx < viewport_columns; tx++) {
-			tmp_id = (ty * viewport_columns) + tx;
-			if (((tx+start_column) < image_columns) && ((ty+start_row) < image_rows)) {
-				tmp_tex = image_tileset->get_tile_RGB(tile_size * (tx + start_column), tile_size * (ty+start_row), band_red, band_green, band_blue);
-				glBindTexture(GL_TEXTURE_2D, tex_base[tmp_id]);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tmp_tex);
-				delete[] tmp_tex;
-			}
+	int tile_x, tile_y;
+	for (short x = 0; x < 4; x++) {
+		if (x == 0) {
+			tile_x = 0;
+			tile_y = 0;
 		}
+		if (x == 1) {
+			tile_x = texture_size*2;
+			tile_y = 0;
+		}
+		if (x == 2) {
+			tile_x = 0;
+			tile_y = texture_size*2;
+		}
+		if (x == 3) {
+			tile_x = texture_size*2;
+			tile_y = texture_size*2;
+		}
+		tex_data = tileset->get_tile_RGB(tile_x,tile_y,1,2,3);
+		glBindTexture(GL_TEXTURE_2D, textures[x]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
+		delete[] tex_data;
+		assert(glIsTexture(textures[x]) == GL_TRUE);
 	}
-#endif
+
+	/* free un-used textures */
+	/* for each needed texture */
+		/* check for video mem space */
+		/* load tile data */
+		/* create texture */
+		/* free tile data */
+		/* store info */
+		
+		
+	/* Have we messed up? */
+	assert(glGetError() == GL_NO_ERROR);
 }
 
 void ImageGL::resize_window(void)
