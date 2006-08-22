@@ -32,23 +32,32 @@ int ToolTab::Create(HWND parent,RECT *parentRect)
     testwin.Create();
     RECT rect;		
     GetClientRect(testwin.GetHandle(),&rect);
-    scrollBox.Create(&rect,testwin.GetHandle());
+    rect.top+=10;
+    rect.left+=10;
+    rect.right-=20;
+    rect.bottom-=20;
+    scrollBox.Create(testwin.GetHandle(),&rect);
 
 	// create static control for heading
     HWND testStatic =CreateWindowEx( 0, szStaticControl, "some text", 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
 		rect.bottom-10, 100, 50, scrollBox.GetHandle(), NULL,
 		GetAppInstance(), NULL);    
-    HWND hwndEdit = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT",      // predefined class 
-                                    NULL,        // no window title 
-                                    WS_CHILD | WS_VISIBLE | WS_VSCROLL | 
-                                    ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | WS_BORDER, 
-                                    10, 10, 100, 50,  // set size in WM_SIZE message 
+  HWND    hwndEdit = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT",      // predefined class 
+                                    0,        // no window title 
+                                    WS_CHILD | WS_VISIBLE | 
+                                    ES_LEFT | ES_AUTOHSCROLL, 
+                                    10, 10, 300, 20,  // set size in WM_SIZE message 
                                     scrollBox.GetHandle(),        // parent window 
                                     (HMENU) 8,   // edit control ID 
-                                    Window::GetAppInstance(), 
-                                    NULL);       // pointer not needed 	
-    SetFocus(hwndEdit);	
+                                    (HINSTANCE) hThisInstance, 
+                                    NULL);       // pointer not needed 
+ 
+            // Add text to the window. 
+            SendMessage(hwndEdit, WM_SETTEXT, 0, (LPARAM) "hello?"); 
+    EnableWindow(hwndEdit,true);
+    SetFocus(hwndEdit);
+    SendMessage(hwndEdit,WM_CHAR,'s',0);
     scrollBox.Hide();
     scrollBox.Show();
     /* end of scroll box / edit control testing code */    

@@ -5,49 +5,136 @@
 #include "Console.h"
 
 /* create scrollable window as a child of another window, with rect set to top-left & bottom-right corners of parent window */
-int ScrollBox::Create(RECT *rect,HWND parentHandle)
+int ScrollBox::Create(HWND parentHandle,RECT *rect)
 {
     /* Create main window */
-    if (!CreateWin(0, "parbat3d scrollable win class", "Parbat3D",
-		WS_CHILD | WS_VSCROLL | WS_CLIPSIBLINGS, rect->top, rect->left, rect->right, rect->bottom,
+    if (!CreateWin(WS_EX_CLIENTEDGE, "parbat3d scrollable win class", "Parbat3D",
+		 WS_CHILD | WS_VSCROLL | WS_CLIPSIBLINGS, rect->top, rect->left, rect->right, rect->bottom,
 		parentHandle, NULL))
         return false;
+
     prevProc=SetWindowProcedure(&ScrollBox::WindowProcedure);
     Show();
     return true;
 }
 
+
+BOOL CALLBACK ScrollBox::GetMaxScrollHeight(HWND hwnd, LPARAM lparam)
+{
+    RECT rect;
+    int height;
+    int cb;
+    
+    ScrollBox *sbox=(ScrollBox*)lparam;
+    GetWindowRect(hwnd,&rect);
+    cb=rect.bottom;
+    
+    GetWindowRect(sbox->GetHandle(),&rect);
+    
+    height=cb-rect.top;
+    if (height > sbox->maxScrollHeight)
+        sbox->maxScrollHeight=height;
+    return true;
+}
+
+// re-calculate amount of content that needs to be scrolled & update scrollbars
 void ScrollBox::UpdateScrollBar()
 {
-    RECT rwscrollbox,rcscrollbox;
+    RECT rcscrollbox;
     SCROLLINFO info;    
+
+    /* get height of content within scroll box */
+    maxScrollHeight=0;
+    EnumChildWindows(GetHandle(),&GetMaxScrollHeight,(LPARAM)this);
    
     /* get position of current container & scrollbar */
-    GetWindowRect(GetHandle(),&rwscrollbox);
     GetClientRect(GetHandle(),&rcscrollbox);    
 
-    /* set height of visible scroll area */   
-    info.nPage=100;
+    /* set scroll amount per unit of scroll position */   
+    info.nPage=1;
     
     /* set scroll range */
     info.nMin=0;
-    info.nMax=100;
+    info.nMax=maxScrollHeight-rcscrollbox.bottom+1;
     
     /* set scroll position */
     info.nPos=0;
-    
-    Console::write("ScrollBox::UpdateScrollBar()\n");
-    Console::write("  wrect= ");
-    Console::writeRECT((uint*)&rwscrollbox);
-    Console::write("\n");
-    Console::write("  crect= ");
-    Console::writeRECT((uint*)&rcscrollbox);
-    Console::write("\n");    
-       
+    info.nTrackPos=0;
+           
     /* set scrollbar info */
     info.cbSize=sizeof(SCROLLINFO);
     info.fMask=SIF_ALL;
     SetScrollInfo(GetHandle(),SB_VERT,&info,true);     
+}
+
+/* scroll the window */
+void ScrollBox::Scroll(int msg)
+{
+    SCROLLINFO info;
+    RECT rect;
+    int prevPos;
+    int amount;
+    
+    /* get scroll bar settings */
+    info.cbSize=sizeof(SCROLLINFO);
+    info.fMask=SIF_POS|SIF_RANGE|SIF_TRACKPOS|SIF_PAGE;
+    GetScrollInfo(GetHandle(),SB_VERT,&info);
+    prevPos=info.nPos;
+
+    /* calculate new scroll bar position */
+    switch (LOWORD(msg))
+    {
+        case SB_LINEUP:
+            info.nPos--;
+            break;
+            
+        case SB_LINEDOWN:
+            info.nPos++;
+            break;
+            
+        case SB_PAGEUP:
+            info.nPos+=info.nPage;
+            break;
+            
+        case SB_PAGEDOWN:
+            info.nPos-=info.nPage;
+            break;
+            
+        case SB_THUMBTRACK:
+            info.nPos=info.nTrackPos;
+            break;
+        default:
+            return;
+    }
+    if (info.nPos<info.nMin)
+        info.nPos=info.nMin;
+    if (info.nPos>info.nMax)
+        info.nPos=info.nMax;
+    
+    if (info.nPos!=prevPos)
+    {
+    
+        // update scroll bar settings    
+        info.fMask=SIF_POS;
+        SetScrollInfo(GetHandle(),SB_VERT,&info,true);
+    
+        // scroll window
+        GetClientRect(GetHandle(),&rect);
+        amount=prevPos-info.nPos;
+        Console::write("amount=");
+        Console::write(amount);
+        Console::write(" prevPos=");
+        Console::write(prevPos);        
+        Console::write(" info.nPos=");
+        Console::write(info.nPos);        
+        Console::write(" info.nMax=");
+        Console::write(info.nMax);        
+        Console::write("\n");
+        ScrollWindowEx(GetHandle(),0,amount,NULL,NULL,NULL,&rect,SW_ERASE|SW_INVALIDATE|SW_SCROLLCHILDREN);
+
+        //InvalidateRect(hToolWindowCurrentTabContainer,&rect,true);
+        UpdateWindow(GetHandle());
+    }
 }
 
 /* handle events related to the main window */
@@ -61,7 +148,7 @@ LRESULT CALLBACK ScrollBox::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             win->UpdateScrollBar();
             break;
         case WM_VSCROLL:
-            
+            win->Scroll(wParam);
             return 0;
     }
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    

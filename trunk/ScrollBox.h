@@ -7,11 +7,17 @@ class ScrollBox:public Window
 {
     private:
     WNDPROC prevProc;
+
     protected:
-    void UpdateScrollBar();
+    int maxScrollHeight;
+
+    static BOOL CALLBACK ScrollBox::GetMaxScrollHeight(HWND hwnd, LPARAM lparam);
+    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);    
+    void Scroll(int msg);
+
     public:
-    int Create(RECT *rect,HWND parentHandle);
-    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+    int Create(HWND parentHandle,RECT *rect);    // create scroll box: rect=co-cordinates of new box on parent window
+    void UpdateScrollBar();                      // re-calculate amount of content that needs to be scrolled & update scrollbars
 };
 
 
