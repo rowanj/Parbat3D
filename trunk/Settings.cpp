@@ -43,4 +43,3 @@ void settings::setSetting (string section, string key, int data) {
     
     openFile.update(section, key, d);
 }
-

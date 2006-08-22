@@ -2,6 +2,9 @@
 #include "main.h"
 #include "Window.h"
 #include "PrefsWindow.h"
+#include "Settings.h"
+#include <string>
+#include <cstring>
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Prefs Window Functions */
@@ -12,17 +15,30 @@ int PrefsWindow::Create(HWND parent)
 {
     RECT rect;
     int mx,my;
-    const int PREFS_WINDOW_WIDTH=250;
-    const int PREFS_WINDOW_HEIGHT=300;
-
-    /* Get Main Window Location for ROI window alignment*/
+    const int PREFS_WINDOW_WIDTH=400;
+    const int PREFS_WINDOW_HEIGHT=500;
+   
+    /* Get Overview Window Location for Prefs window alignment*/
     GetWindowRect(overviewWindow.GetHandle(),&rect);
 
     /* create ROI window */
     if (!CreateWin(0, "Parbat3D Prefs Window", "Preferences",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION,
-	     rect.left, rect.bottom+30, 250, 300, parent, NULL))
+	     rect.left+50, rect.bottom-150, PREFS_WINDOW_WIDTH, PREFS_WINDOW_HEIGHT, parent, NULL))
 	    return false;
+
+	HBRUSH backBrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
+    SetBackgroundBrush(backBrush);
+
+    HWND cacheLabel =CreateWindowEx( 0, szStaticControl, "Cache size (MB):", 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 3,
+		3, 120, 17, GetHandle(), NULL,
+		GetAppInstance(), NULL);
+
+	HWND cacheEntry =CreateWindowEx( 0, "EDIT", (settingsFile->getSetting("preferences", "cachesize")).c_str(), 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | ES_MULTILINE, 125,
+		3, 40, 17, GetHandle(), NULL,
+		GetAppInstance(), NULL);
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
 
