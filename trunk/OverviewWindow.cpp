@@ -8,6 +8,7 @@
 #include "MainWindow.h"
 #include "console.h"
 #include "ROIWindow.h"
+#include "PrefsWindow.h"
 
 
 // Used for accessing the help folder
@@ -133,6 +134,13 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                         roiWindow.Show();
                     else
                         roiWindow.Hide();
+                    return 0;
+                    
+                case IDM_PREFSWINDOW:
+                    if (win->toggleMenuItemTick(win->hMainMenu,IDM_PREFSWINDOW))
+                        prefsWindow.Show();
+                    else
+                        prefsWindow.Hide();
                     return 0;
 
                 case IDM_HELPCONTENTS:

@@ -9,6 +9,7 @@
 #define IDM_IMAGEWINDOW     210
 #define IDM_TOOLSWINDOW     211
 #define IDM_ROIWINDOW       212
+#define IDM_PREFSWINDOW		213
 
 #define IDM_HELPCONTENTS    215
 #define IDM_HELPABOUT       218

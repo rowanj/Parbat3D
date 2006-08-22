@@ -28,12 +28,13 @@ int MainWindow::Create()
 /* handle events related to the main window */
 LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static WINDOWPLACEMENT imageWindowPlacement;        // recorded state of image window when minimised
-    static WINDOWPLACEMENT toolWindowPlacement;         // recorded state of tool window when minimised
-    static WINDOWPLACEMENT roiWindowPlacement;         // recorded state of roi window when minimised
+  //  static WINDOWPLACEMENT imageWindowPlacement;        // recorded state of image window when minimised
+ //   static WINDOWPLACEMENT toolWindowPlacement;         // recorded state of tool window when minimised
+//    static WINDOWPLACEMENT roiWindowPlacement;         // recorded state of roi window when minimised
     static int imageWindowState=0;                      // recorded visibility state of image window
     static int toolWindowState=0;                       // recorded visibility state of tool window
     static int roiWindowState=0;                       // recorded visibility state of tool window
+    static int prefsWindowState=0;						// recorded visibility state of prefs window
     
     
     MainWindow* win=(MainWindow*)Window::GetWindowObject(hwnd);
@@ -52,7 +53,9 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
                     if (toolWindowState!=0)
                         ShowWindow(toolWindow.GetHandle(),toolWindowState);
                     if (roiWindowState!=0)
-                        ShowWindow(roiWindow.GetHandle(),roiWindowState);    
+                        ShowWindow(roiWindow.GetHandle(),roiWindowState);
+					if (prefsWindowState !=0)
+						ShowWindow(prefsWindow.GetHandle(),prefsWindowState);    
                         
                     ShowWindow(overviewWindow.GetHandle(),SW_SHOW);
                     return 0;
@@ -95,13 +98,26 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
                         roiWindowState=0;
                     }
                     
+                    if (prefsWindow.GetHandle()!=NULL)
+                    {
+                        if (!IsWindowVisible(prefsWindow.GetHandle()))
+                            prefsWindowState=0;
+                        else
+                            prefsWindowState=SW_SHOW;                        
+                    }
+                    else
+                    {
+                        prefsWindowState=0;
+                    }
+                    
 
                     /* hide the child windows */     
                     ShowWindow(imageWindow.GetHandle(),SW_HIDE);            
                     ShowWindow(toolWindow.GetHandle(),SW_HIDE);                    
                     ShowWindow(overviewWindow.GetHandle(),SW_HIDE);
                     ShowWindow(roiWindow.GetHandle(),SW_HIDE);
-                    return 0;
+                    ShowWindow(prefsWindow.GetHandle(), SW_HIDE);
+					return 0;
 		    }    
   	       return 0;
        

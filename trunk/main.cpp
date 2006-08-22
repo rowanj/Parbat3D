@@ -20,6 +20,7 @@
 #include "ToolWindow.h"
 #include "DisplayWindow.h"
 #include "ROIWindow.h"
+#include "PrefsWindow.h"
 
 #include "RoI.h"
 
@@ -40,6 +41,7 @@ ToolWindow toolWindow;
 OverviewWindow overviewWindow;
 ImageWindow imageWindow;
 ROIWindow roiWindow;
+PrefsWindow prefsWindow;
 
 char *filename=NULL;                    // currently open image filename
 
@@ -118,7 +120,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Setup main & image windows */
     //  note: image window must be created before overview window
 
-    if ((!imageWindow.Create(mainWindow.GetHandle())) || (!overviewWindow.Create(imageWindow.GetHandle())))
+    if ((!imageWindow.Create(mainWindow.GetHandle())) || (!overviewWindow.Create(imageWindow.GetHandle())) || (!prefsWindow.Create(imageWindow.GetHandle())))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
