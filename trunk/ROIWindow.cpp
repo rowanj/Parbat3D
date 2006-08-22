@@ -31,25 +31,68 @@ int ROIWindow::Create(HWND parent)
 	    
     prevProc=SetWindowProcedure(&WindowProcedure);
 	
-    roiScrollbox =CreateWindowEx( 0, szStaticControl, NULL, 
-		WS_VSCROLL | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0,
-		0, 243, 230, GetHandle(), NULL,
+    hROIScrollbox =CreateWindowEx( 0, szStaticControl, NULL, 
+		WS_VSCROLL | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | WS_BORDER, 5,
+		5, 235, 220, GetHandle(), NULL,
 		Window::GetAppInstance(), NULL);
 
-		roiTick=new HWND[20];	
+		hROITick=new HWND[20];	
 
     for (int i=0; i<20; i++)  
     {
-		roiTick[i] =CreateWindowEx( 0, "BUTTON", "ROI name", 
-		BS_CHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
-		10 + (20 * i), 100, 16, roiScrollbox, NULL,
+		hROITick[i] =CreateWindowEx( 0, "BUTTON", "ROI name", 
+		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
+		10 + (20 * i), 100, 16, hROIScrollbox, NULL,
 		Window::GetAppInstance(), NULL);
 	}
-		
-	roiToolBar =CreateWindowEx( 0, szStaticControl, "Buttons go here", 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0,
-		230, 250, 70, GetHandle(), NULL,
+	
+	//Create Open button
+	hOpenButton =CreateWindowEx( 0, "BUTTON", NULL, 
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 5,
+		230, 36, 36, GetHandle(), (HMENU) 1,
 		Window::GetAppInstance(), NULL);
+		
+	hOpenIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
+	SendMessage (hOpenButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "open.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
+	// this also works: SendMessage(openButton,BM_SETIMAGE,IMAGE_ICON,(LPARAM)hIcon);
+	
+	//Create Save button
+	hSaveButton =CreateWindowEx( 0, "BUTTON", NULL, 
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 45,
+		230, 36, 36, GetHandle(),  (HMENU) 2,
+		Window::GetAppInstance(), NULL);
+		
+	hSaveIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
+	SendMessage (hSaveButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "save.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
+	
+	//Create Polygon selection button
+	hPolyButton =CreateWindowEx( 0, "BUTTON", NULL, 
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 100,
+		230, 36, 36, GetHandle(),  (HMENU) 3,
+		Window::GetAppInstance(), NULL);
+		
+	hPolyIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
+	SendMessage (hPolyButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "poly.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
+	
+	//Create Rectangle selection button
+	hRectButton =CreateWindowEx( 0, "BUTTON", NULL, 
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 140,
+		230, 36, 36, GetHandle(),  (HMENU) 4,
+		Window::GetAppInstance(), NULL);
+		
+	hRectIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
+	SendMessage (hRectButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "rect.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
+	
+	//Create Trash button
+	hTrashButton =CreateWindowEx( 0, "BUTTON", NULL, 
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 200,
+		230, 36, 36, GetHandle(),  (HMENU) 5,
+		Window::GetAppInstance(), NULL);
+		
+	hTrashIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
+	SendMessage (hTrashButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "trash.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
+	
+
 	
 	return true;
 }
@@ -66,7 +109,38 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
     
     switch (message)                  /* handle the messages */
     {
-        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
+        case WM_COMMAND:
+			
+			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
+            {
+				MessageBox( hwnd, (LPSTR) "Open ROI",(LPSTR) "Action",
+					MB_ICONINFORMATION | MB_OK );
+            } 
+			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
+            {
+				MessageBox( hwnd, (LPSTR) "Save ROI",(LPSTR) "Action",
+					MB_ICONINFORMATION | MB_OK );
+            } 
+			if (LOWORD(wParam) == 3 && HIWORD(wParam) == BN_CLICKED)
+            {
+				MessageBox( hwnd, (LPSTR) "Create ROI Poly tool",(LPSTR) "Action",
+					MB_ICONINFORMATION | MB_OK );
+            } 
+			if (LOWORD(wParam) == 4 && HIWORD(wParam) == BN_CLICKED)
+            {
+				MessageBox( hwnd, (LPSTR) "Create ROI Rect tool",(LPSTR) "Action",
+					MB_ICONINFORMATION | MB_OK );
+            } 
+			if (LOWORD(wParam) == 5 && HIWORD(wParam) == BN_CLICKED)
+            {
+				MessageBox( hwnd, (LPSTR) "Delete it",(LPSTR) "Action",
+					MB_ICONINFORMATION | MB_OK );
+            } 
+			
+			break;
+		
+		
+		/* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
         case WM_NCLBUTTONDOWN:
 
             switch(wParam)
@@ -76,21 +150,7 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
                     /* get the mouse co-ords relative to the window */
                     SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&moveMouseOffset);               
                     break;
-
-                /* HTLEFT...HTBOTTOMRIGHT: mouse button was pressed down on the sizing border of window */  
-                /*case HTLEFT:
-                case HTRIGHT:
-                case HTTOP:
-                case HTBOTTOM:
-                case HTTOPLEFT:
-                case HTTOPRIGHT:
-                case HTBOTTOMLEFT:
-                case HTBOTTOMRIGHT:*/
-                    /* record current window & mouse positions */
-                 /*   GetWindowRect(hwnd,&sizeWindowPosition);
-                    sizeMousePosition.x=(int)(short)LOWORD(lParam);
-                    sizeMousePosition.y=(int)(short)HIWORD(lParam);        */           
-                    break;                   
+            
             }
 
             /* also let windows handle this event */
@@ -107,18 +167,6 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             SnappingWindow::snapWindowByMoving(overviewWindow.GetHandle(),(RECT*)lParam);
             SnappingWindow::snapWindowByMoving(toolWindow.GetHandle(),(RECT*)lParam);            
             break;
-    
-        /* WM_SIZING: the window size is about to change */
-        //case WM_SIZING:
-
-            /* set new window size based on position of mouse */
-            //SnappingWindow::setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
-
-            /* prevent window from being resized too small */
-            //if ( (((RECT*)lParam)->bottom) - (((RECT*)lParam)->top)  <100)
-            //    (((RECT*)lParam)->bottom) = (((RECT*)lParam)->top) + 100;
-            //if ( (((RECT*)lParam)->right) - (((RECT*)lParam)->left)  <100)
-             //   (((RECT*)lParam)->right) = (((RECT*)lParam)->left) + 100;
             
             /* snap the window to the edge of the desktop (if near it) */
             SnappingWindow::snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
@@ -127,18 +175,7 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             SnappingWindow::snapWindowBySizing(overviewWindow.GetHandle(),(RECT*)lParam,(int)wParam);           
             break;
 
-        /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            
-        case WM_SIZE:
-           
-            /* resize display/opengl window to fit new size */            
-            GetClientRect(hwnd,&rect);
-            //MoveWindow(win->roiWindowDisplay.GetHandle(),rect.left,rect.top,rect.right,rect.bottom,true);
-            
-            /* update scroll bar settings 
-            if (roi_handler)
-                win->updateROIScrollbar();
-            return 0;
-           */
+
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
             if (wParam)
@@ -146,9 +183,6 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             else
                 CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
-
-
-
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:

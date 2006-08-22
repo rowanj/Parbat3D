@@ -7,13 +7,24 @@ class ROIWindow:public Window
 {
     private:
     WNDPROC prevProc;
-    HWND roiScrollbox;
-    HWND *roiTick;
+    HWND hBG;
+    HWND hROIScrollbox;
+    HWND *hROITick;
     HWND roiToolBar;
     
+    HWND hOpenButton;
+    HICON hOpenIcon;
+    HWND hSaveButton;
+    HICON hSaveIcon;
+    HWND hPolyButton;
+    HICON hPolyIcon;
+    HWND hRectButton;
+    HICON hRectIcon;
+    HWND hTrashButton;
+    HICON hTrashIcon;
         
     public:
-    //DisplayWindow roiWindowDisplay;
+    
 
     int Create(HWND parent);
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
