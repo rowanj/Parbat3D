@@ -28,7 +28,7 @@ int ROIWindow::Create(HWND parent)
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION,
 	     rect.left, rect.bottom+30, 250, 300, parent, NULL))
 	    return false;
-
+	    
     prevProc=SetWindowProcedure(&WindowProcedure);
 	
     roiScrollbox =CreateWindowEx( 0, szStaticControl, NULL, 

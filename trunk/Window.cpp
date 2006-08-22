@@ -157,10 +157,6 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
     {   
         switch (message)
         {
-            case WM_CREATE:
-                /*win=(Window*)((CREATESTRUCT*)lParam)->lpCreateParams;
-                Window::SetWindowObject(hwnd,win);*/
-                break;
             case WM_CLOSE:
                 DestroyWindow(hwnd);
                 return 0;

@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <Commctrl.h>
 #include "Window.h"
+#include "ScrollBox.h"
 #include "ToolWindow.h"
 #include "main.h"
 #include "OverviewWindow.h"
@@ -9,7 +10,7 @@
 #include "SnappingWindow.h"
 
 #include "config.h"
-
+Window testwin;
 // create tool tab container
 int ToolTab::Create(HWND parent,RECT *parentRect)
 {
@@ -26,6 +27,31 @@ int ToolTab::Create(HWND parent,RECT *parentRect)
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
 		0, parentRect->right-SCROLLBAR_WIDTH, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
+
+    /* start of scroll box / edit control testing code */
+    testwin.Create();
+    RECT rect;		
+    GetClientRect(testwin.GetHandle(),&rect);
+    scrollBox.Create(&rect,testwin.GetHandle());
+
+	// create static control for heading
+    HWND testStatic =CreateWindowEx( 0, szStaticControl, "some text", 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
+		rect.bottom-10, 100, 50, scrollBox.GetHandle(), NULL,
+		GetAppInstance(), NULL);    
+    HWND hwndEdit = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT",      // predefined class 
+                                    NULL,        // no window title 
+                                    WS_CHILD | WS_VISIBLE | WS_VSCROLL | 
+                                    ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | WS_BORDER, 
+                                    10, 10, 100, 50,  // set size in WM_SIZE message 
+                                    scrollBox.GetHandle(),        // parent window 
+                                    (HMENU) 8,   // edit control ID 
+                                    Window::GetAppInstance(), 
+                                    NULL);       // pointer not needed 	
+    SetFocus(hwndEdit);	
+    scrollBox.Hide();
+    scrollBox.Show();
+    /* end of scroll box / edit control testing code */    
 	return true;
 }
 

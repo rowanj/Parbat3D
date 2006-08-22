@@ -5,6 +5,8 @@
 
 using namespace std;
 
+typedef unsigned int uint;
+
 class Console
 {
     private:
@@ -16,5 +18,8 @@ class Console
     static void write(char *msg);
     static void write(string *msg);
     static void write(int msg);
+    static void writeRECT(uint *rect);
 };
+
+
 #endif

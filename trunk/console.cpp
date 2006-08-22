@@ -51,6 +51,21 @@ void Console::write(string *msg)
     #endif
 }
 
+// write a RECT structure to console window
+void Console::writeRECT(uint *rect)
+{
+    #if TMP_USE_CONSOLE        
+    Console::write("top: ");
+    Console::write(rect[0]);
+    Console::write(" left: ");
+    Console::write(rect[1]);
+    Console::write(" right: ");
+    Console::write(rect[2]);
+    Console::write(" bottom: ");
+    Console::write(rect[3]);
+    #endif
+}
+
 // write integer to console window
 void Console::write(int msg)
 {

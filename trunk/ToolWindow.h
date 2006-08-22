@@ -1,11 +1,13 @@
 #ifndef _PARBAT_TOOLWINDOW_H
 #define _PARBAT_TOOLWINDOW_H
 
+#include "ScrollBox.h"
 
 class ToolTab:public Window
 {
     protected:
         WNDPROC prevProc;
+        ScrollBox scrollBox;
     public:
         HWND hHeading;        
         virtual int Create(HWND parent,RECT *parentRect);
