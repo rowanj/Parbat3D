@@ -24,7 +24,7 @@ extern ImageWindow imageWindow;
 extern OverviewWindow overviewWindow;
 extern ROIWindow roiWindow;
 extern PrefsWindow prefsWindow;
-enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID};
+enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID,FEATURE_TAB_ID};
 
 
 

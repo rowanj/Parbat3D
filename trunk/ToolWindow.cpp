@@ -12,6 +12,7 @@
 #include "DisplayTab.h"
 #include "QueryTab.h"
 #include "ImageTab.h"
+#include "FeatureTab.h"
 #include "config.h"
 
 
@@ -65,6 +66,11 @@ int ToolWindow::Create(HWND)
     tie.pszText="Image";
     tie.lParam=(DWORD)tie.pszText;    
     TabCtrl_InsertItem(hToolWindowTabControl, IMAGE_TAB_ID, &tie);
+    
+    tie.mask=TCIF_TEXT+TCIF_PARAM;;   
+    tie.pszText="Feature";
+    tie.lParam=(DWORD)tie.pszText;    
+    TabCtrl_InsertItem(hToolWindowTabControl, FEATURE_TAB_ID, &tie);
 
     /* get size of tab control's client area (the area inside the tab control) */
     GetClientRect(hToolWindowTabControl,&rect);   
@@ -85,6 +91,7 @@ int ToolWindow::Create(HWND)
     
     displayTab.Create(hToolWindowTabControl,&rect);
     queryTab.Create(hToolWindowTabControl,&rect);   
+    featureTab.Create(hToolWindowTabControl,&rect);   
            
 	/* Query tab container */
     /* hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "", 
@@ -367,6 +374,10 @@ void ToolWindow::showToolWindowTabContainer(int selectedTabId)
         case IMAGE_TAB_ID:
                 hToolWindowCurrentTabContainer=hToolWindowImageTabContainer;                
                 break;
+        case FEATURE_TAB_ID:
+                hToolWindowCurrentTabContainer=featureTab.GetHandle();              
+                break;
+                
     }       
 
     /* show new tab container window */

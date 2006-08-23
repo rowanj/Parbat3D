@@ -6,6 +6,7 @@
 #include "DisplayTab.h"
 #include "QueryTab.h"
 #include "ImageTab.h"
+#include "FeatureTab.h"
 
 
 
@@ -34,7 +35,8 @@ class ToolWindow:public Window
       public:
        DisplayTab displayTab;                
        QueryTab queryTab;     
-       ImageTab imageTab;                   
+       ImageTab imageTab; 
+       FeatureTab featureTab; 
        HFONT hBoldFont,hNormalFont,hHeadingFont;
        HBRUSH hTabBrush;
        HWND hToolWindowCurrentTabContainer;
