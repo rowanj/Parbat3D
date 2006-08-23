@@ -84,7 +84,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     GetModulePath();
     
     hThisInstance=hInstance;
-    Window::SetAppInstance(hInstance);
+    Window::Init(hInstance);
     
     string settings_path (catcstrings(modulePath, "\\settings.ini"));
     settingsFile = new settings(settings_path);

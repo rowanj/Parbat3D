@@ -27,6 +27,7 @@ int ToolTab::Create(HWND parent,RECT *parentRect)
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
 		0, parentRect->right-SCROLLBAR_WIDTH, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
+	SetStaticFont(hHeading,STATIC_FONT_HEADING);
 
     /* start of scroll box / edit control testing code */
     testwin.Create();
@@ -40,9 +41,10 @@ int ToolTab::Create(HWND parent,RECT *parentRect)
 
 	// create static control for heading
     HWND testStatic =CreateWindowEx( 0, szStaticControl, "some text", 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 10,
 		rect.bottom-10, 100, 50, scrollBox.GetHandle(), NULL,
 		GetAppInstance(), NULL);    
+	SetStaticFont(testStatic,STATIC_FONT_BOLD);
   HWND    hwndEdit = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT",      // predefined class 
                                     0,        // no window title 
                                     WS_CHILD | WS_VISIBLE | 
@@ -75,7 +77,7 @@ LRESULT CALLBACK ToolTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam
 	Console::write("\n");
 #endif
     switch (message) 
-    {
+    {/*
         case WM_DRAWITEM:
 			#if DEBUG_TOOLWINDOW
             Console::write("ToolTab::WindowProcedure WM_DRAWITEM: ");
@@ -90,7 +92,7 @@ LRESULT CALLBACK ToolTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam
                     toolWindow.drawStatic((DRAWITEMSTRUCT*)lParam,toolWindow.hBoldFont);                
                 else
                     toolWindow.drawStatic((DRAWITEMSTRUCT*)lParam,toolWindow.hNormalFont);
-            return 0;
+            return 0;*/
     }        
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam); 
 }
@@ -150,14 +152,15 @@ int DisplayTab::Create(HWND parent,RECT *parentRect)
                name = "NONE";
 
         // Display band name in tool window 
-		CreateWindowEx(0, szStaticControl, name,
+		HWND hstatic=CreateWindowEx(0, szStaticControl, name,
 			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 60, 40 + (20 * i), 100, 18,
 			GetHandle(), NULL, Window::GetAppInstance(), NULL);
+		SetStaticFont(hstatic,STATIC_FONT_NORMAL);
            
 		// Insert 'Update' button under radio buttons. Location based on band number 
 		hupdate =  CreateWindowEx(0, "BUTTON", "Update", WS_CHILD | WS_VISIBLE, 136,
 			50 + (20 * toolWindow.bands), 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
-
+    
 	}    
 	
 	if (toolWindow.bands == 1) {

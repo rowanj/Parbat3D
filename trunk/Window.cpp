@@ -13,6 +13,11 @@ Window::Window()
     hInstance=NULL;
 }
 
+void Window::Init(HINSTANCE hInst)
+{
+    hInstance=hInst;
+}
+
 void ErrorExit(LPTSTR lpszFunction) 
 { 
     LPVOID lpMsgBuf;
@@ -99,6 +104,14 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
     if (GetWindowObject(hwindow)!=this)
         Console::write("Window::CreateWin this object not set properly\n");
 
+    // create fonts
+    HDC hdc=GetDC(GetHandle());
+    hNormalFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
+    hBoldFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
+    hHeadingFont=CreateFont(-MulDiv(10, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma   
+    hBackgroundBrush=(HBRUSH)GetClassLong(hwindow,GCL_HBRBACKGROUND);
+    DeleteObject(hdc);
+
     // set window procedure
     prevWindowProcedure=NULL;
     stPrevWindowProcedure=NULL;
@@ -133,7 +146,11 @@ WNDPROC Window::SetWindowProcedure(WNDPROC newproc)
 void Window::SetWindowObject(HWND hwnd,Window* obj)
 {
     SetWindowLong(hwnd,GWL_USERDATA,(long)obj);
-    //todo: check for err
+}
+
+void Window::SetStaticFont(HWND hwnd,int font)
+{
+    SetWindowLong(hwnd,GWL_USERDATA,(long) font);
 }
 
 Window* Window::GetWindowObject(HWND hwnd)
@@ -151,6 +168,38 @@ Window* Window::GetWindowObject(HWND hwnd)
     return win;
 }
 
+// draw static text control in choosen font
+void Window::drawStatic(DRAWITEMSTRUCT *dis)
+{   
+    char str[255];
+    int len,x,y;
+    SIZE size;  
+    int font;
+
+    GetWindowText(dis->hwndItem,(LPSTR)str,(int)255);
+    len=strlen(str);
+
+    font=(int)GetWindowObject(dis->hwndItem);
+    HFONT hfont;
+    switch(font)
+    {
+        case STATIC_FONT_BOLD:
+            hfont=hBoldFont;
+            break;
+        case STATIC_FONT_HEADING:
+            hfont=hHeadingFont;
+            break;
+        default:
+            hfont=hNormalFont;
+    }
+    SelectObject(dis->hDC,hfont);
+    SetTextColor(dis->hDC,0);                                                                   // set text colour to black
+//    GetTextExtentPoint32(dis->hDC,str,len,&size);                                               // get size of string
+//    SelectObject(dis->hDC,hTabPen);                                                             // set border
+//    SelectObject(dis->hDC,hTabBrush);                                                           // set background fill
+//    Rectangle(dis->hDC,dis->rcItem.left,dis->rcItem.top,dis->rcItem.right,dis->rcItem.bottom);  // display background rectangle
+    TextOut(dis->hDC,dis->rcItem.left,dis->rcItem.top,(char*)str,len);                          // display text
+}
 
 LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -162,7 +211,18 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
             case WM_CLOSE:
                 DestroyWindow(hwnd);
                 return 0;
+            case WM_DRAWITEM:
+                #if DEBUG_WINDOW
+                Console::write("Window::WindowProcedure WM_DRAWITEM\n");
+                #endif
+                if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
+                {
+                    win->drawStatic((DRAWITEMSTRUCT*)lParam);
+                }
+                return 0;
             case WM_DESTROY: 
+                DeleteObject(win->hNormalFont);
+                DeleteObject(win->hBoldFont);                
                 win->hwindow=NULL;
                 return 0;
         }
