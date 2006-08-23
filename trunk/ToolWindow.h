@@ -2,39 +2,8 @@
 #define _PARBAT_TOOLWINDOW_H
 
 #include "ScrollBox.h"
-
-class ToolTab:public Window
-{
-    protected:
-        WNDPROC prevProc;
-        ScrollBox scrollBox;
-    public:
-        HWND hHeading;        
-        virtual int Create(HWND parent,RECT *parentRect);
-        virtual char* GetTabName() {return NULL;};
-        virtual char* GetTabHeading() {return NULL;};
-        virtual int GetContainerHeight() {return 0;};
-        static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);    
-};
-
-
-class DisplayTab:public ToolTab
-{
-    private:
-        WNDPROC prevProc;
-        HWND hRed, hBlue, hGreen;        
-        HWND hupdate;
-        HWND *redRadiobuttons;                // band radio buttons
-        HWND *greenRadiobuttons;
-        HWND *blueRadiobuttons;
-    public:
-        char* GetTabName() {return "Display";};
-        char* GetTabHeading() {return "Channel Selection";};
-        int GetContainerHeight();   
-        int Create(HWND parent,RECT *parentRect);
-        static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);    
-    
-};
+#include "ToolTab.h"
+#include "DisplayTab.h"
 
 
 
