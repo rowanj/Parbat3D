@@ -59,9 +59,6 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
     hwindow=CreateWindowEx(dwExStyle,lpClassName,lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,hMenu,hInstance,this);
     if (hwindow==NULL)
     {
-		#if DEBUG_WINDOW
-        Console::write("Window::CreateWin CreateWindowEx failed first time\n");
-        #endif
         // attempt to register class (incase not already registered)
         WNDCLASSEX wincl;
         HBRUSH hbrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
@@ -97,9 +94,6 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
         }
         
     }
-    #if DEBUG_WINDOW
-    Console::write("Window::CreateWin CreateWindowEx ok\n");    
-    #endif
 
     // add "this" object pointer to hwindow's internal structure
     SetWindowLong(hwindow,GWL_USERDATA,(int)this);
@@ -119,14 +113,10 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
     stPrevWindowProcedure=NULL;
     if (GetWindowLongPtr(hwindow,GWLP_WNDPROC)!=(LONG)&Window::WindowProcedure)
     {
-        Console::write("Window::CreateWin: window proc incorrect, subclassing\n");
         prevWindowProcedure=(WNDPROC)SetWindowLongPtr(hwindow,GWLP_WNDPROC,(LONG)&Window::WindowProcedure);
         stPrevWindowProcedure=prevWindowProcedure;
     }
         
-    #if DEBUG_WINDOW
-    Console::write("Window::CreateWin: ok\n");
-    #endif
     return true;
 }
 
@@ -158,15 +148,6 @@ void Window::SetStaticFont(HWND hwnd,int font)
 Window* Window::GetWindowObject(HWND hwnd)
 {
     Window* win=(Window*)GetWindowLong(hwnd,GWL_USERDATA);
-    if (win==NULL)
-    {
-		#if DEBUG_WINDOW
-        Console::write("Window::GetWindowObject win=NULL\n");
-        #endif
-    }
-   // Console::write("Window::GetWindowObject win=\n");
-//    Console::write((int)win);
-//    Console::write("\n");
     return win;
 }
 
@@ -214,9 +195,6 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                 DestroyWindow(hwnd);
                 return 0;
             case WM_DRAWITEM:
-                #if DEBUG_WINDOW
-                Console::write("Window::WindowProcedure WM_DRAWITEM\n");
-                #endif
                 if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 {
                     win->drawStatic((DRAWITEMSTRUCT*)lParam);

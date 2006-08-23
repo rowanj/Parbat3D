@@ -137,11 +137,6 @@ LRESULT CALLBACK ScrollBox::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
     ScrollBox* win=(ScrollBox*)Window::GetWindowObject(hwnd);
     switch (message)
     {
-            case WM_DRAWITEM:
-                #if DEBUG_WINDOW
-                Console::write("ScrollBox::WindowProcedure WM_DRAWITEM\n");
-                #endif
-                break;        
         case WM_SHOWWINDOW:
             win->UpdateScrollBar();
             break;
