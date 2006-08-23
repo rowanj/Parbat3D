@@ -4,6 +4,8 @@
 #include "PrefsWindow.h"
 #include "Settings.h"
 #include <string>
+#include <cstdio>
+#include <iostream>
 #include <cstring>
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
@@ -30,23 +32,23 @@ int PrefsWindow::Create(HWND parent)
 	HBRUSH backBrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
     SetBackgroundBrush(backBrush);
 
-    HWND cacheLabel =CreateWindowEx( 0, szStaticControl, "Cache size (MB):", 
+    cacheLabel =CreateWindowEx( 0, szStaticControl, "Cache size (MB):", 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 3,
 		3, 120, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
 	
 	SetStaticFont(cacheLabel, STATIC_FONT_NORMAL);
 
-	HWND cacheEntry =CreateWindowEx( WS_EX_CLIENTEDGE, "EDIT", (settingsFile->getSetting("preferences", "cachesize")).c_str(), 
+	cacheEntry =CreateWindowEx( WS_EX_CLIENTEDGE, "EDIT", (settingsFile->getSetting("preferences", "cachesize")).c_str(), 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | SS_OWNERDRAW, 125,
 		3, 40, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
 		
-	HWND okButton = CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | WS_BORDER, 270,
-			430, 55, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
+	okButton = CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | WS_BORDER, 270,
+			435, 55, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
 			
-	HWND cancelButton = CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE | WS_BORDER, 330,
-			430, 55, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);		
+	cancelButton = CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE | WS_BORDER, 330,
+			435, 55, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);		
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
 
@@ -61,20 +63,40 @@ LRESULT CALLBACK PrefsWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
 
     PrefsWindow* win=(PrefsWindow*)Window::GetWindowObject(hwnd);
     
+    
+    
     switch (message)                  /* handle the messages */
     {
 		case WM_COMMAND:
 			
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
 	        {
-				MessageBox( hwnd, (LPSTR) "OK Pressed",(LPSTR) "Prefs Action",
-				MB_ICONINFORMATION | MB_OK );
+				char* cacheSizeCBuffer = new char[255];
+				cacheSizeCBuffer[0] = (char)255;
+				cacheSizeCBuffer[1] = (char)0;
+				std::string cacheSizeString;
+				std::stringstream convertorStream;
 				
+				LRESULT theResult = SendMessage(win->cacheEntry, EM_GETLINE, 0,(LPARAM) cacheSizeCBuffer);
+				Console::write("Got ");
+				Console::write(theResult);
+				Console::write(" TCHARs of data\n");
+				convertorStream << cacheSizeCBuffer;
+				convertorStream >> cacheSizeString;
+				Console::write("Got cache entry - C string = ");
+				Console::write(cacheSizeCBuffer);
+				Console::write("\n");
+				Console::write("C++ string = ");
+				Console::write(&cacheSizeString);
+				Console::write("\n");
+				
+				settingsFile->setSetting("preferences", "cachesize", cacheSizeString);
+				MessageBox( hwnd, (LPSTR) "Preferences saved successfully.",(LPSTR) "Parbat3D",
+				MB_ICONINFORMATION | MB_OK );
 	        } 
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
-				MessageBox( hwnd, (LPSTR) "Cancel pressed",(LPSTR) "Prefs Action",
-				MB_ICONINFORMATION | MB_OK );
+				ShowWindow(hwnd,SW_HIDE);
 	        } 
 			return 0;
 			

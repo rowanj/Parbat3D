@@ -7,6 +7,10 @@ class PrefsWindow:public Window
 {
     private:
     WNDPROC prevProc;
+    HWND cacheLabel;
+    HWND cacheEntry;
+    HWND okButton;
+    HWND cancelButton;
         
     public:
     //DisplayWindow prefsWindowDisplay;
