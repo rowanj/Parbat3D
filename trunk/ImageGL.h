@@ -42,6 +42,7 @@ class ImageGL : public ViewportListener
 	/* Image window textures */
 	ImageTileSet* tileset;
 	GLuint* textures;
+	int band_red, band_green, band_blue;
 	int texture_rows, texture_columns, tex_count;
 	int texture_size;
 	int cache_size;

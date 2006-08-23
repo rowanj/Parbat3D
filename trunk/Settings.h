@@ -37,7 +37,7 @@ class settings {
             not exist in the file then an empty string is returned.
         */
         string getSetting (string, string);
-        
+        int getSettingi (string, string);
         /**
             Adds the setting to the file.
         */
@@ -50,5 +50,7 @@ class settings {
         */
         void setSetting (string, string, int);
 };
+extern settings* settingsFile;
+
 
 #endif

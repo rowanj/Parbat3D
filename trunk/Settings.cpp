@@ -28,6 +28,18 @@ string settings::getSetting (string section, string key) {
     return data;
 }
 
+int settings::getSettingi (string section, string key)
+{
+	string data = "";
+	int value = 0;
+	try {
+        if (openFile.parse(section, key))
+            data = openFile.read(section, key);
+    } catch (...) {}
+    value = atoi(data.c_str());
+	return value;
+}
+
 
 void settings::setSetting (string section, string key, string data) {
     openFile.update(section, key, data);

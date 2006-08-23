@@ -1,4 +1,5 @@
 #include "ImageGL.h"
+#include "Settings.h"
 #include <stdlib.h>
 #include <cassert>
 #include "console.h"
@@ -12,25 +13,24 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	assert (image_file_ptr != NULL);
 	assert (image_viewport_param != NULL);
 
-	image_file = image_file_ptr;
-	image_properties = image_file->getImageProperties();
+	LOD = -1; // Invalid value to force creation
+	tex_count = 0;
+	tileset = NULL;
+	textures = NULL;
 	
 	viewport = image_viewport_param;
-	
+	image_file = image_file_ptr;
+	image_properties = image_file->getImageProperties();
 	image_height = image_properties->getHeight();
-	image_width = image_properties->getWidth();
-	tileset = NULL;
-	LOD = -1; // local special value for un-initialized
-	cache_size = 128; // 128MB cache
-	textures = new GLuint[4];
+	image_width = image_properties->getWidth();	
+
+	cache_size = settingsFile->getSettingi("preferences","cachesize");
 	
 	/* Initialize OpenGL*/
 	gl_image = new GLView(window_hwnd);
 
 	/* Initialize OpenGL machine */
     gl_image->make_current();
-    assert(glGetError() == GL_NO_ERROR);
-	glGenTextures(4, textures);
 
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
@@ -133,10 +133,10 @@ void ImageGL::make_texture(void)
 	/* Find necessary tileset LOD */
 	int r, g, b;
 	viewport->get_display_bands(&r, &g, &b);
-	
-	float tmp_zoom = 1.0;
+
+	float tmp_zoom = 0.5;
 	int needed_LOD = 0;
-	while (tmp_zoom > viewport->get_zoom_level()) {
+	while (tmp_zoom >= viewport->get_zoom_level()) {
 		tmp_zoom = tmp_zoom/2.0;
 		needed_LOD++;
 	}
@@ -146,20 +146,23 @@ void ImageGL::make_texture(void)
 	
 	/* Find needed grid of textures */
 	
-	/* Use current if available and correct */
-	if (needed_LOD == LOD) {
-		/* free any un-used textures */
-		return;
-	} else {
-		#if DEBUG_GL
-		Console::write("(II) ImageGL changing to LOD ");
-		Console::write(needed_LOD);
-		Console::write("\n");
-		#endif
-		/* Else (re-)create tileset and free all textures */
+	/* Do we have the right tileset and color loaded? */
+	if (!(needed_LOD == LOD && band_red == r && band_green == g && band_blue == b)) {
+		/* If not, we need to free all our textures and start again */
+	}
+	band_red = r; band_green = g; band_blue = b;
+	
+	/* If we don't have the right tileset we need to get it */
+	if (needed_LOD != LOD) {
 		if(tileset != NULL) delete tileset;
 		LOD = needed_LOD;
 		tileset = new ImageTileSet(LOD, image_file, texture_size, cache_size);
+	}
+	
+	/* Make sure we have enough texture IDs*/
+	if (textures == NULL) {
+		textures = new GLuint[4];
+		glGenTextures(4, textures);
 	}
 	
 	assert(tileset != NULL);
@@ -183,7 +186,7 @@ void ImageGL::make_texture(void)
 			tile_x = texture_size;
 			tile_y = texture_size;
 		}
-		tex_data = tileset->get_tile_RGB(tile_x,tile_y,r,g,b);
+		tex_data = tileset->get_tile_RGB(tile_x,tile_y,band_red,band_green,band_blue);
 		glBindTexture(GL_TEXTURE_2D, textures[x]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -209,8 +212,11 @@ void ImageGL::make_texture(void)
 
 void ImageGL::resize_window(void)
 {
-     gl_image->GLresize();
-     viewport->set_window_size(gl_image->width(), gl_image->height());
+	int new_height, new_width;
+	int new_tex_rows, new_tex_cols, new_tex_count;
+    gl_image->GLresize();
+    viewport->set_window_size(gl_image->width(), gl_image->height());
+    
 }
 
 unsigned int* ImageGL::get_pixel_values(int image_x, int image_y)
