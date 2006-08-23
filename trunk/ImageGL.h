@@ -29,7 +29,6 @@ class ImageGL : public ViewportListener
 	ImageViewport* viewport;
 	
 	/* State variables */
-	int band_red, band_green, band_blue;
 	int LOD;
 	int LOD_width, LOD_height;
 	int image_width, image_height;

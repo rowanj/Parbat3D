@@ -124,10 +124,10 @@ void OverviewGL::notify_viewport(void)
 		glLoadIdentity();
 		glScalef(scalefactor_lines, scalefactor_lines, scalefactor_lines);
 
-		GLfloat box_top = viewport->get_zoom_y();
-		GLfloat box_bottom = viewport->get_zoom_y() + viewport->get_viewport_height();
-		GLfloat box_left = viewport->get_zoom_x();
-		GLfloat box_right = viewport->get_zoom_x() + viewport->get_viewport_width();
+		GLfloat box_top = viewport->get_image_y();
+		GLfloat box_bottom = viewport->get_image_y() + viewport->get_viewport_height();
+		GLfloat box_left = viewport->get_image_x();
+		GLfloat box_right = viewport->get_image_x() + viewport->get_viewport_width();
 		
 		if (box_top < 0.0) box_top = 0.0;
 		if (box_bottom > image_height) box_bottom = image_height;

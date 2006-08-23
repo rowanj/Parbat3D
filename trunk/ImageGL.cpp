@@ -8,11 +8,14 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 {
 	ImageProperties* image_properties;
 
+	assert (window_hwnd != NULL);
+	assert (image_file_ptr != NULL);
+	assert (image_viewport_param != NULL);
+
 	image_file = image_file_ptr;
 	image_properties = image_file->getImageProperties();
 	
 	viewport = image_viewport_param;
-	viewport->get_display_bands(&band_red, &band_green, &band_blue);
 	
 	image_height = image_properties->getHeight();
 	image_width = image_properties->getWidth();
@@ -89,8 +92,8 @@ void ImageGL::notify_viewport(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(viewport->get_zoom_x(),viewport->get_zoom_x()+viewport->get_viewport_width(),
-			viewport->get_zoom_y()+viewport->get_viewport_height(),viewport->get_zoom_y(),
+	glOrtho(viewport->get_image_x(),viewport->get_image_x()+viewport->get_viewport_width(),
+			viewport->get_image_y()+viewport->get_viewport_height(),viewport->get_image_y(),
 			1.0,-1.0);
 		
 	glEnable(GL_TEXTURE_2D);
@@ -118,7 +121,6 @@ void ImageGL::notify_bands()
 	#if DEBUG_GL
 	Console::write("(II) ImageGL::notify_bands()\n");
 	#endif
-	viewport->get_display_bands(&band_red, &band_green, &band_blue);
 	make_texture();
 	notify_viewport();
 }
@@ -129,12 +131,18 @@ void ImageGL::make_texture(void)
 	Console::write("(II) ImageGL::make_texture()\n");
 	#endif
 	/* Find necessary tileset LOD */
+	int r, g, b;
+	viewport->get_display_bands(&r, &g, &b);
+	
 	float tmp_zoom = 1.0;
 	int needed_LOD = 0;
-/*	while (tmp_zoom >= viewport->get_zoom_level()) {
+	while (tmp_zoom > viewport->get_zoom_level()) {
 		tmp_zoom = tmp_zoom/2.0;
 		needed_LOD++;
-	} */
+	}
+	Console::write("needed_LOD = ");
+	Console::write(needed_LOD);
+	Console::write("\n");
 	
 	/* Find needed grid of textures */
 	
@@ -175,7 +183,7 @@ void ImageGL::make_texture(void)
 			tile_x = texture_size;
 			tile_y = texture_size;
 		}
-		tex_data = tileset->get_tile_RGB(tile_x,tile_y,1,2,3);
+		tex_data = tileset->get_tile_RGB(tile_x,tile_y,r,g,b);
 		glBindTexture(GL_TEXTURE_2D, textures[x]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);

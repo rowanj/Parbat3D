@@ -203,6 +203,8 @@ void ImageWindow::scrollImageY(int scrollMsg)
     // update scroll position
     info.fMask=SIF_POS;
     SetScrollInfo(GetHandle(),SB_VERT,&info,true);
+    Console::write(info.nPos);
+    Console::write("\n");
     viewport->set_zoom_y(info.nPos);
 }
 
