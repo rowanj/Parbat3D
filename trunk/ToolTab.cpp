@@ -12,9 +12,13 @@ Window testwin;
 int ToolTab::Create(HWND parent,RECT *parentRect)
 {
     const int SCROLLBAR_WIDTH=13;
+    int height=GetContainerHeight();
+    if (height==0)
+        height=parentRect->bottom;
+        
 	if (!CreateWin( 0, "Parbat3D ToolTab Container", "", 
 		WS_CHILD | WS_CHILDWINDOW | WS_VISIBLE | WS_CLIPSIBLINGS | SS_OWNERDRAW, parentRect->left,
-		parentRect->top, parentRect->right-SCROLLBAR_WIDTH, GetContainerHeight(), parent, NULL))
+		parentRect->top, parentRect->right-SCROLLBAR_WIDTH, height, parent, NULL))
 		return false;
     SetBackgroundBrush(toolWindow.hTabBrush);
 	prevProc=SetWindowProcedure(&WindowProcedure);

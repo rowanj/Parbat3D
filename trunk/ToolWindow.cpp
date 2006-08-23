@@ -37,7 +37,6 @@ int ToolWindow::Create(HWND)
     setupDrawingObjects(GetHandle());
     prevProc=SetWindowProcedure(&ToolWindow::WindowProcedure);
 
-
       /* get width & height of tool window's client area (ie. inside window's border) */
     GetClientRect(GetHandle(),&rect);
 
@@ -50,28 +49,12 @@ int ToolWindow::Create(HWND)
     SetWindowObject(hToolWindowTabControl,(Window*)this);
     oldTabControlProc=(WNDPROC)SetWindowLong(hToolWindowTabControl,GWL_WNDPROC,(long)&ToolWindowTabControlProcedure);
 
-    /* add tabs to tab-control */
-    
-    tie.mask=TCIF_TEXT+TCIF_PARAM;;
-    tie.pszText="Display";
-    tie.lParam=(DWORD)tie.pszText;
-    TabCtrl_InsertItem(hToolWindowTabControl, DISPLAY_TAB_ID, &tie);
-    
-    tie.mask=TCIF_TEXT+TCIF_PARAM;;   
-    tie.pszText="Query";
-    tie.lParam=(DWORD)tie.pszText;    
-    TabCtrl_InsertItem(hToolWindowTabControl, QUERY_TAB_ID, &tie);
-    
-    tie.mask=TCIF_TEXT+TCIF_PARAM;;   
-    tie.pszText="Image";
-    tie.lParam=(DWORD)tie.pszText;    
-    TabCtrl_InsertItem(hToolWindowTabControl, IMAGE_TAB_ID, &tie);
-    
-    tie.mask=TCIF_TEXT+TCIF_PARAM;;   
-    tie.pszText="Feature";
-    tie.lParam=(DWORD)tie.pszText;    
-    TabCtrl_InsertItem(hToolWindowTabControl, FEATURE_TAB_ID, &tie);
-
+    /* add tabs to list */
+    tabs.push_back(&displayTab);
+    tabs.push_back(&queryTab);
+    tabs.push_back(&imageTab);  
+    tabs.push_back(&featureTab);      
+  
     /* get size of tab control's client area (the area inside the tab control) */
     GetClientRect(hToolWindowTabControl,&rect);   
 
@@ -86,38 +69,20 @@ int ToolWindow::Create(HWND)
     rect.bottom-=SPACING_FOR_TAB_HEIGHT+SPACING_FOR_BOARDER;
     rect.right-=SPACING_FOR_BOARDER+SPACING_FOR_BOARDER;
     
-    /* create tab containers for each tab (a child window that will be shown/hidden when user clicks on a tab) */
-    /* Display tab container */
-    
-    displayTab.Create(hToolWindowTabControl,&rect);
-    queryTab.Create(hToolWindowTabControl,&rect);   
-    featureTab.Create(hToolWindowTabControl,&rect);   
-           
-	/* Query tab container */
-    /* hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "", 
-		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,             // left position relative to tab control 
-           SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, 80 + (20 * (bands+1)), hToolWindowTabControl,           // The window is a childwindow of the tab control 
-           NULL, Window::GetAppInstance(), NULL);
+    /* create tab & tab containers */
 
-	hToolWindowQueryTabHeading =CreateWindowEx( 0, szStaticControl, "Band Values", 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
-		0, rect.right-SCROLLBAR_WIDTH, 20, hToolWindowQueryTabContainer, NULL,
-		Window::GetAppInstance(), NULL); */		
-                      
-    /* Image tab container */
-    hToolWindowImageTabContainer =CreateWindowEx(0, szStaticControl, "",                            
-           WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
-           SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, rect.bottom, hToolWindowTabControl, NULL,                            /* No menu */
-           Window::GetAppInstance(), NULL); 
-
-	hToolWindowImageTabHeading =CreateWindowEx( 0, szStaticControl, "Image Properties", 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
-		0, rect.right-SCROLLBAR_WIDTH, 20, hToolWindowImageTabContainer, NULL,
-		Window::GetAppInstance(), NULL); 		
-
-           
+    for (int i=0;i<tabs.size();i++)
+    {
+        ToolTab *tab=tabs.at(i);
+        tie.mask=TCIF_TEXT+TCIF_PARAM;;
+        tie.pszText=tab->GetTabName();
+        tie.lParam=(DWORD)tie.pszText;
+        TabCtrl_InsertItem(hToolWindowTabControl, i, &tie);
+        tab->Create(hToolWindowTabControl,&rect);
+    }
+                             
     /* show display tab container */
-    showToolWindowTabContainer(DISPLAY_TAB_ID);
+    showToolWindowTabContainer(0);
 
     /* create scroll bar */
     GetClientRect(GetHandle(),&rect);
@@ -126,59 +91,9 @@ int ToolWindow::Create(HWND)
 		rect.right, rect.bottom-SCROLLBAR_TOP, GetHandle(), NULL, Window::GetAppInstance(), NULL);           
     
     /* force Windows to notify us of messages/events related to these controls */
-    //SetWindowObject(hToolWindowQueryTabContainer,(Window*)this);    
-    //oldQueryTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowQueryTabContainer,GWL_WNDPROC,(long)&ToolWindowQueryTabContainerProcedure);
-    SetWindowObject(hToolWindowImageTabContainer,(Window*)this);    
-    oldImageTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowImageTabContainer,GWL_WNDPROC,(long)&ToolWindowImageTabContainerProcedure);
     SetWindowObject(hToolWindowScrollBar,(Window*)this);    
     oldScrollBarContainerProc=(WNDPROC)SetWindowLong(hToolWindowScrollBar,GWL_WNDPROC,(long)&ToolWindowScrollBarProcedure);
-    
-	
-	/* add the image property information under the image tab */
-	ImageProperties* ip=image_handler->get_image_properties();
-	string leader;
-	int ipItems=5;
-	string n[ipItems];
-	string v[ipItems];
-	
-	/* If the filename is too long to be displayed, truncate it.
-	Later on, a roll-over tooltip should be implemented to bring
-	up the full name.*/
-	string fullname = ip->getFileName();
-	string fname, bname, finalname;
-	if (fullname.length() > 25) {
-		fname = fullname.substr(0, 12);
-		bname = fullname.substr(fullname.length()-12, fullname.length()-1);
-		finalname = fname + "…" + bname;
-	} else
-	    finalname = fullname;
-	    
-	string drivername = ip->getDriverLongName();
-	string finaldrivname;
-	if (drivername.length() > 25) {
-		fname = drivername.substr(0, 12);
-		bname = drivername.substr(drivername.length()-12, drivername.length()-1);
-		finaldrivname = fname + "…" + bname;
-	} else
-	    finaldrivname = drivername;
-	
-	    
-	n[0]="File Name"; v[0]=makeMessage(leader, (char*) finalname.c_str());
-	n[1]="File Type"; v[1]=makeMessage(leader, (char*) finaldrivname.c_str());
-	n[2]="Width"; v[2]=makeMessage(leader, ip->getWidth());
-	n[3]="Height"; v[3]=makeMessage(leader, ip->getHeight());
-	n[4]="Bands"; v[4]=makeMessage(leader, ip->getNumBands());
-	
-	for (int i=0; i<ipItems; i++) {
-		CreateWindowEx(0, szStaticControl, (char*) n[i].c_str(),
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40+(i*20), 50, 18,
-			hToolWindowImageTabContainer, NULL, Window::GetAppInstance(), NULL);
-		
-		CreateWindowEx(0, szStaticControl, (char*) v[i].c_str(),
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 78, 40+(i*20), 160, 18,
-			hToolWindowImageTabContainer, NULL, Window::GetAppInstance(), NULL);
-    }
-    
+       
     /* setup tool window scrollbar */
     updateToolWindowScrollbar();
     
@@ -329,14 +244,14 @@ LRESULT CALLBACK ToolWindow::ToolWindowQueryTabContainerProcedure(HWND hwnd, UIN
     return CallWindowProc(win->oldQueryTabContainerProc,hwnd,message,wParam,lParam);
 }*/
 
-/* handle query tab container's messages/events */
+/* handle query tab container's messages/events 
 LRESULT CALLBACK ToolWindow::ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     ToolWindow* win=(ToolWindow*)Window::GetWindowObject(hwnd);
         
-    switch (message)                  /* handle the messages */
+    switch (message)                  // handle the messages //
     {
-        /* draw window's owner-drawn static text controls using our custom fonts */
+        // draw window's owner-drawn static text controls using our custom fonts //
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 if (((DRAWITEMSTRUCT*)lParam)->hwndItem==win->hToolWindowImageTabHeading)
@@ -350,7 +265,7 @@ LRESULT CALLBACK ToolWindow::ToolWindowImageTabContainerProcedure(HWND hwnd, UIN
     }        
     // let Windows perform the default operation for the message recevied    
     return CallWindowProc(win->oldImageTabContainerProc,hwnd,message,wParam,lParam);
-}
+}*/
 
 /* show the correct tab container window for the selected tab */
 void ToolWindow::showToolWindowTabContainer(int selectedTabId)
@@ -363,22 +278,7 @@ void ToolWindow::showToolWindowTabContainer(int selectedTabId)
     }
 
     /* record the new active tab container window */        
-    switch(selectedTabId)
-    {
-        case DISPLAY_TAB_ID:
-                hToolWindowCurrentTabContainer=displayTab.GetHandle();
-                break;
-        case QUERY_TAB_ID:
-                hToolWindowCurrentTabContainer=queryTab.GetHandle();
-                break;
-        case IMAGE_TAB_ID:
-                hToolWindowCurrentTabContainer=hToolWindowImageTabContainer;                
-                break;
-        case FEATURE_TAB_ID:
-                hToolWindowCurrentTabContainer=featureTab.GetHandle();              
-                break;
-                
-    }       
+    hToolWindowCurrentTabContainer=tabs.at(selectedTabId)->GetHandle();
 
     /* show new tab container window */
     ShowWindow(hToolWindowCurrentTabContainer,SW_SHOW);
@@ -601,4 +501,3 @@ LRESULT CALLBACK ToolWindow::ToolWindowScrollBarProcedure(HWND hwnd, UINT messag
     // let Windows perform the default operation for the message recevied        
     return CallWindowProc(win->oldTabControlProc,hwnd,message,wParam,lParam);
 }
-

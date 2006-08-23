@@ -16,7 +16,6 @@ int QueryTab::GetContainerHeight()
 int QueryTab::Create(HWND parent,RECT *parentRect)
 {
     ToolTab::Create(parent,parentRect);
-    prevProc=SetWindowProcedure(&WindowProcedure);
 
 	/* Create container for band values */
 	HWND queryValueContainer = CreateWindowEx(0, "BUTTON", "Values",
@@ -85,13 +84,3 @@ void QueryTab::SetCursorY(char *text)
     SetWindowText(cursorYPos,text);
 }
 
-LRESULT CALLBACK QueryTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    QueryTab* win=(QueryTab*)Window::GetWindowObject(hwnd);
-    
-    switch(message)
-    {
-        
-    }
-    return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
-}
