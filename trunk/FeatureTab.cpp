@@ -6,7 +6,9 @@
 #include "FeatureTab.h"
 #include "Config.h"
 #include "ToolWindow.h"
+#include <commctrl.h>
 
+ScrollBox hFSScrollBox;
 
 int FeatureTab::GetContainerHeight()
 {
@@ -17,7 +19,95 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 {
     ToolTab::Create(parent,parentRect);
     prevProc=SetWindowProcedure(&WindowProcedure);
+    
+    RECT rect2;
+   	rect2.top=5;
+   	rect2.left=25;
+   	rect2.right=235;
+   	rect2.bottom=120;                 	
+	hFSScrollBox.Create(GetHandle(),&rect2);
 
+	hX = CreateWindowEx(0, "BUTTON", "X", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 118, 25,
+		26, 20 + (20 * toolWindow.bands), hFSScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	hY = CreateWindowEx(0, "BUTTON", "Y", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 144, 25,
+		26, 20 + (20 * toolWindow.bands), hFSScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+    hZ = CreateWindowEx(0, "BUTTON", "Z", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 170, 25,
+		26, 20 + (20 * toolWindow.bands), hFSScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+
+	/* Dynamically add Radio buttons  */
+	xRadiobuttons=new HWND[toolWindow.bands];
+	yRadiobuttons=new HWND[toolWindow.bands];
+	zRadiobuttons=new HWND[toolWindow.bands];	
+
+    for (int i=0; i<toolWindow.bands; i++)  
+    {
+		xRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+			hX, NULL, hThisInstance, NULL);
+			
+		yRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+			hY, NULL, hThisInstance, NULL);
+			
+		zRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
+		WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+		 hZ, NULL, hThisInstance, NULL);
+		
+		const char* name;
+		if (i>0) { 
+    		// add band names to radio buttons
+    		name = "";
+            // Add band number to band name
+            name = catcstrings( (char*) inttocstring(i), (char*) name);
+            name = catcstrings( (char*) "Band ", (char*) name);
+        } else
+               name = "NONE";
+
+        // Display band name in tool window 
+		HWND hstatic=CreateWindowEx(0, szStaticControl, name,
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 40, 40 + (20 * i), 100, 18,
+			hFSScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+		SetStaticFont(hstatic,STATIC_FONT_NORMAL);
+		
+		// Create Trackbar (slider)
+		//InitCommonControls(); // loads common control's DLL 
+		
+		hTrackbar = CreateWindowEx( 
+	        0,                             // no extended styles 
+	        "TRACKBAR_CLASS",                // class name TRACKBAR_CLASS
+	        "Granularity",            // title (caption) 
+	        WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,  // style  | TBS_AUTOTICKS | TBS_ENABLESELRANGE
+	        10, 190,                        // position 
+	        200, 30,                       // size 
+	        GetHandle(),                       // parent window 
+	        NULL, //(HMENU) ID_TRACKBAR,             // control identifier  ID_TRACKBAR
+	        Window::GetAppInstance(),                       // instance 
+	        NULL                           // no WM_CREATE parameter 
+	        ); 
+	        
+		
+		// Insert 'Generate' button under radio buttons. Location based on band number 
+		hgenerate =  CreateWindowEx(0, "BUTTON", "Generate", WS_CHILD | WS_VISIBLE, 80,
+			205, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
+    
+	}    
+	
+	if (toolWindow.bands == 1) {
+    	SendMessage(xRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(yRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(zRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    } else if (toolWindow.bands == 2) {
+        SendMessage(xRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(yRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(zRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
+    } else {
+        SendMessage(xRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(yRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
+    	SendMessage(zRadiobuttons[3],BM_SETCHECK,BST_CHECKED,0);
+    }
+    
+    hFSScrollBox.UpdateScrollBar();
+    //return true;
 }
 
 LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)

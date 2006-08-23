@@ -8,7 +8,6 @@ class ROIWindow:public Window
     private:
     WNDPROC prevProc;
     HWND hBG;
-    HWND hROIScrollbox;
     HWND *hROITick;
     HWND roiToolBar;
     

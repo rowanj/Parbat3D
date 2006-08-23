@@ -39,14 +39,9 @@ int ROIWindow::Create(HWND parent)
    	rect2.right=235;
    	rect2.bottom=220;                 	
 	scrollBox.Create(GetHandle(),&rect2);
-	/*
-    hROIScrollbox =CreateWindowEx( 0, szStaticControl, NULL, 
-		WS_VSCROLL | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | WS_BORDER, 5,
-		5, 235, 220, GetHandle(), NULL,
-		Window::GetAppInstance(), NULL);
-*/
-		hROITick=new HWND[5];	
 
+	// temporary ROI list with check boxes
+	hROITick=new HWND[5];	
     for (int i=0; i<5; i++)  
     {
 		hROITick[i] =CreateWindowEx( 0, "BUTTON", "ROI name", 
