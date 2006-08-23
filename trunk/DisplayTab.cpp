@@ -99,7 +99,6 @@ LRESULT CALLBACK DisplayTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
             case WM_COMMAND:
             //if(hupdate==(HWND)lParam)
             {
-
                 // find out which bands are selected
 				int r, g, b;
 				for (int i=0; i<toolWindow.bands; i++)

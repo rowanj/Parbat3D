@@ -21,7 +21,7 @@ int PrefsWindow::Create(HWND parent)
     /* Get Overview Window Location for Prefs window alignment*/
     GetWindowRect(overviewWindow.GetHandle(),&rect);
 
-    /* create ROI window */
+    /* create prefs window */
     if (!CreateWin(0, "Parbat3D Prefs Window", "Preferences",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION,
 	     rect.left+50, rect.bottom-150, PREFS_WINDOW_WIDTH, PREFS_WINDOW_HEIGHT, parent, NULL))
@@ -31,14 +31,22 @@ int PrefsWindow::Create(HWND parent)
     SetBackgroundBrush(backBrush);
 
     HWND cacheLabel =CreateWindowEx( 0, szStaticControl, "Cache size (MB):", 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 3,
-		3, 120, 17, GetHandle(), NULL,
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 3,
+		3, 120, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
+	
+	SetStaticFont(cacheLabel, STATIC_FONT_NORMAL);
 
-	HWND cacheEntry =CreateWindowEx( 0, "EDIT", (settingsFile->getSetting("preferences", "cachesize")).c_str(), 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | ES_MULTILINE, 125,
-		3, 40, 17, GetHandle(), NULL,
+	HWND cacheEntry =CreateWindowEx( WS_EX_CLIENTEDGE, "EDIT", (settingsFile->getSetting("preferences", "cachesize")).c_str(), 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | SS_OWNERDRAW, 125,
+		3, 40, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
+		
+	HWND okButton = CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | WS_BORDER, 270,
+			430, 55, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
+			
+	HWND cancelButton = CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE | WS_BORDER, 330,
+			430, 55, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);		
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
 
@@ -55,6 +63,21 @@ LRESULT CALLBACK PrefsWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
     
     switch (message)                  /* handle the messages */
     {
+		case WM_COMMAND:
+			
+			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
+	        {
+				MessageBox( hwnd, (LPSTR) "OK Pressed",(LPSTR) "Prefs Action",
+				MB_ICONINFORMATION | MB_OK );
+				
+	        } 
+			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
+	        {
+				MessageBox( hwnd, (LPSTR) "Cancel pressed",(LPSTR) "Prefs Action",
+				MB_ICONINFORMATION | MB_OK );
+	        } 
+			return 0;
+			
         /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
         case WM_NCLBUTTONDOWN:
 
