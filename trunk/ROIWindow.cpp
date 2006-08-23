@@ -10,7 +10,9 @@
 #include "ImageHandler.h"
 #include "ImageWindow.h"
 #include "ROIWindow.h"
+#include "ScrollBox.h"
 
+ScrollBox scrollBox;
 
 int ROIWindow::Create(HWND parent)
 {
@@ -31,18 +33,25 @@ int ROIWindow::Create(HWND parent)
 	    
     prevProc=SetWindowProcedure(&WindowProcedure);
 	
+	RECT rect2;
+   	rect2.top=5;
+   	rect2.left=5;
+   	rect2.right=235;
+   	rect2.bottom=220;                 	
+	scrollBox.Create(GetHandle(),&rect2);
+	/*
     hROIScrollbox =CreateWindowEx( 0, szStaticControl, NULL, 
 		WS_VSCROLL | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | WS_BORDER, 5,
 		5, 235, 220, GetHandle(), NULL,
 		Window::GetAppInstance(), NULL);
+*/
+		hROITick=new HWND[5];	
 
-		hROITick=new HWND[20];	
-
-    for (int i=0; i<20; i++)  
+    for (int i=0; i<5; i++)  
     {
 		hROITick[i] =CreateWindowEx( 0, "BUTTON", "ROI name", 
 		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
-		10 + (20 * i), 100, 16, hROIScrollbox, NULL,
+		10 + (20 * i), 100, 16, scrollBox.GetHandle(),NULL,
 		Window::GetAppInstance(), NULL);
 	}
 	
@@ -92,7 +101,7 @@ int ROIWindow::Create(HWND parent)
 	hTrashIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hTrashButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "trash.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
 	
-
+    scrollBox.UpdateScrollBar();
 	
 	return true;
 }
@@ -110,7 +119,16 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
     switch (message)                  /* handle the messages */
     {
         case WM_COMMAND:
+             
+            // find out which ROIs are selected
+            if((SendMessageA(win->hROITick[0], BM_GETCHECK, 0, 0))==BST_CHECKED)
+            {
+               MessageBox( hwnd, (LPSTR) "First ROI is checked",(LPSTR) "Action",
+					MB_ICONINFORMATION | MB_OK );
+            }
+
 			
+			// Handle actions for each button pressed
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
             {
 				MessageBox( hwnd, (LPSTR) "Open ROI",(LPSTR) "Action",
@@ -140,8 +158,8 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
 			break;
 		
 		
-		/* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
-        case WM_NCLBUTTONDOWN:
+		    /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
+            case WM_NCLBUTTONDOWN:
 
             switch(wParam)
             {
@@ -150,8 +168,8 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
                     /* get the mouse co-ords relative to the window */
                     SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&moveMouseOffset);               
                     break;
-            
             }
+            
 
             /* also let windows handle this event */
             return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
