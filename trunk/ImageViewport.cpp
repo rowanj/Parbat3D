@@ -37,6 +37,7 @@ ImageViewport::~ImageViewport(void)
 	
 float ImageViewport::set_zoom_level(float zoom_value)
 {
+	zoom_value = round(zoom_value*100.0)/100.0;
 	zoom_level = max(zoom_minimum, zoom_value);
 	zoom_image_width = int(round(image_width * zoom_level));
 	zoom_image_height = int(round(image_width * zoom_level));

@@ -1,8 +1,8 @@
 #include "OverviewGL.h"
-#include "config.h"
 #include "console.h"
-
 #include <cassert>
+
+#include "config.h"
 
 OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* image_viewport_param)
 {
@@ -97,6 +97,7 @@ OverviewGL::~OverviewGL()
 /* Re-draw our overview window */
 void OverviewGL::notify_viewport(void)
 {
+	if (!tex_overview_id) return;
 #if DEBUG_GL
 	Console::write("(II) OverviewGL redrawing...\n");
 #endif
@@ -190,7 +191,8 @@ void OverviewGL::notify_bands(void)
 	/* Make texture from data */
 	gl_overview->make_current();
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	if (!tex_overview_id) {glGenTextures(1, &tex_overview_id);}
+	if (tex_overview_id) glDeleteTextures(1,&tex_overview_id);
+	glGenTextures(1, &tex_overview_id);
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);

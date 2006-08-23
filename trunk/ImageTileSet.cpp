@@ -20,7 +20,7 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	LOD = level_of_detail;
 	image_file = file;
 	tex_size = tex_size_param;
-	cache_size = cache_size_param;
+	cache_size = cache_size_param * (1024*1024);
 	
 	/* initialize state */
 	cache_fill = 0;
@@ -276,10 +276,9 @@ int ImageTileSet::load_tile(int x, int y)
 unsigned int* ImageTileSet::get_pixel_values(int x, int y)
 {
 	unsigned int* return_values = new unsigned int[num_bands];
-	char *tmp_vals = new char[num_bands];
 	int tmp, tile_index, pixel_start;
 	char* tile_data;
-	
+
 	if ((x >= image_width) || (y >= image_height) || (x < 0) || (y < 0)) {
 		for (tmp = 0; tmp < num_bands; tmp++) {
 			return_values[tmp] = 0;
@@ -292,17 +291,15 @@ unsigned int* ImageTileSet::get_pixel_values(int x, int y)
 
 	/* Find index in tile */
 	x = (x / MathUtils::ipow(2,LOD)) % tex_size;
-	y = (y / MathUtils::ipow(2,LOD)) % tex_size;
-	
-	return_values[0] = x;
-	return_values[1] = y;
+	y = (y / MathUtils::ipow(2,LOD)) % tex_size;	
+
 	
 	pixel_start = (x + (y*tex_size)) * (num_bands * sample_size);
 	return_values[2] = pixel_start;
 	for (tmp = 0; tmp < num_bands; tmp++) {
 		return_values[tmp] = 0;
 		return_values[tmp] = (unsigned int)tile_data[pixel_start + tmp];
-		return_values[tmp] = return_values[tmp] & 0x000000FF;
+		return_values[tmp] = return_values[tmp] & 0xFF; //!! will need to be
 	}
 	
 	/* This finds values by image pixels */

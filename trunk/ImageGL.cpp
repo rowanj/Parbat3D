@@ -131,10 +131,10 @@ void ImageGL::make_texture(void)
 	/* Find necessary tileset LOD */
 	float tmp_zoom = 1.0;
 	int needed_LOD = 0;
-	while (tmp_zoom >= viewport->get_zoom_level()) {
+/*	while (tmp_zoom >= viewport->get_zoom_level()) {
 		tmp_zoom = tmp_zoom/2.0;
 		needed_LOD++;
-	}
+	} */
 	
 	/* Find needed grid of textures */
 	
@@ -164,22 +164,22 @@ void ImageGL::make_texture(void)
 			tile_y = 0;
 		}
 		if (x == 1) {
-			tile_x = texture_size*2;
+			tile_x = texture_size;
 			tile_y = 0;
 		}
 		if (x == 2) {
 			tile_x = 0;
-			tile_y = texture_size*2;
+			tile_y = texture_size;
 		}
 		if (x == 3) {
-			tile_x = texture_size*2;
-			tile_y = texture_size*2;
+			tile_x = texture_size;
+			tile_y = texture_size;
 		}
 		tex_data = tileset->get_tile_RGB(tile_x,tile_y,1,2,3);
 		glBindTexture(GL_TEXTURE_2D, textures[x]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
 		delete[] tex_data;
@@ -207,14 +207,8 @@ void ImageGL::resize_window(void)
 
 unsigned int* ImageGL::get_pixel_values(int image_x, int image_y)
 {
-	unsigned int* blerg = new unsigned int[8];
-	blerg[0] = 10;
-	blerg[1] = 20;
-	blerg[2] = 30;
-	blerg[3] = 40;
-	blerg[4] = 50;
-	blerg[5] = 60;
-	blerg[6] = 70;
-	blerg[7] = 80;
-	return blerg;
+	if (tileset != NULL)
+		return tileset->get_pixel_values(image_x, image_y);
+		
+	return new unsigned int[image_file->getImageProperties()->getNumBands()];
 }
