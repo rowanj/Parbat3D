@@ -10,6 +10,8 @@
 #include "SnappingWindow.h"
 #include "ToolTab.h"
 #include "DisplayTab.h"
+#include "QueryTab.h"
+#include "ImageTab.h"
 #include "config.h"
 
 
@@ -82,18 +84,18 @@ int ToolWindow::Create(HWND)
     /* Display tab container */
     
     displayTab.Create(hToolWindowTabControl,&rect);
-   
+    queryTab.Create(hToolWindowTabControl,&rect);   
            
 	/* Query tab container */
-    hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "", 
-		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,             /* left position relative to tab control */
-           SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, 80 + (20 * (bands+1)), hToolWindowTabControl,           /* The window is a childwindow of the tab control */
+    /* hToolWindowQueryTabContainer =CreateWindowEx(0, szStaticControl, "", 
+		WS_CHILD | WS_CLIPSIBLINGS | SS_OWNERDRAW, SPACING_FOR_BOARDER,             // left position relative to tab control 
+           SPACING_FOR_TAB_HEIGHT, rect.right-SCROLLBAR_WIDTH, 80 + (20 * (bands+1)), hToolWindowTabControl,           // The window is a childwindow of the tab control 
            NULL, Window::GetAppInstance(), NULL);
 
 	hToolWindowQueryTabHeading =CreateWindowEx( 0, szStaticControl, "Band Values", 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
 		0, rect.right-SCROLLBAR_WIDTH, 20, hToolWindowQueryTabContainer, NULL,
-		Window::GetAppInstance(), NULL); 		
+		Window::GetAppInstance(), NULL); */		
                       
     /* Image tab container */
     hToolWindowImageTabContainer =CreateWindowEx(0, szStaticControl, "",                            
@@ -117,61 +119,13 @@ int ToolWindow::Create(HWND)
 		rect.right, rect.bottom-SCROLLBAR_TOP, GetHandle(), NULL, Window::GetAppInstance(), NULL);           
     
     /* force Windows to notify us of messages/events related to these controls */
-    SetWindowObject(hToolWindowQueryTabContainer,(Window*)this);    
-    oldQueryTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowQueryTabContainer,GWL_WNDPROC,(long)&ToolWindowQueryTabContainerProcedure);
+    //SetWindowObject(hToolWindowQueryTabContainer,(Window*)this);    
+    //oldQueryTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowQueryTabContainer,GWL_WNDPROC,(long)&ToolWindowQueryTabContainerProcedure);
     SetWindowObject(hToolWindowImageTabContainer,(Window*)this);    
     oldImageTabContainerProc=(WNDPROC)SetWindowLong(hToolWindowImageTabContainer,GWL_WNDPROC,(long)&ToolWindowImageTabContainerProcedure);
     SetWindowObject(hToolWindowScrollBar,(Window*)this);    
     oldScrollBarContainerProc=(WNDPROC)SetWindowLong(hToolWindowScrollBar,GWL_WNDPROC,(long)&ToolWindowScrollBarProcedure);
     
-	/* Create container for band values */
-	HWND queryValueContainer = CreateWindowEx(0, "BUTTON", "Values",
-		WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 138, 45, 66, 20 + (20 * (bands-1)),
-		hToolWindowQueryTabContainer, NULL, Window::GetAppInstance(), NULL);
-	
-	/* Dynamically add image band values */
-	imageBandValues = new HWND[bands];
-
-
-    for (int i=1; i<bands; i++)  
-    {
-
-		const char* name;
-		// add band names to radio buttons
-		name = "";
-		//name = image_handler->get_band_info(i)->getColourInterpretationName();
-		
-		// If Colour name unknown change band name
-		//const char *altName ="No colour name";
-		//if (strcmp(name, "Unknown")==0)
-         // name = altName;
-            
-        // Add band number to band name
-        //name = catcstrings( (char*) " - ", (char*) name);
-        name = catcstrings( (char*) inttocstring(i), (char*) name);
-        name = catcstrings( (char*) "Band ", (char*) name);
-
-        // add channel names under the query tab
-        CreateWindowEx(0, szStaticControl, name,
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40 + (20 * i), 100, 18,
-			GetHandle(), NULL, Window::GetAppInstance(), NULL);
-
-		// add the band values to the value container under the query tab
-        char tempBandValue[4] = "0"; // temporary storage for the band value
-        imageBandValues[i] = CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * (i-1)),
-			50, 18, queryValueContainer, NULL, Window::GetAppInstance(), NULL);
-    }
-
-	
-	/* display cursor position under query tab */
-	CreateWindowEx(0, szStaticControl, "X", WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW,
-                 20, 60 + (20 * bands), 100, 18, hToolWindowQueryTabContainer, NULL, Window::GetAppInstance(), NULL);
-	CreateWindowEx(0, szStaticControl, "Y", WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW,
-                 20, 60 + (20 * (bands+1)), 100, 18, hToolWindowQueryTabContainer, NULL, Window::GetAppInstance(), NULL);
-    cursorXPos = CreateWindowEx(0, szStaticControl, "-", WS_CHILD | WS_VISIBLE,
-                 143, 60 + (20 * bands), 50, 18, hToolWindowQueryTabContainer, NULL, Window::GetAppInstance(), NULL);			
-    cursorYPos = CreateWindowEx(0, szStaticControl, "-", WS_CHILD | WS_VISIBLE,
-                 143, 60 + (20 * (bands+1)), 50, 18, hToolWindowQueryTabContainer, NULL, Window::GetAppInstance(), NULL);			
 	
 	/* add the image property information under the image tab */
 	ImageProperties* ip=image_handler->get_image_properties();
@@ -224,6 +178,19 @@ int ToolWindow::Create(HWND)
     return true;
 }
 
+// update cursor position on query tab
+void ToolWindow::SetCursorPosition(int x,int y)
+{
+    string leader = "";
+    queryTab.SetCursorX((char *) makeMessage(leader, x));
+    queryTab.SetCursorY((char *) makeMessage(leader, y));
+}
+
+void ToolWindow::SetImageBandValue(int band,int value)
+{
+    string leader = "";
+    queryTab.SetImageBandValue(band, (char *) makeMessage(leader, value));
+}
 
 /* draw a static text control on the screen */
 void ToolWindow::drawStatic(DRAWITEMSTRUCT *dis, HFONT hfont)
@@ -332,14 +299,14 @@ LRESULT CALLBACK ToolWindow::ToolWindowTabControlProcedure(HWND hwnd, UINT messa
 }
 
 
-/* handle query tab container's messages/events */
+/* handle query tab container's messages/events 
 LRESULT CALLBACK ToolWindow::ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     ToolWindow* win=(ToolWindow*)Window::GetWindowObject(hwnd);
         
     switch (message)
     {
-        /* draw window's owner-drawn static text controls using our custom fonts */
+        // draw window's owner-drawn static text controls using our custom fonts
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 if (((DRAWITEMSTRUCT*)lParam)->hwndItem==win->hToolWindowQueryTabHeading)
@@ -353,7 +320,7 @@ LRESULT CALLBACK ToolWindow::ToolWindowQueryTabContainerProcedure(HWND hwnd, UIN
     }        
     // let Windows perform the default operation for the message recevied
     return CallWindowProc(win->oldQueryTabContainerProc,hwnd,message,wParam,lParam);
-}
+}*/
 
 /* handle query tab container's messages/events */
 LRESULT CALLBACK ToolWindow::ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -395,7 +362,7 @@ void ToolWindow::showToolWindowTabContainer(int selectedTabId)
                 hToolWindowCurrentTabContainer=displayTab.GetHandle();
                 break;
         case QUERY_TAB_ID:
-                hToolWindowCurrentTabContainer=hToolWindowQueryTabContainer;
+                hToolWindowCurrentTabContainer=queryTab.GetHandle();
                 break;
         case IMAGE_TAB_ID:
                 hToolWindowCurrentTabContainer=hToolWindowImageTabContainer;                

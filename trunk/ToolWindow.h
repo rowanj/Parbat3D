@@ -4,6 +4,8 @@
 #include "ScrollBox.h"
 #include "ToolTab.h"
 #include "DisplayTab.h"
+#include "QueryTab.h"
+#include "ImageTab.h"
 
 
 
@@ -31,15 +33,15 @@ class ToolWindow:public Window
       
       public:
        DisplayTab displayTab;                
+       QueryTab queryTab;     
+       ImageTab imageTab;                   
        HFONT hBoldFont,hNormalFont,hHeadingFont;
        HBRUSH hTabBrush;
        HWND hToolWindowCurrentTabContainer;
-       HWND hToolWindowQueryTabContainer;
+       //HWND hToolWindowQueryTabContainer;
        HWND hToolWindowImageTabContainer;
 
-       HWND cursorXPos, cursorYPos;
        int bands;
-       HWND *imageBandValues;
 
        void drawStatic(DRAWITEMSTRUCT *dis, HFONT hfont);
 
@@ -50,7 +52,10 @@ class ToolWindow:public Window
        static LRESULT CALLBACK ToolWindowQueryTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
        static LRESULT CALLBACK ToolWindowImageTabContainerProcedure(HWND, UINT, WPARAM, LPARAM);
        static LRESULT CALLBACK ToolWindowScrollBarProcedure(HWND, UINT, WPARAM, LPARAM);
-       void showToolWindowTabContainer(int);      
+       void showToolWindowTabContainer(int);     
+
+       void SetCursorPosition(int x,int y); // update cursor position on query tab
+       void SetImageBandValue(int band,int value); // update image band value on query tab
 };
 
 
