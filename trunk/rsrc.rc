@@ -1,6 +1,8 @@
 #include <Windows.h>
 #include "resources.h"
 
+600 ICON "Parbat3D.ico"
+
 501 MENU 
 BEGIN
 	POPUP "&File"

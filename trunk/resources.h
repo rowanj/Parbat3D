@@ -1,3 +1,5 @@
+#define ID_MAIN_ICON        600
+
 #define ID_MENU             501
 
 #define IDM_FILEOPEN        201

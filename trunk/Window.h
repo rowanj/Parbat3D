@@ -11,6 +11,7 @@ class Window
         
     HWND hwindow;                       // window handle
     static HINSTANCE hInstance;         // process's instance handle
+    static HICON    hIcon;              // default icon
     HFONT hNormalFont,hBoldFont, hHeadingFont;        // fonts used for drawing static controls
     HBRUSH hBackgroundBrush;
 

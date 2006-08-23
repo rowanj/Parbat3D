@@ -1,10 +1,11 @@
 #include "Window.h"
 #include "Console.h"
-
+#include "resources.h"
 #include "config.h"
 
 WNDPROC Window::stPrevWindowProcedure=NULL;
 HINSTANCE Window::hInstance=NULL;
+HICON Window::hIcon=NULL;
 
 Window::Window()
 {
@@ -16,6 +17,7 @@ Window::Window()
 void Window::Init(HINSTANCE hInst)
 {
     hInstance=hInst;
+    hIcon=LoadIcon(hInst,MAKEINTRESOURCE(ID_MAIN_ICON));
 }
 
 void ErrorExit(LPTSTR lpszFunction) 
@@ -69,12 +71,12 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
         wincl.cbClsExtra = 0;
         wincl.cbWndExtra = 0;
         wincl.hInstance=hInstance;
-        wincl.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+        wincl.hIcon = hIcon; //LoadIcon(NULL, IDI_APPLICATION);
         wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
         wincl.hbrBackground = (HBRUSH) hbrush; //GetStockObject(LTGRAY_BRUSH);
         wincl.lpszMenuName = NULL;
         wincl.lpszClassName=lpClassName;
-        wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+        wincl.hIconSm = hIcon; //LoadIcon(NULL, IDI_APPLICATION);
         
         if (RegisterClassEx(&wincl)==0)
         {
