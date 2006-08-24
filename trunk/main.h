@@ -10,6 +10,7 @@
 #include "ImageWindow.h"
 #include "ROIWindow.h"
 #include "PrefsWindow.h"
+#include "StickyWindowManager.h"
 
 extern ImageHandler::ImageHandler* image_handler;
 extern char szStaticControl[];
@@ -24,6 +25,7 @@ extern ImageWindow imageWindow;
 extern OverviewWindow overviewWindow;
 extern ROIWindow roiWindow;
 extern PrefsWindow prefsWindow;
+extern StickyWindowManager stickyWindowManager;
 enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID,FEATURE_TAB_ID};
 
 

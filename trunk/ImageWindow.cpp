@@ -240,18 +240,18 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
     
     switch (message)                  /* handle the messages */
     {
-        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
+        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window         
         case WM_NCLBUTTONDOWN:
 
             switch(wParam)
             {
-                /* HTCAPTION: mouse button was pressed down on the window title bar */                            
+                // HTCAPTION: mouse button was pressed down on the window title bar                             
                 case HTCAPTION:
-                    /* get the mouse co-ords relative to the window */
+                    // get the mouse co-ords relative to the window
                     SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&moveMouseOffset);               
                     break;
 
-                /* HTLEFT...HTBOTTOMRIGHT: mouse button was pressed down on the sizing border of window */  
+                // HTLEFT...HTBOTTOMRIGHT: mouse button was pressed down on the sizing border of window
                 case HTLEFT:
                 case HTRIGHT:
                 case HTTOP:
@@ -260,28 +260,28 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
                 case HTTOPRIGHT:
                 case HTBOTTOMLEFT:
                 case HTBOTTOMRIGHT:
-                    /* record current window & mouse positions */
+                    // record current window & mouse positions //
                     GetWindowRect(hwnd,&sizeWindowPosition);
                     sizeMousePosition.x=(int)(short)LOWORD(lParam);
                     sizeMousePosition.y=(int)(short)HIWORD(lParam);                   
                     break;                   
             }
 
-            /* also let windows handle this event */
+            // also let windows handle this event
             return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
-
-        /* WM_MOVING: the window is about to be moved to a new location */
+        */
+        /* WM_MOVING: the window is about to be moved to a new location 
         case WM_MOVING:
 
-            /* set new window position based on position of mouse */
+            // set new window position based on position of mouse
             SnappingWindow::setNewWindowPosition((RECT*)lParam,&moveMouseOffset);
 
-            /* snap the window to other windows if in range */
+            // snap the window to other windows if in range 
             SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);      
             SnappingWindow::snapWindowByMoving(overviewWindow.GetHandle(),(RECT*)lParam);
             SnappingWindow::snapWindowByMoving(toolWindow.GetHandle(),(RECT*)lParam);            
             break;
-    
+        */
         /* WM_SIZING: the window size is about to change */
         case WM_SIZING:
 

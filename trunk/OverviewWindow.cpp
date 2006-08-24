@@ -161,32 +161,30 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
            }
            return 0;
 
-        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */
+        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window 
         case WM_NCLBUTTONDOWN:
 
-            /* HTCAPTION: mouse button was pressed down on the window title bar
-                         (occurs when user starts to move the window)              */
             if(wParam == HTCAPTION)
             {
 
-                /* record mouse position relative to window position */
+                // record mouse position relative to window position 
                 SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
                      
-                /* record current window positions */
+                // record current window positions 
                 GetWindowRect(hwnd,&prevOverviewWindowRect);  
                 GetWindowRect(imageWindow.GetHandle(),&prevImageWindowRect); 
                 GetWindowRect(roiWindow.GetHandle(),&prevToolWindowRect);
                 GetWindowRect(roiWindow.GetHandle(),&prevROIWindowRect);
                 
                
-                /* find out which windows are connected & which are in a normal state */
+                // find out which windows are connected & which are in a normal state 
                 imageNormalState=SnappingWindow::isWindowInNormalState(imageWindow.GetHandle());
                 toolNormalState=SnappingWindow::isWindowInNormalState(toolWindow.GetHandle());
                 imageAndMainSnapped=(SnappingWindow::isWindowSnapped(win->GetHandle(),imageWindow.GetHandle()));
                 toolAndMainSnapped=(SnappingWindow::isWindowSnapped(win->GetHandle(),toolWindow.GetHandle()));
                 toolAndImageSnapped=(SnappingWindow::isWindowSnapped(toolWindow.GetHandle(),imageWindow.GetHandle()));
 
-                /* calculate whether the image window should be moved */
+                // calculate whether the image window should be moved 
                 if (imageNormalState)
                 {
                     if (imageAndMainSnapped)
@@ -199,7 +197,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 else
                     moveImageWindow=false;  
 
-                /* calculate whether the tool window should be moved */
+                // calculate whether the tool window should be moved 
                 if (toolNormalState)
                 {
                     if (toolAndMainSnapped)
@@ -216,28 +214,29 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
            return DefWindowProc(hwnd, message, wParam, lParam);
 
 
-        /* WM_MOVING: the window is about to be moved to a new location */
+        // WM_MOVING: the window is about to be moved to a new location 
         case WM_MOVING:
 
-            /* set new window position based on position of mouse */
+            // set new window position based on position of mouse 
             SnappingWindow::setNewWindowPosition((RECT*)lParam,&snapMouseOffset);            
             
-            /* snap main window to edge of desktop */           
+            // snap main window to edge of desktop           
             SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);
 
             if (!moveImageWindow)
                 SnappingWindow::snapWindowByMoving(imageWindow.GetHandle(),(RECT*)lParam); 
 
-            /* snap main window to tool window, if near it, if it's not already snapped */
+            // snap main window to tool window, if near it, if it's not already snapped 
             if (!moveToolWindow)
                 SnappingWindow::snapWindowByMoving(toolWindow.GetHandle(),(RECT*)lParam);
             
-            /* move the snapped windows relative to main window's new position */
-            /* only moves the windows that were already snapped to the main window */
+            // move the snapped windows relative to main window's new position 
+            // only moves the windows that were already snapped to the main window
             SnappingWindow::moveSnappedWindows((RECT*)lParam,&prevOverviewWindowRect,&prevImageWindowRect,&prevToolWindowRect,&prevROIWindowRect,moveImageWindow,moveToolWindow,moveROIWindow);
             return 0;
+        */
 
-        /* WM_SIZE: the window has been re-sized, minimized, maximised or restored */
+        // WM_SIZE: the window has been re-sized, minimized, maximised or restored
         case WM_SIZE:
                 
             /* resize display/opengl window to fit new size */

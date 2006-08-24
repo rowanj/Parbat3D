@@ -36,6 +36,8 @@ int ToolWindow::Create(HWND)
         return false;
     setupDrawingObjects(GetHandle());
     prevProc=SetWindowProcedure(&ToolWindow::WindowProcedure);
+    
+    stickyWindowManager.AddStickyWindow(this);  // make the window stick to others    
 
       /* get width & height of tool window's client area (ie. inside window's border) */
     GetClientRect(GetHandle(),&rect);
@@ -422,25 +424,8 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
             break;
 
         case WM_NCLBUTTONDOWN:
-            /* check if the mouse has been clicked on the title bar */
-            if(wParam == HTCAPTION)
-            {
-               /* get the mouse co-ords relative to the window */
-                SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
-            }
-            /* also let windows handle this message */
-            return DefWindowProc(hwnd, message, wParam, lParam); 
-            
+            break;            
         case WM_MOVING:
-            /* set new window position based on position of mouse */
-            SnappingWindow::setNewWindowPosition((RECT*)lParam,&snapMouseOffset);
-
-            /* if new position is near desktop edge, move to the egde */
-            SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);  
-            
-            /* if new position is near another window, move to other the window */    
-            SnappingWindow::snapWindowByMoving(overviewWindow.GetHandle(),(RECT*)lParam);
-            SnappingWindow::snapWindowByMoving(imageWindow.GetHandle(),(RECT*)lParam);
             break;
         
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
@@ -449,13 +434,13 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
                 win->drawTab((DRAWITEMSTRUCT*)lParam);
             else
                 win->drawStatic((DRAWITEMSTRUCT*)lParam,win->hNormalFont);
-            break;           
+            return 0;          
 
         /* WM_MEASUREITEM: an ownerdraw control needs to be measured */        
         case WM_MEASUREITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_TAB)
                 win->measureTab((MEASUREITEMSTRUCT*)lParam);
-            break;
+            return 0;
 
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
@@ -474,14 +459,16 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
         /* WM_DESTORY: system is destroying our window */                
         case WM_DESTROY:
             CheckMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
-            win->freeDrawingObjects();
+            win->freeDrawingObjects();           
+            stickyWindowManager.RemoveStickyWindow(win);
             return 0;
+            
 
         default: 
-            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);
+            break;
     }
     /* return 0 to indicate that we have processed the message */          
-    return 0;
+    return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);
 }
 
 /* handle events related to tool window's scroll bar */

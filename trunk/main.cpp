@@ -42,6 +42,7 @@ OverviewWindow overviewWindow;
 ImageWindow imageWindow;
 ROIWindow roiWindow;
 PrefsWindow prefsWindow;
+StickyWindowManager stickyWindowManager;
 
 char *filename=NULL;                    // currently open image filename
 
@@ -126,6 +127,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
         return 0;
     }
+    stickyWindowManager.SetController(&overviewWindow);    
+    stickyWindowManager.AddStickyWindow(&imageWindow);
+    stickyWindowManager.AddStickyWindow(&prefsWindow);
     
     /* Execute the message loop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))

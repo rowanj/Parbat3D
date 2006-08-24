@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "Console.h"
 #include "resources.h"
+#include "main.h"
 #include "config.h"
 
 WNDPROC Window::stPrevWindowProcedure=NULL;
@@ -200,6 +201,17 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                     win->drawStatic((DRAWITEMSTRUCT*)lParam);
                 }
                 return 0;
+            case WM_NCLBUTTONDOWN:
+                switch(wParam)
+                {
+                    case HTCAPTION:
+                        stickyWindowManager.BeginMoving(win);
+                        break;
+                }
+                break;
+            case WM_MOVING:
+                stickyWindowManager.OnMoving(win,(RECT*)lParam);
+                break;
             case WM_DESTROY: 
                 DeleteObject(win->hNormalFont);
                 DeleteObject(win->hBoldFont);                

@@ -10,23 +10,29 @@ class StickyWindowManager
 {
     private:
     HWND hDesktop;
-    POINT mouseOffset;
+    POINT prevMousePosition;    
     Window *controller;
     vector<Window*> stickyWindows;
+    vector<Window*> snappedWindows;
+    vector<Window*> nonSnappedWindows;
+        
 
     int moveToInsideOfWindow(HWND snapToWin,RECT *rect);
     int moveToOutsideOfWindow(HWND snapToWin,RECT *rect);
     int GetStickyWindowId(Window *win);
-            
+    char isConnected(Window *win1,Window *win2);
+    int isWindowInNormalState(HWND hwnd);
+    void moveWindowByOffset(HWND hwnd,int xOffset,int yOffset);
+    
     public:
     StickyWindowManager();
     void SetController(Window *controller);
     void AddStickyWindow(Window *sticky);
-    //void RemoveStickyWindow(Window *sticky);
-    //void beginSizing(Window* win);
-    void beginMoving(Window* win);
-    void onMoving(Window* win, RECT *rect);
-    //void onSizing(Window* win);
+    void RemoveStickyWindow(Window *sticky);
+    //void BeginSizing(Window* win);
+    void BeginMoving(Window* win);
+    void OnMoving(Window* win, RECT *rect);
+    //void OnSizing(Window* win);
 
 };
 
