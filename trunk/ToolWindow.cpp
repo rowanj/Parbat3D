@@ -81,6 +81,7 @@ int ToolWindow::Create(HWND)
         tie.lParam=(DWORD)tie.pszText;
         TabCtrl_InsertItem(hToolWindowTabControl, i, &tie);
         tab->Create(hToolWindowTabControl,&rect);
+        tab->Hide();
     }
                              
     /* show display tab container */
@@ -88,16 +89,6 @@ int ToolWindow::Create(HWND)
 
     /* create scroll bar */
     GetClientRect(GetHandle(),&rect);
-    hToolWindowScrollBar=CreateWindowEx(0, "SCROLLBAR", NULL,
-		WS_CHILD | WS_VISIBLE | SBS_RIGHTALIGN | SBS_VERT, 0, SCROLLBAR_TOP,
-		rect.right, rect.bottom-SCROLLBAR_TOP, GetHandle(), NULL, Window::GetAppInstance(), NULL);           
-    
-    /* force Windows to notify us of messages/events related to these controls */
-    SetWindowObject(hToolWindowScrollBar,(Window*)this);    
-    oldScrollBarContainerProc=(WNDPROC)SetWindowLong(hToolWindowScrollBar,GWL_WNDPROC,(long)&ToolWindowScrollBarProcedure);
-       
-    /* setup tool window scrollbar */
-    updateToolWindowScrollbar();
     
     return true;
 }
@@ -275,7 +266,7 @@ void ToolWindow::showToolWindowTabContainer(int selectedTabId)
     /* hide previously visible tab container window */
     if (hToolWindowCurrentTabContainer!=NULL)
     {
-        scrollToolWindowToTop();
+//        scrollToolWindowToTop();
         ShowWindow(hToolWindowCurrentTabContainer,SW_HIDE);
     }
 
@@ -286,7 +277,7 @@ void ToolWindow::showToolWindowTabContainer(int selectedTabId)
     ShowWindow(hToolWindowCurrentTabContainer,SW_SHOW);
     
     /* update scroll bar settings for the current tab */
-    updateToolWindowScrollbar();
+//    updateToolWindowScrollbar();
 }    
 
 /* scrolls a window back to its orginal state */
@@ -478,9 +469,9 @@ LRESULT CALLBACK ToolWindow::ToolWindowScrollBarProcedure(HWND hwnd, UINT messag
         
     switch (message)
     {
-        case WM_VSCROLL:          
-            win->scrollToolWindow(wParam);
-            return 0;
+        //case WM_VSCROLL:          
+            //win->scrollToolWindow(wParam);
+          //  return 0;
                         
         default:
             break;

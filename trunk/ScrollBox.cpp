@@ -2,6 +2,7 @@
 #include "main.h"
 #include "Window.h"
 #include "ScrollBox.h"
+#include "config.h"
 
 /* create scrollable window as a child of another window, with rect set to top-left & bottom-right corners of parent window */
 int ScrollBox::Create(HWND parentHandle,RECT *rect)
@@ -45,12 +46,20 @@ void ScrollBox::UpdateScrollBar()
     /* get height of content within scroll box */
     maxScrollHeight=0;
     EnumChildWindows(GetHandle(),&GetMaxScrollHeight,(LPARAM)this);
-   
+     
     /* get position of current container & scrollbar */
     GetClientRect(GetHandle(),&rcscrollbox);    
 
     /* set scroll amount per unit of scroll position */   
     info.nPage=rcscrollbox.bottom;
+   
+    #if DEBUG_SCROLLING
+    Console::write("ScrollBox::UpdateScrollBar() max scroll height: ");
+    Console::write(maxScrollHeight);
+    Console::write(" page size: ");
+    Console::write(info.nPage);
+    Console::write("\n");
+    #endif
     
     /* set scroll range */
     info.nMin=0;

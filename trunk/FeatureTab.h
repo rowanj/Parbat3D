@@ -14,7 +14,7 @@ class FeatureTab:public ToolTab
         HWND *yRadiobuttons;
         HWND *zRadiobuttons;
     public:
-        char* GetTabName() {return "Feature Space";};
+        char* GetTabName() {return "Feature";};
         char* GetTabHeading() {return "Feature Space";};
         int GetContainerHeight();   
         int Create(HWND parent,RECT *parentRect);

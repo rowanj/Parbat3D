@@ -23,7 +23,7 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
     RECT rect2;
    	rect2.top=5;
    	rect2.left=25;
-   	rect2.right=235;
+   	rect2.right=150; //235
    	rect2.bottom=120;                 	
 	hFSScrollBox.Create(GetHandle(),&rect2);
 
