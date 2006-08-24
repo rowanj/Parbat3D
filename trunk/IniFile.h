@@ -43,7 +43,7 @@ class iniFile {
             Deletes the filename so file calls cannot complete.
         */
         void close ();
-
+        
         /**
             Returns the name of the file that is being used.
         */

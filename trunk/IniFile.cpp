@@ -24,68 +24,72 @@ string iniFile::getFileName () {
 
 
 bool iniFile::parse (string section, string key) {
-    bool keyInFile = false;                        // shows if key has been found in the file
-    string line, linekey;                          // temp storage for each line input from file
-    string sectionLabel ('[' + section + ']');     // section text as it appears in the file
+    bool keyInFile = false;                     // shows if key has been found in the file
+    string line, linekey;                       // temp storage for each line input from file
+    string sectionLabel ('[' + section + ']');  // section text as it appears in the file
+    bool inSection = false;                     // true if inside the proper section
     
     if (gotFileName) {
-        ifstream filePtr (fileName.c_str());       // open the file for reading
+        ifstream filePtr (fileName.c_str());    // open the file for reading
         
         if (filePtr.is_open()) {
-            while (!filePtr.eof()) {               // find the appropriate section
-                getline (filePtr, line);
-                if (line == sectionLabel) break;
-            }
-            
-            while (!filePtr.eof()) {               // loop through rest of file
-                getline (filePtr, line);           // read in each line of the file
+            while (!filePtr.eof()) {
+                getline (filePtr, line);        // read in each line of the file
                 
-                if (line[0] == '[') break;         // check for end of section
-                
-                linekey = getKeyFromLine(line);    // get the key from the line
-                
-                if (linekey == key) {              // check if the key matches
-                    keyInFile = true;              // show that the key has been found
-                    break;
+                if (!inSection) {
+                    if (line == sectionLabel)   // check for entering section
+                        inSection = true;
+                } else {
+                    if (line[0] == '[')         // check for end of section
+                        break;
+                    else {
+                        linekey = getKeyFromLine(line);    // get the key from the line
+                        if (linekey == key) {              // check if the key matches
+                            keyInFile = true;              // show that the key has been found
+                            break;
+                        }
+                    }
                 }
             }
-            
-            filePtr.close();                       // close the file
+
+            filePtr.close();                    // close the file
         }
     }
     
-    return keyInFile;  // return true if the key exists in the file
+    return keyInFile;                           // return true if the key exists in the file
 }
 
 
 string iniFile::read (string section, string key) {
-    string data = "";                              // stores the data that corresponds to the key
-    string line, linekey;                          // temp storage for each line input from file
-    string sectionLabel ('[' + section + ']');     // section text as it appears in the file
+    string data = "";                           // stores the data that corresponds to the key
+    string line, linekey;                       // temp storage for each line input from file
+    string sectionLabel ('[' + section + ']');  // section text as it appears in the file
+    bool inSection = false;                     // true if inside the proper section
     
     if (gotFileName) {
-        ifstream filePtr (fileName.c_str());       // open the file for reading
+        ifstream filePtr (fileName.c_str());    // open the file for reading
         
         if (filePtr.is_open()) {
-            while (!filePtr.eof()) {               // find the appropriate section
-                getline (filePtr, line);
-                if (line == sectionLabel) break;
-            }
-            
-            while (!filePtr.eof()) {               // loop through rest of file
-                getline (filePtr, line);           // read in each line of the file
+            while (!filePtr.eof()) {            // find the appropriate section
+                getline (filePtr, line);        // read in each line of the file
                 
-                if (line[0] == '[') break;         // check for end of section
-                
-                linekey = getKeyFromLine(line);    // get the key from the line
-                
-                if (linekey == key) {              // check if the key matches
-                    data = getDataFromLine(line);  // store the data from the key
-                    break;
+                if (!inSection) {
+                    if (line == sectionLabel)   // check for entering section
+                        inSection = true;
+                } else {
+                    if (line[0] == '[')         // check for end of section
+                        break;
+                    else {
+                        linekey = getKeyFromLine(line);    // get the key from the line
+                        if (linekey == key) {              // check if the key matches
+                            data = getDataFromLine(line);  // store the data from the key
+                            break;
+                        }
+                    }
                 }
             }
-
-            filePtr.close();                       // close the file
+            
+            filePtr.close();                    // close the file
         }
     }
     
@@ -94,52 +98,37 @@ string iniFile::read (string section, string key) {
 
 
 void iniFile::update (string section, string key, string data) {
-    string line, linekey;                       // temp storage for each line input from file
-    string sectionLabel ('[' + section + ']');  // section text as it appears in the file
-    bool inSection = false;                     // true if the file pointer is in the desired section or not
-    bool dataAdded = false;                     // true if the file has been added/updated with the data
-    string newLinesToAdd;                       // stores how many new lines are pending to be added
+    string line, linekey;                           // temp storage for each line input from file
+    string sectionLabel ('[' + section + ']');      // section text as it appears in the file
+    bool inSection = false;                         // true if the file pointer is in the desired section or not
+    bool dataAdded = false;                         // true if the file has been added/updated with the data
+    string newLinesToAdd = "";                      // stores how many new lines are pending to be added
     
     if (gotFileName) {
-        // section already exists in the file
-        if (sectionStartsAt(section) > 0) {
-            ifstream filePtrI (fileName.c_str());     // open the original file for reading
-            ofstream filePtrO (".temp", ios::trunc);  // create temp file, erase contents if any
-            
-            if (filePtrI.is_open() && filePtrO.is_open()) {
-                while (!filePtrI.eof()) {             // loop through the entire file
-                    getline(filePtrI, line);          // read in each line of the file
-                    
-                    // gather all the new lines so they can be added where wanted
-                    newLinesToAdd = "";
-                    if (line=="\n") {
-                        while (!filePtrI.eof() && line=="\n") {
-                            newLinesToAdd += "\n";
-                            getline(filePtrI, line);
-                        }
-                    }
-                    
-                    // stops extra new lines being added to the end
-                    if (filePtrI.eof()) {
-                        if (!dataAdded) {
-                            filePtrO << key << '=' << data << '\n';  // update the key's data
-                            dataAdded = true;
-                        }
-                        break;
-                    }
-                    
-                    // check if section is about to be entered
-        	        if (line == sectionLabel) {
-                        inSection = true;
+        ifstream filePtrI (fileName.c_str());       // open the original file for reading
+        ofstream filePtrO (".temp", ios::trunc);    // create temp file, erase contents if any
+        
+        if (filePtrI.is_open() && filePtrO.is_open()) {
+            while (!filePtrI.eof()) {               // loop through the entire file
+                getline(filePtrI, line);            // read in each line of the file
+                
+                if (line=="") {                     // store the extra new lines
+                    newLinesToAdd += "\n";
+                
+                } else {
+                    // before and after the desired section
+                    if (!inSection) {
+                        if (line == sectionLabel)
+                            inSection = true;
+                        
                         filePtrO << newLinesToAdd;
+                        newLinesToAdd = "";
                         filePtrO << line << '\n';
                     
-                    // while inside section
-                    } else if (inSection) {
-                        // check for end of section
+                    // while inside the section
+                    } else {
+                        // check to see if at end of section
                         if (line[0] == '[') {
-                            inSection = false;
-                            
                             // if data was not replaced in the section, it must be added
                             if (!dataAdded) {
                                 filePtrO << key << '=' << data << '\n';
@@ -147,11 +136,14 @@ void iniFile::update (string section, string key, string data) {
                             }
                             
                             filePtrO << newLinesToAdd;
-                            filePtrO << line << '\n';                    // adds the next section title
+                            newLinesToAdd = "";
+                            filePtrO << line << '\n';
                             
-                        // while section has not ended yet
+                            inSection = false;
+                        
                         } else {
                             filePtrO << newLinesToAdd;
+                            newLinesToAdd = "";
                             
                             // check if it is the line to replace
         			        linekey = getKeyFromLine(line);              // get the key from the line
@@ -161,30 +153,24 @@ void iniFile::update (string section, string key, string data) {
                             } else
                                 filePtrO << line << '\n';
                         }
-                    
-                    // before and after section is entered
-                    } else {
-                        filePtrO << newLinesToAdd;
-                        filePtrO << line << '\n';
                     }
                 }
-                
-                filePtrI.close();  // close the reading file
-                filePtrO.close();  // close the writing file
-                
-                // replace the original file with the updated temp one
-                remove(fileName.c_str());
-                rename(".temp", fileName.c_str());
             }
-        
-        // section does not already exist in the file
-        } else {
-            ofstream filePtr (fileName.c_str(), ios::app);   // open the file, data is appended to it
-            if (filePtr.is_open()) {
-                filePtr << "[" << section << ']' << '\n';  // add the new section to the file
-                filePtr << key << '=' << data << '\n';       // add the new data to the file
-                filePtr.close();                             // close the file
+
+            if (!dataAdded) {
+                // if the section does not already exist it must be added
+                if (!inSection)
+                    filePtrO << '\n' << sectionLabel << '\n';   // add the new section to the file
+                filePtrO << key << '=' << data << '\n';         // add the data to the section
+                dataAdded = true;
             }
+            
+            filePtrI.close();                                   // close the reading file
+            filePtrO.close();                                   // close the writing file
+            
+            // replace the original file with the updated temp one
+            remove(fileName.c_str());
+            rename(".temp", fileName.c_str());
         }
     }
 }
@@ -285,7 +271,7 @@ void iniFile::removeSection(string section, bool keepTitle) {
             } else
                 filePtrO << line << '\n';
         }
-            
+        
         filePtrI.close();  // close the reading file
         filePtrO.close();  // close the writing file
         
