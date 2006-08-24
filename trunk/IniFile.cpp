@@ -18,6 +18,11 @@ void iniFile::close () {
 }
 
 
+string iniFile::getFileName () {
+    return fileName;
+}
+
+
 bool iniFile::parse (string section, string key) {
     bool keyInFile = false;                        // shows if key has been found in the file
     string line, linekey;                          // temp storage for each line input from file
@@ -288,9 +293,4 @@ void iniFile::removeSection(string section, bool keepTitle) {
         remove(fileName.c_str());
         rename(".temp", fileName.c_str());
     }
-}
-
-
-string iniFile::getFileName () {
-    return fileName;
 }

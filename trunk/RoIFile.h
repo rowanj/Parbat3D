@@ -3,21 +3,23 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 
-#include "IniFile.h"
+#include "BatchIniFile.h"
 #include "RoI.h"
+#include "StringUtils.h"
 
 using namespace std;
 
 
 class RoIFile {
     private:
-        iniFile openFile;  // reference to the ini file, all file operations go through this
+        BatchIniFile openFile;  // reference to the ini file, all file operations go through this
         
     public:
         RoIFile ();
         
-        virtual ~RoIFile ();
+        ~RoIFile ();
         
         
         void open (string);

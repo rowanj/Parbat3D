@@ -32,7 +32,7 @@ class RoI {
     public:
         RoI (void);
         
-        virtual ~RoI (void);
+        ~RoI (void);
         
         void set_name (string);
         

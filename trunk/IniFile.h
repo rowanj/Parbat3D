@@ -12,6 +12,7 @@ using namespace std;
     file.
 */
 class iniFile {
+    protected:
         bool gotFileName;  // true if a filename has been specified
         string fileName;   // stores the filename
         
@@ -43,7 +44,11 @@ class iniFile {
         */
         void close ();
 
-
+        /**
+            Returns the name of the file that is being used.
+        */
+        string getFileName ();
+        
         /**
             Searches to find if the key provided as a parameter exists in the
             file. If the key is in the file then true is returned, otherwise it
@@ -62,12 +67,6 @@ class iniFile {
             does not exist, then it is added to the file with the value.
         */
         void update (string, string, string);
-        
-        
-        /**
-            Returns the name of the file that is being used.
-        */
-        string getFileName ();
         
         
         /**

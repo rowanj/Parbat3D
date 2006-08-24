@@ -1,5 +1,4 @@
 #include "RoIFile.h"
-#include "StringUtils.h"
 
 
 using namespace std;
@@ -75,79 +74,85 @@ void RoIFile::saveRegionToFile (string filename, RoI* roi) {
 }
 
 void RoIFile::saveRegionToFile (RoI* roi) {
-    string section;             // name of section
-    vector<RoIEntity> elist;    // list of entities
-    RoIEntity re;               // current entity working on
-    vector<coords> pts;         // list of points
-    coords pt;                  // current point working on
-    int rcol, gcol, bcol;       // storage for colours
-    string colStr;              // colour string (for file)
+    string section;           // name of section
+    vector<RoIEntity> elist;  // list of entities
+    RoIEntity re;             // current entity working on
+    vector<coords> pts;       // list of points
+    coords pt;                // current point working on
+    int rcol, gcol, bcol;     // storage for colours
+    string colStr;            // colour string (for file)
     int totalEntities;
-    string et;                  // type of entity
+    string et;                // type of entity
     int totalPoints;
-    string ep, epc;             // name of point
+    string ep, epc;           // name of point
     string curPtXY;
-    string totalRegionsStr;
-    int totalRegions;
-    string leader = "";         // blank leader used for creating strings
+    string leader = "";       // blank leader used for creating strings
     
+    // set the name of the section based on the name of the  ROI
     section = roi->get_name();
     
-    // if the ROI already exists in the file, remove its data from file
-    if (openFile.sectionExists(section))
-        openFile.removeSection(section, true);
-    else {
-        // add the new section info to the list
-        totalRegionsStr = openFile.read("ROI List","count");
-        if (totalRegionsStr == "") {
-            openFile.update("ROI List", "count", "1");
-            openFile.update("ROI List", "roi 0", section);
+    // ROI does not exist, so info must be added
+    if (openFile.readSectionContent(section)=="") {
+        // there is already a header section in the file
+        if (openFile.readSectionContent("ROI List")!="") {
+            int totalRegions;
+            string totalRegionsStr = openFile.readFromBuffer("count");
+            
+            if (totalRegionsStr == "")
+                totalRegions = 0;
+            else {
+                stringstream ss;
+                ss << totalRegionsStr;
+                ss >> totalRegions;
+            }
+            
+            openFile.updateBuffer("count", makeString(leader, totalRegions+1));
+            openFile.updateBuffer(makeString("roi ", totalRegions), section);
+            openFile.writeBufferToSection("ROI List");
+        
+        // a header section must be added to the file
         } else {
-            stringstream ss;
-            ss << totalRegionsStr;
-            ss >> totalRegions;
-            openFile.update("ROI List",
-                            makeString("roi ", totalRegions),
-                            section);
-            totalRegions++;
-            openFile.update("ROI List",
-                            "count",
-                            makeString(leader, totalRegions));
+            openFile.updateBuffer("count", "1");
+            openFile.updateBuffer("roi 0", section);
+            openFile.writeBufferToSection("ROI List");
         }
     }
+    
+    openFile.clearBuffer();
     
     // save ROI colours
     roi->get_colour(&rcol,&gcol,&bcol);
     colStr = makeString("", rcol);
     colStr += ' '; colStr = makeString(colStr, gcol);
     colStr += ' '; colStr = makeString(colStr, bcol);
-    openFile.update(section,"colour",colStr);
+    openFile.updateBuffer("colour",colStr);
     
     // save ROI entities
     elist = roi->get_entities();
     totalEntities = elist.size();
-    openFile.update(section,"entities", makeString(leader, totalEntities));
+    openFile.updateBuffer("entities", makeString(leader, totalEntities));
     for (int i=0; i<totalEntities; i++) {
         re = elist.at(i);
         et = makeString(makeString("entity ", i), " type");
-        openFile.update(section, et, re.type);
+        openFile.updateBuffer(et, re.type);
         
         // save entity points
         pts = re.points;
         ep = makeString(makeString("entity ", i), " point ");
         totalPoints = pts.size();
-        openFile.update(section,
-                        makeString(makeString("entity ", i), " points"),
-                        makeString(leader, totalPoints));
+        openFile.updateBuffer(makeString(makeString("entity ", i), " points"),
+                              makeString(leader, totalPoints));
         for (int i=0; i<totalPoints; i++) {
             pt = pts.at(i);
             epc = makeString(ep, i);
             curPtXY = makeString(leader, pt.x);
             curPtXY += ' ';
             curPtXY = makeString(curPtXY, pt.y);
-            openFile.update(section,epc,curPtXY);
+            openFile.updateBuffer(epc, curPtXY);
         }
     }
+    
+    openFile.writeBufferToSection(section);
 }
 
 
@@ -159,45 +164,49 @@ RoI* RoIFile::loadRegionFromFile (string filename, string name) {
 }
 
 RoI* RoIFile::loadRegionFromFile (string name) {
-    RoI* roi = new RoI();
-    RoIEntity* entityCur;
-    char *cTemp, *cTempB;
-    string sTemp;
-    int rcol, gcol, bcol;  // colours
-    int entityCount;       // entity
+    RoI* roi = new RoI();    // ROI to return
+    RoIEntity* entityCur;    // entity
+    int entityCount;
     string entityBaseStr;
-    int pointCount;        // coords
+    int pointCount;          // coords
     string pointBaseStr;
     coords pt;
+    string data;             // stores data that is read from the buffer
+    char *dataC, *dataCbit;  // stores the char* values of that data
+    int rcol, gcol, bcol;    // colours
     
+    // set the name of the ROI
     roi->set_name(name);
     
+    // stores the contents of the section in the file buffer
+    openFile.readSectionContent(name);
+    
     // get ROI colours from file
-    sTemp = openFile.read(name, "colour");
-    cTemp = copyString(sTemp.c_str());
-    cTempB = strtok(cTemp, " ");            // get red
-    rcol = stringToInt(cTempB);
-    cTempB = strtok(NULL, " ");             // get green
-    gcol = stringToInt(cTempB);
-    cTempB = strtok(NULL, " ");             // get blue
-    bcol = stringToInt(cTempB);
+    data = openFile.readFromBuffer("colour");
+    dataC = copyString(data.c_str());
+    dataCbit = strtok(dataC, " ");            // get red
+    rcol = stringToInt(dataCbit);
+    dataCbit = strtok(NULL, " ");             // get green
+    gcol = stringToInt(dataCbit);
+    dataCbit = strtok(NULL, " ");             // get blue
+    bcol = stringToInt(dataCbit);
     roi->set_colour(rcol,gcol,bcol);
     
-    entityCount = stringToInt(openFile.read(name, "entities"));
+    entityCount = stringToInt(openFile.readFromBuffer("entities"));
     for (int i=0; i<entityCount; i++) {
         entityBaseStr = makeString("entity ",i);
         entityCur = new RoIEntity();
-        entityCur->type = openFile.read(name, makeString(entityBaseStr, " type"));
+        entityCur->type = openFile.readFromBuffer(makeString(entityBaseStr, " type"));
         
-        pointCount = stringToInt(openFile.read(name, makeString(entityBaseStr, " points")));
+        pointCount = stringToInt(openFile.readFromBuffer(makeString(entityBaseStr, " points")));
         for (int j=0; j<pointCount; j++) {
             pointBaseStr = makeString(entityBaseStr, " point ");
-            sTemp = openFile.read(name, makeString(pointBaseStr, j));
-            cTemp = copyString(sTemp.c_str());
-            cTempB = strtok(cTemp, " ");        // get x
-            pt.x = stringToInt(cTempB);
-            cTempB = strtok(NULL, " ");        // get y
-            pt.y = stringToInt(cTempB);
+            data = openFile.readFromBuffer(makeString(pointBaseStr, j));
+            dataC = copyString(data.c_str());
+            dataCbit = strtok(dataC, " ");     // get x
+            pt.x = stringToInt(dataCbit);
+            dataCbit = strtok(NULL, " ");      // get y
+            pt.y = stringToInt(dataCbit);
             
             (entityCur->points).push_back(pt);
         }
