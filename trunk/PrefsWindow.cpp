@@ -52,6 +52,8 @@ int PrefsWindow::Create(HWND parent)
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
 
+    stickyWindowManager.AddStickyWindow(this);  // make the window stick to others 
+
 	return true;
 }
 
@@ -62,7 +64,6 @@ LRESULT CALLBACK PrefsWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
     static RECT rect;                 /* for general use */
 
     PrefsWindow* win=(PrefsWindow*)Window::GetWindowObject(hwnd);
-    
     
     
     switch (message)                  /* handle the messages */
@@ -100,12 +101,6 @@ LRESULT CALLBACK PrefsWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
 	        } 
 			return 0;
 			
-        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
-        case WM_NCLBUTTONDOWN:
-
-            /* let windows handle this event */
-            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
-
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
             if (wParam)
@@ -123,12 +118,9 @@ LRESULT CALLBACK PrefsWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
             CheckMenuItem(overviewWindow.hMainMenu,IDM_PREFSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
-            return 0;
+            break;
             
-        default:
-            /* let windows handle any unknown messages */
-            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
     }
-    /* return 0 to indicate that we have processed the message */       
-    return 0;  
+    /* call the next procedure in the chain */       
+    return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }
