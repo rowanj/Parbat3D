@@ -4,7 +4,6 @@
 #include "OverviewWindow.h"
 #include "MainWindow.h"
 #include "DisplayWindow.h"
-#include "SnappingWindow.h"
 #include "ToolWindow.h"
 #include "Settings.h"
 #include "ImageHandler.h"
@@ -150,44 +149,9 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
 					MB_ICONINFORMATION | MB_OK );
             } 
 			
-			break;
+			return 0;
 		
 		
-		    /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window */        
-            case WM_NCLBUTTONDOWN:
-
-            switch(wParam)
-            {
-                /* HTCAPTION: mouse button was pressed down on the window title bar */                            
-                case HTCAPTION:
-                    /* get the mouse co-ords relative to the window */
-                    SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&moveMouseOffset);               
-                    break;
-            }
-            
-
-            /* also let windows handle this event */
-            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
-
-        /* WM_MOVING: the window is about to be moved to a new location */
-        case WM_MOVING:
-
-            /* set new window position based on position of mouse */
-            SnappingWindow::setNewWindowPosition((RECT*)lParam,&moveMouseOffset);
-
-            /* snap the window to other windows if in range */
-            SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);      
-            SnappingWindow::snapWindowByMoving(overviewWindow.GetHandle(),(RECT*)lParam);
-            SnappingWindow::snapWindowByMoving(toolWindow.GetHandle(),(RECT*)lParam);            
-            break;
-            
-            /* snap the window to the edge of the desktop (if near it) */
-            SnappingWindow::snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
-                        
-            /* snap the window the main window (if near it) */
-            SnappingWindow::snapWindowBySizing(overviewWindow.GetHandle(),(RECT*)lParam,(int)wParam);           
-            break;
-
 
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
@@ -206,12 +170,8 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
             CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
-            return 0;
-            
-        default:
-            /* let windows handle any unknown messages */
-            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
+            break;
     }
-    /* return 0 to indicate that we have processed the message */       
-    return 0;
+    // call next window procedure in chain
+    return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }

@@ -15,7 +15,6 @@ class StickyWindowManager
     vector<Window*> stickyWindows;
     vector<Window*> snappedWindows;
     vector<Window*> nonSnappedWindows;
-        
 
     int moveToInsideOfWindow(HWND snapToWin,RECT *rect);
     int moveToOutsideOfWindow(HWND snapToWin,RECT *rect);
@@ -25,14 +24,15 @@ class StickyWindowManager
     void moveWindowByOffset(HWND hwnd,int xOffset,int yOffset);
     
     public:
-    StickyWindowManager();
-    void SetController(Window *controller);
-    void AddStickyWindow(Window *sticky);
-    void RemoveStickyWindow(Window *sticky);
-    //void BeginSizing(Window* win);
-    void BeginMoving(Window* win);
-    void OnMoving(Window* win, RECT *rect);
-    //void OnSizing(Window* win);
+    StickyWindowManager();                      // constructor
+    
+    void SetController(Window *controller);     // set the window that forces other connected windows to move around with it
+    void AddStickyWindow(Window *sticky);       // register a window so that it will snap to other windows 
+    void RemoveStickyWindow(Window *sticky);    // unregister a window so that it will no longer snap to other windows
+    //void BeginSizing(Window* win);            // not implemented
+    void BeginMoving(Window* win);              // called when a window is about to be dragged by the user
+    void OnMoving(Window* win, RECT *rect);     // called when a window is being dragged by the user
+    //void OnSizing(Window* win);               // not implemented
 
 };
 

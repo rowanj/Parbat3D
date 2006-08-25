@@ -112,7 +112,11 @@ void StickyWindowManager::BeginMoving(Window *win)
                 else if (stickyWindows.at(i)==&imageWindow)
                 {
                     name="imageWindow";
-                }                                
+                }     
+                else if (stickyWindows.at(i)==&toolWindow)
+                {
+                    name="toolWindow";
+                }                                             
                     Console::write(name);
                     Console::write(" is snapped\n");                    
                 #endif

@@ -4,7 +4,6 @@
 #include "OverviewWindow.h"
 #include "MainWindow.h"
 #include "DisplayWindow.h"
-#include "SnappingWindow.h"
 #include "ToolWindow.h"
 #include "Settings.h"
 #include "ImageHandler.h"
@@ -270,23 +269,12 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
             // also let windows handle this event
             return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
         */
-        /* WM_MOVING: the window is about to be moved to a new location 
-        case WM_MOVING:
 
-            // set new window position based on position of mouse
-            SnappingWindow::setNewWindowPosition((RECT*)lParam,&moveMouseOffset);
-
-            // snap the window to other windows if in range 
-            SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);      
-            SnappingWindow::snapWindowByMoving(overviewWindow.GetHandle(),(RECT*)lParam);
-            SnappingWindow::snapWindowByMoving(toolWindow.GetHandle(),(RECT*)lParam);            
-            break;
-        */
         /* WM_SIZING: the window size is about to change */
         case WM_SIZING:
 
-            /* set new window size based on position of mouse */
-            SnappingWindow::setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
+            // set new window size based on position of mouse
+            //SnappingWindow::setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
 
             /* prevent window from being resized too small */
             if ( (((RECT*)lParam)->bottom) - (((RECT*)lParam)->top)  <100)
@@ -295,10 +283,10 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
                 (((RECT*)lParam)->right) = (((RECT*)lParam)->left) + 100;
             
             /* snap the window to the edge of the desktop (if near it) */
-            SnappingWindow::snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
+           // SnappingWindow::snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
                         
             /* snap the window the main window (if near it) */
-            SnappingWindow::snapWindowBySizing(overviewWindow.GetHandle(),(RECT*)lParam,(int)wParam);           
+            //SnappingWindow::snapWindowBySizing(overviewWindow.GetHandle(),(RECT*)lParam,(int)wParam);           
             break;
 
         /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            

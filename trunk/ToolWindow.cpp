@@ -7,7 +7,6 @@
 #include "OverviewWindow.h"
 #include "ImageWindow.h"
 #include "console.h"
-#include "SnappingWindow.h"
 #include "ToolTab.h"
 #include "DisplayTab.h"
 #include "QueryTab.h"
@@ -214,52 +213,6 @@ LRESULT CALLBACK ToolWindow::ToolWindowTabControlProcedure(HWND hwnd, UINT messa
 }
 
 
-/* handle query tab container's messages/events 
-LRESULT CALLBACK ToolWindow::ToolWindowQueryTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    ToolWindow* win=(ToolWindow*)Window::GetWindowObject(hwnd);
-        
-    switch (message)
-    {
-        // draw window's owner-drawn static text controls using our custom fonts
-        case WM_DRAWITEM:
-            if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
-                if (((DRAWITEMSTRUCT*)lParam)->hwndItem==win->hToolWindowQueryTabHeading)
-                    win->drawStatic((DRAWITEMSTRUCT*)lParam,win->hBoldFont);                
-                else
-                    win->drawStatic((DRAWITEMSTRUCT*)lParam,win->hNormalFont);
-            break; 
-                        
-        default:
-            break;
-    }        
-    // let Windows perform the default operation for the message recevied
-    return CallWindowProc(win->oldQueryTabContainerProc,hwnd,message,wParam,lParam);
-}*/
-
-/* handle query tab container's messages/events 
-LRESULT CALLBACK ToolWindow::ToolWindowImageTabContainerProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    ToolWindow* win=(ToolWindow*)Window::GetWindowObject(hwnd);
-        
-    switch (message)                  // handle the messages //
-    {
-        // draw window's owner-drawn static text controls using our custom fonts //
-        case WM_DRAWITEM:
-            if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
-                if (((DRAWITEMSTRUCT*)lParam)->hwndItem==win->hToolWindowImageTabHeading)
-                    win->drawStatic((DRAWITEMSTRUCT*)lParam,win->hBoldFont);                
-                else
-                    win->drawStatic((DRAWITEMSTRUCT*)lParam,win->hNormalFont);
-            break; 
-                        
-        default:
-            break;
-    }        
-    // let Windows perform the default operation for the message recevied    
-    return CallWindowProc(win->oldImageTabContainerProc,hwnd,message,wParam,lParam);
-}*/
-
 /* show the correct tab container window for the selected tab */
 void ToolWindow::showToolWindowTabContainer(int selectedTabId)
 {
@@ -280,14 +233,14 @@ void ToolWindow::showToolWindowTabContainer(int selectedTabId)
 //    updateToolWindowScrollbar();
 }    
 
-/* scrolls a window back to its orginal state */
+/* scrolls a window back to its orginal state 
 void ToolWindow::scrollToolWindowToTop()
 {
     SCROLLINFO info;
     RECT rect;
     int amount;
     
-    /* get scroll bar settings */
+    // get scroll bar settings
     info.cbSize=sizeof(SCROLLINFO);
     info.fMask=SIF_POS;
     GetScrollInfo(hToolWindowScrollBar,SB_VERT,&info);
@@ -295,26 +248,26 @@ void ToolWindow::scrollToolWindowToTop()
     GetClientRect(hToolWindowCurrentTabContainer,&rect);
     amount=info.nPos;
     ScrollWindowEx(hToolWindowCurrentTabContainer,0,amount,NULL,NULL,NULL,&rect,SW_ERASE|SW_INVALIDATE|SW_SCROLLCHILDREN);    
-}    
+}    */
 
-/* change the tool window's scrollbar settings based on the currently visible tab container */
+/* change the tool window's scrollbar settings based on the currently visible tab container 
 void ToolWindow::updateToolWindowScrollbar()
 {
     RECT rcontainer,rscrollbar;
     SCROLLINFO info;    
    
-    /* get position of current container & scrollbar */
+    // get position of current container & scrollbar 
     GetWindowRect(hToolWindowCurrentTabContainer,&rcontainer);
     GetWindowRect(hToolWindowScrollBar,&rscrollbar);
 
-    /* set height of visible scroll area */   
+    // set height of visible scroll area   
     info.nPage=rscrollbar.bottom-rscrollbar.top;
     
-    /* set scroll range */
+    // set scroll range 
     info.nMin=0;
     info.nMax=rcontainer.bottom-rcontainer.top;
     
-    /* set scroll position */
+    // set scroll position
     info.nPos=0;
     
     Console::write("updateToolWindowScrollbar() ");
@@ -326,14 +279,15 @@ void ToolWindow::updateToolWindowScrollbar()
     Console::write(info.nPage);
     Console::write("\n");
        
-    /* set scrollbar info */
+    // set scrollbar info 
     info.cbSize=sizeof(SCROLLINFO);
     info.fMask=SIF_ALL;
     SetScrollInfo(hToolWindowScrollBar,SB_VERT,&info,true);  
     
-}    
+} */   
 
 
+/*
 void ToolWindow::scrollToolWindow(int msg)
 {
     SCROLLINFO info;
@@ -341,13 +295,13 @@ void ToolWindow::scrollToolWindow(int msg)
     int prevPos;
     int amount;
     
-    /* get scroll bar settings */
+    // get scroll bar settings 
     info.cbSize=sizeof(SCROLLINFO);
     info.fMask=SIF_POS|SIF_RANGE|SIF_TRACKPOS|SIF_PAGE;
     GetScrollInfo(hToolWindowScrollBar,SB_VERT,&info);
     prevPos=info.nPos;
 
-    /* calculate new scroll bar position */
+    // calculate new scroll bar position
     switch (LOWORD(msg))
     {
         case SB_LINEUP:
@@ -388,7 +342,7 @@ void ToolWindow::scrollToolWindow(int msg)
 
     //InvalidateRect(hToolWindowCurrentTabContainer,&rect,true);
     UpdateWindow(hToolWindowCurrentTabContainer);
-}    
+}   */  
 
 
 /* handles messages/events related to the tool window */
@@ -414,11 +368,7 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
             }    
             break;
 
-        case WM_NCLBUTTONDOWN:
-            break;            
-        case WM_MOVING:
-            break;
-        
+       
         /* WM_DRAWITEM: an ownerdraw control owned by this window needs to be drawn */
         case WM_DRAWITEM:
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_TAB)
@@ -452,17 +402,14 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
             CheckMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             win->freeDrawingObjects();           
             stickyWindowManager.RemoveStickyWindow(win);
-            return 0;
-            
-
-        default: 
             break;
+
     }
     /* return 0 to indicate that we have processed the message */          
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);
 }
 
-/* handle events related to tool window's scroll bar */
+/* handle events related to tool window's scroll bar 
 LRESULT CALLBACK ToolWindow::ToolWindowScrollBarProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     ToolWindow* win=(ToolWindow*)Window::GetWindowObject(hwnd);
@@ -479,3 +426,4 @@ LRESULT CALLBACK ToolWindow::ToolWindowScrollBarProcedure(HWND hwnd, UINT messag
     // let Windows perform the default operation for the message recevied        
     return CallWindowProc(win->oldTabControlProc,hwnd,message,wParam,lParam);
 }
+*/

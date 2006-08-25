@@ -1,7 +1,6 @@
 #include <Windows.h>
 #include "main.h"
 #include "OverviewWindow.h"
-#include "SnappingWindow.h"
 #include "ImageWindow.h"
 #include "ToolWindow.h"
 #include "DisplayWindow.h"
@@ -73,22 +72,6 @@ int OverviewWindow::toggleMenuItemTick(HMENU hMenu,int itemId)
 /* All messages/events related to the main window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    /* static variables used for snapping windows */
-    static POINT snapMouseOffset;           /* mouse co-ords relative to position of window */
-    static RECT prevOverviewWindowRect;         /* main window position before it was moved */
-    static RECT prevImageWindowRect;        /* image window position before it was moved */
-    static RECT prevToolWindowRect;         /* tool window position before it was moved */
-    static RECT prevROIWindowRect;         /* tool window position before it was moved */
-    static int moveToolWindow=false;       /* whether or not the tool window should be moved with the main window */
-    static int moveImageWindow=false;      /* whether or not the image window should be moved with the main window */
-    static int moveROIWindow=false;      /* whether or not the image window should be moved with the main window */
-    static int imageAndMainSnapped=false;
-    static int toolAndMainSnapped=false;
-    static int roiAndMainSnapped=false;
-    static int toolAndImageSnapped=false;
-    static int imageNormalState=false;
-    static int toolNormalState=false;
-    static int roiNormalState=false;
     static RECT rect;                       /* for general use */
     
     OverviewWindow* win=(OverviewWindow*)Window::GetWindowObject(hwnd);
@@ -159,82 +142,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     MessageBox (NULL, "Created by Team Imagery, 2006" , "Parbat3D", 0);
                     return 0;
            }
-           return 0;
-
-        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window 
-        case WM_NCLBUTTONDOWN:
-
-            if(wParam == HTCAPTION)
-            {
-
-                // record mouse position relative to window position 
-                SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&snapMouseOffset);
-                     
-                // record current window positions 
-                GetWindowRect(hwnd,&prevOverviewWindowRect);  
-                GetWindowRect(imageWindow.GetHandle(),&prevImageWindowRect); 
-                GetWindowRect(roiWindow.GetHandle(),&prevToolWindowRect);
-                GetWindowRect(roiWindow.GetHandle(),&prevROIWindowRect);
-                
-               
-                // find out which windows are connected & which are in a normal state 
-                imageNormalState=SnappingWindow::isWindowInNormalState(imageWindow.GetHandle());
-                toolNormalState=SnappingWindow::isWindowInNormalState(toolWindow.GetHandle());
-                imageAndMainSnapped=(SnappingWindow::isWindowSnapped(win->GetHandle(),imageWindow.GetHandle()));
-                toolAndMainSnapped=(SnappingWindow::isWindowSnapped(win->GetHandle(),toolWindow.GetHandle()));
-                toolAndImageSnapped=(SnappingWindow::isWindowSnapped(toolWindow.GetHandle(),imageWindow.GetHandle()));
-
-                // calculate whether the image window should be moved 
-                if (imageNormalState)
-                {
-                    if (imageAndMainSnapped)
-                        moveImageWindow=true;
-                    else if (toolAndImageSnapped && toolNormalState && toolAndMainSnapped)
-                        moveImageWindow=true;
-                    else
-                        moveImageWindow=false;
-                }  
-                else
-                    moveImageWindow=false;  
-
-                // calculate whether the tool window should be moved 
-                if (toolNormalState)
-                {
-                    if (toolAndMainSnapped)
-                        moveToolWindow=true;
-                    else if (toolAndImageSnapped && moveImageWindow)
-                        moveToolWindow=true;
-                    else
-                        moveToolWindow=false;
-                } 
-                else
-                    moveToolWindow=false; 
-
-           }
-           return DefWindowProc(hwnd, message, wParam, lParam);
-
-
-        // WM_MOVING: the window is about to be moved to a new location 
-        case WM_MOVING:
-
-            // set new window position based on position of mouse 
-            SnappingWindow::setNewWindowPosition((RECT*)lParam,&snapMouseOffset);            
-            
-            // snap main window to edge of desktop           
-            SnappingWindow::snapInsideWindowByMoving(hDesktop,(RECT*)lParam);
-
-            if (!moveImageWindow)
-                SnappingWindow::snapWindowByMoving(imageWindow.GetHandle(),(RECT*)lParam); 
-
-            // snap main window to tool window, if near it, if it's not already snapped 
-            if (!moveToolWindow)
-                SnappingWindow::snapWindowByMoving(toolWindow.GetHandle(),(RECT*)lParam);
-            
-            // move the snapped windows relative to main window's new position 
-            // only moves the windows that were already snapped to the main window
-            SnappingWindow::moveSnappedWindows((RECT*)lParam,&prevOverviewWindowRect,&prevImageWindowRect,&prevToolWindowRect,&prevROIWindowRect,moveImageWindow,moveToolWindow,moveROIWindow);
-            return 0;
-        */
+           break;
 
         // WM_SIZE: the window has been re-sized, minimized, maximised or restored
         case WM_SIZE:
@@ -253,13 +161,13 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 ShowWindow(mainWindow.GetHandle(),SW_MINIMIZE);
                 return 0;
             }            
-            return DefWindowProc(hwnd, message, wParam, lParam);
+            break;
                      
         /* WM_CLOSE: system or user has requested to close the window/application */
         case WM_CLOSE:
             // Shut down the image file and OpenGL
 			if (image_handler) { // Was instantiated
-                if (MessageBox(hwnd,"Are you sure you wish quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
+                if (MessageBox(hwnd,"Are you sure you wish to quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
                     return 0;
                 closeFile();
 			}
@@ -267,7 +175,6 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             DestroyWindow( hwnd );			
             return 0;
             
-
         /* WM_DESTROY: window is being destroyed */
         case WM_DESTROY:
             /* Save the window location */
@@ -278,11 +185,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             
             /* post a message that will cause WinMain to exit from the message loop */
             PostQuitMessage (0);
-            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);
-        
-        default:                   /* for messages that we don't deal with */
-            /* let windows peform the default operation based on the message */
-              return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
+            break;
     }
-    return 0; 
+    return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }

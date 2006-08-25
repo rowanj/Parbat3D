@@ -9,7 +9,6 @@
 #include "ImageProperties.h"
 #include "BandInfo.h"
 #include "StringUtils.h"
-#include "SnappingWindow.h"
 #include "console.h"
 
 #include "main.h"
