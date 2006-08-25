@@ -1,17 +1,24 @@
 #include <Windows.h>
+#include <vector>
+
 #include "console.h"
 #include "main.h"
 #include "OverviewWindow.h"
 #include "MainWindow.h"
 #include "DisplayWindow.h"
 #include "ToolWindow.h"
-#include "Settings.h"
 #include "ImageHandler.h"
 #include "ImageWindow.h"
+#include "RoI.h"
 #include "ROIWindow.h"
+#include "Settings.h"
 #include "ScrollBox.h"
+#include "StringUtils.h"
+
 
 ScrollBox scrollBox;
+
+vector<HWND> ROIWindow::roiCheckboxList;
 
 int ROIWindow::Create(HWND parent)
 {
@@ -39,15 +46,19 @@ int ROIWindow::Create(HWND parent)
    	rect2.bottom=220;                 	
 	scrollBox.Create(GetHandle(),&rect2);
 
-	// temporary ROI list with check boxes
-	hROITick=new HWND[5];	
-    for (int i=0; i<5; i++)  
-    {
-		hROITick[i] =CreateWindowEx( 0, "BUTTON", "ROI name", 
-		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
-		10 + (20 * i), 100, 16, scrollBox.GetHandle(),NULL,
-		Window::GetAppInstance(), NULL);
-	}
+	// add ROI check boxes
+/*	int roiInList = regionsSet->get_regions_count();
+	vector<RoI> rList = regionsSet->get_regions();
+	RoI rCur;
+	hROITick=new HWND[roiInList];	
+    for (int i=0; i<roiInList; i++) {
+        rCur = rList.at(i);
+		hROITick[i] = CreateWindowEx( 0, "BUTTON",
+                      copyString(rCur.get_name().c_str()), 
+		              BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
+		              10 + (20 * i), 100, 16, scrollBox.GetHandle(),NULL,
+		              Window::GetAppInstance(), NULL);
+	}*/
 	
 	//Create Open button
 	hOpenButton =CreateWindowEx( 0, "BUTTON", NULL, 
@@ -114,39 +125,85 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
     {
         case WM_COMMAND:
              
-            // find out which ROIs are selected
-            if((SendMessageA(win->hROITick[0], BM_GETCHECK, 0, 0))==BST_CHECKED)
-            {
+            /* find out which ROIs are selected
+            if((SendMessageA(win->hROITick[0], BM_GETCHECK, 0, 0))==BST_CHECKED) {
                MessageBox( hwnd, (LPSTR) "First ROI is checked",(LPSTR) "Action",
 					MB_ICONINFORMATION | MB_OK );
-            }
+            }*/
 
 			
 			// Handle actions for each button pressed
-			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
-            {
+			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED) {
 				MessageBox( hwnd, (LPSTR) "Open ROI",(LPSTR) "Action",
 					MB_ICONINFORMATION | MB_OK );
-            } 
-			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
-            {
+            }
+            
+			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED) {
 				MessageBox( hwnd, (LPSTR) "Save ROI",(LPSTR) "Action",
 					MB_ICONINFORMATION | MB_OK );
-            } 
-			if (LOWORD(wParam) == 3 && HIWORD(wParam) == BN_CLICKED)
-            {
+            }
+            
+			if (LOWORD(wParam) == 3 && HIWORD(wParam) == BN_CLICKED) {
 				MessageBox( hwnd, (LPSTR) "Create ROI Poly tool",(LPSTR) "Action",
 					MB_ICONINFORMATION | MB_OK );
-            } 
-			if (LOWORD(wParam) == 4 && HIWORD(wParam) == BN_CLICKED)
-            {
-				MessageBox( hwnd, (LPSTR) "Create ROI Rect tool",(LPSTR) "Action",
-					MB_ICONINFORMATION | MB_OK );
-            } 
-			if (LOWORD(wParam) == 5 && HIWORD(wParam) == BN_CLICKED)
-            {
-				MessageBox( hwnd, (LPSTR) "Delete it",(LPSTR) "Action",
-					MB_ICONINFORMATION | MB_OK );
+            }
+            
+			if (LOWORD(wParam) == 4 && HIWORD(wParam) == BN_CLICKED) {
+                int i;
+                int listSize = roiCheckboxList.size();
+                int checked = 0;
+                
+                // find how many ROIs are selected
+                for (i=0; i<listSize; i++) {
+                    HWND hCur = roiCheckboxList.at(i);
+                    if ((SendMessageA(hCur, BM_GETCHECK, 0, 0)) == BST_CHECKED)
+                        checked++;
+                }
+                
+                // if no ROIs are selected then create a new one
+                if (checked == 0) {
+                    // get unique name
+                    i = listSize;
+                    string *name = new string(makeMessage("ROI-", listSize));
+                    
+                    while (regionsSet->name_exists(*name)) {
+                        i++;
+                        name = new string(makeMessage("ROI-", i));
+                    }
+                    
+                    // create ROI with the name
+                    RoI *rCur = regionsSet->new_region(*name);
+                    regionsSet->new_entity("RECT");
+                    
+                    // create checkbox for the ROI
+                    HWND hROITick = CreateWindowEx(
+                                        0, "BUTTON",
+                                        copyString(name->c_str()),
+                                		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
+                                        10, 10 + (20 * listSize),
+                                        100, 16, scrollBox.GetHandle(), NULL,
+                                		Window::GetAppInstance(), NULL);
+                    roiCheckboxList.push_back(hROITick);    // add the ROI checkbox to the list
+                    
+                    // turn buttons off while ROI is being defined
+//                    EnableWindow(win->hPolyButton, false);
+//                    EnableWindow(win->hRectButton, false);
+                
+                // if an ROI is selected then create a new entity for it
+                } else if (checked == 1) {
+                    MessageBox(hwnd, (LPSTR) "Create new entity", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+                }
+            }
+            
+			if (LOWORD(wParam) == 5 && HIWORD(wParam) == BN_CLICKED) {
+                // ** delete procedure
+                // loop through roiCheckboxList
+                //  check each to see if checked
+                //  use name to remove it from regionsSet
+                //  remove it from roiCheckboxList
+                //  reduce the y position of all HWNDs after it
+                
+				MessageBox(hwnd, (LPSTR) "Delete it", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
             } 
 			
 			return 0;

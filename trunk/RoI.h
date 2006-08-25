@@ -132,11 +132,31 @@ class RoISet {
         */
         void remove_region (RoI*);
         
+        /**
+            Removes a Region of Interest from the set by matching the name.
+        */
+        void remove_region (string);
+        
         
         /**
             Returns a vector of all the Regions of Interest.
         */
         vector<RoI> get_regions (void);
+        
+        
+        /**
+            Returns the number of Regions of Interest in the set.
+        */
+        int get_regions_count (void);
+        
+        
+        /**
+            Returns true if there is already a Regions of Interest in the set
+            with the given name.
+        */
+        bool name_exists (string);
 };
+
+extern RoISet *regionsSet;
 
 #endif

@@ -94,7 +94,37 @@ void RoISet::remove_region (RoI* to_go) {
     }
 }
 
+void RoISet::remove_region (string to_go) {
+    for (int i=0; i<regions.size(); i++) {
+        RoI r = regions.at(i);
+        if (r.get_name() == to_go) {
+            regions.erase(regions.begin()+i-1, regions.begin()+i);
+            break;
+        }
+    }
+}
+
 
 vector<RoI> RoISet::get_regions (void) {
     return regions;
+}
+
+
+int RoISet::get_regions_count (void) {
+    return regions.size();
+}
+
+
+bool RoISet::name_exists (string name) {
+    bool exists = false;
+    
+    for (int i=0; i<regions.size(); i++) {
+        RoI r = regions.at(i);
+        if (r.get_name() == name) {
+            exists = true;
+            break;
+        }
+    }
+    
+    return exists;
 }
