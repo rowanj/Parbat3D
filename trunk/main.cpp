@@ -207,7 +207,7 @@ void loadFile()
                     // show tool & image windows
                     toolWindow.Show();
                     imageWindow.Show();
-                    roiWindow.Show();
+                    //roiWindow.Show();
                     orderWindows();                    
 
                     // update opengl displays

@@ -23,15 +23,15 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
     RECT rect2;
    	rect2.top=5;
    	rect2.left=25;
-   	rect2.right=150; //235
-   	rect2.bottom=120;                 	
+   	rect2.right=218;
+   	rect2.bottom=100;                 	
 	hFSScrollBox.Create(GetHandle(),&rect2);
 
-	hX = CreateWindowEx(0, "BUTTON", "X", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 118, 25,
+	hX = CreateWindowEx(0, "BUTTON", "X", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 118, 5,
 		26, 20 + (20 * toolWindow.bands), hFSScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
-	hY = CreateWindowEx(0, "BUTTON", "Y", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 144, 25,
+	hY = CreateWindowEx(0, "BUTTON", "Y", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 144, 5,
 		26, 20 + (20 * toolWindow.bands), hFSScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
-    hZ = CreateWindowEx(0, "BUTTON", "Z", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 170, 25,
+    hZ = CreateWindowEx(0, "BUTTON", "Z", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 170, 5,
 		26, 20 + (20 * toolWindow.bands), hFSScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
 
 	/* Dynamically add Radio buttons  */
@@ -65,30 +65,53 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 
         // Display band name in tool window 
 		HWND hstatic=CreateWindowEx(0, szStaticControl, name,
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 40, 40 + (20 * i), 100, 18,
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 20 + (20 * i), 100, 18,
 			hFSScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
 		SetStaticFont(hstatic,STATIC_FONT_NORMAL);
 		
 		// Create Trackbar (slider)
-		//InitCommonControls(); // loads common control's DLL 
-		
-		hTrackbar = CreateWindowEx( 
+			hTrackbar = CreateWindowEx( 
 	        0,                             // no extended styles 
-	        "TRACKBAR_CLASS",                // class name TRACKBAR_CLASS
+	        "msctls_trackbar32",                // class name TRACKBAR_CLASS
 	        "Granularity",            // title (caption) 
-	        WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,  // style  | TBS_AUTOTICKS | TBS_ENABLESELRANGE
-	        10, 190,                        // position 
-	        200, 30,                       // size 
+	        WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE | TBS_BOTH,  // style  | TBS_AUTOTICKS | TBS_ENABLESELRANGE
+	        5, 145,                        // position 
+	        215, 45,                      // size 
 	        GetHandle(),                       // parent window 
 	        NULL, //(HMENU) ID_TRACKBAR,             // control identifier  ID_TRACKBAR
 	        Window::GetAppInstance(),                       // instance 
 	        NULL                           // no WM_CREATE parameter 
 	        ); 
-	        
+	        // Trackbar range - number of positions
+	        SendMessage(hTrackbar, TBM_SETRANGE, 
+		        (WPARAM) TRUE,                   // redraw flag 
+		        (LPARAM) MAKELONG(1, 6));  // min. & max. positions
+		        
+		    // Trackbar steps taken when clicking to the side of the pointer
+		    SendMessage(hTrackbar, TBM_SETPAGESIZE, 
+		        0, (LPARAM) 1);                  // new page size 
+		        
+			//Trackbar - sets position
+		    SendMessage(hTrackbar, TBM_SETPOS, 
+		        (WPARAM) TRUE,                   // redraw flag 
+		        (LPARAM) 1); 
+		
+		    //Trackbar titles
+			HWND htitle=CreateWindowEx(0, szStaticControl, "Granularity          No. Points:...",
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 10, 130, 210, 18,
+			GetHandle(), NULL, Window::GetAppInstance(), NULL);
+			SetStaticFont(htitle,STATIC_FONT_NORMAL);
+			
+			//Trackbar ratios
+			HWND hratios=CreateWindowEx(0, szStaticControl, "1:1        2:1       4:1       8:1     16:1     32:1",
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 10, 190, 210, 18,
+			GetHandle(), NULL, Window::GetAppInstance(), NULL);
+			SetStaticFont(hratios,STATIC_FONT_NORMAL);
+			 
 		
 		// Insert 'Generate' button under radio buttons. Location based on band number 
 		hgenerate =  CreateWindowEx(0, "BUTTON", "Generate", WS_CHILD | WS_VISIBLE, 80,
-			205, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
+			207, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
     
 	}    
 	
@@ -116,7 +139,10 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
     
     switch(message)
     {
-        
+        case WM_COMMAND:
+        {
+			MessageBox(hwnd, (LPSTR) "Look... a Scatterplot!", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+		}
     }
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }
