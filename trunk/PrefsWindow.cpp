@@ -104,8 +104,8 @@ LRESULT CALLBACK PrefsWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
 				ShowWindow(hwnd,SW_HIDE);
-				//SetDlgItemText((settingsFile->getSetting("preferences", "texsize")).c_str()
-				//(settingsFile->getSetting("preferences", "cachesize")).c_str()
+				LRESULT theResult = SendMessage(win->cacheEntry, WM_SETTEXT, 0, (LPARAM)(settingsFile->getSetting("preferences", "cachesize")).c_str());
+				theResult = SendMessage(win->texSizeEntry, WM_SETTEXT, 0, (LPARAM)(settingsFile->getSetting("preferences", "texsize")).c_str());
 	        } 
 			return 0;
 			
