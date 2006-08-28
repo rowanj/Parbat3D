@@ -130,80 +130,30 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
                MessageBox( hwnd, (LPSTR) "First ROI is checked",(LPSTR) "Action",
 					MB_ICONINFORMATION | MB_OK );
             }*/
-
 			
-			// Handle actions for each button pressed
+			/* Open Button */
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED) {
-				MessageBox( hwnd, (LPSTR) "Open ROI",(LPSTR) "Action",
-					MB_ICONINFORMATION | MB_OK );
+				win->loadROI(win);
             }
             
+            /* Save Button */
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED) {
-				MessageBox( hwnd, (LPSTR) "Save ROI",(LPSTR) "Action",
-					MB_ICONINFORMATION | MB_OK );
+                win->saveROI(win);
             }
             
+            /* Create Polygon ROI Button */
 			if (LOWORD(wParam) == 3 && HIWORD(wParam) == BN_CLICKED) {
-				MessageBox( hwnd, (LPSTR) "Create ROI Poly tool",(LPSTR) "Action",
-					MB_ICONINFORMATION | MB_OK );
+                win->createNewROI(win, "POLYGON");
             }
             
+            /* Create Rectangle ROI Button */
 			if (LOWORD(wParam) == 4 && HIWORD(wParam) == BN_CLICKED) {
-                int i;
-                int listSize = roiCheckboxList.size();
-                int checked = 0;
-                
-                // find how many ROIs are selected
-                for (i=0; i<listSize; i++) {
-                    HWND hCur = roiCheckboxList.at(i);
-                    if ((SendMessageA(hCur, BM_GETCHECK, 0, 0)) == BST_CHECKED)
-                        checked++;
-                }
-                
-                // if no ROIs are selected then create a new one
-                if (checked == 0) {
-                    // get unique name
-                    i = listSize;
-                    string *name = new string(makeMessage("ROI-", listSize));
-                    
-                    while (regionsSet->name_exists(*name)) {
-                        i++;
-                        name = new string(makeMessage("ROI-", i));
-                    }
-                    
-                    // create ROI with the name
-                    RoI *rCur = regionsSet->new_region(*name);
-                    regionsSet->new_entity("RECT");
-                    
-                    // create checkbox for the ROI
-                    HWND hROITick = CreateWindowEx(
-                                        0, "BUTTON",
-                                        copyString(name->c_str()),
-                                		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
-                                        10, 10 + (20 * listSize),
-                                        100, 16, scrollBox.GetHandle(), NULL,
-                                		Window::GetAppInstance(), NULL);
-                    roiCheckboxList.push_back(hROITick);    // add the ROI checkbox to the list
-                    
-                    // turn buttons off while ROI is being defined
-//                    EnableWindow(win->hPolyButton, false);
-//                    EnableWindow(win->hRectButton, false);
-                
-                // if an ROI is selected then create a new entity for it
-                } else if (checked == 1) {
-                    MessageBox(hwnd, (LPSTR) "Create new entity", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
-                }
+                win->createNewROI(win, "RECT");
             }
             
+            /* Delete ROI Button */
 			if (LOWORD(wParam) == 5 && HIWORD(wParam) == BN_CLICKED) {
-                // ** delete procedure
-                // loop through roiCheckboxList
-                //  check each to see if checked
-                //  use name to remove it from regionsSet
-                //  remove it from roiCheckboxList
-                //  reduce the y position of all HWNDs after it
-                
-				MessageBox(hwnd, (LPSTR) "Delete it", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+                win->deleteROI(win);
             } 
 			
 			return 0;
@@ -231,4 +181,87 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
     }
     // call next window procedure in chain
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
+}
+
+
+int ROIWindow::getROICheckedCount () {
+    int i;
+    int listSize = roiCheckboxList.size();
+    int checked = 0;
+    
+    // find how many ROIs are selected
+    for (i=0; i<listSize; i++) {
+        HWND hCur = roiCheckboxList.at(i);
+        if ((SendMessageA(hCur, BM_GETCHECK, 0, 0)) == BST_CHECKED)
+            checked++;
+    }
+    
+    return checked;
+}
+
+
+void ROIWindow::loadROI (ROIWindow* win) {
+    MessageBox(NULL, (LPSTR) "Open ROI", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+}
+
+
+void ROIWindow::saveROI (ROIWindow* win) {
+    int checked = win->getROICheckedCount();
+    
+    if (checked>0) {
+        MessageBox(NULL, (LPSTR) "Save", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+    }
+}
+
+
+void ROIWindow::createNewROI (ROIWindow* win, string roiType) {
+    int i;
+    int listSize = roiCheckboxList.size();
+    int checked = win->getROICheckedCount();
+    
+    // if no ROIs are selected then create a new one
+    if (checked == 0) {
+        // get unique name
+        i = listSize;
+        string *name = new string(makeMessage("ROI-", listSize));
+        
+        while (regionsSet->name_exists(*name)) {
+            i++;
+            name = new string(makeMessage("ROI-", i));
+        }
+        
+        // create ROI with the name
+        RoI *rCur = regionsSet->new_region(*name);
+        regionsSet->new_entity(roiType);
+        
+        // create checkbox for the ROI
+        HWND hROITick = CreateWindowEx(
+                            0, "BUTTON",
+                            copyString(name->c_str()),
+                    		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
+                            10, 10 + (20 * listSize),
+                            100, 16, scrollBox.GetHandle(), NULL,
+                    		Window::GetAppInstance(), NULL);
+        roiCheckboxList.push_back(hROITick);    // add the ROI checkbox to the list
+        
+        // turn buttons off while ROI is being defined
+//        EnableWindow(win->hPolyButton, false);
+//        EnableWindow(win->hRectButton, false);
+    
+    // if an ROI is selected then create a new entity for it
+    } else if (checked == 1) {
+        MessageBox(NULL, (LPSTR) "Create new entity", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+    }
+}
+
+
+void ROIWindow::deleteROI (ROIWindow* win) {
+    // ** delete procedure
+    // loop through roiCheckboxList
+    //  check each to see if checked
+    //  use name to remove it from regionsSet
+    //  remove it from roiCheckboxList
+    //  reduce the y position of all HWNDs after it
+    
+	MessageBox(NULL, (LPSTR) "Delete it", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
 }

@@ -26,6 +26,17 @@ class ROIWindow:public Window
         
         static vector<HWND> roiCheckboxList;
         
+        int getROICheckedCount ();
+        
+        void loadROI (ROIWindow*);
+        
+        void saveROI (ROIWindow*);
+        
+        void createNewROI (ROIWindow*, string);
+        
+        void deleteROI (ROIWindow*);
+        
+        
     public:
         int Create(HWND parent);
         static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
