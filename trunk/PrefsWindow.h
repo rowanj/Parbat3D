@@ -9,6 +9,8 @@ class PrefsWindow:public Window
     WNDPROC prevProc;
     HWND cacheLabel;
     HWND cacheEntry;
+    HWND texSizeLabel;
+    HWND texSizeEntry;
     HWND okButton;
     HWND cancelButton;
         

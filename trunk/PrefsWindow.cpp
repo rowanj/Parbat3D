@@ -17,8 +17,8 @@ int PrefsWindow::Create(HWND parent)
 {
     RECT rect;
     int mx,my;
-    const int PREFS_WINDOW_WIDTH=400;
-    const int PREFS_WINDOW_HEIGHT=500;
+    const int PREFS_WINDOW_WIDTH=190;
+    const int PREFS_WINDOW_HEIGHT=120;
    
     /* Get Overview Window Location for Prefs window alignment*/
     GetWindowRect(overviewWindow.GetHandle(),&rect);
@@ -33,22 +33,34 @@ int PrefsWindow::Create(HWND parent)
     SetBackgroundBrush(backBrush);
 
     cacheLabel =CreateWindowEx( 0, szStaticControl, "Cache size (MB):", 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 3,
-		3, 120, 20, GetHandle(), NULL,
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 6,
+		6, 120, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
 	
 	SetStaticFont(cacheLabel, STATIC_FONT_NORMAL);
 
 	cacheEntry =CreateWindowEx( WS_EX_CLIENTEDGE, "EDIT", (settingsFile->getSetting("preferences", "cachesize")).c_str(), 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | SS_OWNERDRAW, 125,
-		3, 40, 20, GetHandle(), NULL,
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | SS_OWNERDRAW, 138,
+		6, 40, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
 		
-	okButton = CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | WS_BORDER, 270,
-			435, 55, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
+	texSizeLabel =CreateWindowEx( 0, szStaticControl, "Texture dimension (pixels):", 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 6,
+		29, 130, 20, GetHandle(), NULL,
+		GetAppInstance(), NULL);
+	
+	SetStaticFont(texSizeLabel, STATIC_FONT_NORMAL);
+
+	texSizeEntry =CreateWindowEx( WS_EX_CLIENTEDGE, "EDIT", (settingsFile->getSetting("preferences", "texsize")).c_str(), 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | SS_OWNERDRAW, 138,
+		29, 40, 20, GetHandle(), NULL,
+		GetAppInstance(), NULL);
+		
+	okButton = CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | WS_BORDER, 60,
+			55, 55, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
 			
-	cancelButton = CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE | WS_BORDER, 330,
-			435, 55, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);		
+	cancelButton = CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE | WS_BORDER, 120,
+			55, 55, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);		
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
 
@@ -72,28 +84,47 @@ LRESULT CALLBACK PrefsWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
 			
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
 	        {
-				char* cacheSizeCBuffer = new char[255];
-				cacheSizeCBuffer[0] = (char)255;
-				cacheSizeCBuffer[1] = (char)0;
-				std::string cacheSizeString;
+				char* entryCBuffer = new char[255];
+				entryCBuffer[0] = (char)255;
+				entryCBuffer[1] = (char)0;
+				std::string entryString;
 				std::stringstream convertorStream;
 				
-				LRESULT theResult = SendMessage(win->cacheEntry, EM_GETLINE, 0,(LPARAM) cacheSizeCBuffer);
+				LRESULT theResult = SendMessage(win->cacheEntry, EM_GETLINE, 0,(LPARAM) entryCBuffer);
 				Console::write("Got ");
 				Console::write(theResult);
 				Console::write(" TCHARs of data\n");
-				convertorStream << cacheSizeCBuffer;
-				convertorStream >> cacheSizeString;
+				convertorStream << entryCBuffer;
+				convertorStream >> entryString;
 				Console::write("Got cache entry - C string = ");
-				Console::write(cacheSizeCBuffer);
+				Console::write(entryCBuffer);
 				Console::write("\n");
 				Console::write("C++ string = ");
-				Console::write(&cacheSizeString);
+				Console::write(&entryString);
 				Console::write("\n");
 				
-				settingsFile->setSetting("preferences", "cachesize", cacheSizeString);
+				settingsFile->setSetting("preferences", "cachesize", entryString);
+				
+				entryCBuffer[0] = (char)255;
+				entryCBuffer[1] = (char)0;
+				theResult = SendMessage(win->texSizeEntry, EM_GETLINE, 0,(LPARAM) entryCBuffer);
+				Console::write("Got ");
+				Console::write(theResult);
+				Console::write(" TCHARs of data\n");
+				convertorStream << entryCBuffer;
+				convertorStream >> entryString;
+				Console::write("Got tex size entry - C string = ");
+				Console::write(entryCBuffer);
+				Console::write("\n");
+				Console::write("C++ string = ");
+				Console::write(&entryString);
+				Console::write("\n");
+				
+				settingsFile->setSetting("preferences", "texsize", entryString);
+				
 				MessageBox( hwnd, (LPSTR) "Preferences saved successfully.",(LPSTR) "Parbat3D",
 				MB_ICONINFORMATION | MB_OK );
+				delete entryCBuffer;
 	        } 
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
