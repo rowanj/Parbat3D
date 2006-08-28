@@ -224,10 +224,17 @@ int ImageTileSet::load_tile(int x, int y)
 		cache_fill = cache_fill + tile_memory_size;
 		if (cache_fill > cache_size) {
 			if (tiles.size() > 0) {
+				/* This is the cache dropping algorithm */
+#if TRUE
+				/* FIFO */
 				delete[] tiles[0]->data; /* Delete data */
 				delete tiles[0]; /* Delete structure */
 				tiles.erase(tiles.begin());
 				cache_fill = cache_fill - tile_memory_size;
+#else
+				/* LRU */
+#endif
+
 			}
 		}
 		
