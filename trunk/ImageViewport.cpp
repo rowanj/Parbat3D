@@ -37,12 +37,29 @@ ImageViewport::~ImageViewport(void)
 	
 float ImageViewport::set_zoom_level(float zoom_value)
 {
+	int old_viewport_width = viewport_width;
+	int old_viewport_height = viewport_height;
+	
 	zoom_value = round(zoom_value*100.0)/100.0;
 	zoom_level = max(zoom_minimum, zoom_value);
 	zoom_image_width = int(round(image_width * zoom_level));
 	zoom_image_height = int(round(image_width * zoom_level));
 	viewport_width = int(round((float)window_width / zoom_level));
 	viewport_height = int(round((float)window_height / zoom_level));
+	
+	image_x = image_x + (old_viewport_width - viewport_width)/2;
+	image_y = image_y + (old_viewport_height - viewport_height)/2;
+	
+	
+	image_x = min(image_width - viewport_width, image_x);
+	image_y = min(image_height - viewport_height, image_y);	
+	
+	image_x = max(image_x, 0);
+	image_y = max(image_y, 0);
+	
+	zoom_x = int(round(image_x * zoom_level));
+	zoom_y = int(round(image_y * zoom_level));
+	
 	notify_viewport_listeners();
 	return zoom_level;
 }

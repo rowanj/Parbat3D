@@ -96,7 +96,7 @@ LRESULT CALLBACK PrefsWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
 				theResult = SendMessage(win->texSizeEntry, EM_GETLINE, 0,(LPARAM) entryCBuffer);
 				settingsFile->setSetting("preferences", "texsize", atoi(entryCBuffer));
 				
-				MessageBox( hwnd, (LPSTR) "Preferences saved successfully.",(LPSTR) "Parbat3D",
+				MessageBox( hwnd, (LPSTR) "Preferences saved successfully.\nThis will take effect after restarting Parbat.",(LPSTR) "Parbat3D",
 				MB_ICONINFORMATION | MB_OK );
 				ShowWindow(hwnd,SW_HIDE);
 				delete entryCBuffer;
