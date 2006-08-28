@@ -36,9 +36,12 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
     glDisable(GL_DEPTH_TEST);
 
     /* Use larger texture if appropriate */
-    GLint max_texture_size;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
-	texture_size = (((max_texture_size)<(512))?(max_texture_size):(512));
+    {
+	    GLint max_texture_size;
+		int user_texture_size = settingsFile->getSettingi("preferences","texsize");
+	    glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
+		texture_size = min(user_texture_size, max_texture_size);
+	}
 
 	gl_image->GLresize();
 
