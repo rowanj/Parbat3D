@@ -43,7 +43,7 @@ int PrefsWindow::Create(HWND parent)
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | SS_OWNERDRAW, 138,
 		6, 40, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
-		
+
 	texSizeLabel =CreateWindowEx( 0, szStaticControl, "Texture dimension (pixels):", 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 6,
 		29, 130, 20, GetHandle(), NULL,
@@ -87,48 +87,25 @@ LRESULT CALLBACK PrefsWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
 				char* entryCBuffer = new char[255];
 				entryCBuffer[0] = (char)255;
 				entryCBuffer[1] = (char)0;
-				std::string entryString;
-				std::stringstream convertorStream;
 				
-				LRESULT theResult = SendMessage(win->cacheEntry, EM_GETLINE, 0,(LPARAM) entryCBuffer);
-				Console::write("Got ");
-				Console::write(theResult);
-				Console::write(" TCHARs of data\n");
-				convertorStream << entryCBuffer;
-				convertorStream >> entryString;
-				Console::write("Got cache entry - C string = ");
-				Console::write(entryCBuffer);
-				Console::write("\n");
-				Console::write("C++ string = ");
-				Console::write(&entryString);
-				Console::write("\n");
-				
-				settingsFile->setSetting("preferences", "cachesize", entryString);
+				LRESULT theResult = SendMessage(win->cacheEntry, EM_GETLINE, 0,(LPARAM) entryCBuffer);				
+				settingsFile->setSetting("preferences", "cachesize", atoi(entryCBuffer));
 				
 				entryCBuffer[0] = (char)255;
 				entryCBuffer[1] = (char)0;
 				theResult = SendMessage(win->texSizeEntry, EM_GETLINE, 0,(LPARAM) entryCBuffer);
-				Console::write("Got ");
-				Console::write(theResult);
-				Console::write(" TCHARs of data\n");
-				convertorStream << entryCBuffer;
-				convertorStream >> entryString;
-				Console::write("Got tex size entry - C string = ");
-				Console::write(entryCBuffer);
-				Console::write("\n");
-				Console::write("C++ string = ");
-				Console::write(&entryString);
-				Console::write("\n");
-				
-				settingsFile->setSetting("preferences", "texsize", entryString);
+				settingsFile->setSetting("preferences", "texsize", atoi(entryCBuffer));
 				
 				MessageBox( hwnd, (LPSTR) "Preferences saved successfully.",(LPSTR) "Parbat3D",
 				MB_ICONINFORMATION | MB_OK );
+				ShowWindow(hwnd,SW_HIDE);
 				delete entryCBuffer;
 	        } 
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
 				ShowWindow(hwnd,SW_HIDE);
+				//SetDlgItemText((settingsFile->getSetting("preferences", "texsize")).c_str()
+				//(settingsFile->getSetting("preferences", "cachesize")).c_str()
 	        } 
 			return 0;
 			
