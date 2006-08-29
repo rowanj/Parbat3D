@@ -7,23 +7,32 @@
 #include "Config.h"
 #include "ToolWindow.h"
 
+ScrollBox hDScrollBox;
 
 int DisplayTab::GetContainerHeight()
 {
-    return 90 + (20 * toolWindow.bands);
+    //return 90 + (20 * toolWindow.bands);
+    return 0;
 }
 
 int DisplayTab::Create(HWND parent,RECT *parentRect)
 {
     ToolTab::Create(parent,parentRect);
     prevProc=SetWindowProcedure(&WindowProcedure);
+    
+    RECT rect;
+   	rect.top=5;
+   	rect.left=25;
+   	rect.right=218;
+   	rect.bottom=217;                 	
+	hDScrollBox.Create(GetHandle(),&rect);
 
-    hRed = CreateWindowEx(0, "BUTTON", "R", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 138, 25,
-		26, 20 + (20 * toolWindow.bands), GetHandle(), NULL, Window::GetAppInstance(), NULL);
-	hGreen = CreateWindowEx(0, "BUTTON", "G", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 164, 25,
-		26, 20 + (20 * toolWindow.bands), GetHandle(), NULL, Window::GetAppInstance(), NULL);
-    hBlue = CreateWindowEx(0, "BUTTON", "B", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 190, 25,
-		26, 20 + (20 * toolWindow.bands), GetHandle(), NULL, Window::GetAppInstance(), NULL);
+    hRed = CreateWindowEx(0, "BUTTON", "R", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 118, 5,
+		26, 20 + (20 * toolWindow.bands), hDScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	hGreen = CreateWindowEx(0, "BUTTON", "G", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 144, 5,
+		26, 20 + (20 * toolWindow.bands), hDScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+    hBlue = CreateWindowEx(0, "BUTTON", "B", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 170, 5,
+		26, 20 + (20 * toolWindow.bands), hDScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
 
 	/* Dynamically add Radio buttons  */
 	redRadiobuttons=new HWND[toolWindow.bands];
@@ -64,13 +73,13 @@ int DisplayTab::Create(HWND parent,RECT *parentRect)
 
         // Display band name in tool window 
 		HWND hstatic=CreateWindowEx(0, szStaticControl, name,
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 60, 40 + (20 * i), 100, 18,
-			GetHandle(), NULL, Window::GetAppInstance(), NULL);
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 10, 20 + (20 * i), 100, 18,
+			hDScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
 		SetStaticFont(hstatic,STATIC_FONT_NORMAL);
            
 		// Insert 'Update' button under radio buttons. Location based on band number 
-		hupdate =  CreateWindowEx(0, "BUTTON", "Update", WS_CHILD | WS_VISIBLE, 136,
-			50 + (20 * toolWindow.bands), 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
+		hupdate =  CreateWindowEx(0, "BUTTON", "Update", WS_CHILD | WS_VISIBLE, 80,
+			247, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
     
 	}    
 	
@@ -86,7 +95,9 @@ int DisplayTab::Create(HWND parent,RECT *parentRect)
         SendMessage(redRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
     	SendMessage(greenRadiobuttons[2],BM_SETCHECK,BST_CHECKED,0);
     	SendMessage(blueRadiobuttons[3],BM_SETCHECK,BST_CHECKED,0);
-    }	
+    }
+    
+    hDScrollBox.UpdateScrollBar();
 }
 
 LRESULT CALLBACK DisplayTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)

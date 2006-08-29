@@ -17,13 +17,17 @@ class ROIWindow:public Window
         HICON hOpenIcon;
         HWND hSaveButton;
         HICON hSaveIcon;
+        
+        HWND hNewButton;
+        HICON hNewIcon;
+        HWND hDeleteButton;
+        HICON hDeleteIcon;
+        
         HWND hPolyButton;
         HICON hPolyIcon;
         HWND hRectButton;
         HICON hRectIcon;
-        HWND hTrashButton;
-        HICON hTrashIcon;
-        
+                
         static vector<HWND> roiCheckboxList;
         
         int getROICheckedCount ();

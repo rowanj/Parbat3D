@@ -31,7 +31,7 @@ int ToolWindow::Create(HWND)
     /* The class is registered, lets create the program*/
     if (!CreateWin(0, "Parbat3D Tool Window", "Tools",
            WS_POPUP+WS_CAPTION+WS_SYSMENU, rect.left, rect.bottom,
-           250, 300, imageWindow.GetHandle(), NULL))
+           250, 340, imageWindow.GetHandle(), NULL))
         return false;
     setupDrawingObjects(GetHandle());
     prevProc=SetWindowProcedure(&ToolWindow::WindowProcedure);

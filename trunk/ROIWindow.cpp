@@ -16,7 +16,7 @@
 #include "StringUtils.h"
 
 
-ScrollBox scrollBox;
+ScrollBox ROIscrollBox;
 
 vector<HWND> ROIWindow::roiCheckboxList;
 
@@ -43,8 +43,8 @@ int ROIWindow::Create(HWND parent)
    	rect2.top=5;
    	rect2.left=5;
    	rect2.right=235;
-   	rect2.bottom=220;                 	
-	scrollBox.Create(GetHandle(),&rect2);
+   	rect2.bottom=227;                 	
+	ROIscrollBox.Create(GetHandle(),&rect2);
 
 	// add ROI check boxes
 /*	int roiInList = regionsSet->get_regions_count();
@@ -63,50 +63,59 @@ int ROIWindow::Create(HWND parent)
 	//Create Open button
 	hOpenButton =CreateWindowEx( 0, "BUTTON", NULL, 
 		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 5,
-		230, 36, 36, GetHandle(), (HMENU) 1,
+		237, 28, 28, GetHandle(), (HMENU) 1,
 		Window::GetAppInstance(), NULL);
 		
 	hOpenIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
-	SendMessage (hOpenButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "open.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
-	// this also works: SendMessage(openButton,BM_SETIMAGE,IMAGE_ICON,(LPARAM)hIcon);
+	SendMessage (hOpenButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "open.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
 	
 	//Create Save button
 	hSaveButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 45,
-		230, 36, 36, GetHandle(),  (HMENU) 2,
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 40,
+		237, 28, 28, GetHandle(),  (HMENU) 2,
 		Window::GetAppInstance(), NULL);
 		
 	hSaveIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
-	SendMessage (hSaveButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "save.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
+	SendMessage (hSaveButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "save.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
+	
+	//Create New ROI button
+	hNewButton =CreateWindowEx( 0, "BUTTON", NULL, 
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 90,
+		237, 28, 28, GetHandle(),  (HMENU) 3,
+		Window::GetAppInstance(), NULL);
+		
+	hNewIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
+	SendMessage (hNewButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "new.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
+	
+	//Create Delete ROI button
+	hDeleteButton =CreateWindowEx( 0, "BUTTON", NULL, 
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 125,
+		237, 28, 28, GetHandle(),  (HMENU) 4,
+		Window::GetAppInstance(), NULL);
+		
+	hDeleteIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
+	SendMessage (hDeleteButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "delete.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
 	
 	//Create Polygon selection button
 	hPolyButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 100,
-		230, 36, 36, GetHandle(),  (HMENU) 3,
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 177,
+		237, 28, 28, GetHandle(),  (HMENU) 5,
 		Window::GetAppInstance(), NULL);
 		
 	hPolyIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
-	SendMessage (hPolyButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "poly.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
+	SendMessage (hPolyButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "poly.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
 	
 	//Create Rectangle selection button
 	hRectButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 140,
-		230, 36, 36, GetHandle(),  (HMENU) 4,
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 212,
+		237, 28, 28, GetHandle(),  (HMENU) 6,
 		Window::GetAppInstance(), NULL);
 		
 	hRectIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
-	SendMessage (hRectButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "rect.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
+	SendMessage (hRectButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "rect.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
 	
-	//Create Trash button
-	hTrashButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 200,
-		230, 36, 36, GetHandle(),  (HMENU) 5,
-		Window::GetAppInstance(), NULL);
-		
-	hTrashIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
-	SendMessage (hTrashButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "trash.ico", IMAGE_ICON, 32, 32,LR_LOADFROMFILE));
 	
-    scrollBox.UpdateScrollBar();
+    ROIscrollBox.UpdateScrollBar();
 	
 	return true;
 }
@@ -141,24 +150,29 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
                 win->saveROI(win);
             }
             
-            /* Create Polygon ROI Button */
+            /* New ROI Button */
 			if (LOWORD(wParam) == 3 && HIWORD(wParam) == BN_CLICKED) {
-                win->createNewROI(win, "POLYGON");
-            }
-            
-            /* Create Rectangle ROI Button */
-			if (LOWORD(wParam) == 4 && HIWORD(wParam) == BN_CLICKED) {
-                win->createNewROI(win, "RECT");
+            	
             }
             
             /* Delete ROI Button */
-			if (LOWORD(wParam) == 5 && HIWORD(wParam) == BN_CLICKED) {
+			if (LOWORD(wParam) == 4 && HIWORD(wParam) == BN_CLICKED) {
                 win->deleteROI(win);
-            } 
-			
+            }
+            
+            /* Create Polygon ROI Button */
+			if (LOWORD(wParam) == 5 && HIWORD(wParam) == BN_CLICKED) {
+                win->createNewROI(win, "POLYGON");
+                ROIscrollBox.UpdateScrollBar();
+            }
+            
+            /* Create Rectangle ROI Button */
+			if (LOWORD(wParam) == 6 && HIWORD(wParam) == BN_CLICKED) {
+                win->createNewROI(win, "RECT");
+                ROIscrollBox.UpdateScrollBar();
+            }
+
 			return 0;
-		
-		
 
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
@@ -240,7 +254,7 @@ void ROIWindow::createNewROI (ROIWindow* win, string roiType) {
                             copyString(name->c_str()),
                     		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
                             10, 10 + (20 * listSize),
-                            100, 16, scrollBox.GetHandle(), NULL,
+                            100, 16, ROIscrollBox.GetHandle(), NULL,
                     		Window::GetAppInstance(), NULL);
         roiCheckboxList.push_back(hROITick);    // add the ROI checkbox to the list
         
