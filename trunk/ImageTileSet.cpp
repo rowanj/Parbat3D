@@ -185,7 +185,6 @@ int ImageTileSet::load_tile(int x, int y)
 	int tile_size_x, tile_size_y;
 	int data_size_x, data_size_y;
 	int p_in, p_out, p_length;
-	int tile_check;
 	int tile_memory_size;
 
 	tile_memory_size = tex_size * tex_size * num_bands * sample_size;
@@ -205,13 +204,24 @@ int ImageTileSet::load_tile(int x, int y)
 	tile_index = (columns * tile_index_y) + tile_index_x;
 	
 	/* Load if not already */
-	tile_check = 0;
-	while (tile_check < tiles.size()) {
-		if (tiles[tile_check]->tile_index == tile_index) {
-			cache_hits++;
-			return tile_check;
+	{
+		int tile_check = 0;
+		int cached_tile = -1;
+		/* traverse tile vector */
+		while (tile_check < tiles.size()) {
+			/* increment tile age */
+			tiles[tile_check]->age++;
+			// If this is the one we're after...
+			if (tiles[tile_check]->tile_index == tile_index) {
+				found_tile = cached_tile;
+				// reset its age
+				tiles[found_tile]->age = 0;
+				cache_hits++;
+			}
+			tile_check++;
 		}
-		tile_check++;
+		// If we found it, no need to go further
+		if (found_tile >= 0) return cached_tile;
 	}
 	
 	{ // Tile wasn't in cache
@@ -233,8 +243,21 @@ int ImageTileSet::load_tile(int x, int y)
 				cache_fill = cache_fill - tile_memory_size;
 #else
 				/* LRU */
+				unsigned int maxage = -1;
+				int maxindex = 0;
+				for (int x = 0; x < tiles.size(); x++)
+				{
+					if (tiles[x]->age > maxage)
+					{
+						maxindex = x;
+						maxage = tiles[x]->age;
+					}
+				}
+				delete[] tiles[maxindex]->data; /* Delete data */
+				delete tiles[maxindex]; /* Delete structure */
+				tiles.erase(tiles.begin());
+				cache_fill = cache_fill - tile_memory_size;
 #endif
-
 			}
 		}
 		

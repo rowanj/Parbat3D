@@ -8,6 +8,7 @@
 typedef struct tile_t {
 	int tile_index;
 	char* data;
+	unsigned int age;
 } tile, *tile_ptr;
 
 class ImageTileSet
