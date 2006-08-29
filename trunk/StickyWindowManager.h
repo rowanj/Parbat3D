@@ -10,11 +10,13 @@ class StickyWindowManager
 {
     private:
     HWND hDesktop;
-    POINT prevMousePosition;    
+    POINT prevMousePosition;                        // mouse position at last call to OnMoving or BeginMoving
+    POINT origMousePosition;                        // mouse position at last call to BeginMoving
     Window *controller;
     vector<Window*> stickyWindows;
     vector<Window*> snappedWindows;
     vector<Window*> nonSnappedWindows;
+    RECT prevWindowPosition,origWindowPosition;
 
     int moveToInsideOfWindow(HWND snapToWin,RECT *rect);
     int moveToOutsideOfWindow(HWND snapToWin,RECT *rect);

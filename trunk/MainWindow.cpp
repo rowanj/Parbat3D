@@ -31,15 +31,29 @@ int MainWindow::Create()
     return true;
 }
 
+BOOL CALLBACK MainWindow::SaveChildState(HWND hwnd, LPARAM lparam)
+{
+    MainWindow *win=(MainWindow*)lparam;
+    
+//    if (hwnd!=overviewWindow.GetHandle())
+//    {
+        win->savedChildren.push_back(hwnd);
+        if (!IsWindowVisible(hwnd))
+            win->restoreStates.push_back(0);
+        else
+            win->restoreStates.push_back(SW_SHOW);
+
+        /* hide the window */                                                
+        ShowWindow(hwnd,SW_HIDE);                                                           
+ //   }
+    return true;
+}
+
+
 /* handle events related to the main window */
 LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    //static int imageWindowState=0;                      // recorded visibility state of image window
-//    static int toolWindowState=0;                       // recorded visibility state of tool window
-//    static int roiWindowState=0;                       // recorded visibility state of tool window
-//    static int prefsWindowState=0;						// recorded visibility state of prefs window
-  
-    
+
     MainWindow* win=(MainWindow*)Window::GetWindowObject(hwnd);
     int i;
     
@@ -53,84 +67,26 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
                 case SIZE_RESTORED:
                     /* restore child windows to their previous state */
                     
-                    /*
-                    if (imageWindowState!=0)
-                        ShowWindow(imageWindow.GetHandle(),imageWindowState);
-                    if (toolWindowState!=0)
-                        ShowWindow(toolWindow.GetHandle(),toolWindowState);
-                    if (roiWindowState!=0)
-                        ShowWindow(roiWindow.GetHandle(),roiWindowState);
-					if (prefsWindowState !=0)
-						ShowWindow(prefsWindow.GetHandle(),prefsWindowState);    
-                    */
-
-                    for (i=0;i<win->windows.size();i++)
+                   /* for (i=0;i<win->windows.size();i++)
                     {
                         if (win->windowStates[i]!=0)
                             ShowWindow(win->windows.at(i)->GetHandle(),win->windowStates[i]);
+                    }*/                   
+                    for (i=0;i<win->savedChildren.size();i++)
+                    {
+                        if (win->restoreStates.at(i)!=0)
+                            ShowWindow(win->savedChildren.at(i),win->restoreStates.at(i));
                     }
-
-                        
-                    ShowWindow(overviewWindow.GetHandle(),SW_SHOW);
+                       
+                    ShowWindow(overviewWindow.GetHandle(),SW_SHOW);                    
                     return 0;
 
                 case SIZE_MINIMIZED:
-                    /* record the current state of the child windows */
 
                     /*
-                    if (imageWindow.GetHandle()!=NULL)
-                    {
-                        if (!IsWindowVisible(imageWindow.GetHandle()))
-                            imageWindowState=0;
-                        else
-                            imageWindowState=SW_SHOW;
-                    }
-                    else
-                    {
-                        imageWindowState=0;
-                    }
-
-                    if (toolWindow.GetHandle()!=NULL)
-                    {
-                        if (!IsWindowVisible(toolWindow.GetHandle()))
-                            toolWindowState=0;
-                        else
-                            toolWindowState=SW_SHOW;                        
-                    }
-                    else
-                    {
-                        toolWindowState=0;
-                    }
-                    
-                    if (roiWindow.GetHandle()!=NULL)
-                    {
-                        if (!IsWindowVisible(roiWindow.GetHandle()))
-                            roiWindowState=0;
-                        else
-                            roiWindowState=SW_SHOW;                        
-                    }
-                    else
-                    {
-                        roiWindowState=0;
-                    }
-                    
-                    if (prefsWindow.GetHandle()!=NULL)
-                    {
-                        if (!IsWindowVisible(prefsWindow.GetHandle()))
-                            prefsWindowState=0;
-                        else
-                            prefsWindowState=SW_SHOW;                        
-                    }
-                    else
-                    {
-                        prefsWindowState=0;
-                    }
-                    */
-
-
                     for (i=0;i<win->windows.size();i++)
                     {
-                        /* get window state */
+                        // get window state
                         if (win->windows.at(i)->GetHandle()!=NULL)
                         {
                             if (!IsWindowVisible(win->windows.at(i)->GetHandle()))
@@ -138,7 +94,7 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
                             else
                                 win->windowStates[i]=SW_SHOW;                        
 
-                            /* hide the window */                                                
+                            // hide the window                                                
                             ShowWindow(win->windows.at(i)->GetHandle(),SW_HIDE);                                                           
                         }
                         else
@@ -147,14 +103,16 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
                         }
                         
                         
-                    }
-                    
+                    }*/
+                    win->savedChildren.clear();
+                    win->restoreStates.clear();
+//                    EnumChildWindows(hwnd,&SaveChildState,(LPARAM)win);
 
+                    ShowWindow(overviewWindow.GetHandle(),SW_HIDE);
  
                     /*
                     ShowWindow(imageWindow.GetHandle(),SW_HIDE);            
                     ShowWindow(toolWindow.GetHandle(),SW_HIDE);                    
-                    ShowWindow(overviewWindow.GetHandle(),SW_HIDE);
                     ShowWindow(roiWindow.GetHandle(),SW_HIDE);
                     ShowWindow(prefsWindow.GetHandle(), SW_HIDE);
                     */

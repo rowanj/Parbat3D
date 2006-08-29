@@ -1,3 +1,4 @@
+#define _WIN32_IE 0x0400
 
 #include <Windows.h>
 #include <Commctrl.h>
@@ -95,8 +96,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     
     MSG messages;
     
-    
-    InitCommonControls();           /* load window classes for common controls */    
+    INITCOMMONCONTROLSEX icc;
+    icc.dwSize=sizeof(INITCOMMONCONTROLSEX);
+    icc.dwICC=ICC_BAR_CLASSES;
+    InitCommonControlsEx(&icc);
     
     hDesktop=GetDesktopWindow();    /* record handle to desktop window */    
 

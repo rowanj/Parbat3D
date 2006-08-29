@@ -50,6 +50,9 @@ void StickyWindowManager::BeginMoving(Window *win)
     #endif
         
     GetCursorPos(&prevMousePosition);           // save current mouse position
+    GetCursorPos(&origMousePosition);           // save current mouse position    
+    GetWindowRect(win->GetHandle(),&prevWindowPosition);         // save current window position
+    GetWindowRect(win->GetHandle(),&origWindowPosition);         // save current window position    
     
     if (controller==win)
     {
@@ -137,39 +140,51 @@ void StickyWindowManager::BeginMoving(Window *win)
 
 void StickyWindowManager::OnMoving(Window *win, RECT *rect)
 {   
-    POINT mouse,mouseOffset;
-    POINT originalPos;
+    POINT mouse;
+    POINT offsetFromOrigPos;    // offset from original position (last call to BeginMoving) to new position
+    POINT offsetFromPrevPos;    // offset from previous position (last call to OnMoving) to new position
+    POINT posBeforeSnapping;
     
     // get current mouse co-ords
     GetCursorPos(&mouse);
     
     // calculate how much the mouse has moved
-    mouseOffset.x=mouse.x-prevMousePosition.x;
-    mouseOffset.y=mouse.y-prevMousePosition.y;   
+    offsetFromOrigPos.x=mouse.x-origMousePosition.x;
+    offsetFromOrigPos.y=mouse.y-origMousePosition.y;   
     
-    // move window position based on the cursor position
-    GetWindowRect(win->GetHandle(),rect);
-    rect->left+=mouseOffset.x;
-    rect->top+=mouseOffset.y;    
-    rect->right+=mouseOffset.x;
-    rect->bottom+=mouseOffset.y;    
-    originalPos.x=rect->left;
-    originalPos.y=rect->top;
+    // calculate new window position (before snapping)
+    rect->left=origWindowPosition.left+offsetFromOrigPos.x;
+    rect->top=origWindowPosition.top+offsetFromOrigPos.y;
+    rect->right=origWindowPosition.right+offsetFromOrigPos.x;
+    rect->bottom=origWindowPosition.bottom+offsetFromOrigPos.y;            
+
+    posBeforeSnapping.x=rect->left;
+    posBeforeSnapping.y=rect->top;
        
-    // snap to other windows
+    // change position to snap towards other windows
     moveToInsideOfWindow(hDesktop,rect); 
     if (win==controller)
     {
-        // todo: only snap to windows that were not connected to the controller when BeginMoving was called
-        // todo: snap to desktop
+        // todo: snap to windows that were not connected to the controller when BeginMoving was called
+        // todo: snap to other windows & desktop through connected windows
+
+        // calculate how much to move the snapped windows by
+        offsetFromPrevPos.x=rect->left-prevWindowPosition.left;
+        offsetFromPrevPos.y=rect->top-prevWindowPosition.top; 
                 
         // move windows that were connected to the controller when BeginMoving was called
         int i;
         for (i=0;i<snappedWindows.size();i++)
         {
-            moveWindowByOffset(snappedWindows.at(i)->GetHandle(),mouseOffset.x+(rect->left-originalPos.x),mouseOffset.y+(rect->top-originalPos.y));
+            moveWindowByOffset(snappedWindows.at(i)->GetHandle(),offsetFromPrevPos.x,offsetFromPrevPos.y);
         }
         
+        // record new window position as previous
+        prevWindowPosition.left=rect->left;
+        prevWindowPosition.right=rect->right;
+        prevWindowPosition.top=rect->top;
+        prevWindowPosition.bottom=rect->bottom;             
+
     }
     else
     {
@@ -187,11 +202,12 @@ void StickyWindowManager::OnMoving(Window *win, RECT *rect)
                 }
             }
         }
+          
     }
     
     // record current mouse position for use next time
-    prevMousePosition.x=mouse.x-(originalPos.x-rect->left);
-    prevMousePosition.y=mouse.y-(originalPos.y-rect->top);
+    prevMousePosition.x=mouse.x;
+    prevMousePosition.y=mouse.y;
 }
 
 

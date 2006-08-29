@@ -64,7 +64,7 @@ int PrefsWindow::Create(HWND parent)
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
 
-    stickyWindowManager.AddStickyWindow(this);  // make the window stick to others 
+    //stickyWindowManager.AddStickyWindow(this);  // make the window stick to others 
 
 	return true;
 }

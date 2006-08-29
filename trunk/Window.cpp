@@ -211,7 +211,7 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                 break;
             case WM_MOVING:
                 stickyWindowManager.OnMoving(win,(RECT*)lParam);
-                break;
+                return TRUE;
             case WM_DESTROY: 
                 DeleteObject(win->hNormalFont);
                 DeleteObject(win->hBoldFont);                
