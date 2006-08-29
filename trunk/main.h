@@ -11,6 +11,7 @@
 #include "ROIWindow.h"
 #include "PrefsWindow.h"
 #include "StickyWindowManager.h"
+#include "FeatureSpace.h"
 
 extern ImageHandler::ImageHandler* image_handler;
 extern char szStaticControl[];
@@ -26,6 +27,7 @@ extern OverviewWindow overviewWindow;
 extern ROIWindow roiWindow;
 extern PrefsWindow prefsWindow;
 extern StickyWindowManager stickyWindowManager;
+extern vector<FeatureSpace*> featureSpaceWindows;
 enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID,FEATURE_TAB_ID};
 
 

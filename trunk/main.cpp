@@ -45,6 +45,7 @@ ImageWindow imageWindow;
 ROIWindow roiWindow;
 PrefsWindow prefsWindow;
 StickyWindowManager stickyWindowManager;
+vector<FeatureSpace*> featureSpaceWindows;
 
 char *filename=NULL;                    // currently open image filename
 

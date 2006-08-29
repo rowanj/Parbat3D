@@ -141,7 +141,9 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
     {
         case WM_COMMAND:
         {
-			MessageBox(hwnd, (LPSTR) "Look... a Scatterplot!", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+			//MessageBox(hwnd, (LPSTR) "Look... a Scatterplot!", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+			int lod=0,only_ROIs=false;
+			featureSpaceWindows.push_back(new FeatureSpace(lod,only_ROIs));
 		}
     }
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
