@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=76
+UnitCount=78
 Type=0
 Ver=1
 ObjFiles=
@@ -20,7 +20,7 @@ ObjectOutput=build\objects
 OverrideOutput=0
 OverrideOutputName=Parbat3D.exe
 HostApplication=
-Folders=Image_File_PKG,Image_Manipulation_PKG,RoI_PKG,Settings_PKG,Utils,View_PKG
+Folders=Feature_Space_PKG,Image_File_PKG,Image_Manipulation_PKG,RoI_PKG,Settings_PKG,Utils,View_PKG
 CommandLine=
 UseCustomMakefile=0
 CustomMakefile=
@@ -797,20 +797,10 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit77]
-FileName=BatchIniFile.cpp
-CompileCpp=1
-Folder=Settings_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit78]
-FileName=BatchIniFile.h
+FileName=FeatureSpace.h
 CompileCpp=1
-Folder=Settings_PKG
+Folder=Feature_Space_PKG
 Compile=1
 Link=1
 Priority=1000
@@ -821,6 +811,16 @@ BuildCmd=
 FileName=ToolWindow.cpp
 CompileCpp=1
 Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit77]
+FileName=FeatureSpace.cpp
+CompileCpp=1
+Folder=Feature_Space_PKG
 Compile=1
 Link=1
 Priority=1000

@@ -207,6 +207,7 @@ int ImageTileSet::load_tile(int x, int y)
 	{
 		int tile_check = 0;
 		int cached_tile = -1;
+		int found_tile = -1;  // was missing - added by shane
 		/* traverse tile vector */
 		while (tile_check < tiles.size()) {
 			/* increment tile age */
