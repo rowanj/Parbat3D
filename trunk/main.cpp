@@ -22,7 +22,7 @@
 #include "ROIWindow.h"
 #include "PrefsWindow.h"
 
-#include "RoI.h"
+#include "ROISet.h"
 
 using namespace std;
 

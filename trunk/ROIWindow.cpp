@@ -9,7 +9,7 @@
 #include "ToolWindow.h"
 #include "ImageHandler.h"
 #include "ImageWindow.h"
-#include "ROI.h"
+#include "ROISet.h"
 #include "ROIFile.h"
 #include "ROIWindow.h"
 #include "Settings.h"

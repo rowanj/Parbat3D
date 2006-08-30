@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=78
+UnitCount=79
 Type=0
 Ver=1
 ObjFiles=
@@ -821,6 +821,16 @@ BuildCmd=
 FileName=FeatureSpace.cpp
 CompileCpp=1
 Folder=Feature_Space_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit79]
+FileName=ROISet.h
+CompileCpp=1
+Folder=ROI_PKG
 Compile=1
 Link=1
 Priority=1000

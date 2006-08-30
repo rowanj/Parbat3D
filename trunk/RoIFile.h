@@ -7,6 +7,7 @@
 
 #include "BatchIniFile.h"
 #include "ROI.h"
+#include "ROISet.h"
 #include "StringUtils.h"
 
 using namespace std;
