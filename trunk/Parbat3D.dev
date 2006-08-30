@@ -20,7 +20,7 @@ ObjectOutput=build\objects
 OverrideOutput=0
 OverrideOutputName=Parbat3D.exe
 HostApplication=
-Folders=Feature_Space_PKG,Image_File_PKG,Image_Manipulation_PKG,RoI_PKG,Settings_PKG,Utils,View_PKG
+Folders=Feature_Space_PKG,Image_File_PKG,Image_Manipulation_PKG,ROI_PKG,Settings_PKG,Utils,View_PKG
 CommandLine=
 UseCustomMakefile=0
 CustomMakefile=
@@ -250,7 +250,7 @@ BuildCmd=
 [Unit22]
 FileName=RoI.cpp
 CompileCpp=1
-Folder=RoI_PKG
+Folder=ROI_PKG
 Compile=1
 Link=1
 Priority=1000
@@ -260,7 +260,7 @@ BuildCmd=
 [Unit23]
 FileName=RoI.h
 CompileCpp=1
-Folder=RoI_PKG
+Folder=ROI_PKG
 Compile=1
 Link=1
 Priority=1000
@@ -270,7 +270,7 @@ BuildCmd=
 [Unit24]
 FileName=RoISet.cpp
 CompileCpp=1
-Folder=RoI_PKG
+Folder=ROI_PKG
 Compile=1
 Link=1
 Priority=1000
@@ -640,7 +640,7 @@ BuildCmd=
 [Unit61]
 FileName=RoIFile.cpp
 CompileCpp=1
-Folder=RoI_PKG
+Folder=ROI_PKG
 Compile=1
 Link=1
 Priority=1000
@@ -650,7 +650,7 @@ BuildCmd=
 [Unit62]
 FileName=RoIFile.h
 CompileCpp=1
-Folder=RoI_PKG
+Folder=ROI_PKG
 Compile=1
 Link=1
 Priority=1000

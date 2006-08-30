@@ -6,6 +6,7 @@ using namespace std;
 RoISet::RoISet () {
     current_region = NULL;
     current_entity = NULL;
+    editingEntity = false;
 }
 
 RoISet::~RoISet (void) {
@@ -20,6 +21,7 @@ void RoISet::new_entity (string t) {
     if (current_entity!=NULL) delete current_entity;
     current_entity = new RoIEntity();
     current_entity->type = t;
+    editingEntity = true;
 }
 
 
@@ -43,10 +45,17 @@ void RoISet::backtrack (void) {
 }
 
 
+bool RoISet::editing () {
+    return editingEntity;
+}
+
+
 /* Regions Of Interest ********************************************************/
 void RoISet::add_entity_to_current (void) {
     if (current_region!=NULL && current_entity!=NULL)
         current_region->add_entity(*current_entity);
+    
+    editingEntity = false;
 }
 
 

@@ -55,6 +55,7 @@ class RoISet {
         vector<RoI> regions;        // the set of all Regions of Interest
         RoI* current_region;        // the Region of Interest currently being worked on
         RoIEntity* current_entity;  // the shape currently being worked on
+        bool editingEntity;         // true if currently creating an entity
         
         
     public:
@@ -82,6 +83,11 @@ class RoISet {
             been added, nothing happens.
         */
         void backtrack (void);
+        
+        /**
+            Returns true if an entity is currently being created.
+        */
+        bool editing ();
         
         
         /**
