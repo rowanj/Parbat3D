@@ -26,7 +26,7 @@ class ROISet {
             parameter passed in specifies what type of shape it will be - POINT,
             RECT, POLY.
         */
-        void new_entity (string);
+        void new_entity (const char*);
         
         /**
             Adds a point to the shape that is currently being created. If there
@@ -119,6 +119,11 @@ class ROISet {
         */
         bool name_exists (string);
 };
+
+
+extern const char* ROI_POINT;
+extern const char* ROI_RECT;
+extern const char* ROI_POLY;
 
 extern ROISet *regionsSet;
 

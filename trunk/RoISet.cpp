@@ -17,7 +17,7 @@ ROISet::~ROISet (void) {
 
 
 /* Entities *******************************************************************/
-void ROISet::new_entity (string t) {
+void ROISet::new_entity (const char* t) {
     if (current_entity!=NULL) delete current_entity;
     current_entity = new ROIEntity();
     current_entity->type = t;

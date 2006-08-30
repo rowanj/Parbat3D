@@ -153,7 +153,7 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             
             /* New ROI Button */
 			if (LOWORD(wParam) == 3 && HIWORD(wParam) == BN_CLICKED)
-                win->newROI(win, "");
+                win->newROI(win, NULL);
             
             /* Delete ROI Button */
 			if (LOWORD(wParam) == 4 && HIWORD(wParam) == BN_CLICKED)
@@ -219,7 +219,7 @@ int ROIWindow::getROICheckedCount () {
 }
 
 
-void ROIWindow::newROI (ROIWindow* win, string roiType) {
+void ROIWindow::newROI (ROIWindow* win, const char* roiType) {
     // get unique name
     int listSize = roiCheckboxList.size();
     int i = listSize;
@@ -232,7 +232,7 @@ void ROIWindow::newROI (ROIWindow* win, string roiType) {
     
     // create ROI with the name
     ROI *rCur = regionsSet->new_region(*name);
-    if (roiType != "")
+    if (roiType != NULL)
         regionsSet->new_entity(roiType);
     
     // create checkbox for the ROI
@@ -259,13 +259,13 @@ void ROIWindow::saveROI (ROIWindow* win) {
         MessageBox(NULL, (LPSTR) "Save Some", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
     } else {
         MessageBox(NULL, (LPSTR) "Save All", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
-        ROIFile *rf = new ROIFile();
-        rf->saveSetToFile("temp.roi", regionsSet);
+        //ROIFile *rf = new ROIFile();
+        //rf->saveSetToFile("temp.roi", regionsSet);
     }
 }
 
 
-void ROIWindow::newEntity (ROIWindow* win, string roiType) {
+void ROIWindow::newEntity (ROIWindow* win, const char* roiType) {
     int i;
     int listSize = roiCheckboxList.size();
     int checked = win->getROICheckedCount();

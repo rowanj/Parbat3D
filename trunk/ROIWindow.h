@@ -44,7 +44,7 @@ class ROIWindow:public Window
             specifying the type of entity to add to the region. If the second
             parameter is left blank then no new entity is added.
         */
-        void newROI (ROIWindow*, string);
+        void newROI (ROIWindow*, const char*);
         
         /**
             Contains the procedure for loading a set of Regions of Interest
@@ -66,7 +66,7 @@ class ROIWindow:public Window
             is created, with the entity inside it. The second parameter
             specifies the type of entity to create.
         */
-        void newEntity (ROIWindow*, string);
+        void newEntity (ROIWindow*, const char*);
         
         void deleteROI (ROIWindow*);
         

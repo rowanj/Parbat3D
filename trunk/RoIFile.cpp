@@ -134,7 +134,7 @@ void ROIFile::saveRegionToFile (ROI* ROI) {
     for (int i=0; i<totalEntities; i++) {
         re = elist.at(i);
         et = makeString(makeString("entity ", i), " type");
-        openFile.updateBuffer(et, re.type);
+        openFile.updateBuffer(et, makeString(leader, copyString(re.type)));
         
         // save entity points
         pts = re.points;
@@ -196,7 +196,7 @@ ROI* ROIFile::loadRegionFromFile (string name) {
     for (int i=0; i<entityCount; i++) {
         entityBaseStr = makeString("entity ",i);
         entityCur = new ROIEntity();
-        entityCur->type = openFile.readFromBuffer(makeString(entityBaseStr, " type"));
+        entityCur->type = (openFile.readFromBuffer(makeString(entityBaseStr, " type"))).c_str();
         
         pointCount = stringToInt(openFile.readFromBuffer(makeString(entityBaseStr, " points")));
         for (int j=0; j<pointCount; j++) {

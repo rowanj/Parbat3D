@@ -3,6 +3,11 @@
 using namespace std;
 
 
+const char* ROI_POINT = "POINT";
+const char* ROI_RECT = "RECT";
+const char* ROI_POLY = "POLY";
+
+
 ROI::ROI (void) {
     active = true;
     colour_red = 0;

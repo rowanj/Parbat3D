@@ -16,7 +16,7 @@ struct coords {
 class ROIEntity {
     public:
         vector<coords> points;
-        string type;
+        const char* type;
 };
 
 
