@@ -71,7 +71,7 @@ int ROIWindow::Create(HWND parent)
 	
 	//Create Save button
 	hSaveButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 40,
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 38,
 		237, 28, 28, GetHandle(),  (HMENU) 2,
 		Window::GetAppInstance(), NULL);
 		
@@ -80,7 +80,7 @@ int ROIWindow::Create(HWND parent)
 	
 	//Create New ROI button
 	hNewButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 90,
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 75,
 		237, 28, 28, GetHandle(),  (HMENU) 3,
 		Window::GetAppInstance(), NULL);
 		
@@ -89,7 +89,7 @@ int ROIWindow::Create(HWND parent)
 	
 	//Create Delete ROI button
 	hDeleteButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 125,
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 108,
 		237, 28, 28, GetHandle(),  (HMENU) 4,
 		Window::GetAppInstance(), NULL);
 		
@@ -98,7 +98,7 @@ int ROIWindow::Create(HWND parent)
 	
 	//Create Polygon selection button
 	hPolyButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 177,
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 146,
 		237, 28, 28, GetHandle(),  (HMENU) 5,
 		Window::GetAppInstance(), NULL);
 		
@@ -107,15 +107,24 @@ int ROIWindow::Create(HWND parent)
 	
 	//Create Rectangle selection button
 	hRectButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 212,
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 179,
 		237, 28, 28, GetHandle(),  (HMENU) 6,
 		Window::GetAppInstance(), NULL);
 		
 	hRectIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hRectButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "rect.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
 	
+	//Create single point selection button
+	hSingleButton =CreateWindowEx( 0, "BUTTON", NULL, 
+		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 212,
+		237, 28, 28, GetHandle(),  (HMENU) 7,
+		Window::GetAppInstance(), NULL);
+		
+	hSingleIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
+	SendMessage (hSingleButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "single.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
 	
-    ROIscrollBox.UpdateScrollBar();
+	
+    //ROIscrollBox.UpdateScrollBar();
 	
 	return true;
 }
@@ -163,15 +172,20 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             /* Create Polygon ROI Button */
 			if (LOWORD(wParam) == 5 && HIWORD(wParam) == BN_CLICKED) {
                 win->createNewROI(win, "POLYGON");
-                ROIscrollBox.UpdateScrollBar();
             }
             
             /* Create Rectangle ROI Button */
 			if (LOWORD(wParam) == 6 && HIWORD(wParam) == BN_CLICKED) {
                 win->createNewROI(win, "RECT");
-                ROIscrollBox.UpdateScrollBar();
             }
-
+            
+            /* Create Single Point ROI Button */
+			if (LOWORD(wParam) == 7 && HIWORD(wParam) == BN_CLICKED) {
+                win->createNewROI(win, "RECT");
+            }
+            
+            ROIscrollBox.UpdateScrollBar();
+            
 			return 0;
 
         case WM_SHOWWINDOW:

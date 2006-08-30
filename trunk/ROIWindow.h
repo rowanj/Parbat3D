@@ -27,6 +27,8 @@ class ROIWindow:public Window
         HICON hPolyIcon;
         HWND hRectButton;
         HICON hRectIcon;
+        HWND hSingleButton;
+        HICON hSingleIcon;
                 
         static vector<HWND> roiCheckboxList;
         
