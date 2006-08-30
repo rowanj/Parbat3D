@@ -186,6 +186,7 @@ int ImageTileSet::load_tile(int x, int y)
 	int data_size_x, data_size_y;
 	int p_in, p_out, p_length;
 	int tile_memory_size;
+	int oldest_tile = -1;
 
 	tile_memory_size = tex_size * tex_size * num_bands * sample_size;
 	
@@ -207,10 +208,28 @@ int ImageTileSet::load_tile(int x, int y)
 	{
 		int tile_check = 0;
 		int cached_tile = -1;
+		int oldest_age = -1;
 		/* traverse tile vector */
 		while (tile_check < tiles.size()) {
+			#if DEBUG_IMAGE_TILESET
+				Console::write("(II) Tilecheck ");
+				Console::write(tile_check);
+				Console::write("\n");
+			#endif
 			/* increment tile age */
 			tiles[tile_check]->age++;
+			#if DEBUG_IMAGE_TILESET
+				Console::write("(II) Tile age ");
+				Console::write(tiles[tile_check]->age);
+				Console::write("\n");
+			#endif
+			//if ((tiles[tile_check]->age) > oldest_age) 
+			oldest_tile = tile_check;
+			#if DEBUG_IMAGE_TILESET
+				Console::write("(II) Oldest tile after checking ");
+				Console::write(oldest_tile);
+				Console::write("\n");
+			#endif
 			// If this is the one we're after...
 			if (tiles[tile_check]->tile_index == tile_index) {
 				cached_tile = tile_check;
@@ -229,10 +248,14 @@ int ImageTileSet::load_tile(int x, int y)
 		/* Allocate tile */
 		new_tile = new tile;
 		new_tile->tile_index = tile_index;
+		new_tile->age = 0;
 		new_tile->data = new char[tile_memory_size];
 		/* Check cache space, deallocate head if oversize */
 		cache_fill = cache_fill + tile_memory_size;
 		if (cache_fill > cache_size) {
+			Console::write("(II) Tiles size ");
+			Console::write(tiles.size());
+			Console::write("\n");
 			if (tiles.size() > 0) {
 				/* This is the cache dropping algorithm */
 #if TRUE
@@ -243,7 +266,7 @@ int ImageTileSet::load_tile(int x, int y)
 				cache_fill = cache_fill - tile_memory_size;
 #else
 				/* LRU */
-				unsigned int maxage = -1;
+				/*unsigned int maxage = -1;
 				int maxindex = 0;
 				for (int x = 0; x < tiles.size(); x++)
 				{
@@ -252,10 +275,20 @@ int ImageTileSet::load_tile(int x, int y)
 						maxindex = x;
 						maxage = tiles[x]->age;
 					}
-				}
-				delete[] tiles[maxindex]->data; /* Delete data */
-				delete tiles[maxindex]; /* Delete structure */
-				tiles.erase(tiles.begin());
+				}*/
+				#if DEBUG_IMAGE_TILESET
+				Console::write("(II) Oldest tile ");
+				Console::write(oldest_tile);
+				Console::write("\n");
+				#endif
+				delete[] tiles[oldest_tile]->data; /* Delete data */
+				delete tiles[oldest_tile]; /* Delete structure */
+				vector<tile_ptr>::iterator cacheIterator = tiles.begin();
+				
+				cacheIterator+= oldest_tile;
+
+				tiles.erase(cacheIterator);
+				
 				cache_fill = cache_fill - tile_memory_size;
 #endif
 			}

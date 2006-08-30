@@ -6,6 +6,7 @@
 #define DEBUG 0
 #define DEBUG_IMAGE_FILE 0
 #define DEBUG_IMAGE_PROPERTIES 0
+#define DEBUG_IMAGE_TILESET 1
 #define DEBUG_BANDS 0
 #define DEBUG_IMAGE_DATA 0
 #define DEBUG_GL 0
