@@ -205,6 +205,12 @@ LRESULT CALLBACK ToolWindow::ToolWindowTabControlProcedure(HWND hwnd, UINT messa
                 win->drawStatic((DRAWITEMSTRUCT*)lParam,win->hHeadingFont);
             break; 
         case WM_DESTROY:
+            /* destroy tabs */
+            for (int i=0;i<win->tabs.size();i++)
+            {
+                DestroyWindow(win->tabs.at(i)->GetHandle());
+                delete(win->tabs.at(i));
+            }
             /* remove tabs from vector */
             win->tabs.clear();
             break;                  
