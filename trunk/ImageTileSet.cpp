@@ -207,24 +207,23 @@ int ImageTileSet::load_tile(int x, int y)
 	{
 		int tile_check = 0;
 		int cached_tile = -1;
-		int found_tile = -1;  // was missing - added by shane
 		/* traverse tile vector */
 		while (tile_check < tiles.size()) {
 			/* increment tile age */
 			tiles[tile_check]->age++;
 			// If this is the one we're after...
 			if (tiles[tile_check]->tile_index == tile_index) {
-				found_tile = cached_tile;
+				cached_tile = tile_check;
 				// reset its age
-				tiles[found_tile]->age = 0;
+				tiles[tile_check]->age = 0;
 				cache_hits++;
 			}
 			tile_check++;
 		}
 		// If we found it, no need to go further
-		if (found_tile >= 0) return cached_tile;
+		if (cached_tile != -1) return cached_tile;
 	}
-	
+
 	{ // Tile wasn't in cache
 		cache_misses++;
 		/* Allocate tile */

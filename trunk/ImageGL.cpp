@@ -24,7 +24,7 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	image_height = image_properties->getHeight();
 	image_width = image_properties->getWidth();	
 
-	cache_size = settingsFile->getSettingi("preferences","cachesize");
+	cache_size = settingsFile->getSettingi("preferences","cachesize",128);
 	
 	/* Initialize OpenGL*/
 	gl_image = new GLView(window_hwnd);
@@ -38,7 +38,7 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
     /* Use larger texture if appropriate */
     {
 	    GLint max_texture_size;
-		int user_texture_size = settingsFile->getSettingi("preferences","texsize");
+		int user_texture_size = settingsFile->getSettingi("preferences","texsize",512);
 	    glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
 		texture_size = min(user_texture_size, max_texture_size);
 	}
