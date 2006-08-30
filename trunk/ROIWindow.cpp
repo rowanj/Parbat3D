@@ -9,8 +9,8 @@
 #include "ToolWindow.h"
 #include "ImageHandler.h"
 #include "ImageWindow.h"
-#include "RoI.h"
-#include "RoIFile.h"
+#include "ROI.h"
+#include "ROIFile.h"
 #include "ROIWindow.h"
 #include "Settings.h"
 #include "ScrollBox.h"
@@ -231,7 +231,7 @@ void ROIWindow::newROI (ROIWindow* win, string roiType) {
     }
     
     // create ROI with the name
-    RoI *rCur = regionsSet->new_region(*name);
+    ROI *rCur = regionsSet->new_region(*name);
     if (roiType != "")
         regionsSet->new_entity(roiType);
     
@@ -259,7 +259,7 @@ void ROIWindow::saveROI (ROIWindow* win) {
         MessageBox(NULL, (LPSTR) "Save Some", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
     } else {
         MessageBox(NULL, (LPSTR) "Save All", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
-        RoIFile *rf = new RoIFile();
+        ROIFile *rf = new ROIFile();
         rf->saveSetToFile("temp.roi", regionsSet);
     }
 }

@@ -6,20 +6,20 @@
 #include <sstream>
 
 #include "BatchIniFile.h"
-#include "RoI.h"
+#include "ROI.h"
 #include "StringUtils.h"
 
 using namespace std;
 
 
-class RoIFile {
+class ROIFile {
     private:
         BatchIniFile openFile;  // reference to the ini file, all file operations go through this
         
     public:
-        RoIFile ();
+        ROIFile ();
         
-        ~RoIFile ();
+        ~ROIFile ();
         
         
         void open (string);
@@ -27,24 +27,24 @@ class RoIFile {
         void close ();
         
         
-        void saveSetToFile (string, RoISet*);
+        void saveSetToFile (string, ROISet*);
         
-        void saveSetToFile (RoISet*);
-        
-        
-        RoISet* loadSetFromFile (string);
-        
-        RoISet* loadSetFromFile ();
+        void saveSetToFile (ROISet*);
         
         
-        void saveRegionToFile (string, RoI*);
+        ROISet* loadSetFromFile (string);
         
-        void saveRegionToFile (RoI*);
+        ROISet* loadSetFromFile ();
         
         
-        RoI* loadRegionFromFile (string, string);
+        void saveRegionToFile (string, ROI*);
         
-        RoI* loadRegionFromFile (string);
+        void saveRegionToFile (ROI*);
+        
+        
+        ROI* loadRegionFromFile (string, string);
+        
+        ROI* loadRegionFromFile (string);
 };
 
 #endif

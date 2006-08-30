@@ -13,26 +13,26 @@ struct coords {
 };
 
 
-class RoIEntity {
+class ROIEntity {
     public:
         vector<coords> points;
         string type;
 };
 
 
-class RoI {
+class ROI {
     private:
         bool active;
         int colour_red;
         int colour_green;
         int colour_blue;
         string name;
-        vector<RoIEntity> entities;
+        vector<ROIEntity> entities;
         
     public:
-        RoI (void);
+        ROI (void);
         
-        ~RoI (void);
+        ~ROI (void);
         
         void set_name (string);
         
@@ -44,24 +44,24 @@ class RoI {
         void get_colour (int*, int*, int*);
         void get_color (int*, int*, int*);
         
-        void add_entity (RoIEntity);
+        void add_entity (ROIEntity);
         
-        vector<RoIEntity> get_entities (void);
+        vector<ROIEntity> get_entities (void);
 };
 
 
-class RoISet {
+class ROISet {
     private:
-        vector<RoI> regions;        // the set of all Regions of Interest
-        RoI* current_region;        // the Region of Interest currently being worked on
-        RoIEntity* current_entity;  // the shape currently being worked on
+        vector<ROI> regions;        // the set of all Regions of Interest
+        ROI* current_region;        // the Region of Interest currently being worked on
+        ROIEntity* current_entity;  // the shape currently being worked on
         bool editingEntity;         // true if currently creating an entity
         
         
     public:
-        RoISet ();
+        ROISet ();
         
-        virtual ~RoISet (void);
+        virtual ~ROISet (void);
         
         
         /**
@@ -101,7 +101,7 @@ class RoISet {
             currently be worked on, it is replaced by the new one.
             Returns the newly created region.
         */
-        RoI* new_region (void);
+        ROI* new_region (void);
         
         /**
             Creates a new Region of Interest, with a specified name. If there is
@@ -109,14 +109,14 @@ class RoISet {
             one.
             Returns the newly created region.
         */
-        RoI* new_region (string);
+        ROI* new_region (string);
         
         
         /**
             Sets the Region of Interest to work on. The Region of Interest does
             not have to be in the set.
         */
-        void set_current (RoI*);
+        void set_current (ROI*);
         
         /**
             Sets the Region of Interest to work on, based on its name. The
@@ -136,7 +136,7 @@ class RoISet {
         /**
             Removes the specified Region of Interest from the set.
         */
-        void remove_region (RoI*);
+        void remove_region (ROI*);
         
         /**
             Removes a Region of Interest from the set by matching the name.
@@ -147,7 +147,7 @@ class RoISet {
         /**
             Returns a vector of all the Regions of Interest.
         */
-        vector<RoI> get_regions (void);
+        vector<ROI> get_regions (void);
         
         
         /**
@@ -163,6 +163,6 @@ class RoISet {
         bool name_exists (string);
 };
 
-extern RoISet *regionsSet;
+extern ROISet *regionsSet;
 
 #endif

@@ -1,65 +1,65 @@
-#include "RoIFile.h"
+#include "ROIFile.h"
 
 
 using namespace std;
 
 
-RoIFile::RoIFile () {}
+ROIFile::ROIFile () {}
 
-RoIFile::~RoIFile() {}
+ROIFile::~ROIFile() {}
 
 
-void RoIFile::open (string filename) {
+void ROIFile::open (string filename) {
     openFile.open(filename);
 }
 
-void RoIFile::close () {
+void ROIFile::close () {
     openFile.close();
 }
 
 
 /* Set ************************************************************************/
-void RoIFile::saveSetToFile (string filename, RoISet* rs) {
+void ROIFile::saveSetToFile (string filename, ROISet* rs) {
     openFile.open(filename);
     saveSetToFile(rs);
 }
 
-void RoIFile::saveSetToFile (RoISet* rs) {
-    vector<RoI> rlist = rs->get_regions();
-    RoI roi;
+void ROIFile::saveSetToFile (ROISet* rs) {
+    vector<ROI> rlist = rs->get_regions();
+    ROI ROI;
     
     for (int i=0; i<rlist.size(); i++) {
-        roi = rlist.at(i);
-        saveRegionToFile(&roi);
+        ROI = rlist.at(i);
+        saveRegionToFile(&ROI);
     }
 }
 
 
-RoISet* RoIFile::loadSetFromFile (string filename) {
-    RoISet* rs;
+ROISet* ROIFile::loadSetFromFile (string filename) {
+    ROISet* rs;
     openFile.open(filename);
     rs = loadSetFromFile();
     return rs;
 }
 
-RoISet* RoIFile::loadSetFromFile () {
-    RoISet* rset = new RoISet();
-    RoI* roi;
-    string roiCountStr;
-    int roiCount;
-    string roiName;
-    string roiKey;
+ROISet* ROIFile::loadSetFromFile () {
+    ROISet* rset = new ROISet();
+    ROI* ROI;
+    string ROICountStr;
+    int ROICount;
+    string ROIName;
+    string ROIKey;
     
     // get the number of ROIs in the file
-    roiCountStr = openFile.read("ROI List","count");
-    roiCount = stringToInt(roiCountStr);
+    ROICountStr = openFile.read("ROI List","count");
+    ROICount = stringToInt(ROICountStr);
     
     // load the ROIs one at a time
-    for (int i=0; i<roiCount; i++) {
-        roiKey = makeMessage("roi ", i);              // create the key for each ROI
-        roiName = openFile.read("ROI List", roiKey);  // get the name of the ROI
-        roi = loadRegionFromFile(roiName);            // load the ROI from the file
-        rset->set_current(roi);                       // add it to the current set
+    for (int i=0; i<ROICount; i++) {
+        ROIKey = makeMessage("ROI ", i);              // create the key for each ROI
+        ROIName = openFile.read("ROI List", ROIKey);  // get the name of the ROI
+        ROI = loadRegionFromFile(ROIName);            // load the ROI from the file
+        rset->set_current(ROI);                       // add it to the current set
         rset->add_current_to_set();                   // update the set
     }
     
@@ -68,15 +68,15 @@ RoISet* RoIFile::loadSetFromFile () {
 
 
 /* Region *********************************************************************/
-void RoIFile::saveRegionToFile (string filename, RoI* roi) {
+void ROIFile::saveRegionToFile (string filename, ROI* ROI) {
     openFile.open(filename);
-    saveRegionToFile(roi);
+    saveRegionToFile(ROI);
 }
 
-void RoIFile::saveRegionToFile (RoI* roi) {
+void ROIFile::saveRegionToFile (ROI* ROI) {
     string section;           // name of section
-    vector<RoIEntity> elist;  // list of entities
-    RoIEntity re;             // current entity working on
+    vector<ROIEntity> elist;  // list of entities
+    ROIEntity re;             // current entity working on
     vector<coords> pts;       // list of points
     coords pt;                // current point working on
     int rcol, gcol, bcol;     // storage for colours
@@ -89,7 +89,7 @@ void RoIFile::saveRegionToFile (RoI* roi) {
     string leader = "";       // blank leader used for creating strings
     
     // set the name of the section based on the name of the  ROI
-    section = roi->get_name();
+    section = ROI->get_name();
     
     // ROI does not exist, so info must be added
     if (openFile.readSectionContent(section)=="") {
@@ -107,13 +107,13 @@ void RoIFile::saveRegionToFile (RoI* roi) {
             }
             
             openFile.updateBuffer("count", makeString(leader, totalRegions+1));
-            openFile.updateBuffer(makeString("roi ", totalRegions), section);
+            openFile.updateBuffer(makeString("ROI ", totalRegions), section);
             openFile.writeBufferToSection("ROI List");
         
         // a header section must be added to the file
         } else {
             openFile.updateBuffer("count", "1");
-            openFile.updateBuffer("roi 0", section);
+            openFile.updateBuffer("ROI 0", section);
             openFile.writeBufferToSection("ROI List");
         }
     }
@@ -121,14 +121,14 @@ void RoIFile::saveRegionToFile (RoI* roi) {
     openFile.clearBuffer();
     
     // save ROI colours
-    roi->get_colour(&rcol,&gcol,&bcol);
+    ROI->get_colour(&rcol,&gcol,&bcol);
     colStr = makeString("", rcol);
     colStr += ' '; colStr = makeString(colStr, gcol);
     colStr += ' '; colStr = makeString(colStr, bcol);
     openFile.updateBuffer("colour",colStr);
     
     // save ROI entities
-    elist = roi->get_entities();
+    elist = ROI->get_entities();
     totalEntities = elist.size();
     openFile.updateBuffer("entities", makeString(leader, totalEntities));
     for (int i=0; i<totalEntities; i++) {
@@ -156,16 +156,16 @@ void RoIFile::saveRegionToFile (RoI* roi) {
 }
 
 
-RoI* RoIFile::loadRegionFromFile (string filename, string name) {
-    RoI* roi;
+ROI* ROIFile::loadRegionFromFile (string filename, string name) {
+    ROI* ROI;
     openFile.open(filename);
-    roi = loadRegionFromFile(name);
-    return roi;
+    ROI = loadRegionFromFile(name);
+    return ROI;
 }
 
-RoI* RoIFile::loadRegionFromFile (string name) {
-    RoI* roi = new RoI();    // ROI to return
-    RoIEntity* entityCur;    // entity
+ROI* ROIFile::loadRegionFromFile (string name) {
+    ROI* roi = new ROI();    // ROI to return
+    ROIEntity* entityCur;    // entity
     int entityCount;
     string entityBaseStr;
     int pointCount;          // coords
@@ -195,7 +195,7 @@ RoI* RoIFile::loadRegionFromFile (string name) {
     entityCount = stringToInt(openFile.readFromBuffer("entities"));
     for (int i=0; i<entityCount; i++) {
         entityBaseStr = makeString("entity ",i);
-        entityCur = new RoIEntity();
+        entityCur = new ROIEntity();
         entityCur->type = openFile.readFromBuffer(makeString(entityBaseStr, " type"));
         
         pointCount = stringToInt(openFile.readFromBuffer(makeString(entityBaseStr, " points")));

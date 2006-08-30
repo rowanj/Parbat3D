@@ -36,7 +36,7 @@ HWND hDesktop;                      /* handle to desktop window (used for snappi
 
 settings* settingsFile;             /* Used for loading and saving window position and sizes */
 
-RoISet *regionsSet;
+ROISet *regionsSet;
 
 MainWindow mainWindow;
 ToolWindow toolWindow;
@@ -93,7 +93,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     string settings_path (catcstrings(modulePath, "\\settings.ini"));
     settingsFile = new settings(settings_path);
     
-    regionsSet = new RoISet();
+    regionsSet = new ROISet();
     
     MSG messages;
     
