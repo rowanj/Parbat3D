@@ -36,8 +36,10 @@ class settings {
             Returns a string containing the value of the key. If the key does
             not exist in the file then an empty string is returned.
         */
-        string getSetting (string, string);
-        int getSettingi (string, string);
+        string getSetting (string section, string key);
+        string getSetting (string section, string key, string defaultSetting);
+        int getSettingi(string section, string key);
+        int getSettingi (string section, string key, int defaultSetting);
         /**
             Adds the setting to the file.
         */
