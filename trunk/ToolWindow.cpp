@@ -204,7 +204,10 @@ LRESULT CALLBACK ToolWindow::ToolWindowTabControlProcedure(HWND hwnd, UINT messa
             if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 win->drawStatic((DRAWITEMSTRUCT*)lParam,win->hHeadingFont);
             break; 
-                        
+        case WM_DESTROY:
+            /* remove tabs from vector */
+            win->tabs.clear();
+            break;                  
         default:
             break;
     }        
