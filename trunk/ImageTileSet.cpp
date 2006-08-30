@@ -211,20 +211,29 @@ int ImageTileSet::load_tile(int x, int y)
 		int oldest_age = -1;
 		/* traverse tile vector */
 		while (tile_check < tiles.size()) {
-			#if DEBUG_IMAGE_TILESET
+						#if DEBUG_IMAGE_TILESET
 				Console::write("(II) Tilecheck ");
 				Console::write(tile_check);
 				Console::write("\n");
 			#endif
 			/* increment tile age */
 			tiles[tile_check]->age++;
+			int tile_check_age = tiles[tile_check]->age;
 			#if DEBUG_IMAGE_TILESET
 				Console::write("(II) Tile age ");
-				Console::write(tiles[tile_check]->age);
+				Console::write(tile_check_age);
 				Console::write("\n");
 			#endif
-			//if ((tiles[tile_check]->age) > oldest_age) 
-			oldest_tile = tile_check;
+			#if DEBUG_IMAGE_TILESET
+				Console::write("(II) Oldest age ");
+				Console::write(oldest_age);
+				Console::write("\n");
+			#endif
+
+			if (tile_check_age > oldest_age) {
+				oldest_tile = tile_check;
+				oldest_age = tile_check_age;
+			}
 			#if DEBUG_IMAGE_TILESET
 				Console::write("(II) Oldest tile after checking ");
 				Console::write(oldest_tile);
@@ -258,7 +267,7 @@ int ImageTileSet::load_tile(int x, int y)
 			Console::write("\n");
 			if (tiles.size() > 0) {
 				/* This is the cache dropping algorithm */
-#if TRUE
+#if FALSE
 				/* FIFO */
 				delete[] tiles[0]->data; /* Delete data */
 				delete tiles[0]; /* Delete structure */
