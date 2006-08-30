@@ -3,21 +3,23 @@
 
 #include "Window.h"
 #include "GLView.h"
+#include "GLContainer.h"
 
-class FeatureSpace:public Window
+class FeatureSpace:public Window, public GLContainerHandler
 {
     private:
     WNDPROC prevProc;
-    HWND hglcontainer;
     static int numFeatureSpaces;
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
     
     protected:
     GLView *glview;
-    int Create(HWND parent);
+    GLContainer *glContainer;
+    int Create();
         
     public:
-    FeatureSpace(int LOD, bool only_ROIs);
+    FeatureSpace(int LOD, bool only_ROIs);      // create & display new feature space window
+    virtual void PaintGLContainer();    
     
 
 };

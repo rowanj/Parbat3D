@@ -2,8 +2,11 @@
 #include "main.h"
 #include "Window.h"
 #include "FeatureSpace.h"
+#include "GLContainer.h"
 #include "Config.h"
-#include <time.h>
+#include "Console.h"
+#include <gl/gl.h>
+#include <gl/glu.h>
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Prefs Window Functions */
@@ -12,49 +15,48 @@ int FeatureSpace::numFeatureSpaces=0;
 
 FeatureSpace::FeatureSpace(int LOD, bool only_ROIs)
 {
-    assert(Create(imageWindow.GetHandle()));
-    glview=new GLView(hglcontainer);
+    assert(Create());
+    glview=new GLView(glContainer->GetHandle());
     numFeatureSpaces++;
+        
 }
  
-void sleep(unsigned int mseconds)
-{
-    clock_t goal = mseconds + clock();
-    while (goal > clock());
-}
-
-int FeatureSpace::Create(HWND parent)
+int FeatureSpace::Create()
 {
     RECT rect;
     int mx,my;
     const int FEATURE_WINDOW_WIDTH=650;
     const int FEATURE_WINDOW_HEIGHT=550;
-    const int TOOLBAR_HEIGHT=40;
+    const int TOOLBAR_HEIGHT=50;
    
     // Get Overview Window Location for Prefs window alignment
     GetWindowRect(overviewWindow.GetHandle(),&rect);
 
     // create feature space window
-    const char *title=makeMessage("Feature Space - ",numFeatureSpaces+1);
+    const char *title=makeMessage("Feature Space ",numFeatureSpaces+1);
     if (!CreateWin(0, "Parbat3D Feature Window", title,
-	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_SIZEBOX+WS_MAXIMIZEBOX,
-	     rect.right, rect.top, FEATURE_WINDOW_WIDTH, FEATURE_WINDOW_HEIGHT, parent, NULL))
+	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_SIZEBOX+WS_MAXIMIZEBOX+WS_MINIMIZEBOX,
+	     rect.right, rect.top, FEATURE_WINDOW_WIDTH, FEATURE_WINDOW_HEIGHT, NULL, NULL))
         return false;
     delete(title);
-        
-    hglcontainer=CreateWindowEx(0,"static","opengl graphics goes here", 
-                        WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0, 0, 
-                        FEATURE_WINDOW_WIDTH, FEATURE_WINDOW_HEIGHT-TOOLBAR_HEIGHT,
-                        GetHandle(), NULL, Window::GetAppInstance(), NULL);
-        
+    
+    glContainer=new GLContainer(GetHandle(),this,0,0,FEATURE_WINDOW_WIDTH,FEATURE_WINDOW_HEIGHT-TOOLBAR_HEIGHT);       
 
     stickyWindowManager.AddStickyWindow(this);
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
-    sleep(5000);    
+    Sleep(5000);    
     Show();       
     return true;    
 }
+ 
+void FeatureSpace::PaintGLContainer()
+{
+	glview->make_current();
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glview->GLswap();
+} 
  
 /* handle events related to the main window */
 LRESULT CALLBACK FeatureSpace::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -68,6 +70,7 @@ LRESULT CALLBACK FeatureSpace::WindowProcedure(HWND hwnd, UINT message, WPARAM w
     switch (message)                  /* handle the messages */
     {			
         /* WM_DESTORY: system is destroying our window */
+
         case WM_DESTROY:
             stickyWindowManager.RemoveStickyWindow(win);
             break;
