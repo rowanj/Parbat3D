@@ -8,10 +8,13 @@
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Prefs Window Functions */
 
+int FeatureSpace::numFeatureSpaces=0;
+
 FeatureSpace::FeatureSpace(int LOD, bool only_ROIs)
 {
-    
     assert(Create(imageWindow.GetHandle()));
+    glview=new GLView(hglcontainer);
+    numFeatureSpaces++;
 }
  
 void sleep(unsigned int mseconds)
@@ -24,23 +27,32 @@ int FeatureSpace::Create(HWND parent)
 {
     RECT rect;
     int mx,my;
-    const int FEATURE_WINDOW_WIDTH=600;
-    const int FEATURE_WINDOW_HEIGHT=500;
+    const int FEATURE_WINDOW_WIDTH=650;
+    const int FEATURE_WINDOW_HEIGHT=550;
+    const int TOOLBAR_HEIGHT=40;
    
     // Get Overview Window Location for Prefs window alignment
     GetWindowRect(overviewWindow.GetHandle(),&rect);
 
     // create feature space window
-    if (!CreateWin(0, "Parbat3D Feature Window", "Feature Space",
-	     WS_POPUP+WS_SYSMENU+WS_CAPTION,
+    const char *title=makeMessage("Feature Space - ",numFeatureSpaces+1);
+    if (!CreateWin(0, "Parbat3D Feature Window", title,
+	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_SIZEBOX+WS_MAXIMIZEBOX,
 	     rect.right, rect.top, FEATURE_WINDOW_WIDTH, FEATURE_WINDOW_HEIGHT, parent, NULL))
         return false;
-    sleep(5000);    
+    delete(title);
+        
+    hglcontainer=CreateWindowEx(0,"static","opengl graphics goes here", 
+                        WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0, 0, 
+                        FEATURE_WINDOW_WIDTH, FEATURE_WINDOW_HEIGHT-TOOLBAR_HEIGHT,
+                        GetHandle(), NULL, Window::GetAppInstance(), NULL);
+        
 
     stickyWindowManager.AddStickyWindow(this);
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
-    Show();    
+    sleep(5000);    
+    Show();       
     return true;    
 }
  
@@ -55,18 +67,10 @@ LRESULT CALLBACK FeatureSpace::WindowProcedure(HWND hwnd, UINT message, WPARAM w
     
     switch (message)                  /* handle the messages */
     {			
-			
-        /* WM_CLOSE: system or user has requested to close the window/application */             
-        //case WM_CLOSE:
-            /* don't destroy this window, but make it invisible */
-            //ShowWindow(hwnd,SW_HIDE);
-            //return 0;
-
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
             stickyWindowManager.RemoveStickyWindow(win);
             break;
-            
     }
     /* call the next procedure in the chain */       
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
