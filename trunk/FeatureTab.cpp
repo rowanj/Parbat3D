@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "ToolWindow.h"
 #include <commctrl.h>
+#include "Console.h"
 
 ScrollBox hFSScrollBox;
 
@@ -118,7 +119,7 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 	 
 
 	// Insert 'Generate' button under radio buttons. Location based on band number 
-	hgenerate =  CreateWindowEx(0, "BUTTON", "Generate", WS_CHILD | WS_VISIBLE, 80,
+	hgenerate =  CreateWindowEx(0, "BUTTON", "Generate", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE, 80,
 		247, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
 	
 	if (toolWindow.bands == 1) {
@@ -139,6 +140,26 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
     //return true;
 }
 
+void FeatureTab::OnGenerateClicked()
+{
+    int lod=1,only_ROIs=false;  /* todo: change to get actual values */
+    
+    Console::write("FeatureTab::OnGenerateClicked\n");
+    SendMessage(hgenerate,BM_SETCHECK,BST_CHECKED,0);       // make button appear pushed in
+    EnableWindow(hgenerate,false);                          // disable button
+    FeatureSpace *fspace=new FeatureSpace(lod,only_ROIs); 
+    SendMessage(hgenerate,BM_SETCHECK,BST_UNCHECKED,0);     // make button appear normal
+    PostMessage(GetHandle(),WM_USER,0,0);                   // send our own window a custom message to re-enable the button later
+    
+    //featureSpaceWindows.push_back(fspace);
+}
+
+// re-enable generate button
+void FeatureTab::OnUserMessage()
+{
+    EnableWindow(hgenerate,true);
+}
+
 LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     FeatureTab* win=(FeatureTab*)Window::GetWindowObject(hwnd);
@@ -147,10 +168,14 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
     {
         case WM_COMMAND:
         {
-			//MessageBox(hwnd, (LPSTR) "Look... a Scatterplot!", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
-			int lod=0,only_ROIs=false;
-			featureSpaceWindows.push_back(new FeatureSpace(lod,only_ROIs));
+			
+			if (HIWORD(wParam)==BN_CLICKED)
+			{
+                win->OnGenerateClicked();
+            }
 		}
+		case WM_USER:
+            win->OnUserMessage();
     }
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }

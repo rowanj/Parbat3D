@@ -36,10 +36,6 @@ LRESULT CALLBACK GLContainer::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
                 win->handler->PaintGLContainer();
             EndPaint(hwnd,&ps);                
             return 0;
-
-        case WM_DESTROY:
-            stickyWindowManager.RemoveStickyWindow(win);
-            break;
     }
     /* call the next procedure in the chain */       
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    

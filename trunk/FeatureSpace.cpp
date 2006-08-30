@@ -8,28 +8,52 @@
 #include <gl/gl.h>
 #include <gl/glu.h>
 
-/* ------------------------------------------------------------------------------------------------------------------------ */
-/* Prefs Window Functions */
-
 int FeatureSpace::numFeatureSpaces=0;
 
+const int FeatureSpace::FEATURE_WINDOW_WIDTH=650;       // inital width of feature space window
+const int FeatureSpace::FEATURE_WINDOW_HEIGHT=550;      // inital height of feature space window
+const int FeatureSpace::TOOLBAR_HEIGHT=40;              // height of toolbar
+
+
+// timer used for testing
+#include <time.h>   
+void sleep(unsigned int mseconds)
+{
+    clock_t goal = mseconds + clock();
+    while (goal > clock());
+}
+
+// create & display new feature space window
 FeatureSpace::FeatureSpace(int LOD, bool only_ROIs)
 {
-    assert(Create());
+    int createSuccess;
+    
+    createSuccess=Create();
+    assert(createSuccess);
+    
     glview=new GLView(glContainer->GetHandle());
     numFeatureSpaces++;
-        
+    
+    // todo: setup feature space's data
+    Console::write("FeatureSpace::FeatureSpace Sleeping...\n");
+    sleep(5000);    
 }
+
+// draw contents of GLContainer with opengl
+void FeatureSpace::PaintGLContainer()
+{
+	glview->make_current();
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glview->GLswap();
+} 
  
+// create feature space window 
 int FeatureSpace::Create()
 {
     RECT rect;
-    int mx,my;
-    const int FEATURE_WINDOW_WIDTH=650;
-    const int FEATURE_WINDOW_HEIGHT=550;
-    const int TOOLBAR_HEIGHT=50;
-   
-    // Get Overview Window Location for Prefs window alignment
+
+    // get position of overview window for alignment   
     GetWindowRect(overviewWindow.GetHandle(),&rect);
 
     // create feature space window
@@ -40,29 +64,35 @@ int FeatureSpace::Create()
         return false;
     delete(title);
     
+    // create child windows
     glContainer=new GLContainer(GetHandle(),this,0,0,FEATURE_WINDOW_WIDTH,FEATURE_WINDOW_HEIGHT-TOOLBAR_HEIGHT);       
 
+    //todo: create toolbar
+    
+
+    // make this window snap to others
     stickyWindowManager.AddStickyWindow(this);
 
+    // handle events for the window
     prevProc=SetWindowProcedure(&WindowProcedure);	
-    Sleep(5000);    
+    
+    
+    OnResize();    
     Show();       
     return true;    
 }
  
-void FeatureSpace::PaintGLContainer()
+// resize GLContainer to fit the feature space window
+void FeatureSpace::OnResize()
 {
-	glview->make_current();
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glview->GLswap();
-} 
+    RECT rect;
+    GetClientRect(GetHandle(),&rect);
+    MoveWindow(glContainer->GetHandle(),rect.left,rect.top,rect.right-rect.left,rect.bottom-rect.top-TOOLBAR_HEIGHT, true);
+}
  
-/* handle events related to the main window */
+/* handle events related to the feature space window */
 LRESULT CALLBACK FeatureSpace::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {   
-    static POINT moveMouseOffset;     /* mouse offset relative to window, used for snapping */
-    static RECT rect;                 /* for general use */
 
     FeatureSpace* win=(FeatureSpace*)Window::GetWindowObject(hwnd);
     
@@ -70,7 +100,9 @@ LRESULT CALLBACK FeatureSpace::WindowProcedure(HWND hwnd, UINT message, WPARAM w
     switch (message)                  /* handle the messages */
     {			
         /* WM_DESTORY: system is destroying our window */
-
+        case WM_SIZE:
+            win->OnResize();
+            break;
         case WM_DESTROY:
             stickyWindowManager.RemoveStickyWindow(win);
             break;
