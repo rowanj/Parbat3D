@@ -18,7 +18,7 @@ int PrefsWindow::Create(HWND parent)
     RECT rect;
     int mx,my;
     const int PREFS_WINDOW_WIDTH=190;
-    const int PREFS_WINDOW_HEIGHT=120;
+    const int PREFS_WINDOW_HEIGHT=150;
    
     /* Get Overview Window Location for Prefs window alignment*/
     GetWindowRect(overviewWindow.GetHandle(),&rect);
@@ -55,12 +55,31 @@ int PrefsWindow::Create(HWND parent)
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | SS_OWNERDRAW, 138,
 		29, 40, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
-		
+	
+	displayCloseConfirmLabel =CreateWindowEx( 0, szStaticControl, "Display \'open file\' warning", 
+		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 6,
+		52, 130, 20, GetHandle(), NULL,
+		GetAppInstance(), NULL);
+	
+	displayCloseConfirmCheckbox = CreateWindowEx( 0, "BUTTON", NULL,
+        BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 138,
+		52,	40, 20, GetHandle(), NULL,
+        GetAppInstance(), NULL);
+    
+    if (settingsFile->getSettingi("preferences", "displayconfirmwindow", 1) == 1)
+    {
+		LRESULT theResult = SendMessage(displayCloseConfirmCheckbox, BM_SETCHECK, BST_CHECKED, 0);	
+	}
+	else
+	{
+		LRESULT theResult = SendMessage(displayCloseConfirmCheckbox, BM_SETCHECK, BST_UNCHECKED, 0);	
+	}
+	
 	okButton = CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | WS_BORDER, 60,
-			55, 55, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
+			85, 55, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
 			
 	cancelButton = CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE | WS_BORDER, 120,
-			55, 55, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);		
+			85, 55, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);		
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
 
@@ -95,6 +114,18 @@ LRESULT CALLBACK PrefsWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
 				entryCBuffer[1] = (char)0;
 				theResult = SendMessage(win->texSizeEntry, EM_GETLINE, 0,(LPARAM) entryCBuffer);
 				settingsFile->setSetting("preferences", "texsize", atoi(entryCBuffer));
+				
+				theResult = SendMessage(win->displayCloseConfirmCheckbox, BM_GETCHECK, 0, 0);
+				if (theResult == BST_CHECKED)
+				{
+					Console::write("Preferences -- Got checked result, sending 1\n");
+					settingsFile->setSetting("preferences", "displayconfirmwindow", "1");
+				}
+				else if (theResult == BST_UNCHECKED)
+				{
+					Console::write("Preferences -- Got unchecked result, sending 0\n");
+					settingsFile->setSetting("preferences", "displayconfirmwindow", "0");
+				}
 				
 				MessageBox( hwnd, (LPSTR) "Preferences saved successfully.\nThis will take effect after restarting Parbat.",(LPSTR) "Parbat3D",
 				MB_ICONINFORMATION | MB_OK );

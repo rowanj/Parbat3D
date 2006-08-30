@@ -28,7 +28,8 @@ string settings::getSetting (string section, string key, string defaultSetting)
     try {
         if (openFile.parse(section, key))
             data = openFile.read(section, key);
-    } catch (...) {setSetting(section, key, defaultSetting);}
+    } catch (...) {}
+    if (data == defaultSetting) setSetting(section, key, defaultSetting);
     
     return data;
 }
@@ -52,7 +53,8 @@ int settings::getSettingi (string section, string key, int defaultSetting)
 	try {
         if (openFile.parse(section, key))
             data = openFile.read(section, key);
-    } catch (...) {setSetting(section, key, defaultSetting);}
+    } catch (...) {}
+    if (data == d) setSetting(section, key, defaultSetting);
     value = atoi(data.c_str());
 	return value;
 }

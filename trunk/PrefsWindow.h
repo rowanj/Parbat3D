@@ -11,6 +11,8 @@ class PrefsWindow:public Window
     HWND cacheEntry;
     HWND texSizeLabel;
     HWND texSizeEntry;
+    HWND displayCloseConfirmLabel;
+    HWND displayCloseConfirmCheckbox;
     HWND okButton;
     HWND cancelButton;
         
