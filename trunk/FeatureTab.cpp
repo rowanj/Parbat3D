@@ -11,6 +11,7 @@
 
 ScrollBox hFSScrollBox;
 
+
 int FeatureTab::GetContainerHeight()
 {
     return 0;
@@ -121,7 +122,8 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 	// Insert 'Generate' button under radio buttons. Location based on band number 
 	hgenerate =  CreateWindowEx(0, "BUTTON", "Generate", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE, 80,
 		247, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
-	
+	CreateTooltip(hgenerate,"Generate a feature space");
+	    
 	if (toolWindow.bands == 1) {
     	SendMessage(xRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);
     	SendMessage(yRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);

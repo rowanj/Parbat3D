@@ -33,10 +33,11 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs)
     
     glview=new GLView(glContainer->GetHandle());
     numFeatureSpaces++;
-    
-    // todo: setup feature space's data
+
+    // todo: setup feature space's data    
     Console::write("FeatureSpace::FeatureSpace Sleeping...\n");
-    sleep(5000);    
+    sleep(5000);       
+    Show();
 }
 
 // draw contents of GLContainer with opengl
@@ -59,11 +60,11 @@ int FeatureSpace::Create()
     // create feature space window
     const char *title=makeMessage("Feature Space ",numFeatureSpaces+1);
     if (!CreateWin(0, "Parbat3D Feature Window", title,
-	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_SIZEBOX+WS_MAXIMIZEBOX+WS_MINIMIZEBOX,
+	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_SIZEBOX+WS_MAXIMIZEBOX+WS_MINIMIZEBOX+WS_CLIPSIBLINGS,
 	     rect.right, rect.top, FEATURE_WINDOW_WIDTH, FEATURE_WINDOW_HEIGHT, NULL, NULL))
         return false;
     delete(title);
-    
+       
     // create child windows
     glContainer=new GLContainer(GetHandle(),this,0,0,FEATURE_WINDOW_WIDTH,FEATURE_WINDOW_HEIGHT-TOOLBAR_HEIGHT);       
 
@@ -78,7 +79,6 @@ int FeatureSpace::Create()
     
     
     OnResize();    
-    Show();       
     return true;    
 }
  

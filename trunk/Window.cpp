@@ -3,6 +3,7 @@
 #include "resources.h"
 #include "main.h"
 #include "config.h"
+#include <commctrl.h>
 
 WNDPROC Window::stPrevWindowProcedure=NULL;
 HINSTANCE Window::hInstance=NULL;
@@ -235,3 +236,62 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 }
 
 
+/* create a tooltip over a window control */
+void Window::CreateTooltip (HWND hwnd,char *text)
+{
+                 // struct specifying control classes to register
+    INITCOMMONCONTROLSEX iccex; 
+    HWND hwndTT;                 // handle to the ToolTip control
+          // struct specifying info about tool in ToolTip control
+    TOOLINFO ti;
+    unsigned int uid = 0;       // for ti initialization
+    RECT rect;                  // for client area coordinates
+
+    /* INITIALIZE COMMON CONTROLS */
+    iccex.dwICC = ICC_WIN95_CLASSES;
+    iccex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    InitCommonControlsEx(&iccex);
+
+    /* CREATE A TOOLTIP WINDOW */
+    hwndTT = CreateWindowEx(WS_EX_TOPMOST,
+        TOOLTIPS_CLASS,
+        NULL,
+        WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,		
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        hwnd,
+        NULL,
+        Window::GetAppInstance(),
+        NULL
+        );
+
+    SetWindowPos(hwndTT,
+        HWND_TOPMOST,
+        0,
+        0,
+        0,
+        0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+    /* GET COORDINATES OF THE MAIN CLIENT AREA */
+    GetClientRect (hwnd, &rect);
+
+    /* INITIALIZE MEMBERS OF THE TOOLINFO STRUCTURE */
+    ti.cbSize = sizeof(TOOLINFO);
+    ti.uFlags = TTF_SUBCLASS;
+    ti.hwnd = hwnd;
+    ti.hinst = Window::GetAppInstance();
+    ti.uId = uid;
+    ti.lpszText = text;
+        // ToolTip control will cover the whole window
+    ti.rect.left = rect.left;    
+    ti.rect.top = rect.top;
+    ti.rect.right = rect.right;
+    ti.rect.bottom = rect.bottom;
+
+    /* SEND AN ADDTOOL MESSAGE TO THE TOOLTIP CONTROL WINDOW */
+    SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti);	
+
+} 

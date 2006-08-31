@@ -1,6 +1,7 @@
 #ifndef _PARBAT_WINDOW_H
 #define _PARBAT_WINDOW_H
 
+#define _WIN32_IE 0x0400    // required in order to use InitCommonControlsEx
 #include <Windows.h>
 
 class Window
@@ -38,11 +39,12 @@ class Window
     static void SetWindowObject(HWND,Window*);      /* associcate "this" object with window handle */
     
     static void SetStaticFont(HWND,int);      /* associcate a font with a static text control 
-                                                    note: to do not use this & SetWindowObject on same handle */
+                                                    note: SetStaticFont & SetWindowObject store data in the same location */
     static const int STATIC_FONT_NORMAL=0;
     static const int STATIC_FONT_BOLD=32453;   
     static const int STATIC_FONT_HEADING=32454;       
-                                                   
+
+    static void CreateTooltip (HWND hwnd,char *text);   // create a tooltip message when the user moves the mouse over a control
 
     /* window api wrappers */
     inline void Destroy() {DestroyWindow(hwindow);};
