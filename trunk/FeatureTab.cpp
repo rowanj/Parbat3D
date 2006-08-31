@@ -146,11 +146,14 @@ void FeatureTab::OnGenerateClicked()
     
     Console::write("FeatureTab::OnGenerateClicked\n");
     SendMessage(hgenerate,BM_SETCHECK,BST_CHECKED,0);       // make button appear pushed in
-    EnableWindow(hgenerate,false);                          // disable button
     FeatureSpace *fspace=new FeatureSpace(lod,only_ROIs); 
     SendMessage(hgenerate,BM_SETCHECK,BST_UNCHECKED,0);     // make button appear normal
-    PostMessage(GetHandle(),WM_USER,0,0);                   // send our own window a custom message to re-enable the button later
-    
+
+    // remove all mouse messages from the queue (prevent user from clicking on generate while one was being generated)
+    MSG msg;
+    while (PeekMessage(&msg,NULL,WM_MOUSEFIRST,WM_MOUSELAST,PM_REMOVE)!=0) {}
+    SetForegroundWindow(fspace->GetHandle());
+
     //featureSpaceWindows.push_back(fspace);
 }
 
