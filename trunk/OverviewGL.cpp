@@ -182,23 +182,38 @@ void OverviewGL::notify_viewport(void)
 
 void OverviewGL::notify_bands(void)
 {
+	char* tex_overview;
 #if DEBUG_GL
 	Console::write("(II) OverviewGL re-texturing.\n");
 #endif
+	/* Make a texture if it doesn't exist */
+	gl_overview->make_current();	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	if (glIsTexture(tex_overview_id) != GL_TRUE) {
+		GLint proxy_width;
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glGenTextures(1, &tex_overview_id);
+		glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		
+		/* Load proxy texture to check for enough space */
+		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &proxy_width);
+		// If allocation would have failed
+		if (proxy_width == 0) {
+			tex_overview_id = 0; // Stop next loop from using the texture
+			assert(proxy_width > 0); // If we have debugging, show a nasty error
+			return;
+		}
+	}
+	
 	// Get texture data	
 	viewport->get_display_bands(&band_red, &band_green, &band_blue);
-	char* tex_overview = tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
-
-	/* Make texture from data */
-	gl_overview->make_current();
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	if (tex_overview_id) glDeleteTextures(1,&tex_overview_id);
-	glGenTextures(1, &tex_overview_id);
+	tex_overview = tileset->get_tile_RGB(0, 0, band_red, band_green, band_blue);
+	// Select our texture and load the data into it
 	glBindTexture(GL_TEXTURE_2D, (GLuint) tex_overview_id);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
 	/* remember to free the RGB memory */
 	delete[] tex_overview;
