@@ -152,6 +152,8 @@ void FeatureTab::OnGenerateClicked()
     // remove all mouse messages from the queue (prevent user from clicking on generate while one was being generated)
     MSG msg;
     while (PeekMessage(&msg,NULL,WM_MOUSEFIRST,WM_MOUSELAST,PM_REMOVE)!=0) {}
+
+    // make sure new feature space window appears in front  
     SetForegroundWindow(fspace->GetHandle());
 
     //featureSpaceWindows.push_back(fspace);
