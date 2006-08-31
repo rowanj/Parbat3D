@@ -1,4 +1,4 @@
-#define _WIN32_IE 0x0400
+#define _WIN32_IE 0x0470
 
 #include <Windows.h>
 #include <Commctrl.h>
@@ -99,7 +99,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     
     INITCOMMONCONTROLSEX icc;
     icc.dwSize=sizeof(INITCOMMONCONTROLSEX);
-    icc.dwICC=ICC_BAR_CLASSES;
+    icc.dwICC=ICC_BAR_CLASSES|ICC_COOL_CLASSES;
     InitCommonControlsEx(&icc);
     
     hDesktop=GetDesktopWindow();    /* record handle to desktop window */    

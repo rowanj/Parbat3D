@@ -18,6 +18,8 @@ class FeatureSpace:public Window, public GLContainerHandler
     protected:
     GLView *glview;
     GLContainer *glContainer;
+    HWND hToolbar;
+    HWND hRebarControl;
     int Create();
     void OnResize();    
         

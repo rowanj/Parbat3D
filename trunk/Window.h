@@ -1,7 +1,7 @@
 #ifndef _PARBAT_WINDOW_H
 #define _PARBAT_WINDOW_H
 
-#define _WIN32_IE 0x0400    // required in order to use InitCommonControlsEx
+#define _WIN32_IE 0x0570    // required in order to use InitCommonControlsEx
 #include <Windows.h>
 
 class Window

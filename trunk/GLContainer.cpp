@@ -12,7 +12,7 @@ GLContainer::GLContainer(HWND parent,GLContainerHandler *eventHandler,int x,int 
     handler=eventHandler; 
     
     // create container control
-    int createSuccess=CreateWin(0, "Parbat3D GLContainer", NULL,
+    int createSuccess=CreateWin(WS_EX_CLIENTEDGE, "Parbat3D GLContainer", NULL,
 	                       WS_CHILD|WS_VISIBLE, x, y, width, height, parent, NULL);
     
     assert(createSuccess==TRUE);
