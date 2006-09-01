@@ -20,6 +20,8 @@ class MainWindow:public Window
     public:
     virtual int Create();        
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+    void RestoreAll();      /* restore all windows back to their original state */
+    void MinimizeAll();     /* hide all windows owned by the current thread */
 };
 
 

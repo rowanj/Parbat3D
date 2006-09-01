@@ -25,7 +25,7 @@ int OverviewWindow::Create(HWND parent)
     GetWindowRect(imageWindow.GetHandle(),&rect);
         
     /* Create overview window */
-    if (!CreateWin(0, "Parbat3D Overview Window", "Parbat3D",
+    if (!CreateWin(WS_EX_APPWINDOW, "Parbat3D Overview Window", "Parbat3D",
 		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, rect.left-OverviewWindow::OVERVIEW_WINDOW_WIDTH, rect.top, OVERVIEW_WINDOW_WIDTH, 296,
 		parent, NULL))
         return false;
@@ -150,7 +150,23 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             /* resize display/opengl window to fit new size */
             GetClientRect(win->GetHandle(),&rect);
             MoveWindow(win->overviewWindowDisplay.GetHandle(),rect.left,rect.top,rect.right,rect.bottom,true);
-            return 0;
+
+            /* handle minimizing and restoring the child windows */            
+		    switch(wParam)
+		    {
+                
+                case SIZE_RESTORED:
+                    // restore windows to their previous state 
+                    mainWindow.RestoreAll();
+                    return 0;
+
+                 case SIZE_MINIMIZED:
+                    // record whether windows are currently visible & then hide them all
+                    mainWindow.MinimizeAll(); 
+					return 0;
+		    }    
+  	        return 0;
+
                    
         /* WM_SYSCOMMAND: a system-related command associated with window needs to be executed */    
         case WM_SYSCOMMAND:
@@ -158,8 +174,8 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             if (wParam==SC_MINIMIZE)
             {
                 /* cause the main window to minimised instead */
-                ShowWindow(mainWindow.GetHandle(),SW_MINIMIZE);
-                return 0;
+                //ShowWindow(mainWindow.GetHandle(),SW_MINIMIZE);
+                //return 0;
             }            
             break;
                      
