@@ -1,13 +1,15 @@
 #include <Windows.h>
-#include "Window.h"
-#include "Settings.h"
+
+#include "console.h"
 #include "DisplayWindow.h"
 #include "ImageHandler.h"
-#include "ToolWindow.h"
 #include "ImageWindow.h"
-#include "ROIWindow.h"
 #include "main.h"
-#include "console.h"
+#include "ROISet.h"
+#include "ROIWindow.h"
+#include "Settings.h"
+#include "ToolWindow.h"
+#include "Window.h"
 
 DisplayWindow::DisplayWindow()
 {
@@ -96,6 +98,27 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                         }
                     }
                     delete[] bv;
+                }
+            }
+            break;
+        
+        case WM_LBUTTONDOWN:
+            if ((image_handler) && (win==&imageWindow.imageWindowDisplay) && regionsSet->editing()) {
+                // get position of mouse on screen
+                int mx = (short)LOWORD(lParam);
+                int my = (short)HIWORD(lParam);
+                
+                // get position of mouse in image
+                int ix, iy;
+                image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
+                
+                // check if cursor is outside of image bounds
+                ImageProperties* ip = image_handler->get_image_properties();
+                if (ix>=0 && iy>=0 && ix<(ip->getWidth()) && iy<(ip->getHeight())) {
+                    regionsSet->add_point(ix, iy);
+                    //regionsSet->add_entity_to_current();
+                    ROIWindow* roiwin = (ROIWindow*)Window::GetWindowObject(roiWindow.GetHandle());
+                    roiwin->updateButtons(roiwin);
                 }
             }
             break;

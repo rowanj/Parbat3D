@@ -71,13 +71,12 @@ class ROIWindow:public Window
         void deleteROI (ROIWindow*);
         
         
-        void updateButtons (ROIWindow*);
-        
-        
     public:
         int Create(HWND parent);
         
         static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+        
+        void updateButtons (ROIWindow*);
 };
 
 #endif

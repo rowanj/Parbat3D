@@ -9,6 +9,7 @@
 #include "ToolWindow.h"
 #include "ImageHandler.h"
 #include "ImageWindow.h"
+#include "ROI.h"
 #include "ROISet.h"
 #include "ROIFile.h"
 #include "ROIWindow.h"
@@ -161,15 +162,15 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             
             /* Create Polygon ROI Button */
 			if (LOWORD(wParam) == 5 && HIWORD(wParam) == BN_CLICKED)
-                win->newEntity(win, "POLYGON");
+                win->newEntity(win, ROI_POLY);
             
             /* Create Rectangle ROI Button */
 			if (LOWORD(wParam) == 6 && HIWORD(wParam) == BN_CLICKED)
-                win->newEntity(win, "RECT");
+                win->newEntity(win, ROI_RECT);
             
             /* Create Single Point ROI Button */
 			if (LOWORD(wParam) == 7 && HIWORD(wParam) == BN_CLICKED) {
-                win->newEntity(win, "POINT");
+                win->newEntity(win, ROI_POINT);
             }
             
             // turn off the buttons if an entity is being created
@@ -220,25 +221,17 @@ int ROIWindow::getROICheckedCount () {
 
 
 void ROIWindow::newROI (ROIWindow* win, const char* roiType) {
-    // get unique name
-    int listSize = roiCheckboxList.size();
-    int i = listSize;
+    int listSize = regionsSet->get_regions_count();
     
-    string *name = new string(makeMessage("ROI-", listSize));
-    while (regionsSet->name_exists(*name)) {
-        i++;
-        name = new string(makeMessage("ROI-", i));
-    }
-    
-    // create ROI with the name
-    ROI *rCur = regionsSet->new_region(*name);
+    // create ROI with the default name
+    ROI *rCur = regionsSet->new_region();
     if (roiType != NULL)
         regionsSet->new_entity(roiType);
     
     // create checkbox for the ROI
     HWND hROITick = CreateWindowEx(
                         0, "BUTTON",
-                        copyString(name->c_str()),
+                        copyString((rCur->get_name()).c_str()),
                 		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
                         10, 10 + (20 * listSize),
                         100, 16, ROIscrollBox.GetHandle(), NULL,
@@ -255,12 +248,13 @@ void ROIWindow::loadROI (ROIWindow* win) {
 void ROIWindow::saveROI (ROIWindow* win) {
     int checked = win->getROICheckedCount();
     
+    // save only the selected ROIs
     if (checked>0) {
-        MessageBox(NULL, (LPSTR) "Save Some", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+        
+    // save all the ROIs
     } else {
-        MessageBox(NULL, (LPSTR) "Save All", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
         //ROIFile *rf = new ROIFile();
-        //rf->saveSetToFile("temp.roi", regionsSet);
+        //rf->saveSetToFile("test.roi", regionsSet);
     }
 }
 
@@ -299,15 +293,17 @@ void ROIWindow::deleteROI (ROIWindow* win) {
 
 
 void ROIWindow::updateButtons (ROIWindow* win) {
-    // check if entity is being created
-    if (regionsSet->editing()) {
-        // turn off ROI add/remove buttons
-        EnableWindow(win->hNewButton, false);
-        EnableWindow(win->hDeleteButton, false);
-        
-        // turn off entity creation buttons
-        EnableWindow(win->hPolyButton, false);
-        EnableWindow(win->hRectButton, false);
-        EnableWindow(win->hSingleButton, false);
-    }
+    bool stat;
+    
+    if (regionsSet->editing()) stat = false;
+    else stat = true;
+    
+    // turn off ROI add/remove buttons
+    EnableWindow(win->hNewButton, stat);
+    EnableWindow(win->hDeleteButton, stat);
+    
+    // turn off entity creation buttons
+    EnableWindow(win->hPolyButton, stat);
+    EnableWindow(win->hRectButton, stat);
+    EnableWindow(win->hSingleButton, stat);
 }

@@ -137,7 +137,7 @@ void BatchIniFile::writeBufferToSection (string section, bool saveContents) {
                 remove(".temp");
                 
                 // add the data to the end of the file (works if file doesn't exist)
-                ofstream filePtrO (fileName.c_str(), ios::trunc);
+                ofstream filePtrO (fileName.c_str(), ios::app);  // or ios::trunc to remove previous
                 if (filePtrO.is_open()) {
                     filePtrO << sectionLabel << '\n';
                     filePtrO << *contentBuffer;

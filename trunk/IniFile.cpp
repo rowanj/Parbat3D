@@ -171,6 +171,19 @@ void iniFile::update (string section, string key, string data) {
             // replace the original file with the updated temp one
             remove(fileName.c_str());
             rename(".temp", fileName.c_str());
+        } else {
+            if (!filePtrI.is_open() && filePtrO.is_open()) {
+                filePtrO.close();  // clean up since file cannot be opened
+                remove(".temp");
+                
+                // add the data to the end of the file (works if file doesn't exist)
+                ofstream filePtrO (fileName.c_str(), ios::app);
+                if (filePtrO.is_open()) {
+                    filePtrO << sectionLabel << '\n';
+                    filePtrO << key << '=' << data << '\n';
+                    filePtrO.close();
+                }
+            }
         }
     }
 }
