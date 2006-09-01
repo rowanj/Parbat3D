@@ -186,8 +186,10 @@ void Window::drawStatic(DRAWITEMSTRUCT *dis)
     TextOut(dis->hDC,dis->rcItem.left,dis->rcItem.top,(char*)str,len);                          // display text
 }
 
+
 LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    unsigned int flags;
     Window* win=Window::GetWindowObject(hwnd);
     if (win!=NULL)
     {   

@@ -10,12 +10,12 @@ class MainWindow:public Window
 {
     private:
     WNDPROC prevProc;
-    vector<Window*> windows;
-    vector<HWND> savedChildren;
+    //vector<Window*> windows;
+    vector<HWND> savedWindows;
     vector<int> restoreStates;
     int *windowStates; 
     
-    static BOOL CALLBACK MainWindow::SaveChildState(HWND hwnd, LPARAM lparam);
+    static BOOL CALLBACK MainWindow::SaveAndHideWindow(HWND hwnd, LPARAM lparam);
        
     public:
     virtual int Create();        

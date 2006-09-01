@@ -22,6 +22,8 @@ class Window
     int CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,DWORD dwStyle,int x,int y,int nWidth,int nHeight,HWND hWndParent,HMENU hMenu);
             // create window, register window class (if required) & associated it with this object
     
+    int OnWindowPosChanging(WINDOWPOS *wp);
+    
     public:
     Window::Window();
 
