@@ -1,3 +1,4 @@
+#define WINVER 0x0500
 #include <Windows.h>
 #include "main.h"
 #include "ImageWindow.h"
@@ -21,9 +22,11 @@ int MainWindow::Create()
     
     // Create main window positioned off the screen
     if (!CreateWin(0, "parbat3d main win class", "Parbat3D",
-		WS_SYSMENU|WS_MINIMIZEBOX, -200, rect.bottom-200, 1, 1, 
+		WS_SYSMENU|WS_MINIMIZEBOX, -150, rect.bottom+50, 1, 1, 
 		NULL, NULL))
-        return false;                        
+        return false;          
+        
+                
 
     prevProc=SetWindowProcedure(&MainWindow::WindowProcedure);
     Show();
@@ -47,6 +50,7 @@ BOOL CALLBACK MainWindow::SaveAndHideWindow(HWND hwnd, LPARAM lparam)
 
         /* hide the window */                                                
         ShowWindow(hwnd,SW_HIDE);                                                           
+        //AnimateWindow(hwnd,1000,AW_HIDE|AW_CENTER);
     }
     return true;
 }
@@ -61,7 +65,6 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 
     switch (message) 
     {
-
 		case WM_SIZE:
         /* handle minimizing and restoring the child windows */            
 		    switch(wParam)
