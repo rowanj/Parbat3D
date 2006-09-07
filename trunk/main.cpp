@@ -1,4 +1,6 @@
+#ifndef _WIN32_IE
 #define _WIN32_IE 0x0470
+#endif
 
 #include <Windows.h>
 #include <Commctrl.h>
