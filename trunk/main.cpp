@@ -1,12 +1,8 @@
-#ifndef _WIN32_IE
-#define _WIN32_IE 0x0470
-#endif
-
+#include "config.h"
 #include <Windows.h>
 #include <Commctrl.h>
 #include <iostream>
 #include <cassert>
-#include "config.h"
 #include "window.h"
 
 #include "ImageProperties.h"

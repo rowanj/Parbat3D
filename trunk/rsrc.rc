@@ -1,6 +1,8 @@
 #include <Windows.h>
 #include "resources.h"
 
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "Parbat3D.exe.manifest"  // enable XP visual styles for controls/windows
+
 600 ICON "Parbat3D.ico"
 
 501 MENU 

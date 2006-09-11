@@ -11,13 +11,17 @@
 #define DEBUG_IMAGE_DATA 0
 #define DEBUG_GL 0
 #define DEBUG_TOOLWINDOW 0
-#define DEBUG_WINDOW 1
+#define DEBUG_WINDOW 0
 #define DEBUG_SCROLLING 0
+#define DEBUG_STICKY_WINDOW_MANAGER 0
 
 // Declare some packages as optional during initial implementation.
 //  This is to allow other packages to build for testing.
 #define TMP_USE_SETTINGS 0
 #define TMP_USE_CONSOLE 1 //turn console window on/off
+
+#define _WIN32_IE 0x0600    // project compatible with comctrl32.dll up to v6.0
+                            // required in order to use certain common controls functions & constants
 
 // Platform-specific portions of code should test for the relevant PLATFORM_ define
 #ifdef WIN32 // !! may not be defined by all compilers - Rowan
