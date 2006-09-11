@@ -8,6 +8,7 @@
 #include "console.h"
 #include "ROIWindow.h"
 #include "PrefsWindow.h"
+#include "ContrastWindow.h"
 
 
 // Used for accessing the help folder
@@ -124,6 +125,13 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                         prefsWindow.Show();
                     else
                         prefsWindow.Hide();
+                    return 0;
+
+                case IDM_CONTSWINDOW:
+                    if (win->toggleMenuItemTick(win->hMainMenu,IDM_CONTSWINDOW))
+                        contrastWindow.Show();
+                    else
+                        contrastWindow.Hide();
                     return 0;
 
                 case IDM_HELPCONTENTS:

@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=81
+UnitCount=83
 Type=0
 Ver=1
 ObjFiles=
@@ -851,6 +851,26 @@ BuildCmd=
 FileName=GLContainer.h
 CompileCpp=1
 Folder=Feature_Space_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit82]
+FileName=ContrastWindow.cpp
+CompileCpp=1
+Folder=View_PKG/Window Classes
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit83]
+FileName=ContrastWindow.h
+CompileCpp=1
+Folder=View_PKG/Window Classes
 Compile=1
 Link=1
 Priority=1000

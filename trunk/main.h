@@ -10,6 +10,7 @@
 #include "ImageWindow.h"
 #include "ROIWindow.h"
 #include "PrefsWindow.h"
+#include "ContrastWindow.h"
 #include "StickyWindowManager.h"
 #include "FeatureSpace.h"
 
@@ -26,6 +27,7 @@ extern ImageWindow imageWindow;
 extern OverviewWindow overviewWindow;
 extern ROIWindow roiWindow;
 extern PrefsWindow prefsWindow;
+extern ContrastWindow contrastWindow;
 extern StickyWindowManager stickyWindowManager;
 extern vector<FeatureSpace*> featureSpaceWindows;
 enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID,FEATURE_TAB_ID};

@@ -103,11 +103,11 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
         (WPARAM) TRUE,                   // redraw flag 
         (LPARAM) MAKELONG(1, 8));  // min. & max. positions
         
-    // Trackbar steps taken when clicking to the side of the pointer
+    // Trackbar steps taken when clicking to the side of the pointer or scroll wheel
     SendMessage(hTrackbar, TBM_SETPAGESIZE, 
         0, (LPARAM) 1);                  // new page size 
         
-	//Trackbar - sets position
+	//Trackbar - sets initial position
     SendMessage(hTrackbar, TBM_SETPOS, 
         (WPARAM) TRUE,                   // redraw flag 
         (LPARAM) 1); 

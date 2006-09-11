@@ -23,6 +23,7 @@
 #include "DisplayWindow.h"
 #include "ROIWindow.h"
 #include "PrefsWindow.h"
+#include "ContrastWindow.h"
 
 #include "ROISet.h"
 
@@ -46,6 +47,7 @@ OverviewWindow overviewWindow;
 ImageWindow imageWindow;
 ROIWindow roiWindow;
 PrefsWindow prefsWindow;
+ContrastWindow contrastWindow;
 StickyWindowManager stickyWindowManager;
 vector<FeatureSpace*> featureSpaceWindows;
 
@@ -129,7 +131,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Setup main & image windows */
     //  note: image window must be created before overview window
 
-    if ((!imageWindow.Create(mainWindow.GetHandle())) || (!overviewWindow.Create(imageWindow.GetHandle())) || (!prefsWindow.Create(imageWindow.GetHandle())))
+    if ((!imageWindow.Create(mainWindow.GetHandle())) || (!overviewWindow.Create(imageWindow.GetHandle())) || (!prefsWindow.Create(imageWindow.GetHandle())) || (!contrastWindow.Create(imageWindow.GetHandle())))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
@@ -138,6 +140,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     stickyWindowManager.SetController(&overviewWindow);    
     stickyWindowManager.AddStickyWindow(&imageWindow);
     stickyWindowManager.AddStickyWindow(&prefsWindow);
+    stickyWindowManager.AddStickyWindow(&contrastWindow);
     
     /* Execute the message loop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))
@@ -158,7 +161,8 @@ void orderWindows()
 {
     SetWindowPos(imageWindow.GetHandle(),toolWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
     SetWindowPos(imageWindow.GetHandle(),overviewWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
-    SetWindowPos(imageWindow.GetHandle(),roiWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
+    SetWindowPos(imageWindow.GetHandle(),roiWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);
+	//SetWindowPos(imageWindow.GetHandle(),contrastWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
 }    
 
 void loadFile()
