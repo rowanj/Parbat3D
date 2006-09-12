@@ -5,7 +5,7 @@
 #include "console.h"
 #include "config.h"
 
-ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* image_viewport_param)
+ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* image_viewport_param, ROISet *roisToOutline)
 {
 	ImageProperties* image_properties;
 
@@ -18,6 +18,7 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	tileset = NULL;
 	textures = NULL;
 	
+	roiset=roisToOutline;
 	viewport = image_viewport_param;
 	image_file = image_file_ptr;
 	image_properties = image_file->getImageProperties();
@@ -68,6 +69,9 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	/* Test that we haven't already messed up... */
 	assert(glGetError() == GL_NO_ERROR);
 
+	/* Find scale factor for lines */
+	scalefactor_lines = 1.0 / (GLfloat) max(image_width, image_height);
+
 	/* Initial viewport size */
 	resize_window();
 	/* Start listening for events */
@@ -115,6 +119,66 @@ void ImageGL::notify_viewport(void)
 	}
 #endif
 	glDisable(GL_TEXTURE_2D);
+
+	/* Draw ROI outlines over the top of the image */
+	{
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix(); /* Don't destroy tile transform */
+		/* Scale to work in image pixels */
+		glLoadIdentity();
+       // glScalef(scalefactor_lines, scalefactor_lines, scalefactor_lines);
+	
+		/* We'll be using translucent lines */
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        vector<ROI*> rois=roiset->get_regions();
+        int i,j,k,red,green,blue;
+        for (i=0;i<rois.size();i++)
+        {
+            ROI* roi=rois.at(i);            
+            
+            roi->get_colour(&red,&green,&blue);
+            glColor4f(1.0*red/255, 1.0*green/255, 1.0*blue/255, 1.0);
+            
+            vector<ROIEntity*> entities=roi->get_entities();
+            for (j=0;j<entities.size();j++)
+            {
+                ROIEntity *entity=entities.at(j);
+                const char *type=entity->get_type();
+                vector<coords> points=entity->get_points();                
+
+                if (type==ROI_POLY)
+                {
+               		glBegin(GL_LINES);
+                    for (k=0;k<points.size();k++)
+                    {
+                        coords point=points.at(k);
+               			glVertex3f(point.x, point.y, 0.0);
+                    }
+                    glEnd();
+                }
+
+            }
+        }
+
+        // draw test line
+		glBegin(GL_LINES);
+		{
+            
+			glColor4f(1.0, 0.0, 0.0, 0.8);
+			/* top left */
+			glVertex3f(0.0, 0.0, 0.0);
+			/* bottom right */
+			glVertex3f(100.0, 100.0, 0.0);
+		}
+		glEnd();
+	
+		//glDisable(GL_BLEND);
+		
+		glPopMatrix(); /* Restore tile transform */
+	}	
+	
 	gl_image->GLswap();
 }
 

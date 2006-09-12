@@ -185,7 +185,7 @@ void loadFile()
         // load image & setup windows
         int ih_status;
         assert(image_handler == NULL);
-	    image_handler = new ImageHandler::ImageHandler(overviewWindow.overviewWindowDisplay.GetHandle(), imageWindow.imageWindowDisplay.GetHandle(), ofn.lpstrFile);
+	    image_handler = new ImageHandler::ImageHandler(overviewWindow.overviewWindowDisplay.GetHandle(), imageWindow.imageWindowDisplay.GetHandle(), ofn.lpstrFile, regionsSet);
 	    assert(image_handler != NULL);
 	    ih_status = image_handler->get_status();
 		if (ih_status > 0) {

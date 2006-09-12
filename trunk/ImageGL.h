@@ -5,11 +5,12 @@
 #include "ImageFile.h"
 #include "ImageTileSet.h"
 #include "ImageViewport.h"
+#include "ROISet.h"
 
 class ImageGL : public ViewportListener
 {
   public:
-	ImageGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* image_viewport_param);
+	ImageGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* image_viewport_param, ROISet *roisToOutline);
 	virtual ~ImageGL(void);
 	
 	void resize_window(void);
@@ -27,6 +28,7 @@ class ImageGL : public ViewportListener
 	GLView* gl_image;
 	ImageFile* image_file;
 	ImageViewport* viewport;
+	ROISet* roiset;        // set of ROIs to be displayed
 	
 	/* State variables */
 	int LOD;
@@ -47,6 +49,8 @@ class ImageGL : public ViewportListener
 	int texture_size;
 	int cache_size;
 	int start_column, start_row;
+	
+    GLfloat scalefactor_lines;  // scale factor used when drawing ROI outlines
 };
 
 #endif

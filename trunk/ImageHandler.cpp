@@ -5,7 +5,7 @@
 #include "config.h"
 #include "console.h"
 
-ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
+ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, ROISet *roisToOutline)
 {
 	status = 0; // No error
 	status_text = "No error.";
@@ -32,7 +32,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename)
 		overview_gl = new OverviewGL(overview_hwnd, image_file, image_viewport);
 		assert(overview_gl != NULL);
 		image_gl = NULL;
-		image_gl = new ImageGL(image_hwnd, image_file, image_viewport);
+		image_gl = new ImageGL(image_hwnd, image_file, image_viewport, roisToOutline);
 		assert(image_gl != NULL);
 		
 		image_viewport->set_display_bands(1,2,3);

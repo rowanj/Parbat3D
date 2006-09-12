@@ -41,6 +41,10 @@ class ROIEntity {
             else if (s=="RECT") type = ROI_RECT;
             else type = ROI_POLY;
         }
+        
+        const char* get_type() {return type;}
+        
+        vector<coords> get_points() {return points;}        
 };
 
 

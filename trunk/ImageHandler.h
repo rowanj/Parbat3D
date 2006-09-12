@@ -18,7 +18,7 @@ class ImageHandler
 {
 public:
 	/* Class Operators */
-	ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename);
+	ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, ROISet *roisToOutline);
 	virtual ~ImageHandler(void);
 	
 	/* Data Operators */
