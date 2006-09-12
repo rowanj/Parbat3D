@@ -242,7 +242,6 @@ void ROIWindow::newROI (ROIWindow* win, const char* roiType) {
 
 
 void ROIWindow::loadROI (ROIWindow* win) {
-    //MessageBox(NULL, (LPSTR) "Open ROI", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
     OPENFILENAME ofn;
     char szFileName[MAX_PATH] = "";
     
@@ -279,13 +278,36 @@ void ROIWindow::loadROI (ROIWindow* win) {
 void ROIWindow::saveROI (ROIWindow* win) {
     int checked = win->getROICheckedCount();
     
-    // save only the selected ROIs
-    if (checked>0) {
-        
-    // save all the ROIs
-    } else {
-        ROIFile *rf = new ROIFile();
-        rf->saveSetToFile("test.roi", regionsSet);
+    OPENFILENAME ofn;
+    char szFileName[MAX_PATH] = "";
+    
+    ZeroMemory(&ofn, sizeof(ofn));
+    
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = win->GetHandle();//overviewWindow.GetHandle();
+    ofn.lpstrFilter =  "ROI File (*.roi)\0*.roi\0Text File (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
+    ofn.lpstrFile = szFileName;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+    ofn.lpstrDefExt = "txt";
+    
+    
+    if(GetSaveFileName(&ofn)) {
+        // get a string version of the filename
+		string fn_str (ofn.lpstrFile);
+		
+		Console::write("ROI file to save: ");
+		Console::write(&fn_str);
+		Console::write("\n");
+		
+        // save only the selected ROIs
+        if (checked>0) {
+            
+        // save all the ROIs
+        } else {
+            ROIFile *rf = new ROIFile();
+            rf->saveSetToFile(fn_str, regionsSet);
+        }
     }
 }
 
@@ -311,7 +333,7 @@ void ROIWindow::deleteROI (ROIWindow* win) {
     
     // if no ROIs are selected then create a new one
     if (checked >= 1) {
-        MessageBox(NULL, (LPSTR) "Delete it", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+        //MessageBox(NULL, (LPSTR) "Delete it", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
         
         // ** delete procedure
         // loop through roiCheckboxList
