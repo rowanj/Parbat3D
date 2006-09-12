@@ -206,27 +206,25 @@ void loadFile()
         imageWindow.updateImageWindowTitle();              
         imageWindow.updateImageScrollbar();      
 
-                    // re-create tool & image window
-                    toolWindow.Create(imageWindow.GetHandle());
-                    roiWindow.Create(imageWindow.GetHandle());
-                    
-                    // show tool & image windows
-                    toolWindow.Show();
-                    imageWindow.Show();
-                    //roiWindow.Show();
-                    orderWindows();                    
-
-                    // update opengl displays
-                    overviewWindow.Repaint();
-                    imageWindow.Repaint();
-                    //RedrawWindow(overviewWindow.overviewWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);
-                    //RedrawWindow(imageWindow.imageWindowDisplay.GetHandle(),NULL,NULL,RDW_INTERNALPAINT);                
-
+        // re-create tool & image window
+        toolWindow.Create(imageWindow.GetHandle());
+        roiWindow.Create(imageWindow.GetHandle());
+        
+        // show tool & image windows
+        toolWindow.Show();
+        imageWindow.Show();
+        //roiWindow.Show();
+        orderWindows();                    
+        
+        // update opengl displays
+        overviewWindow.Repaint();
+        imageWindow.Repaint();
+        
         // enable window menu items
-                    EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,false);
-                    EnableMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,false);
-                    EnableMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,false);
-                    EnableMenuItem(overviewWindow.hMainMenu,IDM_FILECLOSE,false);
+        EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,false);
+        EnableMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,false);
+        EnableMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,false);
+        EnableMenuItem(overviewWindow.hMainMenu,IDM_FILECLOSE,false);
     }
 }
 

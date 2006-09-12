@@ -40,6 +40,7 @@ int ROIWindow::Create(HWND parent)
 	    return false;
 	    
     prevProc=SetWindowProcedure(&WindowProcedure);
+    stickyWindowManager.AddStickyWindow(this);  // make the window stick to others        
 	
 	RECT rect2;
    	rect2.top=5;
