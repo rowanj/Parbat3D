@@ -71,6 +71,12 @@ class ROISet {
         */
         bool editing ();
         
+        /**
+            Returns the type of entity that is currently being created.
+            ROI_NONE is returned if no entity is being created at the moment.
+        */
+        const char* editingType ();
+        
         
 /* Regions Of Interest ********************************************************/
         /**

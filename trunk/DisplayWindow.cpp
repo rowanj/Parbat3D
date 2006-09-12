@@ -122,6 +122,14 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 }
             }
             break;
+            
+        case WM_LBUTTONDBLCLK:
+            if ((image_handler) && (win==&imageWindow.imageWindowDisplay) && (regionsSet->editingType()==ROI_POLY)) {
+                regionsSet->finish_entity(true);
+                ROIWindow* roiwin = (ROIWindow*)Window::GetWindowObject(roiWindow.GetHandle());
+                roiwin->updateButtons(roiwin);
+            }
+            break;
 
         case WM_DESTROY:
             DeleteObject(win->hNormalFont);

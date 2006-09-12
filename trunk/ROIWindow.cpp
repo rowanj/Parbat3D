@@ -253,8 +253,8 @@ void ROIWindow::saveROI (ROIWindow* win) {
         
     // save all the ROIs
     } else {
-        //ROIFile *rf = new ROIFile();
-        //rf->saveSetToFile("test.roi", regionsSet);
+        ROIFile *rf = new ROIFile();
+        rf->saveSetToFile("test.roi", regionsSet);
     }
 }
 

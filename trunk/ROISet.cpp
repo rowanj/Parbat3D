@@ -81,6 +81,13 @@ bool ROISet::editing () {
     return editingEntity;
 }
 
+const char* ROISet::editingType () {
+    if (current_entity!=NULL)
+        return current_entity->type;
+    else
+        return ROI_NONE;
+}
+
 
 /* Regions Of Interest ********************************************************/
 ROI* ROISet::new_region (void) {

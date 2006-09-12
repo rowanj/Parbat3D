@@ -3,6 +3,7 @@
 using namespace std;
 
 
+const char* ROI_NONE = "NONE";
 const char* ROI_POINT = "POINT";
 const char* ROI_RECT = "RECT";
 const char* ROI_POLY = "POLY";

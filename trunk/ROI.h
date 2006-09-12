@@ -8,6 +8,7 @@ using namespace std;
 
 
 // these represent the different types of entities that can be created
+extern const char* ROI_NONE;   // not an ROI (used for checking if one is being edited)
 extern const char* ROI_POINT;  // consist of a single coord
 extern const char* ROI_RECT;   // consist of 2 coords (top-left and botton-right)
 extern const char* ROI_POLY;   // consist of 3 or more coords
