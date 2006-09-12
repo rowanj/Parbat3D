@@ -53,9 +53,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
 
     DisplayWindow* win=(DisplayWindow*)Window::GetWindowObject(hwnd);
     
-    switch (message) 
-    {
-            
+    switch (message) {
         case WM_SIZE:           
             if (image_handler) {
                 /* Re-size OpenGL stuff */
@@ -67,40 +65,40 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 win->textPos.y=(rect.bottom-rect.top)/2 - win->textSize.cy/2;            
             }    
             break;
-
+        
+        
         case WM_MOUSEMOVE:
-            {
-                /* check if image is open, mouse has moved on image window & the query tab is displayed in the tool window */
-                if ((image_handler)&&(win==&imageWindow.imageWindowDisplay)&&(toolWindow.hToolWindowCurrentTabContainer==toolWindow.queryTab.GetHandle())) {
-                    /* Get mouse screen position */
-                    int mx = (short)LOWORD(lParam);
-                    int my = (short)HIWORD(lParam);
-                    int ix, iy;
-                    unsigned int* bv;
-                    
-                    bv = image_handler->get_window_pixel_values(mx, my);
-                    image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
-                    
-                    /* if cursor is outside of image bounds then display 0,0 as coordinates */
-                    ImageProperties* ip = image_handler->get_image_properties();
-                    if (ix>=0 && iy>=0 && ix<(ip->getWidth()) && iy<(ip->getHeight())) {
+            /* check if image is open, mouse has moved on image window & the query tab is displayed in the tool window */
+            if ((image_handler)&&(win==&imageWindow.imageWindowDisplay)&&(toolWindow.hToolWindowCurrentTabContainer==toolWindow.queryTab.GetHandle())) {
+                /* Get mouse screen position */
+                int mx = (short)LOWORD(lParam);
+                int my = (short)HIWORD(lParam);
+                int ix, iy;
+                unsigned int* bv;
+                
+                bv = image_handler->get_window_pixel_values(mx, my);
+                image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
+                
+                /* if cursor is outside of image bounds then display 0,0 as coordinates */
+                ImageProperties* ip = image_handler->get_image_properties();
+                if (ix>=0 && iy>=0 && ix<(ip->getWidth()) && iy<(ip->getHeight())) {
 
-                        /* Update display of cursor position */
-                        toolWindow.SetCursorPosition(ix,iy);
-                        //SetWindowText(toolWindow.cursorXPos, );
-                        //SetWindowText(toolWindow.cursorYPos, );
-                        
-                        /* Update display of pixel values under query tab */                    
-                        if (bv && (ix!=0 || iy!=0)) { /* make sure the band values were returned */
-                            for (int i=1; i<=toolWindow.bands; i++)
-                                toolWindow.SetImageBandValue(i,bv[i-1]);
-                                //SetWindowText(toolWindow.imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
-                        }
+                    /* Update display of cursor position */
+                    toolWindow.SetCursorPosition(ix,iy);
+                    //SetWindowText(toolWindow.cursorXPos, );
+                    //SetWindowText(toolWindow.cursorYPos, );
+                    
+                    /* Update display of pixel values under query tab */                    
+                    if (bv && (ix!=0 || iy!=0)) { /* make sure the band values were returned */
+                        for (int i=1; i<=toolWindow.bands; i++)
+                            toolWindow.SetImageBandValue(i,bv[i-1]);
+                            //SetWindowText(toolWindow.imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
                     }
-                    delete[] bv;
                 }
+                delete[] bv;
             }
             break;
+        
         
         case WM_LBUTTONDOWN:
             if ((image_handler) && (win==&imageWindow.imageWindowDisplay) && regionsSet->editing()) {
@@ -122,7 +120,8 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 }
             }
             break;
-            
+        
+        
         case WM_LBUTTONDBLCLK:
             if ((image_handler) && (win==&imageWindow.imageWindowDisplay) && (regionsSet->editingType()==ROI_POLY)) {
                 regionsSet->finish_entity(true);
@@ -130,7 +129,17 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 roiwin->updateButtons(roiwin);
             }
             break;
-
+        
+        
+        case WM_RBUTTONDOWN:
+            if ((image_handler) && (win==&imageWindow.imageWindowDisplay) && regionsSet->editing()) {
+                regionsSet->backtrack();
+                ROIWindow* roiwin = (ROIWindow*)Window::GetWindowObject(roiWindow.GetHandle());
+                roiwin->updateButtons(roiwin);
+            }
+            break;
+        
+        
         case WM_DESTROY:
             DeleteObject(win->hNormalFont);
             DeleteObject(win->hbrush); 
