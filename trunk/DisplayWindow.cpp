@@ -26,6 +26,7 @@ int DisplayWindow::Create(HWND hparent)
 		rect.left, rect.top, rect.right, rect.bottom, hparent, NULL);    
 
 	SetDefaultCursor(LoadCursor(NULL, IDC_CROSS));
+	SetBackgroundBrush(NULL);
 	prevProc=SetWindowProcedure(&WindowProcedure);
 	
     /* init variables used for painting "No Image Loaded" message */
@@ -97,6 +98,9 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 }
                 delete[] bv;
             }
+            if ((image_handler) && (win==&imageWindow.imageWindowDisplay) && regionsSet->editing()) {
+                imageWindow.Repaint();           
+            }
             break;
         
         
@@ -117,6 +121,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                     //regionsSet->add_entity_to_current();
                     ROIWindow* roiwin = (ROIWindow*)Window::GetWindowObject(roiWindow.GetHandle());
                     roiwin->updateButtons(roiwin);
+                    imageWindow.Repaint();                    
                 }
             }
             break;
@@ -127,6 +132,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 regionsSet->finish_entity(true);
                 ROIWindow* roiwin = (ROIWindow*)Window::GetWindowObject(roiWindow.GetHandle());
                 roiwin->updateButtons(roiwin);
+                imageWindow.Repaint();
             }
             break;
         
@@ -136,6 +142,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 regionsSet->backtrack();
                 ROIWindow* roiwin = (ROIWindow*)Window::GetWindowObject(roiWindow.GetHandle());
                 roiwin->updateButtons(roiwin);
+                imageWindow.Repaint();                
             }
             break;
         
@@ -144,7 +151,11 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
             DeleteObject(win->hNormalFont);
             DeleteObject(win->hbrush); 
             return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
+        
+        case WM_ERASEBKGND:
             
+            return 0;
+                
 		case WM_PAINT:
             static int p;
             hdc=BeginPaint(hwnd,&ps);

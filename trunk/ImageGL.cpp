@@ -138,77 +138,68 @@ void ImageGL::notify_viewport(void)
         {
             ROI* roi=rois.at(i);            
             
-            // set ROI colour
-            roi->get_colour(&red,&green,&blue);
-            glColor4f(1.0*red/255, 1.0*green/255, 1.0*blue/255, 1.0);
-            
-            // draw ROI entities
-            vector<ROIEntity*> entities=roi->get_entities();
-            for (j=0;j<entities.size();j++)
+            if (roi->get_active())
             {
-                ROIEntity *entity=entities.at(j);
-                const char *type=entity->get_type();
-                vector<coords> points=entity->get_points();                
-
-                if (type==ROI_POLY)
+            
+                // set ROI colour
+                roi->get_colour(&red,&green,&blue);
+                glColor4f(1.0*red/255, 1.0*green/255, 1.0*blue/255, 1.0);
+                
+                // draw ROI entities
+                vector<ROIEntity*> entities=roi->get_entities();
+                for (j=0;j<entities.size();j++)
                 {
-                    // draw outline of polygon
-               		glBegin(GL_LINE_LOOP);
-               		{
-                        for (k=0;k<points.size();k++)
-                        {
-                            coords point=points.at(k);
-                   			glVertex3f(point.x, point.y, 0.0);
+                    ROIEntity *entity=entities.at(j);
+                    const char *type=entity->get_type();
+                    vector<coords> points=entity->get_points();                
+    
+                    if (type==ROI_POLY)
+                    {
+                        // draw outline of polygon
+                   		glBegin(GL_LINE_LOOP);
+                   		{
+                            for (k=0;k<points.size();k++)
+                            {
+                                coords point=points.at(k);
+                       			glVertex3f(point.x, point.y, 0.0);
+                            }
                         }
+                        glEnd();
                     }
-                    glEnd();
-                }
-                else if (type==ROI_POINT)
-                {
-                    // draw point
-               		glBegin(GL_POINTS);
-               		{
-                        if (points.size()>=1)
-                        {
-                   			glVertex3f(points.at(0).x, points.at(0).y, 0.0);
+                    else if (type==ROI_POINT)
+                    {
+                        // draw point
+                   		glBegin(GL_POINTS);
+                   		{
+                            if (points.size()>=1)
+                            {
+                       			glVertex3f(points.at(0).x, points.at(0).y, 0.0);
+                            }
                         }
+                        glEnd();                    
                     }
-                    glEnd();                    
-                }
-                else if (type==ROI_RECT)
-                {
-                    // draw outline of rectangle
-               		glBegin(GL_LINE_LOOP);
-               		{
-                        if (points.size()>=2)
-                        {
-                            coords topleft=points.at(0);
-                            coords bottomright=points.at(1);
-                            
-                   			glVertex3f(topleft.x, topleft.y, 0.0);
-                   			glVertex3f(topleft.x, bottomright.y, 0.0);
-                   			glVertex3f(bottomright.x, bottomright.y, 0.0);
-                   			glVertex3f(bottomright.x, topleft.y, 0.0);                   			
+                    else if (type==ROI_RECT)
+                    {
+                        // draw outline of rectangle
+                   		glBegin(GL_LINE_LOOP);
+                   		{
+                            if (points.size()>=2)
+                            {
+                                coords topleft=points.at(0);
+                                coords bottomright=points.at(1);
+                                
+                       			glVertex3f(topleft.x, topleft.y, 0.0);
+                       			glVertex3f(topleft.x, bottomright.y, 0.0);
+                       			glVertex3f(bottomright.x, bottomright.y, 0.0);
+                       			glVertex3f(bottomright.x, topleft.y, 0.0);                   			
+                            }
                         }
+                        glEnd();                    
                     }
-                    glEnd();                    
                 }
-
             }
         }
 
-        // draw test line
-		glBegin(GL_LINES);
-		{
-            
-			glColor4f(1.0, 0.0, 0.0, 0.8);
-			/* top left */
-			glVertex3f(0.0, 0.0, 0.0);
-			/* bottom right */
-			glVertex3f(100.0, 100.0, 0.0);
-		}
-		glEnd();
-	
 		//glDisable(GL_BLEND);
 		
 		glPopMatrix(); /* Restore tile transform */
