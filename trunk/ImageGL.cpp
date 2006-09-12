@@ -121,7 +121,7 @@ void ImageGL::notify_viewport(void)
 	glDisable(GL_TEXTURE_2D);
 
 	/* Draw ROI outlines over the top of the image */
-	{
+    {
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix(); /* Don't destroy tile transform */
 		/* Scale to work in image pixels */
@@ -138,9 +138,11 @@ void ImageGL::notify_viewport(void)
         {
             ROI* roi=rois.at(i);            
             
+            // set ROI colour
             roi->get_colour(&red,&green,&blue);
             glColor4f(1.0*red/255, 1.0*green/255, 1.0*blue/255, 1.0);
             
+            // draw ROI entities
             vector<ROIEntity*> entities=roi->get_entities();
             for (j=0;j<entities.size();j++)
             {
@@ -150,13 +152,46 @@ void ImageGL::notify_viewport(void)
 
                 if (type==ROI_POLY)
                 {
-               		glBegin(GL_LINES);
-                    for (k=0;k<points.size();k++)
-                    {
-                        coords point=points.at(k);
-               			glVertex3f(point.x, point.y, 0.0);
+                    // draw outline of polygon
+               		glBegin(GL_LINE_LOOP);
+               		{
+                        for (k=0;k<points.size();k++)
+                        {
+                            coords point=points.at(k);
+                   			glVertex3f(point.x, point.y, 0.0);
+                        }
                     }
                     glEnd();
+                }
+                else if (type==ROI_POINT)
+                {
+                    // draw point
+               		glBegin(GL_POINTS);
+               		{
+                        if (points.size()>=1)
+                        {
+                   			glVertex3f(points.at(0).x, points.at(0).y, 0.0);
+                        }
+                    }
+                    glEnd();                    
+                }
+                else if (type==ROI_RECT)
+                {
+                    // draw outline of rectangle
+               		glBegin(GL_LINE_LOOP);
+               		{
+                        if (points.size()>=2)
+                        {
+                            coords topleft=points.at(0);
+                            coords bottomright=points.at(1);
+                            
+                   			glVertex3f(topleft.x, topleft.y, 0.0);
+                   			glVertex3f(topleft.x, bottomright.y, 0.0);
+                   			glVertex3f(bottomright.x, bottomright.y, 0.0);
+                   			glVertex3f(bottomright.x, topleft.y, 0.0);                   			
+                        }
+                    }
+                    glEnd();                    
                 }
 
             }
