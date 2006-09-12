@@ -82,6 +82,17 @@ class ROI {
             Returns the name of this Region of Interest.
         */
         string get_name (void);
+
+
+        /**
+            Sets whether the ROI is currently active
+        */
+        void set_active (bool isActive) {active=isActive;}
+        
+        /**
+            Returns whether the ROI is currently active
+        */
+        bool get_active (void) {return active;}
         
         
         /**
