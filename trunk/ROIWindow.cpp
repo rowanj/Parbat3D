@@ -242,7 +242,37 @@ void ROIWindow::newROI (ROIWindow* win, const char* roiType) {
 
 
 void ROIWindow::loadROI (ROIWindow* win) {
-    MessageBox(NULL, (LPSTR) "Open ROI", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+    //MessageBox(NULL, (LPSTR) "Open ROI", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+    OPENFILENAME ofn;
+    char szFileName[MAX_PATH] = "";
+    
+    ZeroMemory(&ofn, sizeof(ofn));
+    
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = win->GetHandle();//overviewWindow.GetHandle();
+    ofn.lpstrFilter =  "All Supported Files\0*.roi;*.txt\0ROI Files (*.roi)\0*.roi\0Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
+    ofn.lpstrFile = szFileName;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+    ofn.lpstrDefExt = "txt";
+    
+    
+    if(GetOpenFileName(&ofn)) {
+        // get a string version of the filename
+		string fn_str (ofn.lpstrFile);
+		
+		Console::write("ROI file opened: ");
+		Console::write(&fn_str);
+		Console::write("\n");
+		
+		// load the set from the file and combine it with the current set
+        ROIFile *rf = new ROIFile();
+        ROISet* rs = rf->loadSetFromFile(fn_str);
+        regionsSet->combine(rs, true);
+        
+        // update the list of checkboxes with the new regions that were loaded
+        win->updateROIList(win);
+    }
 }
 
 
@@ -307,4 +337,33 @@ void ROIWindow::updateButtons (ROIWindow* win) {
     EnableWindow(win->hPolyButton, stat);
     EnableWindow(win->hRectButton, stat);
     EnableWindow(win->hSingleButton, stat);
+}
+
+
+void ROIWindow::updateROIList (ROIWindow* win) {
+    vector<ROI*> rlist = regionsSet->get_regions();
+    
+    // remove all the original ROI checkboxes from the display
+    for (int i=0; i<roiCheckboxList.size(); i++) {
+        HWND cur = roiCheckboxList.at(i);
+        DestroyWindow(cur);
+    }
+    
+    // remove all the original ROI checkboxes from the list
+    roiCheckboxList.clear();
+    
+    // add the checkboxes based on the new list
+    for (int i=0; i<rlist.size(); i++) {
+        ROI* roi = rlist.at(i);
+        
+        // create checkbox for the ROI
+        HWND hROITick = CreateWindowEx(
+                            0, "BUTTON",
+                            copyString((roi->get_name()).c_str()),
+                    		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
+                            10, 10 + (20 * i),
+                            100, 16, ROIscrollBox.GetHandle(), NULL,
+                    		Window::GetAppInstance(), NULL);
+        roiCheckboxList.push_back(hROITick);    // add the ROI checkbox to the list
+    }
 }

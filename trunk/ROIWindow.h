@@ -68,7 +68,11 @@ class ROIWindow:public Window
         */
         void newEntity (ROIWindow*, const char*);
         
+        
         void deleteROI (ROIWindow*);
+        
+        
+        void updateROIList (ROIWindow*);
         
         
     public:
