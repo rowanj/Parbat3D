@@ -187,3 +187,13 @@ bool ROISet::name_exists (string name) {
     
     return exists;
 }
+
+
+void ROISet::combine(ROISet* rs, bool replace) {
+    vector<ROI*> rlist = rs->get_regions();
+    
+    for (int i=0; i<rlist.size(); i++) {
+        ROI* roi = rlist.at(i);           // grabs an ROI from the new set
+        add_region_to_set(roi, replace);  // adds it to the current one
+    }
+}

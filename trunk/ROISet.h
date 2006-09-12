@@ -142,6 +142,14 @@ class ROISet {
             with the given name.
         */
         bool name_exists (string);
+        
+        
+        /**
+            Combines the ROIs from the specified set with the current set. If
+            the second parameter is true then any ROIs that have the same name
+            in the current set will be replaced by versions from the new set.
+        */
+        void combine (ROISet*, bool);
 };
 
 
