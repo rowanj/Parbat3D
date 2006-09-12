@@ -1,6 +1,8 @@
 #include "config.h"
 #include "GLView.h"
 
+#include <cassert>
+
 // pfd structure aproximated from public domain code at nehe.gamedev.net
 static	PIXELFORMATDESCRIPTOR gl_pfd={	// pfd Tells Windows How We Want Things To Be
 		sizeof(PIXELFORMATDESCRIPTOR),	// Size Of This Pixel Format Descriptor
@@ -29,6 +31,8 @@ GLView::GLView(HWND hWindow)
 	error_text = "No error.";
 	GLuint pixel_format_index;
 	
+	device_context = NULL;
+	rendering_context = NULL;
 	
 	if (hWindow != NULL) {
 		window_handle = hWindow;
@@ -38,29 +42,19 @@ GLView::GLView(HWND hWindow)
 	}
 
 	// Get hardware device context and error check
-	if (!(device_context = GetDC(window_handle))) {
-		status = 2;
-		error_text = "Could not get device context.";
-	}
+	device_context = GetDC(window_handle);
+    assert(device_context != NULL);
 	
+	pixel_format_index = ChoosePixelFormat(device_context, &gl_pfd);
+	assert(pixel_format_index != 0);
 	
-	// Find and set the pixel format
-	if(!(pixel_format_index = ChoosePixelFormat(device_context, &gl_pfd))) {
-		status = 3;
-		error_text = "Could not find suitable pixel format.";
-	}
-	if(!SetPixelFormat(device_context, pixel_format_index, &gl_pfd)) {
-		status = 4;
-		error_text = "Could not set pixel format.";
-	}
+	SetPixelFormat(device_context, pixel_format_index, &gl_pfd);
 	
-	if (!(rendering_context = wglCreateContext(device_context))) {
-		status = 5;
-		error_text = "Could not create rendering context.";
-	}
+    rendering_context = wglCreateContext(device_context);
+    assert(rendering_context != NULL);
+
 	
 	if (!wglMakeCurrent(device_context, rendering_context)) {
-		status = 6;
 		error_text = "Could not make rendering context current.";
 	}
 	
@@ -74,6 +68,7 @@ GLView::~GLView()
 	ReleaseDC(window_handle, device_context);
 }
 
+/* Call on window re-size to adjust OpenGL context to fit */
 void GLView::GLresize(void)
 {
 	GLuint width, height;
@@ -94,6 +89,8 @@ void GLView::GLresize(void)
 
 void GLView::make_current()
 {
+	assert(device_context != NULL);
+	assert(rendering_context != NULL);
 	wglMakeCurrent(device_context, rendering_context);
 }
 

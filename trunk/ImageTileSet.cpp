@@ -3,6 +3,7 @@
 #include "console.h"
 #include "config.h"
 #include <math.h>
+#include <cassert>
 #include "MathUtils.h"
 
 /* NB: tex_size is size of tile in memory,
@@ -15,6 +16,8 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	Console::write(buffer);
 	/* Local Variables */
 	ImageProperties* image_properties;
+
+	assert(tex_size_param > 0);
 	
 	/* set instance variables */
 	LOD = level_of_detail;
