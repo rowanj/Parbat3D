@@ -30,6 +30,7 @@ public:
 	void redraw(void);
 	void resize_image_window(void);
 	ImageViewport* get_image_viewport(void);
+	ImageFile* get_image_file(void);
 	
 	// get pixel values from window co-ordinates
 	unsigned int* get_window_pixel_values(int x, int y); // remember to delete[]

@@ -125,3 +125,5 @@ void ImageHandler::reset_contrast_brightness(void)
 	// !! call function to update display routines
 }
 bool ImageHandler::using_contrast_brightness(void) {return use_ctst_brt;}
+
+ImageFile* ImageHandler::get_image_file(void) {return image_file;}
