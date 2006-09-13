@@ -20,6 +20,7 @@
 #include "ROIWindow.h"
 #include "PrefsWindow.h"
 #include "ContrastWindow.h"
+#include "ContrastAdvWindow.h"
 
 #include "ROISet.h"
 
@@ -44,6 +45,7 @@ ImageWindow imageWindow;
 ROIWindow roiWindow;
 PrefsWindow prefsWindow;
 ContrastWindow contrastWindow;
+ContrastAdvWindow contrastAdvWindow;
 StickyWindowManager stickyWindowManager;
 vector<FeatureSpace*> featureSpaceWindows;
 
@@ -135,7 +137,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     /* Setup main & image windows */
     //  note: image window must be created before overview window
 
-    if ((!imageWindow.Create(mainWindow.GetHandle())) || (!overviewWindow.Create(imageWindow.GetHandle())) || (!prefsWindow.Create(imageWindow.GetHandle())) || (!contrastWindow.Create(imageWindow.GetHandle())))
+    if ((!imageWindow.Create(mainWindow.GetHandle())) || (!overviewWindow.Create(imageWindow.GetHandle())) || (!prefsWindow.Create(imageWindow.GetHandle())) || (!contrastWindow.Create(imageWindow.GetHandle())) || (!contrastAdvWindow.Create(imageWindow.GetHandle())))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
@@ -145,6 +147,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     stickyWindowManager.AddStickyWindow(&imageWindow);
     stickyWindowManager.AddStickyWindow(&prefsWindow);
     stickyWindowManager.AddStickyWindow(&contrastWindow);
+    stickyWindowManager.AddStickyWindow(&contrastAdvWindow);
     
     /* Execute the message loop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))

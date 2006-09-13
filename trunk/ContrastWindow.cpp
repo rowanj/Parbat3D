@@ -126,7 +126,7 @@ int ContrastWindow::Create(HWND parent)
 	
 	hAdvanced = CreateWindowEx( 0, "BUTTON", "Advanced", 
     BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 16, 155, 85, 16,
-	GetHandle(),NULL, Window::GetAppInstance(), NULL);
+	GetHandle(),(HMENU) 9, Window::GetAppInstance(), NULL);
 	
 	hPerChannel = CreateWindowEx( 0, "BUTTON", "Per Channel", 
     BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 118, 155, 100, 16,
@@ -169,9 +169,13 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 	        {
 				ShowWindow(hwnd,SW_HIDE);
 			}
-			
+					
+		    if (LOWORD(wParam) == 9 && HIWORD(wParam) == BN_CLICKED)
+			{
+                contrastWindow.Hide();
+                contrastAdvWindow.Show();
+            }
 			return 0;
-			
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
             if (wParam)

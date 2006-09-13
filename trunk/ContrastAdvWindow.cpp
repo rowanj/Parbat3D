@@ -25,7 +25,7 @@ int ContrastAdvWindow::Create(HWND parent)
     GetWindowRect(overviewWindow.GetHandle(),&rect);
 
     /* create Contrast Brightness window */
-    if (!CreateWin(0, "Parbat3D Contrast & Brightness Window", "Contrast Stretch",
+    if (!CreateWin(0, "Parbat3D Advanced Contrast & Brightness Window", "Advanced Contrast Stretch",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION,
 	     rect.left+50, rect.bottom-150, CONTSADV_WINDOW_WIDTH, CONTSADV_WINDOW_HEIGHT, parent, NULL))
 	    return false;
@@ -33,7 +33,7 @@ int ContrastAdvWindow::Create(HWND parent)
 	/* Brightness Trackbar */
 
 	//Brightness Trackbar title
-	HWND hRedBtitle=CreateWindowEx(0, szStaticControl, "Brightness",
+	HWND hRedBtitle=CreateWindowEx(0, szStaticControl, "Red Brightness",
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 8, 100, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hRedBtitle,STATIC_FONT_NORMAL);
@@ -80,7 +80,7 @@ int ContrastAdvWindow::Create(HWND parent)
 	/* Contrast Trackbar */
 	
 	//Contrast Trackbar title
-	HWND hRedCtitle=CreateWindowEx(0, szStaticControl, "Contrast",
+	HWND hRedCtitle=CreateWindowEx(0, szStaticControl, "Red Contrast",
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 85, 100, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hRedCtitle,STATIC_FONT_NORMAL);
