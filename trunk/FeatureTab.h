@@ -13,7 +13,7 @@ class FeatureTab:public ToolTab
         HWND *xRadiobuttons;                // band radio buttons
         HWND *yRadiobuttons;
         HWND *zRadiobuttons;
-        void OnGenerateClicked();
+        void OnGenerateClicked(int x, int y, int z);
         void OnUserMessage();
     public:
         char* GetTabName() {return "Feature";};

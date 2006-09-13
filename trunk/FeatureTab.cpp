@@ -142,13 +142,14 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
     //return true;
 }
 
-void FeatureTab::OnGenerateClicked()
+void FeatureTab::OnGenerateClicked(int x, int y, int z)
 {
     int lod=1,only_ROIs=false;  /* todo: change to get actual values */
     
     Console::write("FeatureTab::OnGenerateClicked\n");
     SendMessage(hgenerate,BM_SETCHECK,BST_CHECKED,0);       // make button appear pushed in
-    FeatureSpace *fspace=new FeatureSpace(lod,only_ROIs); 
+    FeatureSpace *fspace=new FeatureSpace(lod,only_ROIs);
+    //FeatureSpace *fspace=new FeatureSpace(lod,only_ROIs, x, y, z);
     SendMessage(hgenerate,BM_SETCHECK,BST_UNCHECKED,0);     // make button appear normal
 
     // remove all mouse messages from the queue (prevent user from clicking on generate while one was being generated)
@@ -178,7 +179,24 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 			
 			if (HIWORD(wParam)==BN_CLICKED)
 			{
-                win->OnGenerateClicked();
+                // find out which bands are selected
+				int x, y, z;
+				for (int i=0; i<toolWindow.bands; i++)
+   				{
+					LRESULT state = SendMessageA(win->xRadiobuttons[i], BM_GETCHECK, 0, 0);
+					if(state==BST_CHECKED)
+						x = i;
+					
+					state = SendMessageA(win->yRadiobuttons[i], BM_GETCHECK, 0, 0);
+					if(state==BST_CHECKED)
+						y = i;
+					
+					state = SendMessageA(win->zRadiobuttons[i], BM_GETCHECK, 0, 0);
+					if(state==BST_CHECKED)
+						z = i;
+				}
+                
+                win->OnGenerateClicked(x, y, z);
             }
 		}
 		case WM_USER:
