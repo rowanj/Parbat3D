@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=83
+UnitCount=85
 Type=0
 Ver=1
 ObjFiles=
@@ -869,6 +869,26 @@ BuildCmd=
 
 [Unit83]
 FileName=ContrastWindow.h
+CompileCpp=1
+Folder=View_PKG/Window Classes
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit84]
+FileName=ContrastAdvWindow.cpp
+CompileCpp=1
+Folder=View_PKG/Window Classes
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit85]
+FileName=ContrastAdvWindow.h
 CompileCpp=1
 Folder=View_PKG/Window Classes
 Compile=1

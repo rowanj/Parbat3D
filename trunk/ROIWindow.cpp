@@ -127,6 +127,52 @@ int ROIWindow::Create(HWND parent)
 	SendMessage (hSingleButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "single.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
 	
 	
+	// Tool Tips
+	/* CREATE A TOOLTIP WINDOW */
+    hwndTT = CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, "tooltips_class32", "single point",
+        WS_POPUP,		
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        hSingleButton,
+        NULL,
+        Window::GetAppInstance(),
+        NULL);
+        
+        
+    
+    SetWindowPos(hwndTT,
+        HWND_TOPMOST,
+        0,
+        0,
+        0,
+        0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+    /* GET COORDINATES OF THE MAIN CLIENT AREA */
+    GetClientRect (hSingleButton, &rect);
+
+    /* INITIALIZE MEMBERS OF THE TOOLINFO STRUCTURE */
+    /*
+    ti.cbSize = sizeof(TOOLINFO);
+    ti.uFlags = TTF_SUBCLASS;
+    ti.hwnd = hwnd;
+    ti.hinst = ghThisInstance;
+    ti.uId = uid;
+    ti.lpszText = lptstr;
+        // ToolTip control will cover the whole window
+    ti.rect.left = rect.left;    
+    ti.rect.top = rect.top;
+    ti.rect.right = rect.right;
+    ti.rect.bottom = rect.bottom;
+
+    /* SEND AN ADDTOOL MESSAGE TO THE TOOLTIP CONTROL WINDOW */
+    //SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti);
+	
+	
+	
+	
     //ROIscrollBox.UpdateScrollBar();
 	
 	return true;
