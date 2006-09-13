@@ -171,7 +171,10 @@ void iniFile::update (string section, string key, string data) {
             // replace the original file with the updated temp one
             remove(fileName.c_str());
             rename(".temp", fileName.c_str());
+        
+        // both files could not be opened together (but one may have been)
         } else {
+            // input file isn't open but output is (original doesn't exist)
             if (!filePtrI.is_open() && filePtrO.is_open()) {
                 filePtrO.close();  // clean up since file cannot be opened
                 remove(".temp");

@@ -90,7 +90,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     hThisInstance=hInstance;
     Window::Init(hInstance);
     
-    string settings_path (catcstrings(modulePath, "\\settings.ini"));
+    //string settings_path (catcstrings(modulePath, "\\settings.ini"));  // store in build folder
+    
+    // create the directory in Application Data if it doesn't already exist
+    char* team_dir = copyString(catcstrings(copyString(getenv("APPDATA")), "\\Imagery"));
+    CreateDirectory(team_dir, NULL);
+    char* prog_dir = copyString(catcstrings(team_dir, "\\Parbat3D"));
+    CreateDirectory(prog_dir, NULL);
+    
+    string settings_path (catcstrings(prog_dir, "\\settings.ini"));  // store in App Data folder
     settingsFile = new settings(settings_path);
     
     regionsSet = new ROISet();
@@ -118,7 +126,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 	Console::write("\n");
 
     
-	if (!mainWindow.Create())
+    if (!mainWindow.Create())
     {
         MessageBox(0,"Unable to create main window","Parbat3D Error",MB_OK);
         return 0;
