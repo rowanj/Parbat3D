@@ -42,6 +42,12 @@ public:
 	int get_status(void);
 	const char* get_status_text(void);
 
+	/* Contrast/brigtness */
+	void set_contrast_brightness(int new_contrast, int new_brightness);
+	void get_contrast_brightness(int* contrast_return, int* brightness_return);
+	void reset_contrast_brightness(void);
+	bool using_contrast_brightness(void);
+
 private:
 	/* Sub-objects */
 	ImageFile* image_file;
@@ -53,6 +59,11 @@ private:
 	/* State variables */
 	int status;
 	const char* status_text;
+	
+	bool use_ctst_brt;
+	int contrast_value;
+	int brightness_value;
+	
 };
 
 #endif

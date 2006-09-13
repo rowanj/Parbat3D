@@ -9,6 +9,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, 
 {
 	status = 0; // No error
 	status_text = "No error.";
+	reset_contrast_brightness();
 	
 	// Check for lazily unspecified (NULL argument) parameters
 	assert(overview_hwnd != NULL);
@@ -102,3 +103,25 @@ const char* ImageHandler::get_info_string(void)
 int	ImageHandler::get_status(void) {return status;}
 const char* ImageHandler::get_status_text(void) {return status_text;}
 ImageViewport* ImageHandler::get_image_viewport(void) {return image_viewport;}
+
+void ImageHandler::set_contrast_brightness(int new_contrast, int new_brightness)
+{
+	contrast_value = new_contrast;
+	brightness_value = new_brightness;
+	use_ctst_brt = true;
+	// !! call function to update display routines
+}
+void ImageHandler::get_contrast_brightness(int* contrast_return, int* brightness_return)
+{
+	if (contrast_return != NULL) *contrast_return = contrast_value;
+	if (brightness_return != NULL) *brightness_return = brightness_value;
+}
+
+void ImageHandler::reset_contrast_brightness(void)
+{
+	contrast_value = 255;
+	brightness_value = 255;
+	use_ctst_brt = false;
+	// !! call function to update display routines
+}
+bool ImageHandler::using_contrast_brightness(void) {return use_ctst_brt;}
