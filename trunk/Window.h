@@ -56,6 +56,7 @@ class Window
     inline void Hide() {ShowWindow(hwindow,SW_HIDE);};    
     inline void SetDefaultCursor(HCURSOR hcur) {SetClassLong(hwindow,GCL_HCURSOR,(long)hcur);};
     inline void SetBackgroundBrush(HBRUSH hbrush) {SetClassLong(hwindow,GCL_HBRBACKGROUND,(long)hbrush); hBackgroundBrush=hbrush;};
+    inline static void SetBackgroundBrush(HWND hwin,HBRUSH hbrush) {SetClassLong(hwin,GCL_HBRBACKGROUND,(long)hbrush);};    
     inline void Repaint() {InvalidateRect(hwindow,0,false); UpdateWindow(hwindow);};
 };
 

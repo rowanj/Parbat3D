@@ -27,7 +27,7 @@ int DisplayTab::Create(HWND parent,RECT *parentRect)
    	rect.bottom=217;                 	
 	hDScrollBox.Create(GetHandle(),&rect);
 
-    hRed = CreateWindowEx(0, "BUTTON", "R", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 118, 5,
+    hRed = CreateWindowEx(0, "BUTTON", "R", WS_CHILD | BS_GROUPBOX | WS_VISIBLE , 118, 5,
 		26, 20 + (20 * toolWindow.bands), hDScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	hGreen = CreateWindowEx(0, "BUTTON", "G", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 144, 5,
 		26, 20 + (20 * toolWindow.bands), hDScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
@@ -41,16 +41,17 @@ int DisplayTab::Create(HWND parent,RECT *parentRect)
 
     for (int i=0; i<toolWindow.bands; i++)  
     {
-		redRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+		redRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16,
 			hRed, NULL, hThisInstance, NULL);
+		SetBackgroundBrush(redRadiobuttons[i],toolWindow.hTabBrush);
 			
-		greenRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+		greenRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16,
 			hGreen, NULL, hThisInstance, NULL);
 			
-		blueRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
-		WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18, hBlue, NULL,
+		blueRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
+		WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16, hBlue, NULL,
 			hThisInstance, NULL);
 		
 		const char* name;

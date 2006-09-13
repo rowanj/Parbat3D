@@ -43,16 +43,16 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 
     for (int i=0; i<toolWindow.bands; i++)  
     {
-		xRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+		xRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16,
 			hX, NULL, hThisInstance, NULL);
 			
-		yRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
-			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+		yRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16,
 			hY, NULL, hThisInstance, NULL);
 			
-		zRadiobuttons[i] = CreateWindowEx(0, "BUTTON", NULL,
-		WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 5, 15 + (20 * i), 18, 18,
+		zRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
+		WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16,
 		 hZ, NULL, hThisInstance, NULL);
 		
 		const char* name;
