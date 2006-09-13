@@ -35,19 +35,45 @@ int ROIWindow::Create(HWND parent)
 
     /* create ROI window */
     if (!CreateWin(0, "Parbat3D ROI Window", "Regions of Interest",
-	     WS_POPUP+WS_SYSMENU+WS_CAPTION,
+	     WS_POPUP | WS_SYSMENU | WS_CAPTION | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 	     rect.left, rect.bottom+30, 250, 300, parent, NULL))
 	    return false;
 	    
     prevProc=SetWindowProcedure(&WindowProcedure);
     stickyWindowManager.AddStickyWindow(this);  // make the window stick to others        
-	
+
+	// Create scroll box 	
 	RECT rect2;
    	rect2.top=5;
    	rect2.left=5;
    	rect2.right=235;
    	rect2.bottom=227;                 	
 	ROIscrollBox.Create(GetHandle(),&rect2);
+
+	// Create list box inside scroll box
+	GetClientRect(ROIscrollBox.GetHandle(),&rect2);
+	hROIListBox=CreateWindowEx(0, "LISTBOX", NULL, 
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LBS_MULTICOLUMN, 0, 0, rect.right, rect.bottom, 
+		ROIscrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SendMessage(hROIListBox,LB_SETCOLUMNWIDTH,10,0);
+
+
+	/* colour dialog box test
+	{
+		CHOOSECOLOR cc;
+		COLORREF customColours[16];		// todo: give these inital values
+		cc.lStructSize=sizeof(CHOOSECOLOR);
+		cc.hwndOwner=toolWindow.GetHandle();
+		cc.hInstance=NULL;
+		cc.rgbResult=0xFF0000;				// inital colour (format: 0xBBGGRR)
+		cc.lpCustColors=customColours;	// pointer to array of 16 custom colours
+		cc.Flags=CC_ANYCOLOR|CC_FULLOPEN|CC_RGBINIT|CC_SOLIDCOLOR;
+		cc.lCustData=0;
+		cc.lpfnHook=NULL;
+		cc.lpTemplateName=NULL;
+		ChooseColor(&cc);				// returns nonzero if user clicked OK, otherwise zero
+										// new colour is stored in cc.rgbResult
+	} */
 
 	// add ROI check boxes
 /*	int roiInList = regionsSet->get_regions_count();
@@ -125,6 +151,7 @@ int ROIWindow::Create(HWND parent)
 		
 	hSingleIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hSingleButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "single.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
+
 	
 	
 	// Tool Tips
@@ -140,6 +167,7 @@ int ROIWindow::Create(HWND parent)
         Window::GetAppInstance(),
         NULL);
         
+
         
     
     SetWindowPos(hwndTT,
@@ -149,6 +177,7 @@ int ROIWindow::Create(HWND parent)
         0,
         0,
         SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
 
     /* GET COORDINATES OF THE MAIN CLIENT AREA */
     GetClientRect (hSingleButton, &rect);
@@ -277,13 +306,18 @@ void ROIWindow::newROI (ROIWindow* win, const char* roiType) {
     
     // create checkbox for the ROI
     HWND hROITick = CreateWindowEx(
-                        0, "BUTTON",
-                        copyString((rCur->get_name()).c_str()),
+                        WS_EX_TRANSPARENT, "BUTTON",
+                        NULL,
                 		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
-                        10, 10 + (20 * listSize),
-                        100, 16, ROIscrollBox.GetHandle(), NULL,
+                        0, 0 + (20 * listSize),
+                        16, 16, hROIListBox, NULL,
                 		Window::GetAppInstance(), NULL);
     roiCheckboxList.push_back(hROITick);    // add the ROI checkbox to the list
+    
+    // add ROI name to list box
+    string roiName("    ");
+	roiName+=copyString((rCur->get_name()).c_str());
+    SendMessage(hROIListBox,LB_ADDSTRING,0, (LPARAM) roiName.c_str());
 }
 
 

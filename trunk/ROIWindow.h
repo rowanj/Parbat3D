@@ -12,6 +12,7 @@ class ROIWindow:public Window
         HWND hBG;
         HWND *hROITick;
         HWND roiToolBar;
+        HWND hROIListBox;
         
         HWND hOpenButton;
         HICON hOpenIcon;

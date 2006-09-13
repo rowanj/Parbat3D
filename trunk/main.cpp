@@ -147,7 +147,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     stickyWindowManager.AddStickyWindow(&imageWindow);
     stickyWindowManager.AddStickyWindow(&prefsWindow);
     stickyWindowManager.AddStickyWindow(&contrastWindow);
+
+
+	/* colour dialog box test
+	{
+		CHOOSECOLOR cc;
+		COLORREF customColours[16];		// todo: give these inital values
+		cc.lStructSize=sizeof(CHOOSECOLOR);
+		cc.hwndOwner=toolWindow.GetHandle();
+		cc.hInstance=NULL;
+		cc.rgbResult=0xFF0000;				// inital colour (format: 0xBBGGRR)
+		cc.lpCustColors=customColours;	// pointer to array of 16 custom colours
+		cc.Flags=CC_ANYCOLOR|CC_FULLOPEN|CC_RGBINIT|CC_SOLIDCOLOR;
+		cc.lCustData=0;
+		cc.lpfnHook=NULL;
+		cc.lpTemplateName=NULL;
+		ChooseColor(&cc);				// returns nonzero if user clicked OK, otherwise zero
+										// new colour is stored in cc.rgbResult
+	} */
+
     stickyWindowManager.AddStickyWindow(&contrastAdvWindow);
+
     
     /* Execute the message loop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))
