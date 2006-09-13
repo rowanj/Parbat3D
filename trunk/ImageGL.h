@@ -7,6 +7,9 @@
 #include "ImageViewport.h"
 #include "ROISet.h"
 
+#include <queue>
+#include <vector>
+
 class ImageGL : public ViewportListener
 {
   public:
@@ -22,7 +25,13 @@ class ImageGL : public ViewportListener
 
   private:
 	/* Helper functions */
-	void make_texture(void);
+	void check_textures(void);
+	void check_tileset(void);
+	void flush_textures(void);
+	void load_tile_tex(int x_index, int y_index);
+	GLuint	get_tile_texture(int x_index, int y_index);
+	void	set_tile_texture(int tile_x, int tile_y, GLuint new_id);
+	void draw_rois(void);
 	
 	/* Sub-objects */
 	GLView* gl_image;
@@ -31,26 +40,36 @@ class ImageGL : public ViewportListener
 	ROISet* roiset;        // set of ROIs to be displayed
 	
 	/* State variables */
-	int LOD;
-	int LOD_width, LOD_height;
-	int image_width, image_height;
-	int window_width, window_height;
-	int viewport_width, viewport_height;
-	int viewport_x, viewport_y;
+	int cache_size; // MB maximum decoded tiles kept in cache (static)
+	int image_width, image_height; // Image dimensions (static)
 	
-	/* General OpenGL stuff */
-	unsigned int list_tile; // display list for textured tile
+	/* Viewport positon locals
+		These will change on zoom/scroll */
+	int viewport_width, viewport_height; // Image pixels displayed in window
+	int viewport_x, viewport_y; // Top-left corner (image pixels)
 
 	/* Image window textures */
-	ImageTileSet* tileset;
-	GLuint* textures;
-	int band_red, band_green, band_blue;
-	int texture_rows, texture_columns, tex_count;
-	int texture_size;
-	int cache_size;
-	int start_column, start_row;
+	/* Set these up on window resize */
+		ImageTileSet* tileset; // Tileset object we populate textures from
+		int window_width, window_height; // Screen pixels, GL context dimensions
+		vector<GLuint> free_textures; // Which IDs are currently un-used
+		vector<GLuint> textures; // Which IDs are available (used or not)
+		int viewport_cols, viewport_rows; // Number of textures to show
+		int viewport_start_row, viewport_start_col;
 	
-    GLfloat scalefactor_lines;  // scale factor used when drawing ROI outlines
+	/* Set these up on LOD change */
+		int LOD; // Sample density factor (0 = 1:1, 1 = 1:2, 2 = 1:4, ...)
+		vector<GLuint> tile_textures; // Array of texture IDs for correct tile
+		int  tile_image_size; // Size of tile in image pixels
+		int  tile_rows, tile_cols, tile_count; // Total number of rows/cols 
+		int LOD_width, LOD_height; // Scaled dimensions at this LOD (*not* zoom level)
+
+	/* General OpenGL stuff */
+		unsigned int list_tile; // display list for textured tile
+		int texture_size; // Dimension of each texture
+	
+	/* Band information */
+		int band_red, band_green, band_blue;
 };
 
 #endif
