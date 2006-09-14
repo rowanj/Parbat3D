@@ -13,7 +13,7 @@
 
 // Used for accessing the help folder
 const char *helpPath;
-
+bool advanced;
 DisplayWindow overviewWindowDisplay;
 
 /* setup overview window */
@@ -67,8 +67,17 @@ int OverviewWindow::toggleMenuItemTick(HMENU hMenu,int itemId)
         return true;
     }
 }
+/*
+void OverviewWindow::advancedYes()
+{
+		advanced = true;
+}
 
-
+void OverviewWindow::advancedNo()
+{
+		advanced = false;
+}
+*/
 /* This function is called by the Windows function DispatchMessage( ) */
 /* All messages/events related to the main window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -132,6 +141,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                         contrastWindow.Show();
                     else
                         contrastWindow.Hide();
+                        contrastAdvWindow.Hide();
                     return 0;
 
                 case IDM_HELPCONTENTS:

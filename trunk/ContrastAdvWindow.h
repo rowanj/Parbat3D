@@ -7,8 +7,14 @@ class ContrastAdvWindow:public Window
 {
     private:
     WNDPROC prevProc;
+    
     HWND hRedBrightnessTrackbar;
 	HWND hRedContrastTrackbar;
+	HWND hGreenBrightnessTrackbar;
+	HWND hGreenContrastTrackbar;
+	HWND hBlueBrightnessTrackbar;
+	HWND hBlueContrastTrackbar;
+	
 	HWND hAdvCSOKButton;
 	HWND hAdvCSCancelButton;
 	HWND hAdvancedAdv;

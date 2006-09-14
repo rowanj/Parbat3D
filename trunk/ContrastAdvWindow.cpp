@@ -19,30 +19,32 @@ int ContrastAdvWindow::Create(HWND parent)
     RECT rect;
     int mx,my;
     const int CONTSADV_WINDOW_WIDTH=330;
-    const int CONTSADV_WINDOW_HEIGHT=250;
+    const int CONTSADV_WINDOW_HEIGHT=570;
    
     /* Get Overview Window Location for Prefs window alignment*/
     GetWindowRect(overviewWindow.GetHandle(),&rect);
 
-    /* create Contrast Brightness window */
+    /* create Advanced Contrast Brightness window */
     if (!CreateWin(0, "Parbat3D Advanced Contrast & Brightness Window", "Advanced Contrast Stretch",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION,
 	     rect.left+50, rect.bottom-150, CONTSADV_WINDOW_WIDTH, CONTSADV_WINDOW_HEIGHT, parent, NULL))
 	    return false;
+	
+	////////////////////////////////////////
+	
+	/* Red Brightness Trackbar */
 
-	/* Brightness Trackbar */
-
-	//Brightness Trackbar title
+	//Red Brightness Trackbar title
 	HWND hRedBtitle=CreateWindowEx(0, szStaticControl, "Red Brightness",
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 8, 100, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hRedBtitle,STATIC_FONT_NORMAL);
 	
-	// Create Trackbar (slider) for Brightness
+	// Create Trackbar (slider) for Red Brightness
 	hRedBrightnessTrackbar = CreateWindowEx( 
     0,                             // no extended styles 
     "msctls_trackbar32",                // class name TRACKBAR_CLASS
-    "Contrast",            // title (caption) 
+    "Red Brightness",            // title (caption) 
     WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,  // style  | TBS_AUTOTICKS | TBS_ENABLESELRANGE
     5, 27,                        // position 
     310, 35,                      // size 
@@ -52,44 +54,44 @@ int ContrastAdvWindow::Create(HWND parent)
     NULL                           // no WM_CREATE parameter 
     ); 
 	
-    // Trackbar range - number of positions
+    // Red Brightness Trackbar range - number of positions
     SendMessage(hRedBrightnessTrackbar, TBM_SETRANGE, 
         (WPARAM) TRUE,                   // redraw flag 
         (LPARAM) MAKELONG(1, 255));  // min. & max. positions
         
-    // Set tick mark frequency
+    // Set tick mark frequency for Red Brightness
 	SendMessage(hRedBrightnessTrackbar, TBM_SETTICFREQ, 
         (WPARAM) 128,				// wFreq
 		0);  
     
-    // Trackbar steps taken when clicking to the side of the pointer or scroll wheel
+    // Trackbar steps taken when clicking to the side of the pointer or scroll wheel for Red Brightness
     SendMessage(hRedBrightnessTrackbar, TBM_SETPAGESIZE, 
         0, (LPARAM) 1);                  // new page size 
         
-	//Trackbar - sets initial position
+	//Trackbar - sets initial position for Red Brightness
     SendMessage(hRedBrightnessTrackbar, TBM_SETPOS, 
         (WPARAM) TRUE,                   // redraw flag 
         (LPARAM) 129); 
 	
-	//Trackbar tick values
+	//Trackbar tick values for Red Brightness
 	HWND hRedBValues=CreateWindowEx(0, szStaticControl, "0                                             50                                         100",
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 62, 310, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hRedBValues,STATIC_FONT_NORMAL);
 	
-	/* Contrast Trackbar */
+	/* Red Contrast Trackbar */
 	
-	//Contrast Trackbar title
+	//Red Contrast Trackbar title
 	HWND hRedCtitle=CreateWindowEx(0, szStaticControl, "Red Contrast",
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 85, 100, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hRedCtitle,STATIC_FONT_NORMAL);
 	
-	// Create Trackbar (slider) for Contrast
+	// Create Trackbar (slider) for Red Contrast
 	hRedContrastTrackbar = CreateWindowEx( 
     0,                             // no extended styles 
     "msctls_trackbar32",                // class name TRACKBAR_CLASS
-    "Contrast",            // title (caption) 
+    "Red Contrast",            // title (caption) 
     WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,  // style  | TBS_AUTOTICKS | TBS_ENABLESELRANGE
     5, 104,                        // position 
     310, 35,                      // size 
@@ -99,50 +101,241 @@ int ContrastAdvWindow::Create(HWND parent)
     NULL                           // no WM_CREATE parameter 
     ); 
 	
-    // Trackbar range - number of positions
+    // Trackbar range - number of positions for Red Contrast
     SendMessage(hRedContrastTrackbar, TBM_SETRANGE, 
         (WPARAM) TRUE,                   // redraw flag 
         (LPARAM) MAKELONG(1, 255));  // min. & max. positions
         
-    // Set tick mark frequency
+    // Set tick mark frequency for Red Contrast
 	SendMessage(hRedContrastTrackbar, TBM_SETTICFREQ, 
         (WPARAM) 128,				// wFreq
 		0);  
     
-    // Trackbar steps taken when clicking to the side of the pointer or scroll wheel
+    // Trackbar steps taken when clicking to the side of the pointer or scroll wheel for Red Contrast
     SendMessage(hRedContrastTrackbar, TBM_SETPAGESIZE, 
         0, (LPARAM) 1);                  // new page size 
         
-	//Trackbar - sets initial position
+	//Trackbar - sets initial position for Red Contrast
     SendMessage(hRedContrastTrackbar, TBM_SETPOS, 
         (WPARAM) TRUE,                   // redraw flag 
         (LPARAM) 129); 
 	
-	//Trackbar tick values
+	//Trackbar tick values for Red Contrast
 	HWND hRedCValues=CreateWindowEx(0, szStaticControl, "0                                             50                                         100",
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 139, 310, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hRedCValues,STATIC_FONT_NORMAL);
 	
-	hAdvancedAdv = CreateWindowEx( 0, "BUTTON", "Advanced", 
-    BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 16, 155, 85, 16,
-	GetHandle(),NULL, Window::GetAppInstance(), NULL);
+	/////////////////////////////////
+	
+		/* Green Brightness Trackbar */
+
+	//Red Brightness Trackbar title
+	HWND hGreenBtitle=CreateWindowEx(0, szStaticControl, "Green Brightness",
+	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 168, 100, 18,
+	GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetStaticFont(hGreenBtitle,STATIC_FONT_NORMAL);
+	
+	// Create Trackbar (slider) for Green Brightness
+	hGreenBrightnessTrackbar = CreateWindowEx( 
+    0,                             // no extended styles 
+    "msctls_trackbar32",                // class name TRACKBAR_CLASS
+    "Green Brightness",            // title (caption) 
+    WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,  // style  | TBS_AUTOTICKS | TBS_ENABLESELRANGE
+    5, 187,                        // position 
+    310, 35,                      // size 
+    GetHandle(),                       // parent window 
+    NULL, //(HMENU) ID_TRACKBAR,             // control identifier  ID_TRACKBAR
+    Window::GetAppInstance(),                       // instance 
+    NULL                           // no WM_CREATE parameter 
+    ); 
+	
+    // Green Brightness Trackbar range - number of positions
+    SendMessage(hGreenBrightnessTrackbar, TBM_SETRANGE, 
+        (WPARAM) TRUE,                   // redraw flag 
+        (LPARAM) MAKELONG(1, 255));  // min. & max. positions
+        
+    // Set tick mark frequency for Green Brightness
+	SendMessage(hGreenBrightnessTrackbar, TBM_SETTICFREQ, 
+        (WPARAM) 128,				// wFreq
+		0);  
+    
+    // Trackbar steps taken when clicking to the side of the pointer or scroll wheel for Green Brightness
+    SendMessage(hGreenBrightnessTrackbar, TBM_SETPAGESIZE, 
+        0, (LPARAM) 1);                  // new page size 
+        
+	//Trackbar - sets initial position for Green Brightness
+    SendMessage(hGreenBrightnessTrackbar, TBM_SETPOS, 
+        (WPARAM) TRUE,                   // redraw flag 
+        (LPARAM) 129); 
+	
+	//Trackbar tick values for Green Brightness
+	HWND hGreenBValues=CreateWindowEx(0, szStaticControl, "0                                             50                                         100",
+	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 222, 310, 18,
+	GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetStaticFont(hGreenBValues,STATIC_FONT_NORMAL);
+	
+	/* Green Contrast Trackbar */
+	
+	//Green Contrast Trackbar title
+	HWND hGreenCtitle=CreateWindowEx(0, szStaticControl, "Green Contrast",
+	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 245, 100, 18,
+	GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetStaticFont(hGreenCtitle,STATIC_FONT_NORMAL);
+	
+	// Create Trackbar (slider) for Green Contrast
+	hGreenContrastTrackbar = CreateWindowEx( 
+    0,                             // no extended styles 
+    "msctls_trackbar32",                // class name TRACKBAR_CLASS
+    "Green Contrast",            // title (caption) 
+    WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,  // style  | TBS_AUTOTICKS | TBS_ENABLESELRANGE
+    5, 264,                        // position 
+    310, 35,                      // size 
+    GetHandle(),                       // parent window 
+    NULL, //(HMENU) ID_TRACKBAR,             // control identifier  ID_TRACKBAR
+    Window::GetAppInstance(),                       // instance 
+    NULL                           // no WM_CREATE parameter 
+    ); 
+	
+    // Trackbar range - number of positions for Green Contrast
+    SendMessage(hGreenContrastTrackbar, TBM_SETRANGE, 
+        (WPARAM) TRUE,                   // redraw flag 
+        (LPARAM) MAKELONG(1, 255));  // min. & max. positions
+        
+    // Set tick mark frequency for Green Contrast
+	SendMessage(hGreenContrastTrackbar, TBM_SETTICFREQ, 
+        (WPARAM) 128,				// wFreq
+		0);  
+    
+    // Trackbar steps taken when clicking to the side of the pointer or scroll wheel for Green Contrast
+    SendMessage(hGreenContrastTrackbar, TBM_SETPAGESIZE, 
+        0, (LPARAM) 1);                  // new page size 
+        
+	//Trackbar - sets initial position for Green Contrast
+    SendMessage(hGreenContrastTrackbar, TBM_SETPOS, 
+        (WPARAM) TRUE,                   // redraw flag 
+        (LPARAM) 129); 
+	
+	//Trackbar tick values for Green Contrast
+	HWND hGreenCValues=CreateWindowEx(0, szStaticControl, "0                                             50                                         100",
+	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 299, 310, 18,
+	GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetStaticFont(hGreenCValues,STATIC_FONT_NORMAL);
+	
+	/////////////////////////////////////////
+	
+	
+		/* Blue Brightness Trackbar */
+
+	//Blue Brightness Trackbar title
+	HWND hBlueBtitle=CreateWindowEx(0, szStaticControl, "Green Brightness",
+	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 328, 100, 18,
+	GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetStaticFont(hBlueBtitle,STATIC_FONT_NORMAL);
+	
+	// Create Trackbar (slider) for Blue Brightness
+	hBlueBrightnessTrackbar = CreateWindowEx( 
+    0,                             // no extended styles 
+    "msctls_trackbar32",                // class name TRACKBAR_CLASS
+    "Blue Brightness",            // title (caption) 
+    WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,  // style  | TBS_AUTOTICKS | TBS_ENABLESELRANGE
+    5, 347,                        // position 
+    310, 35,                      // size 
+    GetHandle(),                       // parent window 
+    NULL, //(HMENU) ID_TRACKBAR,             // control identifier  ID_TRACKBAR
+    Window::GetAppInstance(),                       // instance 
+    NULL                           // no WM_CREATE parameter 
+    ); 
+	
+    // Blue Brightness Trackbar range - number of positions
+    SendMessage(hBlueBrightnessTrackbar, TBM_SETRANGE, 
+        (WPARAM) TRUE,                   // redraw flag 
+        (LPARAM) MAKELONG(1, 255));  // min. & max. positions
+        
+    // Set tick mark frequency for Blue Brightness
+	SendMessage(hBlueBrightnessTrackbar, TBM_SETTICFREQ, 
+        (WPARAM) 128,				// wFreq
+		0);  
+    
+    // Trackbar steps taken when clicking to the side of the pointer or scroll wheel for Blue Brightness
+    SendMessage(hBlueBrightnessTrackbar, TBM_SETPAGESIZE, 
+        0, (LPARAM) 1);                  // new page size 
+        
+	//Trackbar - sets initial position for Blue Brightness
+    SendMessage(hBlueBrightnessTrackbar, TBM_SETPOS, 
+        (WPARAM) TRUE,                   // redraw flag 
+        (LPARAM) 129); 
+	
+	//Trackbar tick values for Blue Brightness
+	HWND hBlueBValues=CreateWindowEx(0, szStaticControl, "0                                             50                                         100",
+	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 382, 310, 18,
+	GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetStaticFont(hBlueBValues,STATIC_FONT_NORMAL);
+	
+	/* Blue Contrast Trackbar */
+	
+	//Blue Contrast Trackbar title
+	HWND hBlueCtitle=CreateWindowEx(0, szStaticControl, "Green Contrast",
+	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 405, 100, 18,
+	GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetStaticFont(hBlueCtitle,STATIC_FONT_NORMAL);
+	
+	// Create Trackbar (slider) for Blue Contrast
+	hBlueContrastTrackbar = CreateWindowEx( 
+    0,                             // no extended styles 
+    "msctls_trackbar32",                // class name TRACKBAR_CLASS
+    "Blue Contrast",            // title (caption) 
+    WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,  // style  | TBS_AUTOTICKS | TBS_ENABLESELRANGE
+    5, 424,                        // position 
+    310, 35,                      // size 
+    GetHandle(),                       // parent window 
+    NULL, //(HMENU) ID_TRACKBAR,             // control identifier  ID_TRACKBAR
+    Window::GetAppInstance(),                       // instance 
+    NULL                           // no WM_CREATE parameter 
+    ); 
+	
+    // Trackbar range - number of positions for Blue Contrast
+    SendMessage(hBlueContrastTrackbar, TBM_SETRANGE, 
+        (WPARAM) TRUE,                   // redraw flag 
+        (LPARAM) MAKELONG(1, 255));  // min. & max. positions
+        
+    // Set tick mark frequency for Blue Contrast
+	SendMessage(hBlueContrastTrackbar, TBM_SETTICFREQ, 
+        (WPARAM) 128,				// wFreq
+		0);  
+    
+    // Trackbar steps taken when clicking to the side of the pointer or scroll wheel for Blue Contrast
+    SendMessage(hBlueContrastTrackbar, TBM_SETPAGESIZE, 
+        0, (LPARAM) 1);                  // new page size 
+        
+	//Trackbar - sets initial position for Blue Contrast
+    SendMessage(hBlueContrastTrackbar, TBM_SETPOS, 
+        (WPARAM) TRUE,                   // redraw flag 
+        (LPARAM) 129); 
+	
+	//Trackbar tick values for Blue Contrast
+	HWND hBlueCValues=CreateWindowEx(0, szStaticControl, "0                                             50                                         100",
+	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 459, 310, 18,
+	GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetStaticFont(hBlueCValues,STATIC_FONT_NORMAL);
+	
+	//////////////////////////////////////////
 	
 	hPerChannelAdv = CreateWindowEx( 0, "BUTTON", "Per Channel", 
-    BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 118, 155, 100, 16,
-	GetHandle(),NULL, Window::GetAppInstance(), NULL);
+    BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 18, 480, 100, 16,
+	GetHandle(),(HMENU) 9, Window::GetAppInstance(), NULL);
 	
 	hPreviewAdv = CreateWindowEx( 0, "BUTTON", "Preview", 
-    BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 235, 155, 100, 16,
+    BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 18, 500, 100, 16,
 	GetHandle(),NULL, Window::GetAppInstance(), NULL);
 	
 	// Insert 'OK' button 
 	hAdvCSOKButton =  CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE,
-		140, 180, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);
+		140, 500, 80, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
 		
 	// Insert 'Cancel' button 
 	hAdvCSCancelButton =  CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE,
-		228, 180, 80, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);
+		228, 500, 80, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);
 		
 		
 	
@@ -165,22 +358,34 @@ LRESULT CALLBACK ContrastAdvWindow::WindowProcedure(HWND hwnd, UINT message, WPA
     {
 		case WM_COMMAND:
              
+			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
+	        {
+				MessageBox( hwnd, (LPSTR) "Contrast Stretch complete", (LPSTR) "Contrast / brightness", MB_ICONINFORMATION | MB_OK );
+				ShowWindow(hwnd,SW_HIDE);
+			}
+			
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
 				ShowWindow(hwnd,SW_HIDE);
 			}
 			
+			if (LOWORD(wParam) == 9 && HIWORD(wParam) == BN_CLICKED)
+			{
+                contrastAdvWindow.Hide();
+                contrastWindow.Show();
+            }
+			
 			return 0;
 			
-        //case WM_SHOWWINDOW:
+        case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
-            /*
+            
             if (wParam)
                 CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_CHECKED|MF_BYCOMMAND);            
             else
                 CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
-            */
+            
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
             /* don't destroy this window, but make it invisible */

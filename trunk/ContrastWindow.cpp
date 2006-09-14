@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cstring>
 #include <commctrl.h>
+#include "OverviewWindow.h"
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Prefs Window Functions */
@@ -124,29 +125,22 @@ int ContrastWindow::Create(HWND parent)
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hCValues,STATIC_FONT_NORMAL);
 	
-	hAdvanced = CreateWindowEx( 0, "BUTTON", "Advanced", 
-    BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 16, 155, 85, 16,
+	hPerChannel = CreateWindowEx( 0, "BUTTON", "Per Channel", 
+    BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 18, 160, 100, 16,
 	GetHandle(),(HMENU) 9, Window::GetAppInstance(), NULL);
 	
-	hPerChannel = CreateWindowEx( 0, "BUTTON", "Per Channel", 
-    BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 118, 155, 100, 16,
-	GetHandle(),NULL, Window::GetAppInstance(), NULL);
-	
 	hPreview = CreateWindowEx( 0, "BUTTON", "Preview", 
-    BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 235, 155, 100, 16,
+    BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 18, 180, 100, 16,
 	GetHandle(),NULL, Window::GetAppInstance(), NULL);
 	
 	// Insert 'OK' button 
 	hCSOKButton =  CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE,
-		140, 180, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);
+		140, 180, 80, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
 		
 	// Insert 'Cancel' button 
 	hCSCancelButton =  CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE,
 		228, 180, 80, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);
-		
-		
-	
-	
+
 	prevProc=SetWindowProcedure(&WindowProcedure);	
 
     return true;
@@ -165,6 +159,16 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     {
 		case WM_COMMAND:
              
+			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
+	        {
+				MessageBox( hwnd, (LPSTR) "Contrast Stretch complete", (LPSTR) "Contrast / brightness", MB_ICONINFORMATION | MB_OK );
+				ShowWindow(hwnd,SW_HIDE);
+				//LRESULT state = SendMessageA(win->xRadiobuttons[i], BM_GETCHECK, 0, 0);
+				//DWORD dwPos;
+				//dwPos = SendMessage(hBrightnessTrackbar, TBM_GETTICPOS, 0, 0);
+				//MessageBox( hwnd, (LPSTR) state, (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+			}
+			
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
 				ShowWindow(hwnd,SW_HIDE);
@@ -172,7 +176,8 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 					
 		    if (LOWORD(wParam) == 9 && HIWORD(wParam) == BN_CLICKED)
 			{
-                contrastWindow.Hide();
+                //advancedYes();
+				contrastWindow.Hide();
                 contrastAdvWindow.Show();
             }
 			return 0;
