@@ -9,6 +9,7 @@ class ROIWindow:public Window
 {
     private:
         WNDPROC prevProc;
+        static WNDPROC prevListViewProc;
         HWND hBG;
         HWND *hROITick;
         HWND roiToolBar;
@@ -77,11 +78,12 @@ class ROIWindow:public Window
         
         void updateROIList (ROIWindow*);
         
+        static LRESULT CALLBACK ROIListViewProcedure(HWND, UINT, WPARAM, LPARAM);
+        static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
         
     public:
         int Create(HWND parent);
         
-        static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
         
         void updateButtons (ROIWindow*);
 };

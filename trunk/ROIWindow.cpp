@@ -25,6 +25,7 @@ ScrollBox ROIscrollBox;
 
 vector<HWND> ROIWindow::roiCheckboxList;
 
+WNDPROC ROIWindow::prevListViewProc;
 
 int ROIWindow::Create(HWND parent)
 {
@@ -53,18 +54,11 @@ int ROIWindow::Create(HWND parent)
    	rect2.bottom=227;                 	
 	ROIscrollBox.Create(GetHandle(),&rect2);
 
-	// Create list box inside scroll box
-	/*GetClientRect(ROIscrollBox.GetHandle(),&rect2);
-	hROIListBox=CreateWindowEx(0, "LISTBOX", NULL, 
-		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LBS_MULTICOLUMN, 16, 0, rect.right-36, rect.bottom, 
-		ROIscrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);*/
-	//SendMessage(hROIListBox,LB_SETCOLUMNWIDTH,10,0);
-
-
+	// Create listview control inside scroll box
 	GetClientRect(ROIscrollBox.GetHandle(),&rect);
     hROIListBox = CreateWindowEx(0,WC_LISTVIEW, 
                                 NULL, 
-                                WS_CHILD | LVS_REPORT | LVS_EDITLABELS | WS_VISIBLE, 
+                                WS_CHILD | LVS_REPORT | LVS_EDITLABELS | WS_VISIBLE | LVS_NOCOLUMNHEADER, 
                                 0, 
                                 0, 
                                 rect.right - rect.left, 
@@ -73,27 +67,25 @@ int ROIWindow::Create(HWND parent)
                                 (HMENU) 0, 
                                 Window::GetAppInstance(), 
                                 NULL); 	
+	ListView_SetExtendedListViewStyle(hROIListBox,LVS_EX_CHECKBOXES);
+	prevListViewProc=SetWindowProcedure(hROIListBox,&ROIListViewProcedure);
+	
 	LVCOLUMN lvc;                                
 	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM; 
 	lvc.iSubItem = 0;
 	lvc.pszText = "Show";
-	lvc.cx = 18;     // width of column in pixels
-	lvc.fmt = LVCFMT_LEFT;  // left-aligned column
+	lvc.cx = rect.right-25;     // width of column in pixels
+	lvc.fmt = LVCFMT_CENTER; 
 	ListView_InsertColumn(hROIListBox, 0, &lvc);
 
-	lvc.iSubItem = 2;
-	lvc.pszText = "Colour";
-	lvc.cx = 100;     // width of column in pixels
-	lvc.fmt = LVCFMT_LEFT;  // left-aligned column
-	ListView_InsertColumn(hROIListBox, 2, &lvc);
-
-
-	lvc.mask = LVCF_FMT | LVCF_TEXT | LVCF_SUBITEM; 
 	lvc.iSubItem = 1;
-	lvc.pszText = "Name";
-//	lvc.cx = 100;     // width of column in pixels
-	lvc.fmt = LVCFMT_LEFT;  // left-aligned column
-	ListView_InsertColumn(hROIListBox, 1, &lvc);
+	lvc.pszText = "Colour";
+	lvc.cx = 20;     // width of column in pixels
+	lvc.fmt = LVCFMT_CENTER; 
+	ListView_InsertColumn(hROIListBox,2, &lvc);
+
+
+
 
 
 	/* colour dialog box test
@@ -245,6 +237,39 @@ int ROIWindow::Create(HWND parent)
 	return true;
 }
 
+/* handle drawing the colour buttons within the list view control */
+LRESULT CALLBACK ROIWindow::ROIListViewProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	HBRUSH hbrush;
+	DRAWITEMSTRUCT *di;
+	RECT rect;
+	ROI *roi;
+	int colour;
+	int i;
+	
+	switch (message)
+	{
+		case WM_DRAWITEM:
+			for (i=0;i<roiCheckboxList.size();i++)
+			{
+				if (di->hwndItem==roiCheckboxList.at(i))
+				{
+					roi=regionsSet->get_regions().at(i); //900-di->itemID
+					roi->get_color(&colour,&colour+1,&colour+2);
+					hbrush=CreateSolidBrush(colour);
+					di=(LPDRAWITEMSTRUCT) lParam;
+					SelectObject(di->hDC,hbrush);
+					GetClientRect(di->hwndItem,&rect);
+					Rectangle(di->hDC,rect.left,rect.top,rect.right,rect.bottom);
+					DeleteObject(hbrush);
+					break;
+				}
+			}
+			break;		
+	}
+    return CallWindowProc(prevListViewProc,hwnd,message,wParam,lParam);	
+}
+
 /* All messages/events related to the ROI window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -293,7 +318,7 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             ROIscrollBox.UpdateScrollBar();
             
 			return 0;
-			
+				
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
             if (wParam)
@@ -316,6 +341,7 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
     // call next window procedure in chain
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }
+
 
 
 int ROIWindow::getROICheckedCount () {
@@ -344,22 +370,28 @@ void ROIWindow::newROI (ROIWindow* win, const char* roiType) {
     
     // create checkbox for the ROI
     HWND hROITick = CreateWindowEx(
-                        0, "BUTTON",
+                        WS_EX_CLIENTEDGE, "BUTTON",
                         NULL,
-                		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
-                        2, 0 + (20 * listSize),
-                        16, 16, hROIListBox, NULL,
+                		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | BS_DEFPUSHBUTTON | BS_OWNERDRAW,
+                        2+170, 0 + (20 * listSize),
+                        20, 20, hROIListBox, (HMENU)900+listSize,
                 		Window::GetAppInstance(), NULL);
+	SetBackgroundBrush(hROITick,CreateSolidBrush(0));
     roiCheckboxList.push_back(hROITick);    // add the ROI checkbox to the list
     
-    // add ROI name to list box
+    // add row to listview control
     LVITEM item;
     item.mask=LVIF_TEXT;
     item.iItem=listSize;
-    item.iSubItem=1;
-    item.pszText="test";
-
-    ListView_InsertItem(hROIListBox,&item);
+    item.iSubItem=0;
+    item.pszText=copyString((rCur->get_name()).c_str());
+    ListView_InsertItem(hROIListBox,&item);    
+	// set ROI name
+    item.mask=LVIF_TEXT;
+    item.iItem=listSize;
+    item.iSubItem=0;
+    item.pszText=copyString((rCur->get_name()).c_str());
+//    ListView_SetItem(hROIListBox,&item);
 }
 
 
