@@ -38,6 +38,7 @@ class Window
             // general window event/message handler
             
     WNDPROC SetWindowProcedure(WNDPROC);            /* return current window event/messeger handler & set new one */
+    WNDPROC static SetWindowProcedure(HWND,WNDPROC); /* return current window event/messeger handler & set new one for a control */ 
 
     static Window* GetWindowObject(HWND);           /* obtain "this" object from window handle */
     static void SetWindowObject(HWND,Window*);      /* associcate "this" object with window handle */

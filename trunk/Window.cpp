@@ -137,6 +137,12 @@ WNDPROC Window::SetWindowProcedure(WNDPROC newproc)
     return (WNDPROC)SetWindowLongPtr(hwindow,GWLP_WNDPROC,(LONG)newproc);
 }
 
+
+WNDPROC Window::SetWindowProcedure(HWND hwnd,WNDPROC newproc)
+{
+	return (WNDPROC)SetWindowLongPtr(hwnd,GWLP_WNDPROC,(LONG)newproc);
+}
+
 void Window::SetWindowObject(HWND hwnd,Window* obj)
 {
     SetWindowLong(hwnd,GWL_USERDATA,(long)obj);
@@ -179,10 +185,6 @@ void Window::drawStatic(DRAWITEMSTRUCT *dis)
     }
     SelectObject(dis->hDC,hfont);
     SetTextColor(dis->hDC,0);                                                                   // set text colour to black
-//    GetTextExtentPoint32(dis->hDC,str,len,&size);                                               // get size of string
-//    SelectObject(dis->hDC,hTabPen);                                                             // set border
-//    SelectObject(dis->hDC,hTabBrush);                                                           // set background fill
-//    Rectangle(dis->hDC,dis->rcItem.left,dis->rcItem.top,dis->rcItem.right,dis->rcItem.bottom);  // display background rectangle
     TextOut(dis->hDC,dis->rcItem.left,dis->rcItem.top,(char*)str,len);                          // display text
 }
 
@@ -219,7 +221,7 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                 DeleteObject(win->hNormalFont);
                 DeleteObject(win->hBoldFont);                
                 win->hwindow=NULL;
-                return 0;
+                break;
         }
     
         // let someone else handle the stuff we haven't
