@@ -199,7 +199,6 @@ void ImageGL::draw_rois(void)
 	// draw the ROI that is currently being defined (if there is one)
 	if (roiset->editing())
 	{
-		Console::write("is editing\n");
 		ROIEntity *entity=roiset->get_current_entity();
         glColor4f(1.0, 1.0, 1.0, 1.0);		
 		draw_new_roi_entity(entity);
