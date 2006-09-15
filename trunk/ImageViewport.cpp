@@ -13,7 +13,7 @@ ImageViewport::ImageViewport(ImageProperties* image_properties)
 	window_height = 0;
 	window_width = 0;
 	zoom_level = 0.75;
-	zoom_minimum = 0.05;
+	zoom_minimum = 0.01;
 	
 	assert(image_properties != NULL);
 	num_bands = image_properties->getNumBands();
