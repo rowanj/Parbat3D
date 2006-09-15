@@ -347,7 +347,7 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
     //static POINT sizeMousePosition;   /* mouse position, used for sizing window */
     //static RECT  sizeWindowPosition;  /* window position, used for sizing window */
     static RECT rect;                 /* for general use */
-
+    
     ROIWindow* win=(ROIWindow*)Window::GetWindowObject(hwnd);
     
     switch (message)                  /* handle the messages */
@@ -415,14 +415,13 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
 
 
 int ROIWindow::getROICheckedCount () {
+    int items_in_list = SendMessage(hROIListBox, LVM_GETITEMCOUNT, 0, 0);
     int i;
-    int listSize = roiColourButtonList.size();
     int checked = 0;
     
     // find how many ROIs are selected
-    for (i=0; i<listSize; i++) {
-        HWND hCur = roiColourButtonList.at(i);
-        if ((SendMessageA(hCur, BM_GETCHECK, 0, 0)) == BST_CHECKED)
+    for (i=0; i<items_in_list; i++) {
+        if (ListView_GetCheckState(hROIListBox, i))
             checked++;
     }
     
