@@ -159,20 +159,21 @@ void ImageGL::notify_viewport(void)
 	gl_image->GLswap();
 }
 
+/* Draw ROI outlines */
 void ImageGL::draw_rois(void)
 {
 	gl_image->make_current();
-	/* Draw ROI outlines over the top of the image */
+
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix(); /* Don't destroy tile transform */
 	/* Scale to work in image pixels */
 	glLoadIdentity();
-
-	/* We'll be using translucent lines */
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   
+    // draw exiting roi's
     vector<ROI*> rois=roiset->get_regions();
-    int i,j,k,red,green,blue;
+    int i,j;
+	int red,green,blue;
+    
     for (i=0;i<rois.size();i++)
     {
         ROI* roi=rois.at(i);            
@@ -187,60 +188,105 @@ void ImageGL::draw_rois(void)
             for (j=0;j<entities.size();j++)
             {
                 ROIEntity *entity=entities.at(j);
-                const char *type=entity->get_type();
-                vector<coords> points=entity->get_points();                
-            if (type==ROI_POLY)
-            {
-                // draw outline of polygon
-           		glBegin(GL_LINE_LOOP);
-           		{
-                    for (k=0;k<points.size();k++)
-                    {
-                        coords point=points.at(k);
-               			glVertex3f(point.x, point.y, 0.0);
-                    }
-                }
-                    glEnd();
-            }
-            else if (type==ROI_POINT)
-            {
-                // draw point
-           		glBegin(GL_POINTS);
-          		{
-                    if (points.size()>=1)
-                    {
-               			glVertex3f(points.at(0).x, points.at(0).y, 0.0);
-                    }
-                }
-                glEnd();                    
-            }
-            else if (type==ROI_RECT)
-            {
-                // draw outline of rectangle
-           		glBegin(GL_LINE_LOOP);
-           		{
-                    if (points.size()>=2)
-                    {
-                        coords topleft=points.at(0);
-                        coords bottomright=points.at(1);
-                            
-               			glVertex3f(topleft.x, topleft.y, 0.0);
-               			glVertex3f(topleft.x, bottomright.y, 0.0);
-               			glVertex3f(bottomright.x, bottomright.y, 0.0);
-               			glVertex3f(bottomright.x, topleft.y, 0.0);                   			
-                    }
-                }
-                glEnd();                    
-            }
-           }
-       }
-    }
+				draw_existing_roi_entity(entity);
+			}
+		}
+	}
 
-	//glDisable(GL_BLEND);
+	// draw the ROI that is currently being defined (if there is one)
+	if (roiset->editing())
+	{
+		ROIEntity *entity=roiset->get_current_entity();
+        glColor4f(1.0, 1.0, 1.0, 1.0);		
+		draw_new_roi_entity(entity);
+	}
+
 		
 	glPopMatrix(); /* Restore tile transform */
 	assert(glGetError() == GL_NO_ERROR);
 }
+
+// draw an ROI entity in the current colour
+void ImageGL::draw_existing_roi_entity(ROIEntity *entity)
+{
+	int k;
+    const char *type=entity->get_type();
+	vector<coords> points=entity->get_points();                
+	if (type==ROI_POLY)
+	{
+	    // draw outline of polygon
+		glBegin(GL_LINE_LOOP);
+		{
+	        for (k=0;k<points.size();k++)
+	        {
+	            coords point=points.at(k);
+	   			glVertex3f(point.x, point.y, 0.0);
+	        }
+	    }
+	        glEnd();
+	}
+	else if (type==ROI_POINT)
+	{
+	    // draw point
+		glBegin(GL_POINTS);
+		{
+	        if (points.size()>=1)
+	        {
+	   			glVertex3f(points.at(0).x, points.at(0).y, 0.0);
+	        }
+	    }
+	    glEnd();                    
+	}
+	else if (type==ROI_RECT)
+	{
+	    // draw outline of rectangle
+		glBegin(GL_LINE_LOOP);
+		{
+	        if (points.size()>=2)
+	        {
+	            coords topleft=points.at(0);
+	            coords bottomright=points.at(1);
+	                
+	   			glVertex3f(topleft.x, topleft.y, 0.0);
+	   			glVertex3f(topleft.x, bottomright.y, 0.0);
+	   			glVertex3f(bottomright.x, bottomright.y, 0.0);
+	   			glVertex3f(bottomright.x, topleft.y, 0.0);                   			
+	        }
+	    }
+	    glEnd();                    
+	}	
+	
+}
+
+
+// draw an ROI entity in the current colour
+void ImageGL::draw_new_roi_entity(ROIEntity *entity)
+{
+	int k;
+    const char *type=entity->get_type();
+	vector<coords> points=entity->get_points();                
+	if (type==ROI_POLY)
+	{
+	    // draw outline of polygon
+		glBegin(GL_LINES);
+		{
+   			glVertex3f(0.0, 0.0, 0.0);			
+   			glVertex3f(mouse_x, mouse_y, 0.0);
+	    }
+	    glEnd();
+	}
+	else if (type==ROI_RECT)
+	{
+	    // draw outline of rectangle
+		glBegin(GL_LINES);
+		{
+   			glVertex3f(0.0, 0.0, 0.0);			
+   			glVertex3f(mouse_x, mouse_y, 0.0);
+	    }
+	    glEnd();                    
+	}	
+}
+
 
 void ImageGL::notify_bands(void)
 {

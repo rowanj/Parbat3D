@@ -76,7 +76,8 @@ class ROISet {
             ROI_NONE is returned if no entity is being created at the moment.
         */
         const char* editingType ();
-        
+
+        ROIEntity* get_current_entity();        
         
 /* Regions Of Interest ********************************************************/
         /**
@@ -102,6 +103,8 @@ class ROISet {
             region must already exist in the set otherwise nothing happens.
         */
         void set_current (string);
+        
+
         
         
 /* Set ************************************************************************/

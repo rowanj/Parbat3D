@@ -48,6 +48,9 @@ public:
 	void get_contrast_brightness(int* contrast_return, int* brightness_return);
 	void reset_contrast_brightness(void);
 	bool using_contrast_brightness(void);
+	
+	/* Set Current Mouse Position In Image Co-Ords (For ROI Drawing) */
+	void set_mouse_position(int ix,int iy) {image_gl->set_mouse_position(ix,iy);};
 
 private:
 	/* Sub-objects */

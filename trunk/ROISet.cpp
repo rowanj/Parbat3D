@@ -88,6 +88,10 @@ const char* ROISet::editingType () {
         return ROI_NONE;
 }
 
+ROIEntity* ROISet::get_current_entity()
+{
+	return current_entity;
+}
 
 /* Regions Of Interest ********************************************************/
 ROI* ROISet::new_region (void) {

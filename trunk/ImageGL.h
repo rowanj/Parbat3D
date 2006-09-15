@@ -22,6 +22,9 @@ class ImageGL : public ViewportListener
 	
 	void notify_viewport(void);
 	void notify_bands(void);
+	
+	// set mouse position in image co-ords (for drawing new ROI)	
+	void set_mouse_position(int image_x, int image_y) {mouse_x=image_x; mouse_y=image_y;};
 
   private:
 	/* Helper functions */
@@ -32,6 +35,8 @@ class ImageGL : public ViewportListener
 	GLuint	get_tile_texture(int x_index, int y_index);
 	void	set_tile_texture(int tile_x, int tile_y, GLuint new_id);
 	void draw_rois(void);
+	void draw_existing_roi_entity(ROIEntity *entity);
+	void draw_new_roi_entity(ROIEntity *entity);	
 	
 	/* Sub-objects */
 	GLView* gl_image;
@@ -47,6 +52,7 @@ class ImageGL : public ViewportListener
 		These will change on zoom/scroll */
 	int viewport_width, viewport_height; // Image pixels displayed in window
 	int viewport_x, viewport_y; // Top-left corner (image pixels)
+	int mouse_x, mouse_y;		// Current mouse position in image co-ords (for drawing new ROI)
 
 	/* Image window textures */
 	/* Set these up on window resize */

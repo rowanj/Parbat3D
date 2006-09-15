@@ -97,6 +97,9 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                     }
                 }
                 delete[] bv;
+                
+                /* save current mouse position (for drawing new ROIs) */
+                image_handler->set_mouse_position(ix,iy);
             }
             if ((image_handler) && (win==&imageWindow.imageWindowDisplay) && regionsSet->editing()) {
                 imageWindow.Repaint();           

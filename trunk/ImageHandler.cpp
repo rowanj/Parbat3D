@@ -87,6 +87,7 @@ unsigned int* ImageHandler::get_zoom_pixel_values(int x, int y)
 	return get_image_pixel_values(x,y);
 }
 
+
 /* This function gets pixel values from the current viewport */
 unsigned int* ImageHandler::get_window_pixel_values(int x, int y)
 {
@@ -127,3 +128,5 @@ void ImageHandler::reset_contrast_brightness(void)
 bool ImageHandler::using_contrast_brightness(void) {return use_ctst_brt;}
 
 ImageFile* ImageHandler::get_image_file(void) {return image_file;}
+
+
