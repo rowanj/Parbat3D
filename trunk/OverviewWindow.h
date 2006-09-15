@@ -14,13 +14,11 @@ class OverviewWindow:public Window
     HMENU hMainMenu;
     DisplayWindow overviewWindowDisplay;
     static const int OVERVIEW_WINDOW_WIDTH=250;    /* width of the overview window in pixels */
-    //bool advanced;
 
     virtual int Create(HWND);        
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
     int toggleMenuItemTick(HMENU hMenu,int itemId); 
-    //void advancedYes();
-    //void advancedNo();
+
 };
 
 #endif
