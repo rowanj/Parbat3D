@@ -35,6 +35,7 @@ class ImageGL : public ViewportListener
 	GLuint	get_tile_texture(int x_index, int y_index);
 	void	free_tile_texture(int x_index, int y_index);
 	void	set_tile_texture(int tile_x, int tile_y, GLuint new_id);
+	void	add_new_texture(void);
 	void draw_rois(void);
 	void draw_existing_roi_entity(ROIEntity *entity);
 	void draw_new_roi_entity(ROIEntity *entity);	

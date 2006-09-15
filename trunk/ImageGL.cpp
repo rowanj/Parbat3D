@@ -346,7 +346,7 @@ void ImageGL::check_textures(void)
 	new_start_row = viewport_y / tile_image_size;
 
 	new_end_col = new_start_col + (viewport_width / tile_image_size) + 1;
-	new_end_row = new_start_col + (viewport_height / tile_image_size) + 1;
+	new_end_row = new_start_row + (viewport_height / tile_image_size) + 1;
 
 	new_end_row = min(new_end_row, tile_rows - 1);
 	new_end_col = min(new_end_col, tile_cols - 1);
@@ -422,6 +422,7 @@ void ImageGL::load_tile_tex(int x_index, int y_index) {
 	// Only load if not already
 	if (get_tile_texture(x_index, y_index) != 0) return;
 	
+	if (free_textures.size() == 0) add_new_texture();
 	assert(free_textures.size() > 0);
 	// Load the tile data
 	tex_data = tileset->get_tile_RGB(tile_x,tile_y,band_red,band_green,band_blue);
@@ -519,46 +520,52 @@ void ImageGL::resize_window(void)
 	#if DEBUG_GL
 	Console::write("(II) Resize window triggered.\n");
 	#endif
-	int new_tex_rows, new_tex_cols;
-	int new_tex_count;
+/*	int new_tex_rows, new_tex_cols;
+	int new_tex_count; */
 	
 	/* Re-size the OpenGL context */
 	gl_image->GLresize();
 
 	/* Number how many textures at near-next LOD cover the screen? */
-	new_tex_cols = (gl_image->width() / (texture_size / 2)) + 1;
+/*	new_tex_cols = (gl_image->width() / (texture_size / 2)) + 1;
 	new_tex_rows = (gl_image->height() / (texture_size / 2)) + 1;
-	new_tex_count = new_tex_rows * new_tex_cols;
+	new_tex_count = new_tex_rows * new_tex_cols; */
 	
 	/* Do we need more texture IDs?  Allocate them */
-	gl_image->make_current();
+/*	gl_image->make_current();
 	while (textures.size() < new_tex_count) {
-		/* Get another texture ID and set it up */
-		GLuint new_tex;
-		GLint proxy_width; // used for checking available video memory
-		glGenTextures(1, &new_tex);
-		glBindTexture(GL_TEXTURE_2D, new_tex);
-		/* Set up wrapping and filtering parameters for this texture */
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		
-		/* Load proxy texture to check for enough space */
-		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &proxy_width);
-		/* And abort if not */
-		assert(proxy_width == texture_size);
-		
-		/* Now, we know the new texture is valid, and we can start using it */
-		textures.push_back(new_tex);
-		free_textures.push_back(new_tex);
-	}
+		add_new_texture();
+	} */
 
 	// We use this as an invalid test case later, so we don't want it to work...
 	assert(glIsTexture(0) == GL_FALSE);
 
 	viewport->set_window_size(gl_image->width(), gl_image->height());
+}
+
+void ImageGL::add_new_texture(void)
+{
+	gl_image->make_current();
+	/* Get another texture ID and set it up */
+	GLuint new_tex;
+	GLint proxy_width; // used for checking available video memory
+	glGenTextures(1, &new_tex);
+	glBindTexture(GL_TEXTURE_2D, new_tex);
+	/* Set up wrapping and filtering parameters for this texture */
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		
+	/* Load proxy texture to check for enough space */
+	glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &proxy_width);
+	/* And abort if not */
+	assert(proxy_width == texture_size);
+	
+	/* Now, we know the new texture is valid, and we can start using it */
+	textures.push_back(new_tex);
+	free_textures.push_back(new_tex);
 }
 
 unsigned int* ImageGL::get_pixel_values(int image_x, int image_y)
