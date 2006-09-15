@@ -19,15 +19,13 @@ const int FeatureSpace::TOOLBAR_HEIGHT=30;              // height of toolbar are
 
 // timer used for testing
 #include <time.h>   
-void sleep(unsigned int mseconds)
-{
+void sleep(unsigned int mseconds) {
     clock_t goal = mseconds + clock();
     while (goal > clock());
 }
 
 // create & display new feature space window
-FeatureSpace::FeatureSpace(int LOD, bool only_ROIs)
-{
+FeatureSpace::FeatureSpace(int LOD, bool only_ROIs) {
     int createSuccess;
     
     createSuccess=Create();
@@ -38,22 +36,39 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs)
 
     // todo: setup feature space's data    
     Console::write("FeatureSpace::FeatureSpace Sleeping...\n");
-    sleep(5000);       
+    //sleep(5000);       
     Show();
 }
 
 // draw contents of GLContainer with opengl
-void FeatureSpace::PaintGLContainer()
-{
-	glview->make_current();
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glview->GLswap();
+void FeatureSpace::PaintGLContainer() {
+    glview->make_current();
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    bbox_size = 0.9;
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(0, 0, -1);
+    
+    glPolygonMode(GL_FRONT, GL_LINE);
+    glPolygonMode(GL_BACK, GL_LINE);
+    glColor3f(1, 1, 1);
+    
+    glBegin(GL_QUADS);
+        glVertex3f( bbox_size,  bbox_size,  0);
+        glVertex3f(-bbox_size,  bbox_size,  0);
+        glVertex3f(-bbox_size, -bbox_size,  0);
+        glVertex3f( bbox_size, -bbox_size,  0);
+    glEnd();
+    
+    glview->GLswap();
 } 
- 
+
+
 // create feature space window 
-int FeatureSpace::Create()
-{
+int FeatureSpace::Create() {
     RECT rect;
 
     // get position of overview window for alignment   
@@ -179,18 +194,31 @@ int FeatureSpace::Create()
 }
  
 // resize GLContainer to fit the feature space window
-void FeatureSpace::OnResize()
-{
+void FeatureSpace::OnResize() {
     RECT rect;
-    GetClientRect(GetHandle(),&rect);
-    MoveWindow(glContainer->GetHandle(),rect.left,rect.top,rect.right-rect.left,rect.bottom-rect.top-TOOLBAR_HEIGHT, true);
-    MoveWindow(hToolbar,rect.left,rect.bottom-TOOLBAR_HEIGHT,rect.right,TOOLBAR_HEIGHT, true);    
-
+    int x, y, width, height;
+    
+    GetClientRect(GetHandle(), &rect);
+    x = rect.left;
+    y = rect.top;
+    width = rect.right - rect.left;
+    height = rect.bottom - rect.top - TOOLBAR_HEIGHT;
+    
+    MoveWindow(glContainer->GetHandle(), x, y, width, height, true);
+    MoveWindow(hToolbar, x, rect.bottom-TOOLBAR_HEIGHT, rect.right, TOOLBAR_HEIGHT, true);    
+    
+    /*
+    glViewport(0,0,width,height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,100.0f);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    */
 }
  
 /* handle events related to the feature space window */
-LRESULT CALLBACK FeatureSpace::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{   
+LRESULT CALLBACK FeatureSpace::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
     FeatureSpace* win=(FeatureSpace*)Window::GetWindowObject(hwnd);
     
