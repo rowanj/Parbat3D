@@ -148,7 +148,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     stickyWindowManager.AddStickyWindow(&prefsWindow);
     stickyWindowManager.AddStickyWindow(&contrastWindow);
 
-
 	/* colour dialog box test
 	{
 		CHOOSECOLOR cc;

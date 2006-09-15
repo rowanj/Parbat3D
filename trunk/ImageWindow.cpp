@@ -324,19 +324,32 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
+            /* remove the check in the menu */
+            //CheckMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
+            
             /* don't destroy this window, but make it invisible */
             ShowWindow(hwnd,SW_HIDE);
             return 0;
-
+            
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
-            CheckMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
-            return 0;
+            /* save the image window attributes */
+            RECT *image_window_rect;
+            GetWindowRect(hwnd, image_window_rect);
+            if (image_window_rect != NULL) {
+                settingsFile->setSetting("image window", "x", image_window_rect->left);
+                settingsFile->setSetting("image window", "y", image_window_rect->top);
+                settingsFile->setSetting("image window", "width", (image_window_rect->right-image_window_rect->left));
+                settingsFile->setSetting("image window", "height", (image_window_rect->bottom-image_window_rect->top));
+    //            settingsFile->setSetting("image window", "maximised", 0);
+    //            settingsFile->setSetting("image window", "snapped", 0);
+            }
+            break;
             
         default:
             /* let windows handle any unknown messages */
             return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
     }
-    /* return 0 to indicate that we have processed the message */       
-    return 0;
+    
+    return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);
 }

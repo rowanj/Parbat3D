@@ -205,8 +205,23 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     return 0;
                 closeFile();
 			}
+			
+			/* destroy all the windows that have been created */
+			/*
+            if (imageWindow.GetHandle()!=NULL)        // image
+                DestroyWindow(imageWindow.GetHandle());
+            if (roiWindow.GetHandle()!=NULL)          // ROI
+                DestroyWindow(roiWindow.GetHandle());
+			if (prefsWindow.GetHandle()!=NULL)        // preferences
+                DestroyWindow(prefsWindow.GetHandle());
+            if (contrastWindow.GetHandle()!=NULL)     // contrast (normal)
+                DestroyWindow(contrastWindow.GetHandle());
+            if (contrastAdvWindow.GetHandle()!=NULL)  // contrast (advanced)
+                DestroyWindow(contrastAdvWindow.GetHandle());
+			*/
+			
             /* destroy this window */
-            DestroyWindow( hwnd );			
+            DestroyWindow( hwnd );
             return 0;
             
         /* WM_DESTROY: window is being destroyed */
@@ -223,3 +238,4 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     }
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }
+
