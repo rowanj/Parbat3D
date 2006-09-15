@@ -58,7 +58,7 @@ int ROIWindow::Create(HWND parent)
 	GetClientRect(ROIscrollBox.GetHandle(),&rect);
     hROIListBox = CreateWindowEx(0,WC_LISTVIEW, 
                                 NULL, 
-                                WS_CHILD | LVS_REPORT | LVS_EDITLABELS | WS_VISIBLE | LVS_NOCOLUMNHEADER, 
+                                WS_CHILD | LVS_REPORT | LVS_EDITLABELS | WS_VISIBLE | LVS_NOCOLUMNHEADER | LVS_SHOWSELALWAYS, 
                                 0, 
                                 0, 
                                 rect.right - rect.left, 
@@ -467,17 +467,35 @@ void ROIWindow::saveROI (ROIWindow* win) {
 
 
 void ROIWindow::newEntity (ROIWindow* win, const char* roiType) {
-    int i;
-    int listSize = roiCheckboxList.size();
-    int checked = win->getROICheckedCount();
+    int items_in_list = SendMessage(hROIListBox, LVM_GETITEMCOUNT, 0, 0);
+    int selected = -1;
+    char buffer[256];
+    string *name;
+    
+    for (int i=0; i<items_in_list; i++) {
+        if (SendMessage(hROIListBox, LVM_GETITEMSTATE, i, LVIS_SELECTED) == LVIS_SELECTED) {
+            selected = i;
+            
+            LVITEM lvitem;
+            lvitem.mask = LVIF_TEXT;
+            lvitem.iItem = selected;
+            lvitem.pszText = buffer;
+            lvitem.cchTextMax = 256;
+            lvitem.iSubItem = 0;
+            
+            ListView_GetItem(hROIListBox, &lvitem);
+            name = new string(buffer);
+        }
+    }
     
     // if no ROIs are selected then create a new one
-    if (checked == 0) {
+    if (selected == -1) {
         win->newROI(win, roiType);
         
     // if an ROI is selected then create a new entity for it
-    } else if (checked == 1) {
-        MessageBox(NULL, (LPSTR) "Create new entity", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+    } else {
+        regionsSet->set_current(*name);
+        regionsSet->new_entity(roiType);
     }
 }
 
