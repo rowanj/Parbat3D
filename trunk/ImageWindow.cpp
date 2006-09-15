@@ -43,7 +43,20 @@ int ImageWindow::Create(HWND parent)
 
     /* create a child window that will be used by OpenGL */
     imageWindowDisplay.Create(GetHandle());
-
+	
+	RegisterHotKey(GetHandle(), 100, NULL, VK_UP);
+	RegisterHotKey(GetHandle(), 110, MOD_SHIFT, VK_UP);
+	
+	RegisterHotKey(GetHandle(), 200, NULL, VK_DOWN);
+	RegisterHotKey(GetHandle(), 210, MOD_SHIFT, VK_DOWN);
+	
+	RegisterHotKey(GetHandle(), 300, NULL, VK_LEFT);
+	RegisterHotKey(GetHandle(), 310, MOD_SHIFT, VK_LEFT);
+	
+	RegisterHotKey(GetHandle(), 400, NULL, VK_RIGHT);
+	RegisterHotKey(GetHandle(), 410, MOD_SHIFT, VK_RIGHT);
+	
+	
     return true;
 }
 
@@ -122,6 +135,9 @@ void ImageWindow::scrollImageX(int scrollMsg)
     GetScrollInfo(GetHandle(),SB_HORZ,&info);
      
     Console::write("scrollImageX() ");
+    Console::write("\n");
+    Console::write(scrollMsg);
+    
     switch(LOWORD(scrollMsg))
     {
         case SB_LINEUP:
@@ -168,6 +184,9 @@ void ImageWindow::scrollImageY(int scrollMsg)
     GetScrollInfo(GetHandle(),SB_VERT,&info);
      
     Console::write("scrollImageY() ");
+    Console::write("\n");
+    Console::write(scrollMsg);
+    
     switch(LOWORD(scrollMsg))
     {
         case SB_LINEUP:
@@ -320,6 +339,59 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
         case WM_MOUSEWHEEL:
             win->zoomImage(GET_WHEEL_DELTA_WPARAM(wParam)/WHEEL_DELTA);
             return 0;
+            
+        case WM_HOTKEY:
+			// scroll up small
+			if (LOWORD(wParam) == 100)
+			{
+				win->scrollImageY(0);
+				win->scrollImageY(8);
+			}
+			// scroll up big
+			if (LOWORD(wParam) == 110)
+			{
+				win->scrollImageY(2);
+				win->scrollImageY(8);
+			}
+			// scroll down small
+			if (LOWORD(wParam) == 200)
+			{
+				win->scrollImageY(1);
+				win->scrollImageY(8);
+			}
+			// scroll down big
+			if (LOWORD(wParam) == 210)
+			{
+				win->scrollImageY(3);
+				win->scrollImageY(8);
+			}
+			// scroll left small
+			if (LOWORD(wParam) == 300)
+			{
+				win->scrollImageX(0);
+				win->scrollImageX(8);
+			}
+			
+			//scroll left big
+			if (LOWORD(wParam) == 310)
+			{
+				win->scrollImageX(2);
+				win->scrollImageX(8);
+			}
+			
+			// scroll right small
+			if (LOWORD(wParam) == 400)
+			{
+				win->scrollImageX(1);
+				win->scrollImageX(8);
+			}
+			// scroll right big
+			if (LOWORD(wParam) == 410)
+			{
+				win->scrollImageX(3);
+				win->scrollImageX(8);
+			}
+			return 0;
 
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
