@@ -98,10 +98,15 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 }
                 delete[] bv;
                 
-                /* save current mouse position (for drawing new ROIs) */
-                image_handler->set_mouse_position(ix,iy);
             }
             if ((image_handler) && (win==&imageWindow.imageWindowDisplay) && regionsSet->editing()) {
+	            int mx = (short)LOWORD(lParam);
+                int my = (short)HIWORD(lParam);
+                int ix, iy;
+
+                /* update current mouse position (for drawing new ROIs) */               
+                image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);				
+                image_handler->set_mouse_position(ix,iy);
                 imageWindow.Repaint();           
             }
             break;

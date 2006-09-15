@@ -90,6 +90,9 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	}
 	glEndList();
 
+	/* Set inital mouse coords */
+	mouse_x=0;
+	mouse_y=0;
 
 	/* Test that we haven't already messed up... */
 	assert(glGetError() == GL_NO_ERROR);
@@ -196,6 +199,7 @@ void ImageGL::draw_rois(void)
 	// draw the ROI that is currently being defined (if there is one)
 	if (roiset->editing())
 	{
+		Console::write("is editing\n");
 		ROIEntity *entity=roiset->get_current_entity();
         glColor4f(1.0, 1.0, 1.0, 1.0);		
 		draw_new_roi_entity(entity);
@@ -223,7 +227,7 @@ void ImageGL::draw_existing_roi_entity(ROIEntity *entity)
 	   			glVertex3f(point.x, point.y, 0.0);
 	        }
 	    }
-	        glEnd();
+	    glEnd();
 	}
 	else if (type==ROI_POINT)
 	{
@@ -264,26 +268,38 @@ void ImageGL::draw_new_roi_entity(ROIEntity *entity)
 {
 	int k;
     const char *type=entity->get_type();
-	vector<coords> points=entity->get_points();                
+	vector<coords> points=entity->get_points();   
+
+	// do nothing if no points have been defiend
+	if (points.size()==0)
+		return;
+		             
 	if (type==ROI_POLY)
 	{
 	    // draw outline of polygon
-		glBegin(GL_LINES);
+		glBegin(GL_LINE_LOOP);
 		{
-   			glVertex3f(0.0, 0.0, 0.0);			
-   			glVertex3f(mouse_x, mouse_y, 0.0);
+	        for (k=0;k<points.size();k++)
+	        {
+	            coords point=points.at(k);
+	   			glVertex3f(point.x, point.y, 0.0);
+	        }
 	    }
+ 		glVertex3f(mouse_x, mouse_y, 0.0);	    
 	    glEnd();
 	}
 	else if (type==ROI_RECT)
 	{
 	    // draw outline of rectangle
-		glBegin(GL_LINES);
+		glBegin(GL_LINE_LOOP);
 		{
-   			glVertex3f(0.0, 0.0, 0.0);			
+            coords topleft=points.at(0);
+   			glVertex3f(topleft.x, topleft.y, 0.0);
+   			glVertex3f(topleft.x, mouse_y, 0.0);
    			glVertex3f(mouse_x, mouse_y, 0.0);
+   			glVertex3f(mouse_x, topleft.y, 0.0);                   			
 	    }
-	    glEnd();                    
+	    glEnd();                     
 	}	
 }
 
