@@ -23,9 +23,12 @@
 
 ScrollBox ROIscrollBox;
 
-vector<HWND> ROIWindow::roiCheckboxList;
+vector<HWND> ROIWindow::roiColourButtonList;
 
 WNDPROC ROIWindow::prevListViewProc;
+
+// array to store custom colour values as choosen by user (all initilised to black)
+COLORREF ROIWindow::customColours[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 int ROIWindow::Create(HWND parent)
 {
@@ -58,7 +61,7 @@ int ROIWindow::Create(HWND parent)
 	GetClientRect(ROIscrollBox.GetHandle(),&rect);
     hROIListBox = CreateWindowEx(0,WC_LISTVIEW, 
                                 NULL, 
-                                WS_CHILD | LVS_REPORT | LVS_EDITLABELS | WS_VISIBLE | LVS_NOCOLUMNHEADER | LVS_SHOWSELALWAYS, 
+                                WS_CHILD | LVS_REPORT | LVS_EDITLABELS | WS_VISIBLE | LVS_NOCOLUMNHEADER | LVS_SINGLESEL | LVS_SORTASCENDING | LVS_SHOWSELALWAYS, 
                                 0, 
                                 0, 
                                 rect.right - rect.left, 
@@ -88,22 +91,7 @@ int ROIWindow::Create(HWND parent)
 
 
 
-	/* colour dialog box test
-	{
-		CHOOSECOLOR cc;
-		COLORREF customColours[16];		// todo: give these inital values
-		cc.lStructSize=sizeof(CHOOSECOLOR);
-		cc.hwndOwner=toolWindow.GetHandle();
-		cc.hInstance=NULL;
-		cc.rgbResult=0xFF0000;				// inital colour (format: 0xBBGGRR)
-		cc.lpCustColors=customColours;	// pointer to array of 16 custom colours
-		cc.Flags=CC_ANYCOLOR|CC_FULLOPEN|CC_RGBINIT|CC_SOLIDCOLOR;
-		cc.lCustData=0;
-		cc.lpfnHook=NULL;
-		cc.lpTemplateName=NULL;
-		ChooseColor(&cc);				// returns nonzero if user clicked OK, otherwise zero
-										// new colour is stored in cc.rgbResult
-	} */
+
 
 	// add ROI check boxes
 /*	int roiInList = regionsSet->get_regions_count();
@@ -237,34 +225,116 @@ int ROIWindow::Create(HWND parent)
 	return true;
 }
 
-/* handle drawing the colour buttons within the list view control */
-LRESULT CALLBACK ROIWindow::ROIListViewProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+// show colour dialog box allowing user to change an roi's colour
+void ROIWindow::ChangeROIColour(HWND hbutton)
+{
+	CHOOSECOLOR cc;
+	int r,g,b;	
+	int colour;	
+	ROI *roi;
+	int i;
+
+	// find ROI object that is associated with the button
+	for (i=0;i<roiColourButtonList.size();i++)
+	{
+		if (roiColourButtonList.at(i)==hbutton)
+		{
+			LVITEM item;
+			item.mask=LVIF_PARAM;
+			item.iItem=i;
+			item.iSubItem=0;
+			ListView_GetItem(roiWindow.hROIListBox,&item);			
+			roi=(ROI*)item.lParam;	
+			
+			roi->get_color(&r,&g,&b);
+			colour=(b<<16)+(g<<8)+r;
+			
+			//  display colour dialog box
+			cc.lStructSize=sizeof(CHOOSECOLOR);
+			cc.hwndOwner=roiWindow.GetHandle();
+			cc.hInstance=NULL;
+			cc.rgbResult=colour;			// inital colour (format: 0xBBGGRR)
+			cc.lpCustColors=customColours;	// pointer to array of 16 custom colours
+			cc.Flags=CC_ANYCOLOR|CC_FULLOPEN|CC_RGBINIT|CC_SOLIDCOLOR;
+			cc.lCustData=0;
+			cc.lpfnHook=NULL;
+			cc.lpTemplateName=NULL;
+			if (ChooseColor(&cc)!=0)
+			{
+				// save new colour
+				colour=cc.rgbResult;
+				r=colour&0xFF;
+				g=(colour>>8)&0xFF;
+				b=(colour>>16)&0xFF;
+				roi->set_colour(r,g,b);
+				
+				// re-paint colour button
+				InvalidateRect(hbutton,NULL,TRUE);
+				UpdateWindow(hbutton);
+				// re-paint image window
+				imageWindow.Repaint();
+			}					
+			
+			break;
+		}
+	}
+	
+	
+}
+
+// draw an ROI's colour button in its own colour
+void ROIWindow::DrawColourButton(LPDRAWITEMSTRUCT di)
 {
 	HBRUSH hbrush;
-	DRAWITEMSTRUCT *di;
 	RECT rect;
 	ROI *roi;
 	int colour;
+	int r,g,b;	
 	int i;
-	
+
+	// find the ROI object that is associated with the colour button
+	for (i=0;i<roiColourButtonList.size();i++)
+	{
+		if (di->hwndItem==roiColourButtonList.at(i))
+		{
+			LVITEM item;
+			item.mask=LVIF_PARAM;
+			item.iItem=i;
+			item.iSubItem=0;
+			ListView_GetItem(roiWindow.hROIListBox,&item);			
+			roi=(ROI*)item.lParam;
+			roi->get_color(&r,&g,&b);
+			colour=(b<<16)+(g<<8)+r;
+			
+			// draw box filled with ROI's colour
+			hbrush=CreateSolidBrush(colour);
+			SelectObject(di->hDC,hbrush);
+			GetClientRect(di->hwndItem,&rect);
+			Rectangle(di->hDC,rect.left,rect.top,rect.right,rect.bottom);
+			DrawEdge(di->hDC,&rect,EDGE_RAISED,BF_RECT);
+			DeleteObject(hbrush);
+			break;
+		}
+	}	
+}
+
+/* handle events related to the list view control & its controls */
+LRESULT CALLBACK ROIWindow::ROIListViewProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	ROI *roi;
 	switch (message)
 	{
-		case WM_DRAWITEM:
-			for (i=0;i<roiCheckboxList.size();i++)
+		// handle button clicks
+		case WM_COMMAND:
+			if (HIWORD(wParam)==BN_CLICKED)
 			{
-				if (di->hwndItem==roiCheckboxList.at(i))
-				{
-					roi=regionsSet->get_regions().at(i); //900-di->itemID
-					roi->get_color(&colour,&colour+1,&colour+2);
-					hbrush=CreateSolidBrush(colour);
-					di=(LPDRAWITEMSTRUCT) lParam;
-					SelectObject(di->hDC,hbrush);
-					GetClientRect(di->hwndItem,&rect);
-					Rectangle(di->hDC,rect.left,rect.top,rect.right,rect.bottom);
-					DeleteObject(hbrush);
-					break;
-				}
+				ChangeROIColour((HWND)lParam);
 			}
+			break;
+		
+		// draw colour buttons 
+		case WM_DRAWITEM:
+			DrawColourButton((LPDRAWITEMSTRUCT) lParam);
 			break;		
 	}
     return CallWindowProc(prevListViewProc,hwnd,message,wParam,lParam);	
@@ -346,12 +416,12 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
 
 int ROIWindow::getROICheckedCount () {
     int i;
-    int listSize = roiCheckboxList.size();
+    int listSize = roiColourButtonList.size();
     int checked = 0;
     
     // find how many ROIs are selected
     for (i=0; i<listSize; i++) {
-        HWND hCur = roiCheckboxList.at(i);
+        HWND hCur = roiColourButtonList.at(i);
         if ((SendMessageA(hCur, BM_GETCHECK, 0, 0)) == BST_CHECKED)
             checked++;
     }
@@ -362,38 +432,49 @@ int ROIWindow::getROICheckedCount () {
 
 void ROIWindow::newROI (ROIWindow* win, const char* roiType) {
     int listSize = regionsSet->get_regions_count();
+    int newId=listSize;
+    
+    Console::write("ROIWindow::newROI newId=");
+    Console::write(newId);
+    Console::write("\n");
     
     // create ROI with the default name
     ROI *rCur = regionsSet->new_region();
     if (roiType != NULL)
         regionsSet->new_entity(roiType);
     
-    // create checkbox for the ROI
-    HWND hROITick = CreateWindowEx(
-                        WS_EX_CLIENTEDGE, "BUTTON",
-                        NULL,
-                		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | BS_DEFPUSHBUTTON | BS_OWNERDRAW,
-                        2+170, 0 + (20 * listSize),
-                        20, 20, hROIListBox, (HMENU)900+listSize,
-                		Window::GetAppInstance(), NULL);
-	SetBackgroundBrush(hROITick,CreateSolidBrush(0));
-    roiCheckboxList.push_back(hROITick);    // add the ROI checkbox to the list
-    
-    // add row to listview control
-    LVITEM item;
-    item.mask=LVIF_TEXT;
-    item.iItem=listSize;
-    item.iSubItem=0;
-    item.pszText=copyString((rCur->get_name()).c_str());
-    ListView_InsertItem(hROIListBox,&item);    
-	// set ROI name
-    item.mask=LVIF_TEXT;
-    item.iItem=listSize;
-    item.iSubItem=0;
-    item.pszText=copyString((rCur->get_name()).c_str());
-//    ListView_SetItem(hROIListBox,&item);
+    // add an item & colour box in the list for the ROI 
+    addNewRoiToList(rCur,newId);
+
 }
 
+// add a new row in the ROI list
+void ROIWindow::addNewRoiToList(ROI *rCur,int newId)
+{
+    // add row to listview control
+    LVITEM item;
+    item.mask=LVIF_TEXT|LVIF_PARAM;
+    item.iItem=newId;
+    item.iSubItem=0;
+    item.pszText=copyString((rCur->get_name()).c_str());
+    item.lParam=(LPARAM)rCur;
+    ListView_InsertItem(hROIListBox,&item);    
+
+	RECT rect;
+	ListView_GetItemRect(hROIListBox,newId,&rect,LVIR_BOUNDS);
+	int boxSize=rect.bottom-rect.top-2;
+	
+    // create colour button for the ROI
+    HWND hColourButton = CreateWindowEx(
+                        0, "BUTTON",
+                        NULL,
+                		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | BS_PUSHBUTTON | BS_OWNERDRAW,
+                        210-20, rect.top+1,
+                        20, boxSize, hROIListBox, (HMENU)NULL,
+                		Window::GetAppInstance(), NULL);
+
+    roiColourButtonList.push_back(hColourButton);    // add the ROI colour button to the list	
+}
 
 void ROIWindow::loadROI (ROIWindow* win) {
     OPENFILENAME ofn;
@@ -508,10 +589,10 @@ void ROIWindow::deleteROI (ROIWindow* win) {
         //MessageBox(NULL, (LPSTR) "Delete it", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
         
         // ** delete procedure
-        // loop through roiCheckboxList
+        // loop through roiColourButtonList
         //  check each to see if checked
         //  use name to remove it from regionsSet
-        //  remove it from roiCheckboxList
+        //  remove it from roiColourButtonList
         //  reduce the y position of all HWNDs after it
     }
 }
@@ -538,26 +619,24 @@ void ROIWindow::updateROIList (ROIWindow* win) {
     vector<ROI*> rlist = regionsSet->get_regions();
     
     // remove all the original ROI checkboxes from the display
-    for (int i=0; i<roiCheckboxList.size(); i++) {
-        HWND cur = roiCheckboxList.at(i);
+    for (int i=0; i<roiColourButtonList.size(); i++) {
+        HWND cur = roiColourButtonList.at(i);
         DestroyWindow(cur);
     }
     
     // remove all the original ROI checkboxes from the list
-    roiCheckboxList.clear();
+    roiColourButtonList.clear();
+    ListView_DeleteAllItems(hROIListBox);
     
     // add the checkboxes based on the new list
     for (int i=0; i<rlist.size(); i++) {
         ROI* roi = rlist.at(i);
         
-        // create checkbox for the ROI
-        HWND hROITick = CreateWindowEx(
-                            0, "BUTTON",
-                            copyString((roi->get_name()).c_str()),
-                    		BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
-                            10, 10 + (20 * i),
-                            100, 16, ROIscrollBox.GetHandle(), NULL,
-                    		Window::GetAppInstance(), NULL);
-        roiCheckboxList.push_back(hROITick);    // add the ROI checkbox to the list
+        // create list entry & colour box for the ROI
+		addNewRoiToList(roi,i);
     }
+    
+    // re-paint windows to draw ROIs
+    imageWindow.Repaint();
+    roiWindow.Repaint();
 }

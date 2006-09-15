@@ -34,8 +34,9 @@ class ROIWindow:public Window
         
         HWND hwndTT;
                 
-        static vector<HWND> roiCheckboxList;
+        static vector<HWND> roiColourButtonList;
         
+        static COLORREF customColours[];
         
         /**
             Returns the number of ROI checkboxes that have been checked.
@@ -80,6 +81,12 @@ class ROIWindow:public Window
         
         static LRESULT CALLBACK ROIListViewProcedure(HWND, UINT, WPARAM, LPARAM);
         static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+        
+        static void ChangeROIColour(HWND hbutton);
+
+        static void DrawColourButton(LPDRAWITEMSTRUCT di);
+        
+        void addNewRoiToList(ROI *rCur,int newId);
         
     public:
         int Create(HWND parent);
