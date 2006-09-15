@@ -33,6 +33,7 @@ class ImageGL : public ViewportListener
 	void flush_textures(void);
 	void load_tile_tex(int x_index, int y_index);
 	GLuint	get_tile_texture(int x_index, int y_index);
+	void	free_tile_texture(int x_index, int y_index);
 	void	set_tile_texture(int tile_x, int tile_y, GLuint new_id);
 	void draw_rois(void);
 	void draw_existing_roi_entity(ROIEntity *entity);
@@ -60,8 +61,8 @@ class ImageGL : public ViewportListener
 		int window_width, window_height; // Screen pixels, GL context dimensions
 		vector<GLuint> free_textures; // Which IDs are currently un-used
 		vector<GLuint> textures; // Which IDs are available (used or not)
-		int viewport_cols, viewport_rows; // Number of textures to show
 		int viewport_start_row, viewport_start_col;
+		int viewport_end_row, viewport_end_col;
 	
 	/* Set these up on LOD change */
 		int LOD; // Sample density factor (0 = 1:1, 1 = 1:2, 2 = 1:4, ...)

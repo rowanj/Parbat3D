@@ -5,6 +5,7 @@
 #include "console.h"
 #include "config.h"
 
+
 ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* image_viewport_param, ROISet *roisToOutline)
 {
 	ImageProperties* image_properties;
@@ -21,7 +22,7 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	/* Grab image properties from image_file */
 	image_properties = image_file->getImageProperties();
 	image_height = image_properties->getHeight();
-	image_width = image_properties->getWidth();	
+	image_width = image_properties->getWidth();
 	/* Load cache size from preferences */
 	cache_size = settingsFile->getSettingi("preferences","cachesize",128);
 	
@@ -35,6 +36,14 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	LOD = -1; // Invalid value to force creation on first run
 	tileset = NULL; // No reference to a tileset untill LOD is decided
 	tile_count = 0;
+	viewport_x = 0;
+	viewport_y = 0;
+	viewport_width = 0;
+	viewport_height = 0;
+	viewport_start_row = 0;
+	viewport_start_col = 0;
+	viewport_end_row = 0;
+	viewport_end_col = 0;
 	flush_textures();
 
 	
@@ -120,16 +129,23 @@ void ImageGL::notify_viewport(void)
 	#if DEBUG_GL
 	Console::write("(II) ImageGL::notify_viewport()\n");
 	#endif
+	
+	/* Update viewport locals */
+	viewport_x = viewport->get_image_x(); 
+	viewport_y = viewport->get_image_y();
+	viewport_width = viewport->get_viewport_width();
+	viewport_height = viewport->get_viewport_height();
 
 	check_textures();
 
 	gl_image->make_current();
+	
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(viewport->get_image_x(),viewport->get_image_x()+viewport->get_viewport_width(),
-			viewport->get_image_y()+viewport->get_viewport_height(),viewport->get_image_y(),
+	glOrtho(viewport_x, viewport_x + viewport_width,
+			viewport_y + viewport_height, viewport_y,
 			1.0,-1.0);
 		
 	glEnable(GL_TEXTURE_2D);
@@ -139,8 +155,13 @@ void ImageGL::notify_viewport(void)
 #if TRUE
 	glMatrixMode(GL_MODELVIEW);
 	GLuint tex_id;
-	for (short y = 0; y < 2; y++) {
-	for (short x = 0; x < 2; x++) {
+	#if DEBUG_GL
+	Console::write("viewport_end_col = ");
+	Console::write(viewport_end_col);
+	Console::write("\n");
+	#endif
+	for (short y = viewport_start_row; y <= viewport_end_row; y++) {
+	for (short x = viewport_start_col; x <= viewport_end_col; x++) {
 		glLoadIdentity();
 		tex_id = get_tile_texture(x,y);
 		assert(glIsTexture(tex_id) == GL_TRUE);
@@ -311,7 +332,6 @@ void ImageGL::notify_bands(void)
 	int r, g, b;
 	viewport->get_display_bands(&band_red, &band_green, &band_blue);
 	
-	tile_textures.clear();
 	tile_textures.assign(tile_count, 0);
 	free_textures = textures;
 }
@@ -321,92 +341,87 @@ void ImageGL::check_textures(void)
 	check_tileset();
 			
 	/* Find new display rect */
-	int new_row, new_col, new_num_rows, new_num_cols;
-	new_col = viewport->get_image_x() / tile_image_size;
-	new_row = viewport->get_image_y() / tile_image_size;
+	int new_start_row, new_start_col, new_end_row, new_end_col;
+	new_start_col = viewport_x / tile_image_size;
+	new_start_row = viewport_y / tile_image_size;
 
-	new_num_cols = (viewport->get_viewport_width() / tile_image_size) + 1;
-	new_num_rows = (viewport->get_viewport_height() / tile_image_size) + 1;
+	new_end_col = new_start_col + (viewport_width / tile_image_size) + 1;
+	new_end_row = new_start_col + (viewport_height / tile_image_size) + 1;
+
+	new_end_row = min(new_end_row, tile_rows - 1);
+	new_end_col = min(new_end_col, tile_cols - 1);
 
 	/* free un-used texture IDs */
 	gl_image->make_current();
-/*	// Left of new
-	for (int x = viewport_start_col; x < new_col; x++) {
-		for (int y = viewport_start_row; y < (viewport_start_row + viewport_rows); y++) {
-			int tile_texture = get_tile_texture(x,y);
-			if (glIsTexture(tile_texture) == GL_TRUE) {
-				free_textures.push_back(tile_tex);
-				set_tile_texture(x,y,0);
-			}
-		}
-		viewport_start_col++;
-		viewport_cols--;
-	}
-	// Right of new
-	for (int x = start_col + num_cols; x >= (new_col + new_num_rows); x--) {
-		for (int y = start_row; y < (start_row + num_rows); y++) {
-			int tile_index = get_tile_id(x, y);
-			int tile_tex = tile_texture[tile_index];
-			if (glIsTexture(tile_tex) == GL_TRUE) {
-				free_textures.push_back(tile_tex);
-			}
-			textures[tile_tex] = 0;
-			tile_texture[tile_index] = -1;
-		}
-		num_cols--;
-	}
-	// Above new
-	for (int y = start_row; y < new_row; y++) {
-		for (int x = start_col; x < (start_col + num_cols); x++) {
-			int tile_index = get_tile_id(x, y);
-			int tile_tex = tile_texture[tile_index];
-			if (glIsTexture(tile_tex) == GL_TRUE) {
-				free_textures.push_back(tile_tex);
-			}
-			textures[tile_tex] = 0;
-			tile_texture[tile_index] = -1;
-		}
-		start_row++;
-		num_rows--;
-	}
-	// Below new
-	for (int y = start_row + num_rows; y >= (new_row + new_num_rows); y--) {
-		for (int x = start_col; x < (start_col + num_cols); x++) {
-			int tile_index = get_tile_id(x, y);
-			int tile_tex = tile_texture[tile_index];
-			if (glIsTexture(tile_tex) == GL_TRUE) {
-				free_textures.push_back(tile_tex);
-			}
-			textures[tile_tex] = 0;
-			tile_texture[tile_index] = -1;
-		}
-		num_rows--;
-	} */
+	
 	
 	assert(tileset != NULL);
 	
-	/* Find which new tiles are needed */
+	/* Compare new exposed tiles to old */
+	/* Delete old & ! new */
+	// For each column within old or new set bounds
+	for (int x = min (viewport_start_col, new_start_col);
+		x <= max (viewport_end_col, new_end_col); x++) {
+			// if this column is within the new set, load it
+			if ((x >= new_start_col) && (x <= new_end_col)) {
+				for (int y = new_start_row; y <= new_end_row; y++) {
+					load_tile_tex(x,y);
+				}
+			} else { // unload it
+				for (int y = viewport_start_row; y <= viewport_end_row; y++) {
+					free_tile_texture(x,y);
+				}
+			}
+		}
+		
+	// For each row within old or new set bounds
+	for (int y = min (viewport_start_row, new_start_row);
+		y <= max (viewport_end_row, new_end_row); y++) {
+			// If this row is within the new set, load it
+			if ((y >= new_start_row) && (y <= new_end_row)) {
+				for (int x = new_start_col; x <= new_end_col; x++) {
+					load_tile_tex(x,y);
+				}
+			} else { // unload it
+				for (int x = viewport_start_col; x <= viewport_end_col; x++) {
+					free_tile_texture(x,y);
+				}
+			}
+		}
+
+	viewport_start_row = new_start_row;
+	viewport_start_col = new_start_col;
+	viewport_end_row = new_end_row;
+	viewport_end_col = new_end_col;
 	
+#if FALSE		
 	/* for each needed texture */
 	load_tile_tex(0,0);
 	load_tile_tex(1,0);
 	load_tile_tex(0,1);
 	load_tile_tex(1,1);
+#endif
 
 	/* Have we messed up? */
 	assert(glGetError() == GL_NO_ERROR);
 }
 
 void ImageGL::load_tile_tex(int x_index, int y_index) {
+	#if DEBUG_GL
+	Console::write("(II) load_tile_tex(");
+	Console::write(x_index);
+	Console::write(", ");
+	Console::write(y_index);
+	Console::write(")\n");
+	#endif
 	char* tex_data;
 	int tile_x = x_index * tile_image_size;
 	int tile_y = y_index * tile_image_size;
 	GLuint tex_id;
 	
-	// !! Temporary stop-leak
+	// Only load if not already
 	if (get_tile_texture(x_index, y_index) != 0) return;
 	
-	int num_free = free_textures.size();
 	assert(free_textures.size() > 0);
 	// Load the tile data
 	tex_data = tileset->get_tile_RGB(tile_x,tile_y,band_red,band_green,band_blue);
@@ -417,6 +432,7 @@ void ImageGL::load_tile_tex(int x_index, int y_index) {
 	
 	// Load the data into the texture
 	gl_image->make_current();
+	assert(glIsTexture(tex_id) == GL_TRUE);
 	glBindTexture(GL_TEXTURE_2D, tex_id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
 	delete[] tex_data;
@@ -451,14 +467,20 @@ void ImageGL::check_tileset(void)
 		tileset = new ImageTileSet(LOD, image_file, texture_size, cache_size);
 
 		// [re-]initialize the texture ID array
-//		if (tile_textures != NULL) delete[] tile_textures;
 		tile_rows = tileset->get_rows();
 		tile_cols = tileset->get_columns();
 		tile_count = tile_rows * tile_cols;
-//		tile_textures = new GLuint[tile_count];
-//		for (int x = 0; x < tile_count; x++) tile_textures[x] = 0;
-		tile_textures.clear();
+		#if DEBUG_GL
+		Console::write("Allocating  ");
+		Console::write(tile_count);
+		Console::write(" tiles.\n");
+		#endif
 		tile_textures.assign(tile_count, 0);
+			
+		viewport_start_col = 400;
+		viewport_start_row = 400;
+		viewport_end_col = -1;
+		viewport_end_row = -1;
 			
 		/* All textures can be re-used */
 		free_textures = textures;
@@ -554,12 +576,49 @@ unsigned int* ImageGL::get_pixel_values(int image_x, int image_y)
 // Return the texture id of a tile at column/row index:
 GLuint ImageGL::get_tile_texture(int x_index, int y_index) {
 	int tile_index = y_index*tile_cols + x_index;
+	#if DEBUG_GL
+	Console::write("(II) get_tile_texture (");
+	Console::write(x_index);
+	Console::write(", ");
+	Console::write(y_index);
+	Console::write(") - tile_index = ");
+	Console::write(tile_index);
+	Console::write(")\n");
+	#endif
 	assert(tile_textures.size() > tile_index);
 	return tile_textures.at(tile_index);
 }
 // Set the texture id of a tile at column/row index:
 void ImageGL::set_tile_texture(int x_index, int y_index, GLuint new_id) {
+	#if DEBUG_GL
+	Console::write("(II) set_tile_texture(");
+	Console::write(x_index);
+	Console::write(", ");
+	Console::write(y_index);
+	Console::write(", ");
+	Console::write(new_id);
+	Console::write(")\n");
+	#endif
 	int tile_index = y_index*tile_cols + x_index;
 	assert(tile_textures.size() > tile_index);
 	tile_textures[tile_index] = new_id;
+}
+
+void ImageGL::free_tile_texture(int x_index, int y_index)
+{
+	#if DEBUG_GL
+	Console::write("(II) free_tile_texture(");
+	Console::write(x_index);
+	Console::write(", ");
+	Console::write(y_index);
+	Console::write(")\n");
+	#endif
+	GLuint tex_id;
+	int tile_index = y_index*tile_cols + x_index;
+	assert(tile_textures.size() > tile_index);
+	tex_id = tile_textures[tile_index];
+	if (tex_id != 0) {
+		free_textures.push_back(tex_id);
+		tile_textures[tile_index] = 0;
+	}
 }
