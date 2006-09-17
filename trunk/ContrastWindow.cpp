@@ -167,10 +167,10 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 				//DWORD state = SendMessage(hBrightnessTrackbar, TBM_GETTICPOS, 0, 0);
 				//LRESULT state = SendMessage(hBrightnessTrackbar, TBM_GETTICPOS, 0, 0);
 				
-				//DWORD state = SendMessageA(hBrightnessTrackbar, TBM_GETPOS, 0, 0);
+				DWORD state = SendMessageA(win->hBrightnessTrackbar, TBM_GETPOS, 0, 0);
 				//LRESULT state = SendMessageA(hBrightnessTrackbar, TBM_GETPOS, 0, 0);
-				
-				//MessageBox( hwnd, (LPSTR) state, (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+				// note: MessageBox expects char*, state is int
+				MessageBox( hwnd, (LPSTR) makeMessage("state:",(int)state), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
 			}
 			
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
