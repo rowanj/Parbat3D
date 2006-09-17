@@ -48,6 +48,20 @@ int OverviewWindow::Create(HWND parent)
     /* Make the window visible on the screen */
     Show();
     
+    /* Register Short cut keys */
+    // Toggle Tool Window
+	RegisterHotKey(GetHandle(), 110, NULL, 'T');
+	// Toggle Image Window
+	RegisterHotKey(GetHandle(), 111, NULL, 'I');
+	// Toggle ROI Window
+	RegisterHotKey(GetHandle(), 112, NULL, 'R');
+	// Toggle Preferences Window
+	RegisterHotKey(GetHandle(), 113, NULL, 'P');
+	// Toggle Contrast Stretch Window
+	RegisterHotKey(GetHandle(), 114, NULL, 'C');
+    // Help shortcut key
+	RegisterHotKey(GetHandle(), 115, NULL, VK_F1);
+    
     return true;
 }
 
@@ -149,8 +163,56 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 case IDM_HELPABOUT:
                     MessageBox (NULL, "Created by Team Imagery, 2006" , "Parbat3D", 0);
                     return 0;
-           }
-           break;
+			}
+           
+       case WM_HOTKEY:
+			switch( wParam )
+            {
+				// toggle tool window
+				case 110:
+					if (win->toggleMenuItemTick(win->hMainMenu,IDM_TOOLSWINDOW))
+                        toolWindow.Show();
+                    else
+                        toolWindow.Hide();
+                    return 0;
+                // toggle Image window
+                case 111:
+					if (win->toggleMenuItemTick(win->hMainMenu,IDM_IMAGEWINDOW))
+                        ShowWindow(imageWindow.GetHandle(),SW_SHOW);
+                    else
+                        ShowWindow(imageWindow.GetHandle(),SW_HIDE);
+                    return 0;
+				// toggle ROI window
+				case 112:
+					if (win->toggleMenuItemTick(win->hMainMenu,IDM_ROIWINDOW))
+	                	roiWindow.Show();
+	                else
+	                    roiWindow.Hide();
+	                return 0;
+	            // toggle Preferences window
+				case 113:
+					if (win->toggleMenuItemTick(win->hMainMenu,IDM_PREFSWINDOW))
+                        prefsWindow.Show();
+                    else
+                        prefsWindow.Hide();
+                    return 0;
+				// toggle Contrast window
+				case 114:
+					if (win->toggleMenuItemTick(win->hMainMenu,IDM_CONTSWINDOW))
+                        contrastWindow.Show();
+                    else
+                        contrastWindow.Hide();
+                        contrastAdvWindow.Hide();
+                    return 0;
+                case 115:
+					// get path to help folder
+                     helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");
+
+				     // launch default browser
+                     ShellExecute(NULL, "open", helpPath, NULL, "help", SW_SHOWNORMAL);
+                     return 0;
+			}
+			return 0;
 
         // WM_SIZE: the window has been re-sized, minimized, maximised or restored
         case WM_SIZE:

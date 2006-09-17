@@ -44,17 +44,24 @@ int ImageWindow::Create(HWND parent)
     /* create a child window that will be used by OpenGL */
     imageWindowDisplay.Create(GetHandle());
 	
+	/* Register Short cut keys */
+	// Panning
 	RegisterHotKey(GetHandle(), 100, NULL, VK_UP);
-	RegisterHotKey(GetHandle(), 110, MOD_SHIFT, VK_UP);
+	RegisterHotKey(GetHandle(), 101, MOD_SHIFT, VK_UP);
 	
-	RegisterHotKey(GetHandle(), 200, NULL, VK_DOWN);
-	RegisterHotKey(GetHandle(), 210, MOD_SHIFT, VK_DOWN);
+	RegisterHotKey(GetHandle(), 102, NULL, VK_DOWN);
+	RegisterHotKey(GetHandle(), 103, MOD_SHIFT, VK_DOWN);
 	
-	RegisterHotKey(GetHandle(), 300, NULL, VK_LEFT);
-	RegisterHotKey(GetHandle(), 310, MOD_SHIFT, VK_LEFT);
+	RegisterHotKey(GetHandle(), 104, NULL, VK_LEFT);
+	RegisterHotKey(GetHandle(), 105, MOD_SHIFT, VK_LEFT);
 	
-	RegisterHotKey(GetHandle(), 400, NULL, VK_RIGHT);
-	RegisterHotKey(GetHandle(), 410, MOD_SHIFT, VK_RIGHT);
+	RegisterHotKey(GetHandle(), 106, NULL, VK_RIGHT);
+	RegisterHotKey(GetHandle(), 107, MOD_SHIFT, VK_RIGHT);
+	
+	// Zoom in
+	RegisterHotKey(GetHandle(), 108, NULL, VK_PRIOR);
+	// Zoom out
+	RegisterHotKey(GetHandle(), 109, NULL, VK_NEXT);
 	
 	
     return true;
@@ -134,9 +141,9 @@ void ImageWindow::scrollImageX(int scrollMsg)
     info.fMask=SIF_ALL;
     GetScrollInfo(GetHandle(),SB_HORZ,&info);
      
-    Console::write("scrollImageX() ");
-    Console::write("\n");
-    Console::write(scrollMsg);
+    //Console::write("scrollImageX() ");
+    //Console::write("\n");
+    //Console::write(scrollMsg);
     
     switch(LOWORD(scrollMsg))
     {
@@ -183,9 +190,9 @@ void ImageWindow::scrollImageY(int scrollMsg)
     info.fMask=SIF_ALL;
     GetScrollInfo(GetHandle(),SB_VERT,&info);
      
-    Console::write("scrollImageY() ");
-    Console::write("\n");
-    Console::write(scrollMsg);
+    //Console::write("scrollImageY() ");
+    //Console::write("\n");
+    //Console::write(scrollMsg);
     
     switch(LOWORD(scrollMsg))
     {
@@ -351,48 +358,60 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
 				win->scrollImageY(8);
 			}
 			// scroll up big
-			if (LOWORD(wParam) == 110)
+			if (LOWORD(wParam) == 101)
 			{
 				win->scrollImageY(2);
 				win->scrollImageY(8);
 			}
 			// scroll down small
-			if (LOWORD(wParam) == 200)
+			if (LOWORD(wParam) == 102)
 			{
 				win->scrollImageY(1);
 				win->scrollImageY(8);
 			}
 			// scroll down big
-			if (LOWORD(wParam) == 210)
+			if (LOWORD(wParam) == 103)
 			{
 				win->scrollImageY(3);
 				win->scrollImageY(8);
 			}
 			// scroll left small
-			if (LOWORD(wParam) == 300)
+			if (LOWORD(wParam) == 104)
 			{
 				win->scrollImageX(0);
 				win->scrollImageX(8);
 			}
 			
 			//scroll left big
-			if (LOWORD(wParam) == 310)
+			if (LOWORD(wParam) == 105)
 			{
 				win->scrollImageX(2);
 				win->scrollImageX(8);
 			}
 			
 			// scroll right small
-			if (LOWORD(wParam) == 400)
+			if (LOWORD(wParam) == 106)
 			{
 				win->scrollImageX(1);
 				win->scrollImageX(8);
 			}
 			// scroll right big
-			if (LOWORD(wParam) == 410)
+			if (LOWORD(wParam) == 107)
 			{
 				win->scrollImageX(3);
 				win->scrollImageX(8);
+			}
+			
+			// Zoom in
+			if (LOWORD(wParam) == 108)
+			{
+				win->zoomImage(1);
+			}
+			
+			// zoom out
+			if (LOWORD(wParam) == 109)
+			{
+				win->zoomImage(-1);
 			}
 			return 0;
 
