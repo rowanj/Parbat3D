@@ -26,6 +26,8 @@ class ImageGL : public ViewportListener
 	
 	// set mouse position in image co-ords (for drawing new ROI)	
 	void set_mouse_position(int image_x, int image_y) {mouse_x=image_x; mouse_y=image_y;};
+	
+	void set_brightness_contrast(float brightnes_arg, float contrast_arg);
 
   private:
 	/* Helper functions */

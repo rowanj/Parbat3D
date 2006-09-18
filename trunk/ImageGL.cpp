@@ -5,6 +5,7 @@
 #include "console.h"
 #include "config.h"
 
+#define DEBUG_GL_TEXTURES 1
 
 ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* image_viewport_param, ROISet *roisToOutline)
 {
@@ -54,10 +55,15 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	/* Initialize OpenGL machine */
     gl_image->make_current();
 
+	// Write OpenGL extensions to console
+	//Console::write((char*) glGetString(GL_EXTENSIONS));
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
+    
 
-    /* Use larger texture if appropriate */
+    /* Select texture size */
     {
 	    GLint max_texture_size;
 		int user_texture_size = settingsFile->getSettingi("preferences","texsize",512);
@@ -72,11 +78,7 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 				order++;
 			}
 			user_texture_size = int(round(pow(2,order)));
-			#if DEBUG_GL
-			Console::write("(II) User texture size (rounded) = ");
-			Console::write(user_texture_size);
-			Console::write("\n");
-			#endif
+			Console::write("(II) User texture size (rounded) = %d\n", user_texture_size);
 		}
 	    glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);
 		texture_size = min(user_texture_size, max_texture_size);
@@ -140,11 +142,18 @@ void ImageGL::notify_viewport(void)
 	viewport_y = viewport->get_image_y();
 	viewport_width = viewport->get_viewport_width();
 	viewport_height = viewport->get_viewport_height();
+	
+	#if DEBUG_GL_TEXTURES
+	gl_image->make_current();
+	glDrawBuffer(GL_FRONT);
+	gl_text->draw_string(10,20, "Redrawing viewport at %d,%d.", viewport_x, viewport_y);
+	glDrawBuffer(GL_BACK);
+	#endif
 
 	check_textures();
 
 	gl_image->make_current();
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -159,11 +168,7 @@ void ImageGL::notify_viewport(void)
 #if TRUE
 	glMatrixMode(GL_MODELVIEW);
 	GLuint tex_id;
-	#if DEBUG_GL
-	Console::write("viewport_end_col = ");
-	Console::write(viewport_end_col);
-	Console::write("\n");
-	#endif
+
 	for (short y = viewport_start_row; y <= viewport_end_row; y++) {
 	for (short x = viewport_start_col; x <= viewport_end_col; x++) {
 		glLoadIdentity();
@@ -183,8 +188,6 @@ void ImageGL::notify_viewport(void)
 	assert(glGetError() == GL_NO_ERROR);
 
 	draw_rois();
-	gl_text->draw_string(20, 20, "blerg %d bits woot foo int all bar %1.2f", 42, 127.7472);
-	gl_text->draw_string(50, 50, "woot %d", 30);
 
 	gl_image->GLswap();
 }
@@ -589,42 +592,28 @@ unsigned int* ImageGL::get_pixel_values(int image_x, int image_y)
 // Return the texture id of a tile at column/row index:
 GLuint ImageGL::get_tile_texture(int x_index, int y_index) {
 	int tile_index = y_index*tile_cols + x_index;
-	#if DEBUG_GL
-	Console::write("(II) get_tile_texture (");
-	Console::write(x_index);
-	Console::write(", ");
-	Console::write(y_index);
-	Console::write(") - tile_index = ");
-	Console::write(tile_index);
-	Console::write(")\n");
-	#endif
 	assert(tile_textures.size() > tile_index);
+	#if DEBUG_GL_TEXTURES
+	Console::write("(II) get_tile_texture(%d, %d) - tile_textures[%d]-> %d\n",
+			x_index, y_index, tile_index, tile_textures.at(tile_index) );
+	#endif
 	return tile_textures.at(tile_index);
 }
 // Set the texture id of a tile at column/row index:
 void ImageGL::set_tile_texture(int x_index, int y_index, GLuint new_id) {
-	#if DEBUG_GL
-	Console::write("(II) set_tile_texture(");
-	Console::write(x_index);
-	Console::write(", ");
-	Console::write(y_index);
-	Console::write(", ");
-	Console::write(new_id);
-	Console::write(")\n");
-	#endif
 	int tile_index = y_index*tile_cols + x_index;
 	assert(tile_textures.size() > tile_index);
+	#if DEBUG_GL_TEXTURES
+	Console::write("(II) set_tile_texture(%d, %d) - tile_textures[%d] = %d\n",
+			x_index, y_index, tile_index, new_id);
+	#endif
 	tile_textures[tile_index] = new_id;
 }
 
 void ImageGL::free_tile_texture(int x_index, int y_index)
 {
-	#if DEBUG_GL
-	Console::write("(II) free_tile_texture(");
-	Console::write(x_index);
-	Console::write(", ");
-	Console::write(y_index);
-	Console::write(")\n");
+	#if DEBUG_GL_TEXTURES
+	Console::write("(II) free_tile_texture(%d, %d)\n", x_index, y_index);
 	#endif
 	GLuint tex_id;
 	int tile_index = y_index*tile_cols + x_index;
@@ -634,4 +623,18 @@ void ImageGL::free_tile_texture(int x_index, int y_index)
 		free_textures.push_back(tex_id);
 		tile_textures[tile_index] = 0;
 	}
+}
+
+void ImageGL::set_brightness_contrast(float brightness_arg, float contrast_arg)
+{
+	GLfloat brightness_factor, contrast_factor;
+	
+	glPushAttrib(GL_MATRIX_MODE);
+	glMatrixMode(GL_COLOR);
+	glLoadIdentity();
+	// Set contrast
+	glScalef(contrast_arg,contrast_arg,contrast_arg);
+	// Set brightness
+	glTranslatef(brightness_arg,brightness_arg,brightness_arg);
+	glPopAttrib();
 }
