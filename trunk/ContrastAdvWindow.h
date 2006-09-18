@@ -17,13 +17,14 @@ class ContrastAdvWindow:public Window
 	
 	HWND hAdvCSOKButton;
 	HWND hAdvCSCancelButton;
-	HWND hAdvancedAdv;
-	HWND hPerChannelAdv;
+	//HWND hAdvancedAdv;
+	
 	HWND hPreviewAdv;
 	
     
     public:
     //DisplayWindow prefsWindowDisplay;
+    HWND hPerChannelAdv;
 
     int Create(HWND parent);
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);

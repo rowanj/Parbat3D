@@ -196,7 +196,10 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 						z = i;
 				}
                 
-                win->OnGenerateClicked(x, y, z);
+            win->OnGenerateClicked(x, y, z);
+            
+            DWORD GranState = SendMessageA(win->hTrackbar, TBM_GETPOS, 0, 0);
+			MessageBox( hwnd, (LPSTR) makeMessage("GranState:",(int)GranState), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
             }
 		}
 		case WM_USER:

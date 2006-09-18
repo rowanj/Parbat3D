@@ -164,13 +164,12 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 				MessageBox( hwnd, (LPSTR) "Contrast Stretch complete", (LPSTR) "Contrast / brightness", MB_ICONINFORMATION | MB_OK );
 				ShowWindow(hwnd,SW_HIDE);
 				
-				//DWORD state = SendMessage(hBrightnessTrackbar, TBM_GETTICPOS, 0, 0);
-				//LRESULT state = SendMessage(hBrightnessTrackbar, TBM_GETTICPOS, 0, 0);
-				
-				DWORD state = SendMessageA(win->hBrightnessTrackbar, TBM_GETPOS, 0, 0);
-				//LRESULT state = SendMessageA(hBrightnessTrackbar, TBM_GETPOS, 0, 0);
+				// Get Slider values
+				DWORD Bstate = SendMessageA(win->hBrightnessTrackbar, TBM_GETPOS, 0, 0);
 				// note: MessageBox expects char*, state is int
-				MessageBox( hwnd, (LPSTR) makeMessage("state:",(int)state), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+				MessageBox( hwnd, (LPSTR) makeMessage("Bstate:",(int)Bstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+				DWORD Cstate = SendMessageA(win->hContrastTrackbar, TBM_GETPOS, 0, 0);
+				MessageBox( hwnd, (LPSTR) makeMessage("Cstate:",(int)Cstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
 			}
 			
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
@@ -180,8 +179,8 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 					
 		    if (LOWORD(wParam) == 9 && HIWORD(wParam) == BN_CLICKED)
 			{
-                //advancedYes();
-				contrastWindow.Hide();
+                contrastWindow.Hide();
+                SendMessage(contrastAdvWindow.hPerChannelAdv,BM_SETCHECK,BST_CHECKED,0);
                 contrastAdvWindow.Show();
             }
 			return 0;

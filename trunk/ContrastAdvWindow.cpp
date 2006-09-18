@@ -362,6 +362,23 @@ LRESULT CALLBACK ContrastAdvWindow::WindowProcedure(HWND hwnd, UINT message, WPA
 	        {
 				MessageBox( hwnd, (LPSTR) "Contrast Stretch complete", (LPSTR) "Contrast / brightness", MB_ICONINFORMATION | MB_OK );
 				ShowWindow(hwnd,SW_HIDE);
+				
+				
+			// Get Slider values
+			DWORD RBstate = SendMessageA(win->hRedBrightnessTrackbar, TBM_GETPOS, 0, 0);
+			MessageBox( hwnd, (LPSTR) makeMessage("RBstate:",(int)RBstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+			DWORD RCstate = SendMessageA(win->hRedContrastTrackbar, TBM_GETPOS, 0, 0);
+			MessageBox( hwnd, (LPSTR) makeMessage("RCstate:",(int)RCstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+			
+			DWORD GBstate = SendMessageA(win->hGreenBrightnessTrackbar, TBM_GETPOS, 0, 0);
+			MessageBox( hwnd, (LPSTR) makeMessage("GBstate:",(int)GBstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+			DWORD GCstate = SendMessageA(win->hGreenContrastTrackbar, TBM_GETPOS, 0, 0);
+			MessageBox( hwnd, (LPSTR) makeMessage("GCstate:",(int)GCstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+			
+			DWORD BBstate = SendMessageA(win->hBlueBrightnessTrackbar, TBM_GETPOS, 0, 0);
+			MessageBox( hwnd, (LPSTR) makeMessage("BBstate:",(int)BBstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+			DWORD BCstate = SendMessageA(win->hBlueContrastTrackbar, TBM_GETPOS, 0, 0);
+			MessageBox( hwnd, (LPSTR) makeMessage("BCstate:",(int)BCstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
 			}
 			
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
@@ -372,6 +389,8 @@ LRESULT CALLBACK ContrastAdvWindow::WindowProcedure(HWND hwnd, UINT message, WPA
 			if (LOWORD(wParam) == 9 && HIWORD(wParam) == BN_CLICKED)
 			{
                 contrastAdvWindow.Hide();
+                SendMessage(contrastWindow.hPerChannel,BM_SETCHECK,0,0);
+                //SendMessage( hwnd, WM_CLOSE, 0, 0L );
                 contrastWindow.Show();
             }
 			
