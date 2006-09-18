@@ -86,6 +86,7 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* i
 
 	/* Find scale factor for lines */
 	scalefactor_lines = 1.0 / (GLfloat) max(image_width, image_height);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);	
 }
 
 OverviewGL::~OverviewGL()
@@ -102,7 +103,6 @@ void OverviewGL::notify_viewport(void)
 	Console::write("(II) OverviewGL redrawing...\n");
 #endif
 	gl_overview->make_current();
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/* Set up texture for overview image */
