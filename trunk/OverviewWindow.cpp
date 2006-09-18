@@ -50,17 +50,17 @@ int OverviewWindow::Create(HWND parent)
     
     /* Register Short cut keys */
     // Toggle Tool Window
-	RegisterHotKey(GetHandle(), 110, NULL, 'T');
+	RegisterHotKey(GetHandle(), 110, 0, 'T');
 	// Toggle Image Window
-	RegisterHotKey(GetHandle(), 111, NULL, 'I');
+	RegisterHotKey(GetHandle(), 111, 0, 'I');
 	// Toggle ROI Window
-	RegisterHotKey(GetHandle(), 112, NULL, 'R');
+	RegisterHotKey(GetHandle(), 112, 0, 'R');
 	// Toggle Preferences Window
-	RegisterHotKey(GetHandle(), 113, NULL, 'P');
+	RegisterHotKey(GetHandle(), 113, 0, 'P');
 	// Toggle Contrast Stretch Window
-	RegisterHotKey(GetHandle(), 114, NULL, 'C');
+	RegisterHotKey(GetHandle(), 114, 0, 'C');
     // Help shortcut key
-	RegisterHotKey(GetHandle(), 115, NULL, VK_F1);
+	RegisterHotKey(GetHandle(), 115, 0, VK_F1);
     
     return true;
 }

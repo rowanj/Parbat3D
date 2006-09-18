@@ -46,22 +46,22 @@ int ImageWindow::Create(HWND parent)
 	
 	/* Register Short cut keys */
 	// Panning
-	RegisterHotKey(GetHandle(), 100, NULL, VK_UP);
+	RegisterHotKey(GetHandle(), 100, 0, VK_UP);
 	RegisterHotKey(GetHandle(), 101, MOD_SHIFT, VK_UP);
 	
-	RegisterHotKey(GetHandle(), 102, NULL, VK_DOWN);
+	RegisterHotKey(GetHandle(), 102, 0, VK_DOWN);
 	RegisterHotKey(GetHandle(), 103, MOD_SHIFT, VK_DOWN);
 	
-	RegisterHotKey(GetHandle(), 104, NULL, VK_LEFT);
+	RegisterHotKey(GetHandle(), 104, 0, VK_LEFT);
 	RegisterHotKey(GetHandle(), 105, MOD_SHIFT, VK_LEFT);
 	
-	RegisterHotKey(GetHandle(), 106, NULL, VK_RIGHT);
+	RegisterHotKey(GetHandle(), 106, 0, VK_RIGHT);
 	RegisterHotKey(GetHandle(), 107, MOD_SHIFT, VK_RIGHT);
 	
 	// Zoom in
-	RegisterHotKey(GetHandle(), 108, NULL, VK_PRIOR);
+	RegisterHotKey(GetHandle(), 108, 0, VK_PRIOR);
 	// Zoom out
-	RegisterHotKey(GetHandle(), 109, NULL, VK_NEXT);
+	RegisterHotKey(GetHandle(), 109, 0, VK_NEXT);
 	
 	
     return true;
