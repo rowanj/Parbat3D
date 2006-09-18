@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <string>
 #include <stdlib.h>
+#include <stdio.h>
 //#include <stringstream>
 
 #include "console.h"
@@ -32,12 +33,22 @@ void Console::close()
 }
 
 // write string to console window
-void Console::write(char *msg)
+void Console::write(const char *msg_format, ...)
 {
     #if TMP_USE_CONSOLE        
+	char* text = new char[512];
+	va_list	ap;
+	
+	assert(msg_format != NULL);
+	
+	va_start(ap, msg_format);
+    vsprintf(text, msg_format, ap);
+	va_end(ap);
+
+
     int len,written;
-    len=strlen(msg);
-    WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE),msg,len,(DWORD*)&written,NULL);           
+    len=strlen(text);
+    WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE),text,len,(DWORD*)&written,NULL);           
     #endif
 }
 
