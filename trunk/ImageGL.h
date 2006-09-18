@@ -2,6 +2,7 @@
 #define _IMAGE_GL_H
 
 #include "GLView.h"
+#include "GLText.h"
 #include "ImageFile.h"
 #include "ImageTileSet.h"
 #include "ImageViewport.h"
@@ -42,6 +43,7 @@ class ImageGL : public ViewportListener
 	
 	/* Sub-objects */
 	GLView* gl_image;
+	GLText* gl_text;
 	ImageFile* image_file;
 	ImageViewport* viewport;
 	ROISet* roiset;        // set of ROIs to be displayed

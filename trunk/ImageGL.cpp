@@ -30,6 +30,10 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	gl_image = NULL;
 	gl_image = new GLView(window_hwnd);
 	assert(gl_image != NULL);
+	
+	gl_text = NULL;
+	gl_text = new GLText(gl_image, "Ariel", 14);
+	assert(gl_text != NULL);
 
 	/* Initialize local variables
 		Most of the texture and tile stuff is initialized in flush_textures() */
@@ -118,6 +122,7 @@ ImageGL::~ImageGL()
 {
 	flush_textures();
 	tile_textures.clear();
+	delete gl_text;
 	delete gl_image;
 	delete tileset;
 }
@@ -139,7 +144,6 @@ void ImageGL::notify_viewport(void)
 	check_textures();
 
 	gl_image->make_current();
-	
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
@@ -179,7 +183,9 @@ void ImageGL::notify_viewport(void)
 	assert(glGetError() == GL_NO_ERROR);
 
 	draw_rois();
-	
+	gl_text->draw_string(20, 20, "blerg %d bits woot foo int all bar %1.2f", 42, 127.7472);
+	gl_text->draw_string(50, 50, "woot %d", 30);
+
 	gl_image->GLswap();
 }
 
