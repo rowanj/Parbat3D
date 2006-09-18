@@ -28,6 +28,8 @@ public:
 	const char* error_text;			/* Pointer to textual description of
 										any error, or "No error." */
 
+	HDC get_device_context(void) {return device_context;};
+
 private:
 	/* State variables */
 	int window_height, window_width;
