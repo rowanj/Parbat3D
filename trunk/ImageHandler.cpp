@@ -107,9 +107,15 @@ ImageViewport* ImageHandler::get_image_viewport(void) {return image_viewport;}
 
 void ImageHandler::set_contrast_brightness(int new_contrast, int new_brightness)
 {
+	float brightness_param, contrast_param;
 	contrast_value = new_contrast;
 	brightness_value = new_brightness;
-	use_ctst_brt = true;
+	
+	Console::write("set_contrast_brightness(");
+	Console::write(new_contrast);
+	Console::write(",");
+	Console::write(new_brightness);
+	Console::write(")\n");
 	// !! call function to update display routines
 }
 void ImageHandler::get_contrast_brightness(int* contrast_return, int* brightness_return)
@@ -120,12 +126,8 @@ void ImageHandler::get_contrast_brightness(int* contrast_return, int* brightness
 
 void ImageHandler::reset_contrast_brightness(void)
 {
-	contrast_value = 255;
-	brightness_value = 255;
-	use_ctst_brt = false;
-	// !! call function to update display routines
+	set_contrast_brightness(255,255);
 }
-bool ImageHandler::using_contrast_brightness(void) {return use_ctst_brt;}
 
 ImageFile* ImageHandler::get_image_file(void) {return image_file;}
 
