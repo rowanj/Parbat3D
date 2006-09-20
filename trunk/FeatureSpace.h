@@ -9,6 +9,7 @@
 #include "GLContainer.h"
 #include "ROI.h"
 #include "ROISet.h"
+#include "ImageTileSet.h"
 
 typedef struct myPoint
 {
@@ -33,6 +34,7 @@ class FeatureSpace:public Window, public GLContainerHandler
 		int yoffset;
 		int vectorsize;
 		vector<myPoint> polyPoints;
+		ImageTileSet* fsTileset;
         
         void getPixelData();
 		void getRectData(ROIEntity* theEntity);

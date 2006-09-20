@@ -73,6 +73,9 @@ void FeatureSpace::getPixelData()
 {
 	vector<ROI*> theROIs = regionsSet->get_regions();
     ROI* currentROI;
+    int theLOD = 
+	
+	//fsTileset = new ImageTileSet(theLOD, 128
 	
 	for (int cr = 0; cr < theROIs.size(); cr++)
 	{
@@ -95,7 +98,7 @@ void FeatureSpace::getPixelData()
 				else if(theType == ROI_RECT) //ROI == rectangle
 				{
 					//add data at all points in rectangle to data lists
-					vector<coords> theCoords = currentEntity->get_points();
+					getRectData(currentEntity);
 				}
 				else //ROI == polygon
 				{
@@ -104,6 +107,17 @@ void FeatureSpace::getPixelData()
 			}
 		}
 	}
+}
+
+// -----------------------------------------------------------------------------------------
+// getRectData
+// -----------------------------------------------------------------------------------------
+// Gets data for all points inside a given rect
+// -----------------------------------------------------------------------------------------
+
+void FeatureSpace::getRectData(ROIEntity* theEntity)
+{
+	
 }
 
 // -----------------------------------------------------------------------------------------
