@@ -12,6 +12,8 @@
 
 #include "config.h"
 
+char* imageWindowTitle;
+
 int ImageWindow::Create(HWND parent)
 {
     
@@ -19,6 +21,7 @@ int ImageWindow::Create(HWND parent)
     int mx,my;
     const int IMAGE_WINDOW_WIDTH=700;
     const int IMAGE_WINDOW_HEIGHT=600;
+    imageWindowTitle = new char[256];
 
     /* Get the width & height of the desktop window */
     GetWindowRect(hDesktop,&rect);
@@ -71,11 +74,13 @@ int ImageWindow::Create(HWND parent)
 void ImageWindow::updateImageWindowTitle()
 {
     /* Display the file name & zoom level on the image window title bar */
-    string leader = "Image - ";
+    sprintf(imageWindowTitle, "Image - %s (%.0f%%)", filename, image_handler->get_image_viewport()->get_zoom_level()*100.0);
+    SetWindowText(GetHandle(), imageWindowTitle);
+/*    string leader = "Image - ";
     string title  = makeMessage(leader,filename);
     title+=makeString(" (",image_handler->get_image_viewport()->get_zoom_level()*100.0);
     title+="%)";
-	SetWindowText(GetHandle(), (char*) title.c_str());
+	SetWindowText(GetHandle(), (char*) title.c_str()); */
 }
 
 /* update image window's scroll bar display settings  */
@@ -248,8 +253,9 @@ void ImageWindow::zoomImage(int nlevels)
     zoom+=nlevels/100.0;
     if (zoom>2.0)
         zoom=2.0;
-    else if (zoom<0.01) // a per-image minimum is calculated in ImageViwport
-        zoom=0.01;
+    // a per-image minimum is calculated in ImageViwport
+/*    else if (zoom<0.01)
+        zoom=0.01; */
     image_handler->get_image_viewport()->set_zoom_level(zoom);
     updateImageWindowTitle();
     updateImageScrollbar();
@@ -438,6 +444,7 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
     //            settingsFile->setSetting("image window", "maximised", 0);
     //            settingsFile->setSetting("image window", "snapped", 0);
             }
+            delete[] imageWindowTitle;
             break;
             
         default:

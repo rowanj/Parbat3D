@@ -67,8 +67,14 @@ float ImageViewport::set_zoom_level(float zoom_value)
 float ImageViewport::get_zoom_level(void) {return zoom_level;}
 float ImageViewport::get_zoom_minimum(void)
 {
-	// !! if smaller than current, re-do current
-	// !! find fit-to-screen
+	// find fit-to-screen
+	float horiz_min, vert_min, new_min;
+	horiz_min = float(window_width) /  float(image_width);
+	vert_min = float(window_height) / float(image_height);
+	zoom_minimum = min(horiz_min, vert_min);
+	
+	// Show a bit of border at minimum zoom (to ensure edges shown)
+	zoom_minimum = zoom_minimum * 0.9;
 	
 	// allow at least zooming out to 50% if small image
 	zoom_minimum = min(zoom_minimum, (float)0.5);

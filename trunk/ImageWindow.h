@@ -2,6 +2,7 @@
 #define _PARBAT_IMAGEWINDOW_H
 
 #include "Window.h"
+extern char* imageWindowTitle;
 
 class ImageWindow:public Window
 {

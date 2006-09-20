@@ -144,12 +144,13 @@ void ImageGL::notify_viewport(void)
 	viewport_width = viewport->get_viewport_width();
 	viewport_height = viewport->get_viewport_height();
 	
-	#if DEBUG_GL_TEXTURES
+//	#if DEBUG_GL_TEXTURES
 	gl_image->make_current();
 	glDrawBuffer(GL_FRONT);
 	gl_text->draw_string(10,20, "Redrawing viewport at %d,%d.", viewport_x, viewport_y);
+	gl_text->draw_string(10,40, "Loading tiles...");
 	glDrawBuffer(GL_BACK);
-	#endif
+//	#endif
 
 	check_textures();
 
