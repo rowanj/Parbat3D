@@ -197,7 +197,7 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 				}
 				
             DWORD GranState = SendMessageA(win->hTrackbar, TBM_GETPOS, 0, 0);
-            win->OnGenerateClicked((int)GranState), x, y, z);
+            win->OnGenerateClicked((int)GranState, x, y, z);
             
             
 			MessageBox( hwnd, (LPSTR) makeMessage("GranState:",(int)GranState), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );

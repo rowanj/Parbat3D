@@ -73,7 +73,7 @@ void FeatureSpace::getPixelData()
 {
 	vector<ROI*> theROIs = regionsSet->get_regions();
     ROI* currentROI;
-    int theLOD = 
+    int theLOD = 0;
 	
 	//fsTileset = new ImageTileSet(theLOD, 128
 	
