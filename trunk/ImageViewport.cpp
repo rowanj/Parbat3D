@@ -21,7 +21,7 @@ ImageViewport::ImageViewport(ImageProperties* image_properties)
 	image_width = image_properties->getWidth();
 	
 	zoom_image_width = int(round(image_width * zoom_level));
-	zoom_image_height = int(round(image_width * zoom_level));
+	zoom_image_height = int(round(image_height * zoom_level));
 	
 	band_red = 1;
 	band_green = min(2,num_bands);
