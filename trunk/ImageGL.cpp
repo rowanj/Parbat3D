@@ -362,12 +362,10 @@ void ImageGL::check_textures(void)
 	new_end_row = min(new_end_row, tile_rows - 1);
 	new_end_col = min(new_end_col, tile_cols - 1);
 
+
 	/* free un-used texture IDs */
 	gl_image->make_current();
-	
-	
 	assert(tileset != NULL);
-	
 	/* Compare new exposed tiles to old */
 	/* Delete old & ! new */
 	// For each column within old or new set bounds
@@ -626,10 +624,12 @@ void ImageGL::set_brightness_contrast(float brightness_arg, float contrast_arg)
 	glPushAttrib(GL_MATRIX_MODE);
 	glMatrixMode(GL_COLOR);
 	glLoadIdentity();
+
+	// Set brightness
+	glTranslatef(brightness_arg,brightness_arg,brightness_arg);
 	// Set contrast
 	glScalef(contrast_arg,contrast_arg,contrast_arg);
-	// Set brightness
-//	glTranslatef(brightness_arg,brightness_arg,brightness_arg);
+
 	glPopAttrib();
-	notify_viewport();
+	notify_bands();
 }
