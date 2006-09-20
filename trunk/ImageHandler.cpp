@@ -95,7 +95,7 @@ unsigned int* ImageHandler::get_window_pixel_values(int x, int y)
 {
 	int ix, iy;
 	image_viewport->translate_window_to_image(x, y, &ix, &iy);
-	return image_gl->get_pixel_values(x,y);
+	return image_gl->get_pixel_values(ix,iy);
 }
 
 const char* ImageHandler::get_info_string(void)

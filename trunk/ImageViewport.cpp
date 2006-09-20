@@ -159,6 +159,7 @@ void ImageViewport::translate_window_to_image(int window_x, int window_y,
 	if (image_y_return != NULL) {
 		*image_y_return = int(round((zoom_y + window_y) / zoom_level));
 	}
+	//Console::write("ImageViewport::translate_window_to_image\n window_x=%d image_x=%d \n window_y=%d image_y=%d\n", window_x, *image_x_return, window_y, *image_y_return);
 }
 	
 void ImageViewport::register_listener(ViewportListener* target)

@@ -257,6 +257,7 @@ void ImageWindow::zoomImage(int nlevels)
 /*    else if (zoom<0.01)
         zoom=0.01; */
     image_handler->get_image_viewport()->set_zoom_level(zoom);
+    //image_handler->get_image_viewport()->set_zoom_level(1.0);	// *****for testing only*****
     updateImageWindowTitle();
     updateImageScrollbar();
 }

@@ -77,6 +77,8 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 int ix, iy;
                 unsigned int* bv;
                 
+                //Console::write("DisplayWindow WM_MOUSEMOVE\n mx=%d my=%d\n",mx,my);
+                
                 bv = image_handler->get_window_pixel_values(mx, my);
                 image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
                 
