@@ -21,6 +21,14 @@ int ContrastWindow::Create(HWND parent)
     int mx,my;
     const int CONTS_WINDOW_WIDTH=330;
     const int CONTS_WINDOW_HEIGHT=250;
+    
+    // Use ImageHandler to get current values;
+    int previous_brightness = 250;
+	int previous_contrast = 250;
+    assert(image_handler != NULL);
+    if(image_handler != NULL) {
+    	image_handler->get_brightness_contrast(&previous_brightness, &previous_contrast);
+	}
    
     /* Get Overview Window Location for Prefs window alignment*/
     GetWindowRect(overviewWindow.GetHandle(),&rect);
@@ -56,11 +64,11 @@ int ContrastWindow::Create(HWND parent)
     // Trackbar range - number of positions
     SendMessage(hBrightnessTrackbar, TBM_SETRANGE, 
         (WPARAM) TRUE,                   // redraw flag 
-        (LPARAM) MAKELONG(1, 255));  // min. & max. positions
+        (LPARAM) MAKELONG(1, 500));  // min. & max. positions
         
     // Set tick mark frequency
 	SendMessage(hBrightnessTrackbar, TBM_SETTICFREQ, 
-        (WPARAM) 128,				// wFreq
+        (WPARAM) 25,				// wFreq
 		0);  
     
     // Trackbar steps taken when clicking to the side of the pointer or scroll wheel
@@ -70,7 +78,7 @@ int ContrastWindow::Create(HWND parent)
 	//Trackbar - sets initial position
     SendMessage(hBrightnessTrackbar, TBM_SETPOS, 
         (WPARAM) TRUE,                   // redraw flag 
-        (LPARAM) 129); 
+        (LPARAM) previous_brightness); 
 	
 	//Trackbar tick values
 	HWND hBValues=CreateWindowEx(0, szStaticControl, "0                                             50                                         100",
@@ -103,11 +111,11 @@ int ContrastWindow::Create(HWND parent)
     // Trackbar range - number of positions
     SendMessage(hContrastTrackbar, TBM_SETRANGE, 
         (WPARAM) TRUE,                   // redraw flag 
-        (LPARAM) MAKELONG(1, 255));  // min. & max. positions
+        (LPARAM) MAKELONG(1, 500));  // min. & max. positions
         
     // Set tick mark frequency
 	SendMessage(hContrastTrackbar, TBM_SETTICFREQ, 
-        (WPARAM) 128,				// wFreq
+        (WPARAM) 25,				// wFreq
 		0);  
     
     // Trackbar steps taken when clicking to the side of the pointer or scroll wheel
@@ -117,7 +125,7 @@ int ContrastWindow::Create(HWND parent)
 	//Trackbar - sets initial position
     SendMessage(hContrastTrackbar, TBM_SETPOS, 
         (WPARAM) TRUE,                   // redraw flag 
-        (LPARAM) 129); 
+        (LPARAM) previous_contrast); 
 	
 	//Trackbar tick values
 	HWND hCValues=CreateWindowEx(0, szStaticControl, "0                                             50                                         100",
@@ -161,15 +169,19 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
              
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
 	        {
-				MessageBox( hwnd, (LPSTR) "Contrast Stretch complete", (LPSTR) "Contrast / brightness", MB_ICONINFORMATION | MB_OK );
+//				MessageBox( hwnd, (LPSTR) "Contrast Stretch complete", (LPSTR) "Contrast / brightness", MB_ICONINFORMATION | MB_OK );
 				ShowWindow(hwnd,SW_HIDE);
 				
 				// Get Slider values
 				DWORD Bstate = SendMessageA(win->hBrightnessTrackbar, TBM_GETPOS, 0, 0);
 				// note: MessageBox expects char*, state is int
-				MessageBox( hwnd, (LPSTR) makeMessage("Bstate:",(int)Bstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+//				MessageBox( hwnd, (LPSTR) makeMessage("Bstate:",(int)Bstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
 				DWORD Cstate = SendMessageA(win->hContrastTrackbar, TBM_GETPOS, 0, 0);
-				MessageBox( hwnd, (LPSTR) makeMessage("Cstate:",(int)Cstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+//				MessageBox( hwnd, (LPSTR) makeMessage("Cstate:",(int)Cstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+				assert(image_handler != NULL);
+				if (image_handler != NULL) {
+					image_handler->set_brightness_contrast((int)Bstate, (int)Cstate);
+				}
 			}
 			
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)

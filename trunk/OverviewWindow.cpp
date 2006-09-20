@@ -41,6 +41,7 @@ int OverviewWindow::Create(HWND parent)
     EnableMenuItem(hMainMenu,IDM_TOOLSWINDOW,true);
     EnableMenuItem(hMainMenu,IDM_ROIWINDOW,true);
     EnableMenuItem(hMainMenu,IDM_FILECLOSE,true);
+    EnableMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,true); 
 
     /* create a child window that will be used by OpenGL */
     overviewWindowDisplay.Create(GetHandle());

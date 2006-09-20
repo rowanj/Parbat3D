@@ -5,7 +5,8 @@
 #include "console.h"
 #include "config.h"
 
-#define DEBUG_GL_TEXTURES 1
+#define DEBUG_GL_TEXTURES 0
+#define DEBUG_GL 1
 
 ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* image_viewport_param, ROISet *roisToOutline)
 {
@@ -403,25 +404,14 @@ void ImageGL::check_textures(void)
 	viewport_end_row = new_end_row;
 	viewport_end_col = new_end_col;
 	
-#if FALSE		
-	/* for each needed texture */
-	load_tile_tex(0,0);
-	load_tile_tex(1,0);
-	load_tile_tex(0,1);
-	load_tile_tex(1,1);
-#endif
 
 	/* Have we messed up? */
 	assert(glGetError() == GL_NO_ERROR);
 }
 
 void ImageGL::load_tile_tex(int x_index, int y_index) {
-	#if DEBUG_GL
-	Console::write("(II) load_tile_tex(");
-	Console::write(x_index);
-	Console::write(", ");
-	Console::write(y_index);
-	Console::write(")\n");
+	#if DEBUG_GL_TEXTURES
+	Console::write("(II) load_tile_tex(%d, %d)\n", x_index, y_index);
 	#endif
 	char* tex_data;
 	int tile_x = x_index * tile_image_size;
@@ -627,6 +617,9 @@ void ImageGL::free_tile_texture(int x_index, int y_index)
 
 void ImageGL::set_brightness_contrast(float brightness_arg, float contrast_arg)
 {
+	#if DEBUG_GL
+	Console::write("ImageGL::set_brightness_contrast(%1.4f,%1.4f)\n", brightness_arg, contrast_arg);
+	#endif
 	GLfloat brightness_factor, contrast_factor;
 	
 	glPushAttrib(GL_MATRIX_MODE);
@@ -635,6 +628,7 @@ void ImageGL::set_brightness_contrast(float brightness_arg, float contrast_arg)
 	// Set contrast
 	glScalef(contrast_arg,contrast_arg,contrast_arg);
 	// Set brightness
-	glTranslatef(brightness_arg,brightness_arg,brightness_arg);
+//	glTranslatef(brightness_arg,brightness_arg,brightness_arg);
 	glPopAttrib();
+	notify_viewport();
 }

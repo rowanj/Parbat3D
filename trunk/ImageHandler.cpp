@@ -9,7 +9,9 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, 
 {
 	status = 0; // No error
 	status_text = "No error.";
-	reset_contrast_brightness();
+	brightness_value = 250;
+	contrast_value = 250;
+//	reset_brightness_contrast();
 	
 	// Check for lazily unspecified (NULL argument) parameters
 	assert(overview_hwnd != NULL);
@@ -105,28 +107,26 @@ int	ImageHandler::get_status(void) {return status;}
 const char* ImageHandler::get_status_text(void) {return status_text;}
 ImageViewport* ImageHandler::get_image_viewport(void) {return image_viewport;}
 
-void ImageHandler::set_contrast_brightness(int new_contrast, int new_brightness)
+// Should be given parameters between 1 and 500 (inclusive)
+void ImageHandler::set_brightness_contrast(int new_brightness, int new_contrast)
 {
+	Console::write("ImageHandler::set_contrast_brightness(%d, %d)\n", new_brightness, new_contrast);
+
 	float brightness_param, contrast_param;
-	contrast_value = new_contrast;
 	brightness_value = new_brightness;
+	contrast_value = new_contrast;
 	
-	Console::write("set_contrast_brightness(");
-	Console::write(new_contrast);
-	Console::write(",");
-	Console::write(new_brightness);
-	Console::write(")\n");
-	// !! call function to update display routines
+	image_gl->set_brightness_contrast(float(brightness_value) / 250.0, float(contrast_value) / 250.0);
 }
-void ImageHandler::get_contrast_brightness(int* contrast_return, int* brightness_return)
+void ImageHandler::get_brightness_contrast(int* brightness_return, int* contrast_return)
 {
-	if (contrast_return != NULL) *contrast_return = contrast_value;
 	if (brightness_return != NULL) *brightness_return = brightness_value;
+	if (contrast_return != NULL) *contrast_return = contrast_value;
 }
 
-void ImageHandler::reset_contrast_brightness(void)
+void ImageHandler::reset_brightness_contrast(void)
 {
-	set_contrast_brightness(255,255);
+	set_brightness_contrast(250,250);
 }
 
 ImageFile* ImageHandler::get_image_file(void) {return image_file;}

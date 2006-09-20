@@ -44,9 +44,9 @@ public:
 	const char* get_status_text(void);
 
 	/* Contrast/brigtness */
-	void set_contrast_brightness(int new_contrast, int new_brightness);
-	void get_contrast_brightness(int* contrast_return, int* brightness_return);
-	void reset_contrast_brightness(void);
+	void set_brightness_contrast(int new_brightness, int new_contrast);
+	void get_brightness_contrast(int* brightness_return, int* contrast_return);
+	void reset_brightness_contrast(void);
 	
 	/* Set Current Mouse Position In Image Co-Ords (For ROI Drawing) */
 	void set_mouse_position(int ix,int iy) {image_gl->set_mouse_position(ix,iy);};
