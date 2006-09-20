@@ -20,7 +20,11 @@ public:
 	
 	/* Tile Data */
 	char* get_tile_RGB(int x, int y, int band_R, int band_G, int band_B);
+	char* get_tile_RGB_LOD(int LOD_x, int LOD_y, int band_R, int band_G, int band_B);
 	unsigned int* get_pixel_values(int x, int y);
+	
+	int get_LOD_factor(void) {return LOD_factor;}
+	int get_tile_image_size(void) {return tile_size;}
 	
 	int get_texture_size(void);
 	int get_columns(void);
@@ -43,6 +47,7 @@ private:
 	
 	/* Tileset properties */
 	int LOD;
+	int LOD_factor;
 	ImageFile* image_file;
 	
 	/* Cache */

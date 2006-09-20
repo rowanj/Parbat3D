@@ -29,6 +29,7 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	cache_fill = 0;
 	cache_hits = 0;
 	cache_misses = 0;
+	LOD_factor = 0;
 	
 	/* !! Needs to get actual sample size from ImageFile */
 	sample_size = 1;
@@ -56,10 +57,10 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 		tile_size = tex_size; /* must be non-zero */
 	} else {
 		/* (width in tiles is width/tiles rounded up) */
-		int LOD_temp = MathUtils::ipow(2,LOD);
-		tile_size = tex_size * LOD_temp;
-		LOD_width = image_width / LOD_temp;
-		LOD_height = image_height / LOD_temp;
+		LOD_factor = MathUtils::ipow(2,LOD);
+		tile_size = tex_size * LOD_factor;
+		LOD_width = image_width / LOD_factor;
+		LOD_height = image_height / LOD_factor;
 		columns = (image_width/tile_size) + ((image_width%tile_size)!=0);
 		rows = (image_height/tile_size) + ((image_height%tile_size)!=0);
 		last_column_width = tile_size;
@@ -174,6 +175,14 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	
 	/* return temporary tile */
 	return out_tile;
+}
+
+char* ImageTileSet::get_tile_RGB_LOD(int LOD_x, int LOD_y, int band_R, int band_G, int band_B)
+{
+	int image_x, image_y;
+	image_x = LOD_x * LOD_factor;
+	image_y = LOD_y * LOD_factor;
+	return get_tile_RGB(image_x, image_y, band_R, band_G, band_B);
 }
 
 /* Return index of tile containing *IMAGE* pixel x, y */
