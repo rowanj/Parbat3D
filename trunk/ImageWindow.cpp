@@ -47,26 +47,6 @@ int ImageWindow::Create(HWND parent)
     /* create a child window that will be used by OpenGL */
     imageWindowDisplay.Create(GetHandle());
 	
-	/* Register Short cut keys */
-	// Panning
-	//RegisterHotKey(GetHandle(), 100, 0, VK_UP);
-	//RegisterHotKey(GetHandle(), 101, MOD_SHIFT, VK_UP);
-	
-	//RegisterHotKey(GetHandle(), 102, 0, VK_DOWN);
-	//RegisterHotKey(GetHandle(), 103, MOD_SHIFT, VK_DOWN);
-	
-	//RegisterHotKey(GetHandle(), 104, 0, VK_LEFT);
-	//RegisterHotKey(GetHandle(), 105, MOD_SHIFT, VK_LEFT);
-	
-	//RegisterHotKey(GetHandle(), 106, 0, VK_RIGHT);
-	//RegisterHotKey(GetHandle(), 107, MOD_SHIFT, VK_RIGHT);
-	
-	// Zoom in
-	//RegisterHotKey(GetHandle(), 108, 0, VK_PRIOR);
-	// Zoom out
-	//RegisterHotKey(GetHandle(), 109, 0, VK_NEXT);
-	
-	
     return true;
 }
 
@@ -262,6 +242,67 @@ void ImageWindow::zoomImage(int nlevels)
     updateImageScrollbar();
 }
 
+// handle shortcut key events
+void ImageWindow::onKeyDown(int virtualKey)
+{
+	// check whether shift is currently down
+	bool shift_pressed=(bool)(GetKeyState(VK_SHIFT)&128);
+	
+	// scroll up small
+	if (virtualKey == VK_UP)
+	{
+		scrollImageY(SB_LINEUP);
+	}
+	// scroll up big
+	if (virtualKey == VK_UP && shift_pressed)
+	{
+		scrollImageY(SB_PAGEUP);
+	}
+	// scroll down small
+	if (virtualKey == VK_DOWN)
+	{
+		scrollImageY(SB_LINEDOWN);		
+	}
+	// scroll down big
+	if (virtualKey == VK_DOWN && shift_pressed)
+	{
+		scrollImageY(SB_PAGEDOWN);		
+	}
+	// scroll left small
+	if (virtualKey == VK_LEFT)
+	{
+		scrollImageX(SB_LINEUP);
+	}
+	
+	//scroll left big
+	if (virtualKey == VK_LEFT && shift_pressed)
+	{
+		scrollImageX(SB_PAGEUP);
+	}
+	
+	// scroll right small
+	if (virtualKey == VK_RIGHT)
+	{
+		scrollImageX(SB_LINEDOWN);
+	}
+	// scroll right big
+	if (virtualKey == VK_RIGHT && shift_pressed)
+	{
+		scrollImageX(SB_PAGEDOWN);
+	}
+	
+	// Zoom in
+	if (virtualKey == VK_PRIOR)
+	{
+		zoomImage(1);
+	}
+	
+	// zoom out
+	if (virtualKey == VK_NEXT)
+	{
+		zoomImage(-1);
+	}	
+}
 
 /* All messages/events related to the image window (or it's controls) are sent to this procedure */
 LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -357,73 +398,9 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
             win->zoomImage(GET_WHEEL_DELTA_WPARAM(wParam)/WHEEL_DELTA);
             return 0;
             
-        case WM_KEYUP:
-			// scroll up small
-			
-			//GetKeyState(VK_SHIFT)
-			if (wParam == VK_UP)
-			{
-				win->scrollImageY(0);
-				win->scrollImageY(8);
-			}
-			// scroll up big
-			if (wParam == 101)
-			{
-				win->scrollImageY(2);
-				win->scrollImageY(8);
-			}
-			// scroll down small
-			if (wParam == VK_DOWN)
-			{
-				win->scrollImageY(1);
-				win->scrollImageY(8);
-			}
-			// scroll down big
-			if (wParam == 103)
-			{
-				win->scrollImageY(3);
-				win->scrollImageY(8);
-			}
-			// scroll left small
-			if (wParam == VK_LEFT)
-			{
-				win->scrollImageX(0);
-				win->scrollImageX(8);
-			}
-			
-			//scroll left big
-			if (wParam == 105)
-			{
-				win->scrollImageX(2);
-				win->scrollImageX(8);
-			}
-			
-			// scroll right small
-			if (wParam == VK_RIGHT)
-			{
-				win->scrollImageX(1);
-				win->scrollImageX(8);
-			}
-			// scroll right big
-			if (wParam == 107)
-			{
-				win->scrollImageX(3);
-				win->scrollImageX(8);
-			}
-			
-			// Zoom in
-			if (wParam == VK_PRIOR)
-			{
-				win->zoomImage(1);
-			}
-			
-			// zoom out
-			if (wParam == VK_NEXT)
-			{
-				win->zoomImage(-1);
-			}
+        case WM_KEYDOWN:
+			win->onKeyDown(wParam);
 			break;
-
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:

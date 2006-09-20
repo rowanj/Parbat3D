@@ -27,7 +27,7 @@ vector<HWND> ROIWindow::roiColourButtonList;
 
 WNDPROC ROIWindow::prevListViewProc;
 
-// array to store custom colour values as choosen by user (all initilised to black)
+// array to store custom colour values as choosen by user (all initilised to grey)
 COLORREF ROIWindow::customColours[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 int ROIWindow::Create(HWND parent)

@@ -166,55 +166,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     return 0;
 			}
            
-       case WM_HOTKEY:
-			switch( wParam )
-            {
-				// toggle tool window
-				case 110:
-					if (win->toggleMenuItemTick(win->hMainMenu,IDM_TOOLSWINDOW))
-                        toolWindow.Show();
-                    else
-                        toolWindow.Hide();
-                    return 0;
-                // toggle Image window
-                case 111:
-					if (win->toggleMenuItemTick(win->hMainMenu,IDM_IMAGEWINDOW))
-                        ShowWindow(imageWindow.GetHandle(),SW_SHOW);
-                    else
-                        ShowWindow(imageWindow.GetHandle(),SW_HIDE);
-                    return 0;
-				// toggle ROI window
-				case 112:
-					if (win->toggleMenuItemTick(win->hMainMenu,IDM_ROIWINDOW))
-	                	roiWindow.Show();
-	                else
-	                    roiWindow.Hide();
-	                return 0;
-	            // toggle Preferences window
-				case 113:
-					if (win->toggleMenuItemTick(win->hMainMenu,IDM_PREFSWINDOW))
-                        prefsWindow.Show();
-                    else
-                        prefsWindow.Hide();
-                    return 0;
-				// toggle Contrast window
-				case 114:
-					if (win->toggleMenuItemTick(win->hMainMenu,IDM_CONTSWINDOW))
-                        contrastWindow.Show();
-                    else
-                        contrastWindow.Hide();
-                        contrastAdvWindow.Hide();
-                    return 0;
-                case 115:
-					// get path to help folder
-                     helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");
-
-				     // launch default browser
-                     ShellExecute(NULL, "open", helpPath, NULL, "help", SW_SHOWNORMAL);
-                     return 0;
-			}
-			return 0;
-
+ 
         // WM_SIZE: the window has been re-sized, minimized, maximised or restored
         case WM_SIZE:
                 

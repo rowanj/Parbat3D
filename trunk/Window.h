@@ -25,6 +25,11 @@ class Window
             // create window, register window class (if required) & associated it with this object
     
     int OnWindowPosChanging(WINDOWPOS *wp);
+
+    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+	    // general window event/message handler    
+
+    void OnKeyDown(int virtualKey);	// handle global shortcut key events
     
     public:
     Window::Window();
@@ -34,9 +39,7 @@ class Window
    
     static void Init(HINSTANCE hInst);            /* called at startup to setup static variables */    
     static HINSTANCE GetAppInstance() {return hInstance;};
-    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
-            // general window event/message handler
-            
+           
     WNDPROC SetWindowProcedure(WNDPROC);            /* return current window event/messeger handler & set new one */
     WNDPROC static SetWindowProcedure(HWND,WNDPROC); /* return current window event/messeger handler & set new one for a control */ 
 

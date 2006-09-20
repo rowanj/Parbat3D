@@ -188,7 +188,58 @@ void Window::drawStatic(DRAWITEMSTRUCT *dis)
     TextOut(dis->hDC,dis->rcItem.left,dis->rcItem.top,(char*)str,len);                          // display text
 }
 
-
+// handle global shortcut key events
+void Window::OnKeyDown(int virtualKey)
+{
+	const char *helpPath; // Used for accessing the help folder
+	
+	// toggle tool window
+	switch (virtualKey)
+	{
+		case 'T':
+			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_TOOLSWINDOW))
+		        toolWindow.Show();
+		    else
+		        toolWindow.Hide();
+		    break;
+		// toggle Image window
+		case 'I':	
+			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_IMAGEWINDOW))
+		        ShowWindow(imageWindow.GetHandle(),SW_SHOW);
+		    else
+		        ShowWindow(imageWindow.GetHandle(),SW_HIDE);
+		    break;
+		// toggle ROI window
+		case 'R':
+			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_ROIWINDOW))
+		    	roiWindow.Show();
+		    else
+		        roiWindow.Hide();
+		    break;
+		// toggle Preferences window
+		case 'P':
+			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_PREFSWINDOW))
+		        prefsWindow.Show();
+		    else
+		        prefsWindow.Hide();
+		    break;
+		// toggle Contrast window
+		case 'C':
+			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_CONTSWINDOW))
+		        contrastWindow.Show();
+		    else
+		        contrastWindow.Hide();
+		        contrastAdvWindow.Hide();
+		    break;
+		case VK_F1:
+			// get path to help folder
+		    helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");
+		
+		    // launch default browser
+		    ShellExecute(NULL, "open", helpPath, NULL, "help", SW_SHOWNORMAL);
+		    break;
+	}
+}
 
 LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -216,18 +267,10 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                 }
                 break;
 
-            case WM_CHAR:
-				Console::write("Window WM_CHAR\n");
+			case WM_KEYDOWN:
+				win->OnKeyDown(wParam);
 				break;
-
-            case WM_KEYUP:
-				Console::write("Window WM_KEYUP\n\tvirtual code=%d\n",wParam);
-				break;
-				
-            case WM_SYSKEYDOWN:
-				Console::write("Window WM_SYSKEYDOWN\n");				
-				break;
-				
+			
             case WM_MOVING:
                 stickyWindowManager.OnMoving(win,(RECT*)lParam);
                 return TRUE;
