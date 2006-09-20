@@ -72,41 +72,35 @@ void FeatureSpace::PaintGLContainer() {
 void FeatureSpace::getPixelData()
 {
 	vector<ROI*> theROIs = regionsSet->get_regions();
-//	vector<ROI*>::iterator currentROI;
     ROI* currentROI;
 	
-//	for (currentROI = theROIs.begin(); currentROI != theROIs.end(); currentROI++) //each ROI
 	for (int cr = 0; cr < theROIs.size(); cr++)
 	{
 		vector<ROIEntity*> theEntities = currentROI->get_entities();
-//		vector<ROIEntity*>::iterator currentEntity;
 		currentROI = theROIs.at(cr);
 		ROIEntity* currentEntity;
-		
-//		for (currentEntity = theEntities.begin(); currentEntity != theEntities.end(); currentEntity++) //each entity in the ROI
-		for(int ce = 0; ce < theEntities.size(); ce++)
+		if (currentROI->get_active())
 		{
-			currentEntity = theEntities.at(ce);
-			
-			char* theType = (char*)currentEntity->get_type();
-			if(theType == ROI_POINT) //ROI == point
+			for(int ce = 0; ce < theEntities.size(); ce++)
 			{
-				//add data at point to data lists
-				vector<coords> theCoords = currentEntity->get_points();
-				//addPointToFSLists(theCoords[].x, theCoords[].y, currentROI);
-			}
-			else if(theType == ROI_RECT) //ROI == rectangle
-			{
-				//add data at all points in rectangle to data lists
-				vector<coords> theCoords = currentEntity->get_points();
-			}
-			else //ROI == polygon
-			{
-				maxy = 0;
-				miny = std::numeric_limits<int>::max();
-				yoffset = 0;
-				vectorsize = 0;
-				getPolygonData(currentEntity);
+				currentEntity = theEntities.at(ce);
+				
+				char* theType = (char*)currentEntity->get_type();
+				if(theType == ROI_POINT) //ROI == point
+				{
+					//add data at point to data lists
+					vector<coords> theCoords = currentEntity->get_points();
+					//addPointToFSLists(theCoords[].x, theCoords[].y, currentROI);
+				}
+				else if(theType == ROI_RECT) //ROI == rectangle
+				{
+					//add data at all points in rectangle to data lists
+					vector<coords> theCoords = currentEntity->get_points();
+				}
+				else //ROI == polygon
+				{
+					getPolygonData(currentEntity);
+				}
 			}
 		}
 	}
@@ -125,6 +119,11 @@ void FeatureSpace::getPixelData()
 
 void FeatureSpace::getPolygonData(ROIEntity* theEntity)
 {	
+	maxy = 0;
+	miny = std::numeric_limits<int>::max();
+	yoffset = 0;
+	vectorsize = 0;
+	
 	getPolygonVertices(theEntity);
 	
 	if (!polyPoints.empty())	//if we've got something to rasterise...
@@ -242,8 +241,8 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity)
 void FeatureSpace::getPolygonVertices(ROIEntity* theEntity)
 {
 	vector<coords> theCoords = theEntity->get_points();
-	//vector<coords>::iterator currentCoords;
 	coords currentCoords;
+	
 	//clear our vector of polygon points
 	polyPoints.clear();
 	
@@ -470,6 +469,10 @@ void FeatureSpace::pushXPixel(int rx, int y)
 	}
 }
 
+void FeatureSpace::addPointToFSLists(int x, int y, ROI* theROI)
+{
+	
+}
 
 // create feature space window 
 int FeatureSpace::Create() {

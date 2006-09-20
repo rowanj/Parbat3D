@@ -41,6 +41,7 @@ class FeatureSpace:public Window, public GLContainerHandler
 		void isTurningPoint(int first, int middle, int last);
 		void generateBoundaryLine(int x1, int y1, int x2, int y2);
 		void pushXPixel(int rx, int y);
+		void addPointToFSLists(int x, int y, ROI* theROI);
     
     protected:
         GLView *glview;
