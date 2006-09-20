@@ -49,22 +49,22 @@ int ImageWindow::Create(HWND parent)
 	
 	/* Register Short cut keys */
 	// Panning
-	RegisterHotKey(GetHandle(), 100, 0, VK_UP);
-	RegisterHotKey(GetHandle(), 101, MOD_SHIFT, VK_UP);
+	//RegisterHotKey(GetHandle(), 100, 0, VK_UP);
+	//RegisterHotKey(GetHandle(), 101, MOD_SHIFT, VK_UP);
 	
-	RegisterHotKey(GetHandle(), 102, 0, VK_DOWN);
-	RegisterHotKey(GetHandle(), 103, MOD_SHIFT, VK_DOWN);
+	//RegisterHotKey(GetHandle(), 102, 0, VK_DOWN);
+	//RegisterHotKey(GetHandle(), 103, MOD_SHIFT, VK_DOWN);
 	
-	RegisterHotKey(GetHandle(), 104, 0, VK_LEFT);
-	RegisterHotKey(GetHandle(), 105, MOD_SHIFT, VK_LEFT);
+	//RegisterHotKey(GetHandle(), 104, 0, VK_LEFT);
+	//RegisterHotKey(GetHandle(), 105, MOD_SHIFT, VK_LEFT);
 	
-	RegisterHotKey(GetHandle(), 106, 0, VK_RIGHT);
-	RegisterHotKey(GetHandle(), 107, MOD_SHIFT, VK_RIGHT);
+	//RegisterHotKey(GetHandle(), 106, 0, VK_RIGHT);
+	//RegisterHotKey(GetHandle(), 107, MOD_SHIFT, VK_RIGHT);
 	
 	// Zoom in
-	RegisterHotKey(GetHandle(), 108, 0, VK_PRIOR);
+	//RegisterHotKey(GetHandle(), 108, 0, VK_PRIOR);
 	// Zoom out
-	RegisterHotKey(GetHandle(), 109, 0, VK_NEXT);
+	//RegisterHotKey(GetHandle(), 109, 0, VK_NEXT);
 	
 	
     return true;
@@ -357,70 +357,72 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
             win->zoomImage(GET_WHEEL_DELTA_WPARAM(wParam)/WHEEL_DELTA);
             return 0;
             
-        case WM_HOTKEY:
+        case WM_KEYUP:
 			// scroll up small
-			if (LOWORD(wParam) == 100)
+			
+			//GetKeyState(VK_SHIFT)
+			if (wParam == VK_UP)
 			{
 				win->scrollImageY(0);
 				win->scrollImageY(8);
 			}
 			// scroll up big
-			if (LOWORD(wParam) == 101)
+			if (wParam == 101)
 			{
 				win->scrollImageY(2);
 				win->scrollImageY(8);
 			}
 			// scroll down small
-			if (LOWORD(wParam) == 102)
+			if (wParam == VK_DOWN)
 			{
 				win->scrollImageY(1);
 				win->scrollImageY(8);
 			}
 			// scroll down big
-			if (LOWORD(wParam) == 103)
+			if (wParam == 103)
 			{
 				win->scrollImageY(3);
 				win->scrollImageY(8);
 			}
 			// scroll left small
-			if (LOWORD(wParam) == 104)
+			if (wParam == VK_LEFT)
 			{
 				win->scrollImageX(0);
 				win->scrollImageX(8);
 			}
 			
 			//scroll left big
-			if (LOWORD(wParam) == 105)
+			if (wParam == 105)
 			{
 				win->scrollImageX(2);
 				win->scrollImageX(8);
 			}
 			
 			// scroll right small
-			if (LOWORD(wParam) == 106)
+			if (wParam == VK_RIGHT)
 			{
 				win->scrollImageX(1);
 				win->scrollImageX(8);
 			}
 			// scroll right big
-			if (LOWORD(wParam) == 107)
+			if (wParam == 107)
 			{
 				win->scrollImageX(3);
 				win->scrollImageX(8);
 			}
 			
 			// Zoom in
-			if (LOWORD(wParam) == 108)
+			if (wParam == VK_PRIOR)
 			{
 				win->zoomImage(1);
 			}
 			
 			// zoom out
-			if (LOWORD(wParam) == 109)
+			if (wParam == VK_NEXT)
 			{
 				win->zoomImage(-1);
 			}
-			return 0;
+			break;
 
 
         /* WM_CLOSE: system or user has requested to close the window/application */             

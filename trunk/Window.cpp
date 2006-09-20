@@ -189,6 +189,7 @@ void Window::drawStatic(DRAWITEMSTRUCT *dis)
 }
 
 
+
 LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     unsigned int flags;
@@ -214,6 +215,19 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                         break;
                 }
                 break;
+
+            case WM_CHAR:
+				Console::write("Window WM_CHAR\n");
+				break;
+
+            case WM_KEYUP:
+				Console::write("Window WM_KEYUP\n\tvirtual code=%d\n",wParam);
+				break;
+				
+            case WM_SYSKEYDOWN:
+				Console::write("Window WM_SYSKEYDOWN\n");				
+				break;
+				
             case WM_MOVING:
                 stickyWindowManager.OnMoving(win,(RECT*)lParam);
                 return TRUE;
