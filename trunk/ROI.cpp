@@ -11,9 +11,9 @@ const char* ROI_POLY = "POLY";
 
 ROI::ROI (void) {
     active = true;
-    colour_red = 0;
-    colour_green = 0;
-    colour_blue = 0;
+    colour_red = 128;
+    colour_green = 128;
+    colour_blue = 128;
 }
 
 ROI::~ROI (void) {
