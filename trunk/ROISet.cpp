@@ -151,7 +151,7 @@ void ROISet::remove_region (ROI* to_go) {
     for (int i=0; i<regions.size(); i++) {
         ROI* r = regions.at(i);
         if (r == to_go) {
-            regions.erase(regions.begin()+i-1, regions.begin()+i);
+            regions.erase(regions.begin()+i, regions.begin()+i+1);
             break;
         }
     }
@@ -161,7 +161,7 @@ void ROISet::remove_region (string to_go) {
     for (int i=0; i<regions.size(); i++) {
         ROI* r = regions.at(i);
         if (r->get_name() == to_go) {
-            regions.erase(regions.begin()+i-1, regions.begin()+i);
+            regions.erase(regions.begin()+i, regions.begin()+i+1);
             break;
         }
     }

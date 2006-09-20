@@ -43,6 +43,21 @@ class ROIWindow:public Window
         */
         int getROICheckedCount ();
         
+        
+        /**
+            Returns the index of the selected item in the list. Returns -1 if
+            nothing is selected.
+        */
+        int getSelectedItemIndex ();
+        
+        /**
+            Returns the text of the selected item in the list. The text is the
+            name of the ROI that the list item represents. Returns a blank
+            string ("") if nothing is selected.
+        */
+        string getSelectedItemText ();
+        
+        
         /**
             Creates a new Region of Interest and, if specified, creates a new
             entity inside the new region. The second parameter accepts a string
@@ -74,6 +89,11 @@ class ROIWindow:public Window
         void newEntity (ROIWindow*, const char*);
         
         
+        /**
+            Removes an ROI from the set. Removes the ROI from the set, the item
+            from the list and the ROIs colour picker. Finally, moves all the
+            other colour pickers up one position.
+        */
         void deleteROI (ROIWindow*);
         
         

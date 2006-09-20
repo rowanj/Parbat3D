@@ -429,6 +429,45 @@ int ROIWindow::getROICheckedCount () {
 }
 
 
+int ROIWindow::getSelectedItemIndex () {
+    int items_in_list = SendMessage(hROIListBox, LVM_GETITEMCOUNT, 0, 0);
+    int selected = -1;
+    
+    for (int i=0; i<items_in_list; i++) {
+        if (SendMessage(hROIListBox, LVM_GETITEMSTATE, i, LVIS_SELECTED) == LVIS_SELECTED) {
+            selected = i;
+            break;
+        }
+    }
+    
+    return selected;
+}
+
+string ROIWindow::getSelectedItemText () {
+    int items_in_list = SendMessage(hROIListBox, LVM_GETITEMCOUNT, 0, 0);
+    char buffer[256];
+    string *name = new string("");
+    
+    for (int i=0; i<items_in_list; i++) {
+        if (SendMessage(hROIListBox, LVM_GETITEMSTATE, i, LVIS_SELECTED) == LVIS_SELECTED) {
+            LVITEM lvitem;
+            lvitem.mask = LVIF_TEXT;
+            lvitem.iItem = i;
+            lvitem.pszText = buffer;
+            lvitem.cchTextMax = 256;
+            lvitem.iSubItem = 0;
+            
+            ListView_GetItem(hROIListBox, &lvitem);
+            name = new string(buffer);
+            
+            break;
+        }
+    }
+    
+    return *name;
+}
+
+
 void ROIWindow::newROI (ROIWindow* win, const char* roiType) {
     int listSize = regionsSet->get_regions_count();
     int newId=listSize;
@@ -481,6 +520,7 @@ void ROIWindow::loadROI (ROIWindow* win) {
     
     ZeroMemory(&ofn, sizeof(ofn));
     
+    // open a dialog box to ask for the filename to load
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = win->GetHandle();//overviewWindow.GetHandle();
     ofn.lpstrFilter =  "All Supported Files\0*.roi;*.txt\0ROI Files (*.roi)\0*.roi\0Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
@@ -494,10 +534,6 @@ void ROIWindow::loadROI (ROIWindow* win) {
         // get a string version of the filename
 		string fn_str (ofn.lpstrFile);
 		
-		Console::write("ROI file opened: ");
-		Console::write(&fn_str);
-		Console::write("\n");
-		
 		// load the set from the file and combine it with the current set
         ROIFile *rf = new ROIFile();
         ROISet* rs = rf->loadSetFromFile(fn_str);
@@ -505,18 +541,20 @@ void ROIWindow::loadROI (ROIWindow* win) {
         
         // update the list of checkboxes with the new regions that were loaded
         win->updateROIList(win);
+        
+        // update the display
+        imageWindow.Repaint();
     }
 }
 
 
 void ROIWindow::saveROI (ROIWindow* win) {
-    int checked = win->getROICheckedCount();
-    
     OPENFILENAME ofn;
     char szFileName[MAX_PATH] = "";
     
     ZeroMemory(&ofn, sizeof(ofn));
     
+    // open a dialog box to ask for the filename to load
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = win->GetHandle();//overviewWindow.GetHandle();
     ofn.lpstrFilter =  "ROI File (*.roi)\0*.roi\0Text File (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
@@ -530,69 +568,63 @@ void ROIWindow::saveROI (ROIWindow* win) {
         // get a string version of the filename
 		string fn_str (ofn.lpstrFile);
 		
-		Console::write("ROI file to save: ");
-		Console::write(&fn_str);
-		Console::write("\n");
-		
-        // save only the selected ROIs
-        if (checked>0) {
-            
         // save all the ROIs
-        } else {
-            ROIFile *rf = new ROIFile();
-            rf->saveSetToFile(fn_str, regionsSet);
-        }
+        ROIFile *rf = new ROIFile();
+        rf->saveSetToFile(fn_str, regionsSet);
     }
 }
 
 
 void ROIWindow::newEntity (ROIWindow* win, const char* roiType) {
-    int items_in_list = SendMessage(hROIListBox, LVM_GETITEMCOUNT, 0, 0);
-    int selected = -1;
-    char buffer[256];
-    string *name;
-    
-    for (int i=0; i<items_in_list; i++) {
-        if (SendMessage(hROIListBox, LVM_GETITEMSTATE, i, LVIS_SELECTED) == LVIS_SELECTED) {
-            selected = i;
-            
-            LVITEM lvitem;
-            lvitem.mask = LVIF_TEXT;
-            lvitem.iItem = selected;
-            lvitem.pszText = buffer;
-            lvitem.cchTextMax = 256;
-            lvitem.iSubItem = 0;
-            
-            ListView_GetItem(hROIListBox, &lvitem);
-            name = new string(buffer);
-        }
-    }
+    string name = getSelectedItemText();
     
     // if no ROIs are selected then create a new one
-    if (selected == -1) {
+    if (name == "") {
         win->newROI(win, roiType);
         
     // if an ROI is selected then create a new entity for it
     } else {
-        regionsSet->set_current(*name);
+        regionsSet->set_current(name);
         regionsSet->new_entity(roiType);
     }
 }
 
 
 void ROIWindow::deleteROI (ROIWindow* win) {
-    int checked = win->getROICheckedCount();
+    // get the index of the selected item in the ROI list
+    int i = getSelectedItemIndex();
+
+	RECT rect;
+	ListView_GetItemRect(hROIListBox,1,&rect,LVIR_BOUNDS);
+	int boxSize=rect.bottom-rect.top;
     
-    // if no ROIs are selected then create a new one
-    if (checked >= 1) {
-        //MessageBox(NULL, (LPSTR) "Delete it", (LPSTR) "Action", MB_ICONINFORMATION | MB_OK );
+    if (i != -1) {
+        // get the name of the selected item in the ROI list
+        string name = getSelectedItemText();
         
-        // ** delete procedure
-        // loop through roiColourButtonList
-        //  check each to see if checked
-        //  use name to remove it from regionsSet
-        //  remove it from roiColourButtonList
-        //  reduce the y position of all HWNDs after it
+        // remove the item from the list
+        SendMessage(hROIListBox, LVM_DELETEITEM, i, 0);
+        
+        // remove the ROI colour picker
+        HWND colBox = roiColourButtonList.at(i);
+        DestroyWindow(colBox);
+        roiColourButtonList.erase(roiColourButtonList.begin()+i, roiColourButtonList.begin()+i+1);
+        
+        // move all the colour boxes after the deleted item up one position
+        for (int j=i; j<roiColourButtonList.size(); j++) {
+            colBox = roiColourButtonList.at(j);
+            MoveWindow(colBox, 190, 1+j*17, 20, 15, true);
+            
+            // better way of doing it - but doesn't currently work
+            //GetWindowRect(colBox,&rect);
+            //MoveWindow(colBox, 210-20, rect.top-boxSize+1, rect.right-rect.left, rect.bottom-rect.top, true);
+        }
+        
+        // remove the ROI from the set
+        regionsSet->remove_region(name);
+        
+        // update the display
+        imageWindow.Repaint();
     }
 }
 
