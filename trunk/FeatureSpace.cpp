@@ -66,6 +66,410 @@ void FeatureSpace::PaintGLContainer() {
     glview->GLswap();
 } 
 
+//getPixelData gets all point coordinates from within ROIs, and
+//then gets all data values for those pixel coords, and stores
+//them, ready for display list generation.
+void FeatureSpace::getPixelData()
+{
+	vector<ROI*> theROIs = regionsSet->get_regions();
+//	vector<ROI*>::iterator currentROI;
+    ROI* currentROI;
+	
+//	for (currentROI = theROIs.begin(); currentROI != theROIs.end(); currentROI++) //each ROI
+	for (int cr = 0; cr < theROIs.size(); cr++)
+	{
+		vector<ROIEntity*> theEntities = currentROI->get_entities();
+//		vector<ROIEntity*>::iterator currentEntity;
+		currentROI = theROIs.at(cr);
+		ROIEntity* currentEntity;
+		
+//		for (currentEntity = theEntities.begin(); currentEntity != theEntities.end(); currentEntity++) //each entity in the ROI
+		for(int ce = 0; ce < theEntities.size(); ce++)
+		{
+			currentEntity = theEntities.at(ce);
+			
+			char* theType = (char*)currentEntity->get_type();
+			if(theType == ROI_POINT) //ROI == point
+			{
+				//add data at point to data lists
+				vector<coords> theCoords = currentEntity->get_points();
+				//addPointToFSLists(theCoords[].x, theCoords[].y, currentROI);
+			}
+			else if(theType == ROI_RECT) //ROI == rectangle
+			{
+				//add data at all points in rectangle to data lists
+				vector<coords> theCoords = currentEntity->get_points();
+			}
+			else //ROI == polygon
+			{
+				maxy = 0;
+				miny = std::numeric_limits<int>::max();
+				yoffset = 0;
+				vectorsize = 0;
+				getPolygonData(currentEntity);
+			}
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------------------
+// getPolygonData
+// -----------------------------------------------------------------------------------------
+// This function creates a list of the coordinates of all points circumscribed by a
+// polygon. It does so by recording the x coordinate for any points at a given y coordinate.
+// The algorithm generates these boundary points in sorted order from lowest x to highest x,
+// and there will always be an even number of these values.
+// The algorithm then gets the pixel value of any point x, y, where y is the current y being
+// gathered, and x is a value between the pairs of x points stored for that y.
+// -----------------------------------------------------------------------------------------
+
+void FeatureSpace::getPolygonData(ROIEntity* theEntity)
+{	
+	getPolygonVertices(theEntity);
+	
+	if (!polyPoints.empty())	//if we've got something to rasterise...
+	{
+		yoffset = miny;
+		vectorsize = (maxy - miny) + 1;
+		pixCoords.resize(vectorsize, new list<int>);
+		
+		//get the point coordinates for our boundary lines first
+		for (int i = 0; i < polyPoints.size() - 1; i++)
+		{
+			generateBoundaryLine(polyPoints[i].x, polyPoints[i].y, polyPoints[i+1].x, polyPoints[i+1].y);
+		}
+		generateBoundaryLine(polyPoints[polyPoints.size()-1].x, polyPoints[polyPoints.size()-1].y, polyPoints[0].x, polyPoints[0].y);
+		
+		int firstPoint = 0;
+		int lastPoint = polyPoints.size() - 1;
+		int secondLastPoint = polyPoints.size() - 2;
+		
+		//remove turning points
+		//calculate first point
+		isTurningPoint(lastPoint, firstPoint, firstPoint + 1);
+		//calculate middle points
+		for (int i = firstPoint; i < lastPoint - 1; i++)
+		{
+			isTurningPoint(i, i+1, i+2);
+		}
+		//calculate last point
+		isTurningPoint(secondLastPoint, lastPoint, firstPoint);
+		
+		
+		//write current point to cout
+		for (int i = 0; i < vectorsize; i++)
+		{
+			Console::write("Point at Y %d:\n", i + yoffset);
+			for(list<int>::iterator j = pixCoords[i]->begin(); j != pixCoords[i]->end(); j++)
+			{
+				Console::write("\tX %d\n", *j);
+			}
+		}
+		
+		//get the point coordinates for all points between those lines, if size not odd
+		for (int i = 0; i < vectorsize; i++)
+		{
+			//iterators for our "point pairs"
+			if ((pixCoords[i]->size()%2) == 0)
+			{
+				Console::write("Drawing lines at Y %d:\n", i + yoffset);
+				list<int>::iterator j1 = pixCoords[i]->begin();
+				list<int>::iterator j2 = j1;
+				//set our second point to the next point in the list
+				j2++;
+				
+				//loop until we reach the end of the point list
+				while(true)
+				{
+					//if our points are identical, just get the one copy of it
+					//Console::write("\tFilling line from %d to %d\n", *j1, *j2);
+					if (*j1 == *j2)
+					{
+						//plotPixel((short)*j1, (short)(i + yoffset));
+						//Console::write("Fill point at X %d, Y %d\n", *j1, i + yoffset);
+					}
+					else //get all points between them (inclusive)
+					{
+						for(int k = *j1; k <= *j2; k++)
+						{
+							//plotPixel((short)k, (short)(i + yoffset));
+							//Console::write("Fill point at X %d, Y %d\n", Y, i + yoffset);
+						}
+					}
+					
+					//move j2 on to the next point in the list
+					j2++;
+					if(j2 == pixCoords[i]->end()) //if we're at the end of the list, break
+					{
+						break;
+					}
+					//otherwise, set j1 to be the next point as well, and
+					//move j2 on to the next point in the pair
+					j1 = j2;
+					j2++;
+					if(j2 == pixCoords[i]->end()) //if we're at the end of the list, break
+					{
+						break;
+					}
+				}
+			}
+			else if (pixCoords[i]->size() == 1)
+			{
+				Console::write("Single point at %d -- drawing\n", i + yoffset);
+				//plotPixel((short)*pixCoords[i]->begin(), (short)(i + yoffset));
+			}
+			else
+			{
+				Console::write("Odd number of points at %d\n", i + yoffset);
+			}
+		}
+	}
+	
+	//we're finished -- clear our data for the next run
+	pixCoords.clear();
+	maxy = 0; 
+	miny = std::numeric_limits<int>::max();
+	yoffset = 0;
+	vectorsize = 0;
+}
+
+// -----------------------------------------------------------------------------------------
+// getPolygonVertices
+// -----------------------------------------------------------------------------------------
+// convert the polygon vertices for the current ROI to vector<myPoint> format
+// -----------------------------------------------------------------------------------------
+
+void FeatureSpace::getPolygonVertices(ROIEntity* theEntity)
+{
+	vector<coords> theCoords = theEntity->get_points();
+	//vector<coords>::iterator currentCoords;
+	coords currentCoords;
+	//clear our vector of polygon points
+	polyPoints.clear();
+	
+	//make a new point structure, get the data,
+	//and push it to the back of the vector
+	for(int i = 0; i < theCoords.size(); i++)
+	{
+		currentCoords = theCoords.at(i);
+		myPoint* thePoint = new myPoint;
+		thePoint->x = currentCoords.x;
+		thePoint->y = currentCoords.y;
+		polyPoints.push_back(*thePoint);
+		Console::write("Poly point at X %d, Y %d\n", thePoint->x, thePoint->y);
+		
+		//determine if this point is a max or min y value
+		if (thePoint->y > maxy) maxy = thePoint->y;
+		if (thePoint->y < miny) miny = thePoint->y;
+	}
+}
+
+// -----------------------------------------------------------------------------------------
+// isTurningPoint
+// -----------------------------------------------------------------------------------------
+// Determine whether a point is a turning point in the y-axis.
+// Algorithm by Rowan James, execution by Dafydd Williams
+// -----------------------------------------------------------------------------------------
+
+void FeatureSpace::isTurningPoint(int first, int middle, int last)
+{
+	Console::write("examining point X %d, Y %d\n", polyPoints[middle].x, polyPoints[middle].y);
+	if((polyPoints[first].y > polyPoints[middle].y && polyPoints[last].y > polyPoints[middle].y) || //if both neighbour y greater than middle y
+	   (polyPoints[first].y < polyPoints[middle].y && polyPoints[last].y < polyPoints[middle].y)) //or if both neighbour y less than middle y
+	{
+		Console::write("\tpoint is turning point -- attempting to find pixel values matching\n");
+		for(list<int>::iterator j = pixCoords[polyPoints[middle].y - yoffset]->begin(); j != pixCoords[polyPoints[middle].y - yoffset]->end(); j++)
+		{
+			if(*j == polyPoints[middle].x)
+			{
+				pixCoords[polyPoints[middle].y - yoffset]->erase(j);
+				Console::write("\t\tfound point record to erase where X = %d\n", *j);
+				Console::write("\t\tPoint at Y %d:\n", middle + yoffset);
+				for(list<int>::iterator iter = pixCoords[polyPoints[middle].y - yoffset]->begin(); iter != pixCoords[polyPoints[middle].y - yoffset]->end(); iter++)
+				{
+					Console::write("\t\t\tX %d\n", *iter);
+				}
+				break;
+			}
+		}
+	}
+	else
+	{
+		Console::write("\tpoint was not turning point\n");
+	}
+}
+
+// -----------------------------------------------------------------------------------------
+// generateBoundaryLine
+// -----------------------------------------------------------------------------------------
+// Generate a line from a to b using the DDA Algorithm.
+// Stub code by Tony Gray @ UTas
+// -----------------------------------------------------------------------------------------
+
+void FeatureSpace::generateBoundaryLine (int x1, int y1, int x2, int y2)
+{
+	Console::write("Line from X1 %d, Y1 %d to X2 %d, Y2 %d\n", x1, y1, x2, y2);
+	
+	float increment;
+	int dx, dy, steps;
+	
+	//if our second point is less than our first on the x axis, swap the point pairs
+	if (x2<x1)
+	{
+		int temp;
+		
+		temp = x1;
+		x1 = x2;
+		x2 = temp;
+		temp = y1;
+		y1 = y2;
+		y2 = temp;
+	}
+	
+	//get our differences between the x coord pair and the y coord pair
+	dx = x2 - x1;
+	dy = y2 - y1;
+	
+	//if our x points are identical and our first y is greater than our second y
+	//(in other words, if we have a vertical line segment going straight down)
+	//swap our y coords only.
+	if (x1 == x2 && y1 > y2)
+	{
+		int temp;
+		
+		temp = y1;
+		y1 = y2;
+		y2 = temp;
+		//dy = abs(dy);
+	}
+	
+	//We're always stepping by Y in this modified algorithm, so set steps
+	steps = abs(dy);
+	increment = (float) dx / (float) steps;
+
+	if (dy < 0)
+	{
+		int temp;
+		temp = y1;
+		y1 = y2;
+		y2 = temp;
+		temp = x1;
+		x1 = x2;
+		x2 = temp;
+		increment = increment - (increment * 2);
+	}
+	Console::write("We'll start from X %d, Y %d, and go to X %d, Y %d\n", x1, y1, x2, y2);
+	float x = (float) x1;
+	cout.precision(6);
+	Console::write("After conversion to float, our x starting point is %d\n", x); 
+	Console::write("Our increment is %d", increment); 
+	if (y1 == y2)
+	{
+		pushXPixel(x1, y1);
+		//plotPixel((short)x1, (short)y1);
+		Console::write("drew a point at X %d, Y %d\n", x1, y1);
+		pushXPixel(x2, y1);
+		//plotPixel((short)x2, (short)y1);
+		Console::write("drew a point at X %d, Y %d\n", x2, y1);
+	}
+	else if (x1 == x2)
+	{
+		if (y1 > y2)
+		{
+			int temp = y1;
+			y1 = y2;
+			y2 = temp;
+		}
+		
+		Console::write("this is a vertical line\n");
+		Console::write("i starts at %d and ends at %d\n", y1, y2); 
+		for(int i = y1; i <= y2; i++)
+		{
+			pushXPixel(x1, i);
+			Console::write("drew a point at X %d, Y %d\n", x1, i);
+			//plotPixel((short)x1, (short)i);
+		}
+	}
+	else
+	{
+		for (int y = y1; y <= y2; y++) //do not draw first point - assume it is drawn as last point of line preceding (including final line loop ender) 
+		{
+			int rx = int(round(x));
+			//draw our pixel, for reference
+			Console::write("drew a point at X %d, Y %d\n", rx, y);
+			//plotPixel((short)rx, (short)y);
+			
+			pushXPixel(rx, y);
+			
+			x += increment;
+		}
+	}
+}
+
+
+// -----------------------------------------------------------------------------------------
+// pushXPixel
+// -----------------------------------------------------------------------------------------
+// Push our given X coord into the list of X coords for Y.
+// -----------------------------------------------------------------------------------------
+
+void FeatureSpace::pushXPixel(int rx, int y)
+{
+	list<int>::iterator i, j;
+	
+	//cout << "y - yoffset = " << y - yoffset << endl;
+	if (pixCoords[y - yoffset]->empty())
+	{
+		//cout << "\t\tX list for Y = " << y << " is empty" << endl;
+		list<int>* tempxlist = new list<int>;
+		pixCoords[y - yoffset] = tempxlist;
+		pixCoords[y - yoffset]->push_front(rx);
+		//cout << "\t\t\tPushed X = " << rx << " to front of list for Y = " << y << endl;
+	}
+	else
+	{
+		//cout << "\t\tX list for Y = " << y << " is not empty." << endl;
+		//cout << "\t\t\tPerforming sorted insert." << endl;
+		i = pixCoords[y - yoffset]->begin();
+		while (i != pixCoords[y - yoffset]->end())
+		{
+			if (*i < rx)
+			{
+				j = i;
+				j++;
+				if (j == pixCoords[y - yoffset]->end())
+				{
+					//cout << "\t\t\t\tX " << rx << " is largest yet for " << y << " -- pushing " << rx << " to back" << endl;
+					pixCoords[y - yoffset]->push_back(rx);
+					break;
+				}
+				else
+				{
+					i++;
+				}
+			}
+			else if (*i > rx)
+			{
+				//cout << "\t\t\t\t" << *i << " is greater than or equal to X = " << rx << " -- inserting " << rx << endl;
+				pixCoords[y - yoffset]->insert(i, rx);
+				break;
+			}
+			else if (*i == rx)
+			{
+				Console::write("\t**Y = %d has duplicate X value for X = %d\n", y, rx);
+				//pixCoords[y - yoffset]->insert(i, rx);
+				Console::write("\t**List of X at Y is:\n");
+				for(list<int>::iterator iter = pixCoords[y - yoffset]->begin(); iter != pixCoords[y - yoffset]->end(); iter++)
+				{
+					Console::write("\t\tX %d", *iter);
+				}
+				break;
+			}
+			
+		}
+	}
+}
+
 
 // create feature space window 
 int FeatureSpace::Create() {
