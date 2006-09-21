@@ -25,8 +25,16 @@ void sleep(unsigned int mseconds) {
 }
 
 // create & display new feature space window
-FeatureSpace::FeatureSpace(int LOD, bool only_ROIs) {
-    int createSuccess;
+FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
+    theLOD = LOD;
+    onlyROIs = only_ROIs;
+    band1 = b1;
+    band2 = b2;
+    band3 = b3;
+    Console::write("FeatureSpace -- Our LOD is %d\n", theLOD);
+    Console::write("FeatureSpace -- Band 1 = %d, Band 2 = %d, Band 3 = %d\n", band1, band2, band3);
+    
+	int createSuccess;
     
     createSuccess=Create();
     assert(createSuccess);
@@ -35,8 +43,8 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs) {
     numFeatureSpaces++;
 
     // todo: setup feature space's data    
-    Console::write("FeatureSpace::FeatureSpace Sleeping...\n");
-    //sleep(5000);       
+    getPixelData();
+	   
     Show();
 }
 
@@ -72,40 +80,69 @@ void FeatureSpace::PaintGLContainer() {
 void FeatureSpace::getPixelData()
 {
 	vector<ROI*> theROIs = regionsSet->get_regions();
+	Console::write("FeatureSpace -- Count of regions is %d\n", regionsSet->get_regions_count());
+	assert(regionsSet != NULL);
+	Console::write("FeatureSpace -- Got vector of ROIs\n");
+	
     ROI* currentROI;
-    int theLOD = 0;
 	
-	//fsTileset = new ImageTileSet(theLOD, 128
+	fsTileset = new ImageTileSet(theLOD, image_handler->get_image_file(), 512, 128);
 	
-	for (int cr = 0; cr < theROIs.size(); cr++)
+	Console::write("FeatureSpace -- Got past fsTileset creation\n");
+	assert(theROIs[0] != NULL);
+	if (!theROIs.empty()) //if there are some ROIs in the set
 	{
-		vector<ROIEntity*> theEntities = currentROI->get_entities();
-		currentROI = theROIs.at(cr);
-		ROIEntity* currentEntity;
-		if (currentROI->get_active())
+		Console::write("FeatureSpace -- Got past theROIs empty check\n");
+		for (int cr = 0; cr < theROIs.size(); cr++)
 		{
-			for(int ce = 0; ce < theEntities.size(); ce++)
+			Console::write("FeatureSpace -- Got into the ROIs loop\n");
+			currentROI = theROIs.at(cr);
+			vector<ROIEntity*> theEntities = currentROI->get_entities();
+			Console::write("FeatureSpace -- Got vector of entities\n");
+			if (!theEntities.empty())
 			{
-				currentEntity = theEntities.at(ce);
-				
-				char* theType = (char*)currentEntity->get_type();
-				if(theType == ROI_POINT) //ROI == point
+				Console::write("FeatureSpace -- Set our current ROI\n");
+				ROIEntity* currentEntity;
+				if (currentROI->get_active())
 				{
-					//add data at point to data lists
-					vector<coords> theCoords = currentEntity->get_points();
-					//addPointToFSLists(theCoords[].x, theCoords[].y, currentROI);
-				}
-				else if(theType == ROI_RECT) //ROI == rectangle
-				{
-					//add data at all points in rectangle to data lists
-					getRectData(currentEntity);
-				}
-				else //ROI == polygon
-				{
-					getPolygonData(currentEntity);
+					Console::write("FeatureSpace -- Current ROI is active -- checking types\n");
+					for(int ce = 0; ce < theEntities.size(); ce++)
+					{
+						currentEntity = theEntities.at(ce);
+						Console::write("FeatureSpace -- Set our current entity\n");
+						
+						char* theType = (char*)currentEntity->get_type();
+						
+						if(theType == ROI_POINT) //ROI == point
+						{
+							Console::write("FeatureSpace -- Current type is POINT\n");
+							//add data at point to data lists
+							vector<coords> theCoords = currentEntity->get_points();
+							//addPointToFSLists(theCoords[].x, theCoords[].y, currentROI);
+						}
+						else if(theType == ROI_RECT) //ROI == rectangle
+						{
+							Console::write("FeatureSpace -- Current type is RECT\n");
+							//add data at all points in rectangle to data lists
+							getRectData(currentEntity);
+						}
+						else //ROI == polygon
+						{
+							Console::write("FeatureSpace -- Current type is POLYGON\n");
+							getPolygonData(currentEntity);
+						}
+					}
 				}
 			}
+			else
+			{
+				Console::write("FeatureSpace -- the entities set is empty\n");	
+			}
 		}
+	}
+	else
+	{
+		Console::write("FeatureSpace -- the ROIs set is empty\n");
 	}
 }
 
@@ -133,6 +170,7 @@ void FeatureSpace::getRectData(ROIEntity* theEntity)
 
 void FeatureSpace::getPolygonData(ROIEntity* theEntity)
 {	
+	int totalPoints = 0;
 	maxy = 0;
 	miny = std::numeric_limits<int>::max();
 	yoffset = 0;
@@ -144,6 +182,7 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity)
 	{
 		yoffset = miny;
 		vectorsize = (maxy - miny) + 1;
+		boundsCoords.resize(vectorsize, new list<int>);
 		pixCoords.resize(vectorsize, new list<int>);
 		
 		//get the point coordinates for our boundary lines first
@@ -168,25 +207,14 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity)
 		//calculate last point
 		isTurningPoint(secondLastPoint, lastPoint, firstPoint);
 		
-		
-		//write current point to cout
-		for (int i = 0; i < vectorsize; i++)
-		{
-			Console::write("Point at Y %d:\n", i + yoffset);
-			for(list<int>::iterator j = pixCoords[i]->begin(); j != pixCoords[i]->end(); j++)
-			{
-				Console::write("\tX %d\n", *j);
-			}
-		}
-		
 		//get the point coordinates for all points between those lines, if size not odd
 		for (int i = 0; i < vectorsize; i++)
 		{
 			//iterators for our "point pairs"
-			if ((pixCoords[i]->size()%2) == 0)
+			if ((boundsCoords[i]->size()%2) == 0 && boundsCoords[i]->size() != 0)
 			{
-				Console::write("Drawing lines at Y %d:\n", i + yoffset);
-				list<int>::iterator j1 = pixCoords[i]->begin();
+				//Console::write("Drawing lines at Y %d:\n", i + yoffset);
+				list<int>::iterator j1 = boundsCoords[i]->begin();
 				list<int>::iterator j2 = j1;
 				//set our second point to the next point in the list
 				j2++;
@@ -198,13 +226,16 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity)
 					//Console::write("\tFilling line from %d to %d\n", *j1, *j2);
 					if (*j1 == *j2)
 					{
-						//plotPixel((short)*j1, (short)(i + yoffset));
+						pushXPixel(*j1, i + yoffset);
+						totalPoints++;
 						//Console::write("Fill point at X %d, Y %d\n", *j1, i + yoffset);
 					}
 					else //get all points between them (inclusive)
 					{
 						for(int k = *j1; k <= *j2; k++)
 						{
+							pushXPixel(k, i + yoffset);
+							totalPoints++;
 							//plotPixel((short)k, (short)(i + yoffset));
 							//Console::write("Fill point at X %d, Y %d\n", Y, i + yoffset);
 						}
@@ -212,7 +243,7 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity)
 					
 					//move j2 on to the next point in the list
 					j2++;
-					if(j2 == pixCoords[i]->end()) //if we're at the end of the list, break
+					if(j2 == boundsCoords[i]->end()) //if we're at the end of the list, break
 					{
 						break;
 					}
@@ -220,15 +251,17 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity)
 					//move j2 on to the next point in the pair
 					j1 = j2;
 					j2++;
-					if(j2 == pixCoords[i]->end()) //if we're at the end of the list, break
+					if(j2 == boundsCoords[i]->end()) //if we're at the end of the list, break
 					{
 						break;
 					}
 				}
 			}
-			else if (pixCoords[i]->size() == 1)
+			else if (boundsCoords[i]->size() == 1)
 			{
-				Console::write("Single point at %d -- drawing\n", i + yoffset);
+				//Console::write("Single point at %d -- drawing\n", i + yoffset);
+				pushXPixel(*boundsCoords[i]->begin(), i + yoffset);
+				totalPoints++;
 				//plotPixel((short)*pixCoords[i]->begin(), (short)(i + yoffset));
 			}
 			else
@@ -238,7 +271,13 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity)
 		}
 	}
 	
+	//write the resultant array
+	Console::write("FeatureSpace -- Total points in poly = %d\n", totalPoints);
+	
+	//push the values for this data to our lists of values -- TO DO
+	
 	//we're finished -- clear our data for the next run
+	boundsCoords.clear();
 	pixCoords.clear();
 	maxy = 0; 
 	miny = std::numeric_limits<int>::max();
@@ -286,23 +325,27 @@ void FeatureSpace::getPolygonVertices(ROIEntity* theEntity)
 
 void FeatureSpace::isTurningPoint(int first, int middle, int last)
 {
-	Console::write("examining point X %d, Y %d\n", polyPoints[middle].x, polyPoints[middle].y);
+	//Console::write("examining point X %d, Y %d\n", polyPoints[middle].x, polyPoints[middle].y);
 	if((polyPoints[first].y > polyPoints[middle].y && polyPoints[last].y > polyPoints[middle].y) || //if both neighbour y greater than middle y
 	   (polyPoints[first].y < polyPoints[middle].y && polyPoints[last].y < polyPoints[middle].y)) //or if both neighbour y less than middle y
 	{
-		Console::write("\tpoint is turning point -- attempting to find pixel values matching\n");
-		for(list<int>::iterator j = pixCoords[polyPoints[middle].y - yoffset]->begin(); j != pixCoords[polyPoints[middle].y - yoffset]->end(); j++)
+		//Console::write("\tpoint is turning point -- attempting to find pixel values matching\n");
+		for(list<int>::iterator j = boundsCoords[polyPoints[middle].y - yoffset]->begin(); j != boundsCoords[polyPoints[middle].y - yoffset]->end(); j++)
 		{
-			if(*j == polyPoints[middle].x)
+			if(*j == polyPoints[middle].x && boundsCoords[polyPoints[middle].y - yoffset]->size() > 1)
 			{
-				pixCoords[polyPoints[middle].y - yoffset]->erase(j);
+				boundsCoords[polyPoints[middle].y - yoffset]->erase(j);
 				Console::write("\t\tfound point record to erase where X = %d\n", *j);
 				Console::write("\t\tPoint at Y %d:\n", middle + yoffset);
-				for(list<int>::iterator iter = pixCoords[polyPoints[middle].y - yoffset]->begin(); iter != pixCoords[polyPoints[middle].y - yoffset]->end(); iter++)
+				for(list<int>::iterator iter = boundsCoords[polyPoints[middle].y - yoffset]->begin(); iter != boundsCoords[polyPoints[middle].y - yoffset]->end(); iter++)
 				{
 					Console::write("\t\t\tX %d\n", *iter);
 				}
 				break;
+			}
+			else
+			{
+				Console::write("Single point - ignoring\n");
 			}
 		}
 	}
@@ -321,7 +364,7 @@ void FeatureSpace::isTurningPoint(int first, int middle, int last)
 
 void FeatureSpace::generateBoundaryLine (int x1, int y1, int x2, int y2)
 {
-	Console::write("Line from X1 %d, Y1 %d to X2 %d, Y2 %d\n", x1, y1, x2, y2);
+	//Console::write("Line from X1 %d, Y1 %d to X2 %d, Y2 %d\n", x1, y1, x2, y2);
 	
 	float increment;
 	int dx, dy, steps;
@@ -371,19 +414,19 @@ void FeatureSpace::generateBoundaryLine (int x1, int y1, int x2, int y2)
 		x2 = temp;
 		increment = increment - (increment * 2);
 	}
-	Console::write("We'll start from X %d, Y %d, and go to X %d, Y %d\n", x1, y1, x2, y2);
+	//Console::write("We'll start from X %d, Y %d, and go to X %d, Y %d\n", x1, y1, x2, y2);
 	float x = (float) x1;
 	cout.precision(6);
-	Console::write("After conversion to float, our x starting point is %d\n", x); 
-	Console::write("Our increment is %d", increment); 
+	//Console::write("After conversion to float, our x starting point is %d\n", x); 
+	//Console::write("Our increment is %f\n", increment); 
 	if (y1 == y2)
 	{
-		pushXPixel(x1, y1);
+		pushXPixelBounds(x1, y1);
 		//plotPixel((short)x1, (short)y1);
-		Console::write("drew a point at X %d, Y %d\n", x1, y1);
-		pushXPixel(x2, y1);
+		//Console::write("drew a point at X %d, Y %d\n", x1, y1);
+		pushXPixelBounds(x2, y1);
 		//plotPixel((short)x2, (short)y1);
-		Console::write("drew a point at X %d, Y %d\n", x2, y1);
+		//Console::write("drew a point at X %d, Y %d\n", x2, y1);
 	}
 	else if (x1 == x2)
 	{
@@ -394,25 +437,25 @@ void FeatureSpace::generateBoundaryLine (int x1, int y1, int x2, int y2)
 			y2 = temp;
 		}
 		
-		Console::write("this is a vertical line\n");
-		Console::write("i starts at %d and ends at %d\n", y1, y2); 
+		//Console::write("this is a vertical line\n");
+		//Console::write("i starts at %d and ends at %d\n", y1, y2); 
 		for(int i = y1; i <= y2; i++)
 		{
-			pushXPixel(x1, i);
-			Console::write("drew a point at X %d, Y %d\n", x1, i);
+			pushXPixelBounds(x1, i);
+			//Console::write("drew a point at X %d, Y %d\n", x1, i);
 			//plotPixel((short)x1, (short)i);
 		}
 	}
 	else
 	{
-		for (int y = y1; y <= y2; y++) //do not draw first point - assume it is drawn as last point of line preceding (including final line loop ender) 
+		for (int y = y1; y <= y2; y++)
 		{
 			int rx = int(round(x));
 			//draw our pixel, for reference
-			Console::write("drew a point at X %d, Y %d\n", rx, y);
+			//Console::write("drew a point at X %d, Y %d\n", rx, y);
 			//plotPixel((short)rx, (short)y);
 			
-			pushXPixel(rx, y);
+			pushXPixelBounds(rx, y);
 			
 			x += increment;
 		}
@@ -426,23 +469,79 @@ void FeatureSpace::generateBoundaryLine (int x1, int y1, int x2, int y2)
 // Push our given X coord into the list of X coords for Y.
 // -----------------------------------------------------------------------------------------
 
+void FeatureSpace::pushXPixelBounds(int rx, int y)
+{
+	list<int>::iterator i, j;
+	
+	//Console::write("y - yoffset = %d\n", y - yoffset);
+	if (boundsCoords[y - yoffset]->empty())
+	{
+		//Console::write("\t\tX list for Y = %d is empty\n", y);
+		list<int>* tempxlist = new list<int>;
+		boundsCoords[y - yoffset] = tempxlist;
+		boundsCoords[y - yoffset]->push_front(rx);
+		//Console::write("\t\t\tPushed X = %d to front of list for Y = %d\n", rx, y);
+	}
+	else
+	{
+		//Console::write("\t\tX list for Y = %d is not empty\n", y);
+		//Console::write("\t\t\tPerforming sorted insert.\n");
+		i = boundsCoords[y - yoffset]->begin();
+		while (i != boundsCoords[y - yoffset]->end())
+		{
+			if (*i < rx)
+			{
+				j = i;
+				j++;
+				if (j == boundsCoords[y - yoffset]->end())
+				{
+					//Console::write("\t\t\t\tX %d is largest yet for %d -- pushing %d to back\n", rx, y, rx);
+					boundsCoords[y - yoffset]->push_back(rx);
+					break;
+				}
+				else
+				{
+					i++;
+				}
+			}
+			else if (*i > rx)
+			{
+				//Console::write("\t\t\t\t%d  is greater than or equal to X = %d -- inserting %d\n", *i, rx, rx);
+				boundsCoords[y - yoffset]->insert(i, rx);
+				break;
+			}
+			else if (*i == rx)
+			{
+				Console::write("\t**Y = %d has duplicate X value for X = %d\n", y, rx);
+				Console::write("\t**List of X at Y is:\n");
+				for(list<int>::iterator iter = boundsCoords[y - yoffset]->begin(); iter != boundsCoords[y - yoffset]->end(); iter++)
+				{
+					Console::write("\t\tX %d\n", *iter);
+				}
+				break;
+			}
+		}
+	}
+}
+
+
 void FeatureSpace::pushXPixel(int rx, int y)
 {
 	list<int>::iterator i, j;
 	
-	//cout << "y - yoffset = " << y - yoffset << endl;
+	//Console::write("y - yoffset = %d\n", y - yoffset);
 	if (pixCoords[y - yoffset]->empty())
 	{
-		//cout << "\t\tX list for Y = " << y << " is empty" << endl;
+		//Console::write("\t\tX list for Y = %d is empty\n", y);
 		list<int>* tempxlist = new list<int>;
 		pixCoords[y - yoffset] = tempxlist;
 		pixCoords[y - yoffset]->push_front(rx);
-		//cout << "\t\t\tPushed X = " << rx << " to front of list for Y = " << y << endl;
+		//Console::write("\t\t\tPushed X = %d to front of list for Y = %d\n", rx, y);
 	}
 	else
 	{
-		//cout << "\t\tX list for Y = " << y << " is not empty." << endl;
-		//cout << "\t\t\tPerforming sorted insert." << endl;
+		//Console::write("\t\tX list for Y = %d is not empty\n", y);
+		//Console::write("\t\t\tPerforming sorted insert.\n");
 		i = pixCoords[y - yoffset]->begin();
 		while (i != pixCoords[y - yoffset]->end())
 		{
@@ -452,7 +551,7 @@ void FeatureSpace::pushXPixel(int rx, int y)
 				j++;
 				if (j == pixCoords[y - yoffset]->end())
 				{
-					//cout << "\t\t\t\tX " << rx << " is largest yet for " << y << " -- pushing " << rx << " to back" << endl;
+					//Console::write("\t\t\t\tX %d is largest yet for %d -- pushing %d to back\n", rx, y, rx);
 					pixCoords[y - yoffset]->push_back(rx);
 					break;
 				}
@@ -463,22 +562,20 @@ void FeatureSpace::pushXPixel(int rx, int y)
 			}
 			else if (*i > rx)
 			{
-				//cout << "\t\t\t\t" << *i << " is greater than or equal to X = " << rx << " -- inserting " << rx << endl;
+				//Console::write("\t\t\t\t%d  is greater than or equal to X = %d -- inserting %d\n", *i, rx, rx);
 				pixCoords[y - yoffset]->insert(i, rx);
 				break;
 			}
 			else if (*i == rx)
 			{
 				Console::write("\t**Y = %d has duplicate X value for X = %d\n", y, rx);
-				//pixCoords[y - yoffset]->insert(i, rx);
 				Console::write("\t**List of X at Y is:\n");
 				for(list<int>::iterator iter = pixCoords[y - yoffset]->begin(); iter != pixCoords[y - yoffset]->end(); iter++)
 				{
-					Console::write("\t\tX %d", *iter);
+					Console::write("\t\tX %d\n", *iter);
 				}
 				break;
 			}
-			
 		}
 	}
 }

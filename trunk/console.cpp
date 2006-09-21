@@ -18,7 +18,7 @@ void Console::open()
     AllocConsole();
     COORD mySize;
     mySize.X = 80;
-    mySize.Y = 2000;
+    mySize.Y = 10000;
     SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), mySize);
     //hstdout=GetStdHandle(STD_OUTPUT_HANDLE);        
     #endif
