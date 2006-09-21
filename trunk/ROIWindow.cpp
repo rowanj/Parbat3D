@@ -77,7 +77,7 @@ int ROIWindow::Create(HWND parent)
 	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM; 
 	lvc.iSubItem = 0;
 	lvc.pszText = "Show";
-	lvc.cx = rect.right-25;     // width of column in pixels
+	lvc.cx = rect.right-45;     // width of column in pixels
 	lvc.fmt = LVCFMT_CENTER; 
 	ListView_InsertColumn(hROIListBox, 0, &lvc);
 
@@ -498,9 +498,11 @@ void ROIWindow::addNewRoiToList(ROI *rCur,int newId)
     item.lParam=(LPARAM)rCur;
     ListView_InsertItem(hROIListBox,&item);    
 
+	// get coords of new row in list box
 	RECT rect;
 	ListView_GetItemRect(hROIListBox,newId,&rect,LVIR_BOUNDS);
-	int boxSize=rect.bottom-rect.top-2;
+	int rowHeight=rect.bottom-rect.top;
+	int boxSize=rowHeight-2;
 	
     // create colour button for the ROI
     HWND hColourButton = CreateWindowEx(
@@ -512,6 +514,15 @@ void ROIWindow::addNewRoiToList(ROI *rCur,int newId)
                 		Window::GetAppInstance(), NULL);
 
     roiColourButtonList.push_back(hColourButton);    // add the ROI colour button to the list	
+
+	// get width & height of scrollbox client area
+	GetClientRect(ROIscrollBox.GetHandle(),&rect);
+	
+	// re-size list view control to show all rows inside scroll box
+	int newListViewHeight=(roiColourButtonList.size()*rowHeight)+5;
+	if (newListViewHeight<rect.bottom-4)
+		newListViewHeight=rect.bottom-4;
+	MoveWindow(hROIListBox,0,0,rect.right-rect.left,newListViewHeight,true);
 }
 
 void ROIWindow::loadROI (ROIWindow* win) {
@@ -619,6 +630,20 @@ void ROIWindow::deleteROI (ROIWindow* win) {
             //GetWindowRect(colBox,&rect);
             //MoveWindow(colBox, 210-20, rect.top-boxSize+1, rect.right-rect.left, rect.bottom-rect.top, true);
         }
+
+		// get height of each row
+		ListView_GetItemRect(hROIListBox,1,&rect,LVIR_BOUNDS);
+		int rowHeight=rect.bottom-rect.top;
+
+		// get width & height of scrollbox client area
+		GetClientRect(ROIscrollBox.GetHandle(),&rect);
+		
+		// re-size list view control to show all rows inside scroll box
+		int newListViewHeight=(roiColourButtonList.size()*rowHeight)+5;
+		if (newListViewHeight<rect.bottom-4)
+			newListViewHeight=rect.bottom-4;
+		MoveWindow(hROIListBox,0,0,rect.right-rect.left,newListViewHeight,true);
+
         
         // remove the ROI from the set
         regionsSet->remove_region(name);
