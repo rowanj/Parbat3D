@@ -31,6 +31,7 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     band1 = b1;
     band2 = b2;
     band3 = b3;
+    tileSize = 512;
     Console::write("FeatureSpace -- Our LOD is %d\n", theLOD);
     Console::write("FeatureSpace -- Band 1 = %d, Band 2 = %d, Band 3 = %d\n", band1, band2, band3);
     
@@ -86,10 +87,13 @@ void FeatureSpace::getPixelData()
 	
     ROI* currentROI;
 	
-	fsTileset = new ImageTileSet(theLOD, image_handler->get_image_file(), 512, 128);
+	fsTileset = new ImageTileSet(theLOD, image_handler->get_image_file(), tileSize, 128);
+	LODfactor = fsTileset->get_LOD_factor();
+	LODwidth = fsTileset->get_LOD_width();
+	LODheight = fsTileset->get_LOD_height();
 	
-	Console::write("FeatureSpace -- Got past fsTileset creation\n");
-	assert(theROIs[0] != NULL);
+	Console::write("FeatureSpace -- LOD factor is %d\n", LODfactor);
+
 	if (!theROIs.empty()) //if there are some ROIs in the set
 	{
 		Console::write("FeatureSpace -- Got past theROIs empty check\n");
@@ -144,6 +148,8 @@ void FeatureSpace::getPixelData()
 	{
 		Console::write("FeatureSpace -- the ROIs set is empty\n");
 	}
+	
+	delete fsTileset;
 }
 
 // -----------------------------------------------------------------------------------------
@@ -153,7 +159,27 @@ void FeatureSpace::getPixelData()
 // -----------------------------------------------------------------------------------------
 void FeatureSpace::getPointData(ROIEntity* theEntity, ROI* theROI)
 {
+	vector<coords> theCoords = theEntity->get_points();
+	int x = theCoords[0].x;
+	int y = theCoords[0].y;
+	int fx = x / LODfactor;
+	int fy = y / LODfactor;
+	int fromTileXOrigin = (fx / tileSize) * tileSize;
+	int fromTileYOrigin = (fy / tileSize) * tileSize;
+	int tilex = fx % tileSize;
+	int tiley = fy % tileSize;
 	
+	Console::write("tile X orig = %d, tile Y orig = %d\n", fromTileXOrigin, fromTileYOrigin);
+	Console::write("fx = %d, fy = %d\n", fx, fy);
+	Console::write("x pos in tile = %d, y pos in tile = %d\n", tilex, tiley);
+	
+	char* grabbedData = fsTileset->get_tile_RGB_LOD(fx, fy, band1, band2, band3);
+	
+	/*char b1 = grabbedData[0];
+	char b2 = grabbedData[1];
+	char b3 = grabbedData[2];
+	
+	Console::write("Point data is:\n b1 = %d, b2 = %d, b3 = %d\n", b1, b2, b3);*/
 }
 
 // -----------------------------------------------------------------------------------------

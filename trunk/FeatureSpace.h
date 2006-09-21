@@ -67,6 +67,10 @@ class FeatureSpace:public Window, public GLContainerHandler
 		vector<myPoint> polyPoints;
 		ImageTileSet* fsTileset;
 		int theLOD;
+		int LODfactor;
+		int LODwidth;
+		int LODheight;
+		int tileSize;
 		bool onlyROIs;
 		int band1;
 		int band2;
@@ -74,6 +78,7 @@ class FeatureSpace:public Window, public GLContainerHandler
 		list<xListStruct*> pixelDataList;
         
         void getPixelData();
+        void getPointData(ROIEntity* theEntity, ROI* theROI);
 		void getRectData(ROIEntity* theEntity, ROI* theROI);
 		void getPolygonData(ROIEntity* theEntity, ROI* theROI);
 		void getPolygonVertices(ROIEntity* theEntity);
@@ -81,7 +86,6 @@ class FeatureSpace:public Window, public GLContainerHandler
 		void generateBoundaryLine(int x1, int y1, int x2, int y2);
 		void pushXPixelBounds(int rx, int y);
 		void pushXPixel(int rx, int y);
-		void getPointData(ROIEntity* theEntity, ROI* theROI);
     
     protected:
         GLView *glview;
