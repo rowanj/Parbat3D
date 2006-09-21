@@ -175,11 +175,11 @@ void FeatureSpace::getPointData(ROIEntity* theEntity, ROI* theROI)
 	
 	char* grabbedData = fsTileset->get_tile_RGB_LOD(fx, fy, band1, band2, band3);
 	
-	/*char b1 = grabbedData[0];
-	char b2 = grabbedData[1];
-	char b3 = grabbedData[2];
+	unsigned char b1 = (unsigned char)grabbedData[(fy * tileSize * 3) + (fx*3)];
+	unsigned char b2 = (unsigned char)grabbedData[(fy * tileSize * 3) + (fx*3) + 1];
+	unsigned char b3 = (unsigned char)grabbedData[(fy * tileSize * 3) + (fx*3) + 2];
 	
-	Console::write("Point data is:\n b1 = %d, b2 = %d, b3 = %d\n", b1, b2, b3);*/
+	Console::write("Point data is:\n b1 = %u, b2 = %u, b3 = %u\n", b1, b2, b3);
 }
 
 // -----------------------------------------------------------------------------------------
