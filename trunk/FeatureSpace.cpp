@@ -117,19 +117,19 @@ void FeatureSpace::getPixelData()
 						{
 							Console::write("FeatureSpace -- Current type is POINT\n");
 							//add data at point to data lists
-							vector<coords> theCoords = currentEntity->get_points();
-							//addPointToFSLists(theCoords[].x, theCoords[].y, currentROI);
+							getPointData(currentEntity, currentROI);
 						}
 						else if(theType == ROI_RECT) //ROI == rectangle
 						{
 							Console::write("FeatureSpace -- Current type is RECT\n");
 							//add data at all points in rectangle to data lists
-							getRectData(currentEntity);
+							getRectData(currentEntity, currentROI);
 						}
 						else //ROI == polygon
 						{
 							Console::write("FeatureSpace -- Current type is POLYGON\n");
-							getPolygonData(currentEntity);
+							//add data at all points in polygon to data lists
+							getPolygonData(currentEntity, currentROI);
 						}
 					}
 				}
@@ -147,12 +147,22 @@ void FeatureSpace::getPixelData()
 }
 
 // -----------------------------------------------------------------------------------------
+// getPointData
+// -----------------------------------------------------------------------------------------
+// Adds a point to the pix data lists
+// -----------------------------------------------------------------------------------------
+void FeatureSpace::getPointData(ROIEntity* theEntity, ROI* theROI)
+{
+	
+}
+
+// -----------------------------------------------------------------------------------------
 // getRectData
 // -----------------------------------------------------------------------------------------
 // Gets data for all points inside a given rect
 // -----------------------------------------------------------------------------------------
 
-void FeatureSpace::getRectData(ROIEntity* theEntity)
+void FeatureSpace::getRectData(ROIEntity* theEntity, ROI* theROI)
 {
 	
 }
@@ -168,7 +178,7 @@ void FeatureSpace::getRectData(ROIEntity* theEntity)
 // gathered, and x is a value between the pairs of x points stored for that y.
 // -----------------------------------------------------------------------------------------
 
-void FeatureSpace::getPolygonData(ROIEntity* theEntity)
+void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 {	
 	int totalPoints = 0;
 	maxy = 0;
@@ -580,10 +590,6 @@ void FeatureSpace::pushXPixel(int rx, int y)
 	}
 }
 
-void FeatureSpace::addPointToFSLists(int x, int y, ROI* theROI)
-{
-	
-}
 
 // create feature space window 
 int FeatureSpace::Create() {

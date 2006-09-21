@@ -22,6 +22,31 @@ typedef struct myPoint
 	int y;
 };
 
+typedef struct pixDataStruct
+{
+	int count;
+	ROI* pixROI;	
+};
+
+typedef struct zListStruct
+{
+	int z;
+	list<pixDataStruct*> pixData;
+};
+
+typedef struct yListStruct
+{
+	int y;
+	list<zListStruct*> zList;
+};
+
+typedef struct xListStruct
+{
+	int x;
+	list<yListStruct*> yList;
+};
+
+
 class FeatureSpace:public Window, public GLContainerHandler
 {
     private:
@@ -46,16 +71,17 @@ class FeatureSpace:public Window, public GLContainerHandler
 		int band1;
 		int band2;
 		int band3;
+		list<xListStruct*> pixelDataList;
         
         void getPixelData();
-		void getRectData(ROIEntity* theEntity);
-		void getPolygonData(ROIEntity* theEntity);
+		void getRectData(ROIEntity* theEntity, ROI* theROI);
+		void getPolygonData(ROIEntity* theEntity, ROI* theROI);
 		void getPolygonVertices(ROIEntity* theEntity);
 		void isTurningPoint(int first, int middle, int last);
 		void generateBoundaryLine(int x1, int y1, int x2, int y2);
 		void pushXPixelBounds(int rx, int y);
 		void pushXPixel(int rx, int y);
-		void addPointToFSLists(int x, int y, ROI* theROI);
+		void getPointData(ROIEntity* theEntity, ROI* theROI);
     
     protected:
         GLView *glview;
