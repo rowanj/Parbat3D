@@ -17,29 +17,42 @@ char* imageWindowTitle;
 int ImageWindow::Create(HWND parent)
 {
     
-    RECT rect;
-    int mx,my;
+    RECT desktopRect;
+    int mx,my,mwidth,mheight;
     const int IMAGE_WINDOW_WIDTH=700;
     const int IMAGE_WINDOW_HEIGHT=600;
     imageWindowTitle = new char[256];
 
     /* Get the width & height of the desktop window */
-    GetWindowRect(hDesktop,&rect);
+    GetWindowRect(hDesktop,&desktopRect);
 
     /* Get the stored window position or use defaults if there's a problem */
-    mx = atoi(settingsFile->getSetting("overview window", "x").c_str());
-	my = atoi(settingsFile->getSetting("overview window", "y").c_str());
-	if ((mx <= 0) || (mx >= rect.right))
-        mx = (rect.right /2) - ((IMAGE_WINDOW_WIDTH+OverviewWindow::OVERVIEW_WINDOW_WIDTH) /2);         /* default x position to center windows */
-    mx+=OverviewWindow::OVERVIEW_WINDOW_WIDTH;                                                          /* leave room for overview window */
-	       
-	if ((my <= 0) || (my >= rect.bottom))
-       my = (rect.bottom /2) - (IMAGE_WINDOW_HEIGHT/2);                                 /* default y position to center windows */
+    mx = atoi(settingsFile->getSetting("image window", "x").c_str());
+	my = atoi(settingsFile->getSetting("image window", "y").c_str());
+	mwidth = atoi(settingsFile->getSetting("image window", "width").c_str());
+	mheight = atoi(settingsFile->getSetting("image window", "height").c_str());
+	if ((mx < 0) || (mx > (desktopRect.right-50)))
+	{
+        mx = (desktopRect.right /2) - ((IMAGE_WINDOW_WIDTH+OverviewWindow::OVERVIEW_WINDOW_WIDTH) /2);         /* default x position to center windows */
+	    mx+=OverviewWindow::OVERVIEW_WINDOW_WIDTH;                                                          /* leave room for overview window */
+	}
+	
+	if ((my < 0) || (my > (desktopRect.bottom-50)))
+	{
+        my = (desktopRect.bottom /2) - (IMAGE_WINDOW_HEIGHT/2);                                 /* default y position to center windows */
+	}
+
+	// if image window is too big to fit on screen, set it to the default size
+	if ((mwidth>desktopRect.right)||(mheight>desktopRect.bottom))
+	{
+		mwidth=IMAGE_WINDOW_WIDTH;
+		mheight=IMAGE_WINDOW_HEIGHT;		
+	}
 
     /* create image window */
     if (!CreateWin(0, "Parbat3D Image Window", "Image Window",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
-	     mx, my, IMAGE_WINDOW_WIDTH, IMAGE_WINDOW_HEIGHT, parent, NULL))
+	     mx, my, mwidth, mheight, parent, NULL))
 	    return false;
 
     prevProc=SetWindowProcedure(&WindowProcedure);

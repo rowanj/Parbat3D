@@ -19,18 +19,34 @@
 int ToolWindow::Create(HWND)
 {
     TCITEM tie;  /* datastructure for tabs */
-    RECT rect;
+    RECT overviewRect,desktopRect;
+    int mx,my;
 
     const int SCROLLBAR_WIDTH=13;
     const int SCROLLBAR_TOP=25;
 
   
     /* Get Main Window Location for image window alignment*/
-    GetWindowRect(overviewWindow.GetHandle(),&rect);
+    GetWindowRect(overviewWindow.GetHandle(),&overviewRect);
     
+    /* Get the width & height of the desktop window */
+    GetWindowRect(hDesktop,&desktopRect);
+
+    /* Get the stored window position or use defaults if there's a problem */
+    mx = atoi(settingsFile->getSetting("tool window", "x").c_str());
+	my = atoi(settingsFile->getSetting("tool window", "y").c_str());
+	if ((mx < 0) || (mx > (desktopRect.right-50)))
+	{
+        mx = overviewRect.left;						// set default x position based on poisition of overview window
+	}
+	if ((my < 0) || (my > (desktopRect.bottom-50)))
+	{
+        my = overviewRect.bottom;					// set default y position based on poisition of overview window
+	}
+   
     /* The class is registered, lets create the program*/
     if (!CreateWin(0, "Parbat3D Tool Window", "Tools",
-           WS_POPUP+WS_CAPTION+WS_SYSMENU, rect.left, rect.bottom,
+           WS_POPUP+WS_CAPTION+WS_SYSMENU, mx, my,
            250, 340, imageWindow.GetHandle(), NULL))
         return false;
     setupDrawingObjects(GetHandle());
@@ -38,7 +54,8 @@ int ToolWindow::Create(HWND)
     
     stickyWindowManager.AddStickyWindow(this);  // make the window stick to others    
 
-      /* get width & height of tool window's client area (ie. inside window's border) */
+    /* get width & height of tool window's client area (ie. inside window's border) */
+    RECT rect;
     GetClientRect(GetHandle(),&rect);
 
     /* create tab control */
@@ -295,12 +312,17 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
         /* WM_CLOSE: system or user has requested to close the window/application */              
         case WM_CLOSE:
             /* don't destory this window, but make it invisible */            
+            CheckMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             ShowWindow(hwnd,SW_HIDE);
             return 0;
 
         /* WM_DESTORY: system is destroying our window */                
         case WM_DESTROY:
-            CheckMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
+            RECT tool_window_rect;
+            GetWindowRect(hwnd, &tool_window_rect);
+            settingsFile->setSetting("tool window", "x", tool_window_rect.left);
+            settingsFile->setSetting("tool window", "y", tool_window_rect.top);
+
             win->freeDrawingObjects();           
             stickyWindowManager.RemoveStickyWindow(win);
             break;

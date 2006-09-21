@@ -21,13 +21,27 @@ int OverviewWindow::Create(HWND parent)
 {
 
     RECT rect;
+    RECT imageRect;
+    int mx,my;
+
+    /* Get the width & height of the desktop window */
+    GetWindowRect(hDesktop,&rect);
     
     /* get co-ords of image window */
-    GetWindowRect(imageWindow.GetHandle(),&rect);
-        
+    GetWindowRect(imageWindow.GetHandle(),&imageRect);
+
+    /* Get the stored window position or use defaults if there's a problem */
+    mx = atoi(settingsFile->getSetting("overview window", "x").c_str());
+	my = atoi(settingsFile->getSetting("overview window", "y").c_str());
+	if ((mx < 0) || (mx > (rect.right-50)))
+        mx=imageRect.left-OverviewWindow::OVERVIEW_WINDOW_WIDTH;
+    
+	if ((my < 0) || (my > (rect.bottom-50)))
+		my=imageRect.top;
+      
     /* Create overview window */
     if (!CreateWin(WS_EX_APPWINDOW, "Parbat3D Overview Window", "Parbat3D",
-		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, rect.left-OverviewWindow::OVERVIEW_WINDOW_WIDTH, rect.top, OVERVIEW_WINDOW_WIDTH, 296,
+		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, mx, my, OVERVIEW_WINDOW_WIDTH, 296,
 		parent, NULL))
         return false;
     prevProc=SetWindowProcedure(&OverviewWindow::WindowProcedure);
