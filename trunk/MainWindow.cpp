@@ -33,7 +33,7 @@ int MainWindow::Create()
     return true;
 }
 
-// save a window's visibility state & hide it
+// save a window's visibility state & hide it (callback function)
 BOOL CALLBACK MainWindow::SaveAndHideWindow(HWND hwnd, LPARAM lparam)
 {
     MainWindow *win=(MainWindow*)lparam;
@@ -56,6 +56,12 @@ BOOL CALLBACK MainWindow::SaveAndHideWindow(HWND hwnd, LPARAM lparam)
 }
 
 
+// destroy all windows owned by the main window
+void MainWindow::DestroyAll()
+{
+    DestroyWindow(GetHandle());		// destory main window, which will destroy all others
+}
+
 void MainWindow::RestoreAll()
 {
     int i;
@@ -74,6 +80,8 @@ void MainWindow::MinimizeAll()
     EnumThreadWindows(GetCurrentThreadId(),(WNDENUMPROC)&SaveAndHideWindow,(LPARAM)&mainWindow);
 }
 
+
+
 /* handle events related to the main window */
 LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -83,22 +91,7 @@ LRESULT CALLBACK MainWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 
     switch (message) 
     {
-//		case WM_SIZE:
-        /* handle minimizing and restoring the child windows */            
-//		    switch(wParam)
-//		    {
-                
-//                case SIZE_RESTORED:
-//                    // restore windows to their previous state 
-//                    win->RestoreAll();
-//                    return 0;
 
-//                 case SIZE_MINIMIZED:
-//                    // record whether windows are currently visible & then hide them all
-//                    win->MinimizeAll(); 
-//					return 0;
-//		    }    
-//  	        return 0;
        
     }
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    

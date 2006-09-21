@@ -22,6 +22,7 @@ class MainWindow:public Window
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
     void RestoreAll();      /* restore all windows back to their original state */
     void MinimizeAll();     /* hide all windows owned by the current thread */
+    void DestroyAll();		/* destroy all windows owned by current thread */
 };
 
 

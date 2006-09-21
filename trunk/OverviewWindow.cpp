@@ -48,21 +48,7 @@ int OverviewWindow::Create(HWND parent)
    
     /* Make the window visible on the screen */
     Show();
-    
-    /* Register Short cut keys */
-    // Toggle Tool Window
-	//RegisterHotKey(GetHandle(), 110, 0, 'T');
-	// Toggle Image Window
-	//RegisterHotKey(GetHandle(), 111, 0, 'I');
-	// Toggle ROI Window
-	//RegisterHotKey(GetHandle(), 112, 0, 'R');
-	// Toggle Preferences Window
-	//RegisterHotKey(GetHandle(), 113, 0, 'P');
-	// Toggle Contrast Stretch Window
-	//RegisterHotKey(GetHandle(), 114, 0, 'C');
-    // Help shortcut key
-	//RegisterHotKey(GetHandle(), 115, 0, VK_F1);
-    
+       
     return true;
 }
 
@@ -190,17 +176,6 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 		    }    
   	        return 0;
 
-                   
-        /* WM_SYSCOMMAND: a system-related command associated with window needs to be executed */    
-        case WM_SYSCOMMAND:
-            /* check if user has tried to minimize the overview window */
-            if (wParam==SC_MINIMIZE)
-            {
-                /* cause the main window to minimised instead */
-                //ShowWindow(mainWindow.GetHandle(),SW_MINIMIZE);
-                //return 0;
-            }            
-            break;
                      
         /* WM_CLOSE: system or user has requested to close the window/application */
         case WM_CLOSE:
@@ -210,6 +185,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     return 0;
                 closeFile();
 			}
+			mainWindow.DestroyAll();
 			
 			/* destroy all the windows that have been created */
 			/*
@@ -226,7 +202,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 			*/
 			
             /* destroy this window */
-            DestroyWindow( hwnd );
+            //DestroyWindow( hwnd );
             return 0;
             
         /* WM_DESTROY: window is being destroyed */

@@ -87,3 +87,14 @@ void Console::write(int msg)
     WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE),message,strlen(message),(DWORD*)&written,NULL);
     #endif
 }
+
+// wait for user to press a enter in the console window
+void Console::waitForEnter()
+{
+	#if TMP_USE_CONSOLE
+	char buffer[1];
+	DWORD bytesRead;
+	ReadConsole(GetStdHandle(STD_INPUT_HANDLE),buffer,1,&bytesRead,0);
+	#endif
+}
+

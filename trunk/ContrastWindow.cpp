@@ -208,11 +208,11 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
         case WM_CLOSE:
             /* don't destroy this window, but make it invisible */
             ShowWindow(hwnd,SW_HIDE);
+            CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             return 0;
 
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
-            CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             break;
             
     }

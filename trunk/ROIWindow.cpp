@@ -401,11 +401,11 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
         case WM_CLOSE:
             /* don't destroy this window, but make it invisible */
             ShowWindow(hwnd,SW_HIDE);
+            CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             return 0;
 
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
-            CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             break;
     }
     // call next window procedure in chain

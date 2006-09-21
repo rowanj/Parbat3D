@@ -413,17 +413,16 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
             
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
+//			Console::write("ImageWindow WM_DESTROY");
             /* save the image window attributes */
-            RECT *image_window_rect;
-            GetWindowRect(hwnd, image_window_rect);
-            if (image_window_rect != NULL) {
-                settingsFile->setSetting("image window", "x", image_window_rect->left);
-                settingsFile->setSetting("image window", "y", image_window_rect->top);
-                settingsFile->setSetting("image window", "width", (image_window_rect->right-image_window_rect->left));
-                settingsFile->setSetting("image window", "height", (image_window_rect->bottom-image_window_rect->top));
+            RECT image_window_rect;
+            GetWindowRect(hwnd, &image_window_rect);
+            settingsFile->setSetting("image window", "x", image_window_rect.left);
+            settingsFile->setSetting("image window", "y", image_window_rect.top);
+            settingsFile->setSetting("image window", "width", (image_window_rect.right-image_window_rect.left));
+            settingsFile->setSetting("image window", "height", (image_window_rect.bottom-image_window_rect.top));
     //            settingsFile->setSetting("image window", "maximised", 0);
     //            settingsFile->setSetting("image window", "snapped", 0);
-            }
             delete[] imageWindowTitle;
             break;
             

@@ -20,6 +20,7 @@ class Console
     static void write(string *msg);
     static void write(int msg);
     static void writeRECT(uint *rect);
+    static void waitForEnter();
 };
 
 

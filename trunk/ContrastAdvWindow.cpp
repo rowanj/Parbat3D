@@ -408,12 +408,12 @@ LRESULT CALLBACK ContrastAdvWindow::WindowProcedure(HWND hwnd, UINT message, WPA
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
             /* don't destroy this window, but make it invisible */
+            CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             ShowWindow(hwnd,SW_HIDE);
             return 0;
 
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
-            CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             break;
             
     }
