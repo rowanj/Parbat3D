@@ -345,7 +345,14 @@ void ROIWindow::OnListItemChanged(NMLISTVIEW* pnml)
 {
 	if ((pnml->uChanged&LVIF_STATE)!=0)		// check if state of item has changed
 	{
-		//Console::write("ROIWindow LVN_ITEMCHANGED\n\tstate changed, id=%d oldState=%d newState=%d uChanged=%d uChangedAnded=%d newStateAnded=%d\n",pnml->iItem,pnml->uOldState,pnml->uNewState,pnml->uChanged,pnml->uChanged&LVIF_STATE,pnml->uNewState&LVIS_STATEIMAGEMASK);
+		// get roi object associated with item
+		ROI *roi;
+		LVITEM item;
+		item.mask=LVIF_PARAM;
+		item.iItem=pnml->iItem;
+		item.iSubItem=0;
+		ListView_GetItem(roiWindow.hROIListBox,&item);			
+		roi=(ROI*)item.lParam;		
 		
 		// get check box state (1=unticked, 2=ticked)
 		int checkBoxState=(pnml->uNewState&LVIS_STATEIMAGEMASK)>>12;			
@@ -355,12 +362,14 @@ void ROIWindow::OnListItemChanged(NMLISTVIEW* pnml)
 			
 			case 2:
 				// show ROI
-				Console::write("List view item (id=%d) ticked\n",pnml->iItem);
+				roi->set_active(true);
+				imageWindow.Repaint();
 				break;
 				
 			case 1:
 				// hide ROI
-				Console::write("List view item (id=%d) unticked\n",pnml->iItem);						
+				roi->set_active(false);
+				imageWindow.Repaint();
 				break;							
 		}
 	
