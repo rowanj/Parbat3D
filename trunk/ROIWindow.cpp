@@ -340,18 +340,53 @@ LRESULT CALLBACK ROIWindow::ROIListViewProcedure(HWND hwnd, UINT message, WPARAM
     return CallWindowProc(prevListViewProc,hwnd,message,wParam,lParam);	
 }
 
-/* All messages/events related to the ROI window (or it's controls) are sent to this procedure */
+// handle list item changed notification
+void ROIWindow::OnListItemChanged(NMLISTVIEW* pnml)
+{
+	if ((pnml->uChanged&LVIF_STATE)!=0)		// check if state of item has changed
+	{
+		//Console::write("ROIWindow LVN_ITEMCHANGED\n\tstate changed, id=%d oldState=%d newState=%d uChanged=%d uChangedAnded=%d newStateAnded=%d\n",pnml->iItem,pnml->uOldState,pnml->uNewState,pnml->uChanged,pnml->uChanged&LVIF_STATE,pnml->uNewState&LVIS_STATEIMAGEMASK);
+		
+		// get check box state (1=unticked, 2=ticked)
+		int checkBoxState=(pnml->uNewState&LVIS_STATEIMAGEMASK)>>12;			
+	
+		switch (checkBoxState)
+		{
+			
+			case 2:
+				// show ROI
+				Console::write("List view item (id=%d) ticked\n",pnml->iItem);
+				break;
+				
+			case 1:
+				// hide ROI
+				Console::write("List view item (id=%d) unticked\n",pnml->iItem);						
+				break;							
+		}
+	
+	}
+}
+
+/* handle messages/events related to the ROI window */
 LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static POINT moveMouseOffset;     /* mouse offset relative to window, used for snapping */
-    //static POINT sizeMousePosition;   /* mouse position, used for sizing window */
-    //static RECT  sizeWindowPosition;  /* window position, used for sizing window */
-    static RECT rect;                 /* for general use */
+    RECT rect;                 /* for general use */
+	NMHDR *pnmh;
     
     ROIWindow* win=(ROIWindow*)Window::GetWindowObject(hwnd);
     
     switch (message)                  /* handle the messages */
     {
+		case WM_NOTIFY:
+			pnmh=(NMHDR*)lParam;
+			switch(pnmh->code)
+			{
+				case LVN_ITEMCHANGED:
+					win->OnListItemChanged((NMLISTVIEW*)pnmh);
+					break;
+			}
+			break;
+			
         case WM_COMMAND:
             /* Open Button */
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)

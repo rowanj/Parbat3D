@@ -95,12 +95,13 @@ class ROIWindow:public Window
             other colour pickers up one position.
         */
         void deleteROI (ROIWindow*);
-        
-        
+               
         void updateROIList (ROIWindow*);
+        
         
         static LRESULT CALLBACK ROIListViewProcedure(HWND, UINT, WPARAM, LPARAM);
         static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+        void OnListItemChanged(NMLISTVIEW* pnml);        
         
         static void ChangeROIColour(HWND hbutton);
 
