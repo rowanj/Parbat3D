@@ -55,13 +55,14 @@ class Window
     static void CreateTooltip (HWND hwnd,char *text);   // create a tooltip message when the user moves the mouse over a control
 
     /* window api wrappers */
-    inline void Destroy() {DestroyWindow(hwindow);};
-    inline void Show() {ShowWindow(hwindow,SW_SHOW);};
-    inline void Hide() {ShowWindow(hwindow,SW_HIDE);};    
-    inline void SetDefaultCursor(HCURSOR hcur) {SetClassLong(hwindow,GCL_HCURSOR,(long)hcur);};
-    inline void SetBackgroundBrush(HBRUSH hbrush) {SetClassLong(hwindow,GCL_HBRBACKGROUND,(long)hbrush); hBackgroundBrush=hbrush;};
-    inline static void SetBackgroundBrush(HWND hwin,HBRUSH hbrush) {SetClassLong(hwin,GCL_HBRBACKGROUND,(long)hbrush);};    
-    inline void Repaint() {InvalidateRect(hwindow,0,false); UpdateWindow(hwindow);};
+    void Destroy() {DestroyWindow(hwindow);};
+    void Show() {ShowWindow(hwindow,SW_SHOW);};
+    void Hide() {ShowWindow(hwindow,SW_HIDE);};    
+    void SetDefaultCursor(HCURSOR hcur) {SetClassLong(hwindow,GCL_HCURSOR,(long)hcur);};
+    void SetBackgroundBrush(HBRUSH hbrush) {SetClassLong(hwindow,GCL_HBRBACKGROUND,(long)hbrush); hBackgroundBrush=hbrush;};
+    static void SetBackgroundBrush(HWND hwin,HBRUSH hbrush) {SetClassLong(hwin,GCL_HBRBACKGROUND,(long)hbrush);};    
+    void Repaint() {InvalidateRect(hwindow,0,false); UpdateWindow(hwindow);};
+    static HWND GetParentHandle(HWND hwnd) {return (HWND)GetWindowLong(hwnd,GWL_HWNDPARENT);};	// Get Handle To Parent Window From a Handle To a Child Window 
 };
 
 

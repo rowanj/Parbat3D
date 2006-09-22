@@ -146,6 +146,15 @@ LRESULT CALLBACK ScrollBox::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
     ScrollBox* win=(ScrollBox*)Window::GetWindowObject(hwnd);
     switch (message)
     {
+		case WM_NOTIFY:
+			// forward notification messages to scrollbox's parent window
+			static HWND parent=GetParentHandle(hwnd);
+			if (parent!=NULL)
+			{
+				SendMessage(parent,message,wParam,lParam);
+			}
+			break;
+			
         case WM_SHOWWINDOW:
             win->UpdateScrollBar();
             break;
