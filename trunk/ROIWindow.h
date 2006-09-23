@@ -2,8 +2,8 @@
 #define _PARBAT_ROIWINDOW_H
 
 #include <vector>
-
 #include "Window.h"
+#include <Commctrl.h>
 
 class ROIWindow:public Window
 {
