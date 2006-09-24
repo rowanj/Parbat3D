@@ -46,7 +46,6 @@ typedef struct xListStruct
 	list<yListStruct*> yList;
 };
 
-
 class FeatureSpace:public Window, public GLContainerHandler
 {
     private:
@@ -86,7 +85,12 @@ class FeatureSpace:public Window, public GLContainerHandler
 		void generateBoundaryLine(int x1, int y1, int x2, int y2);
 		void pushXPixelBounds(int rx, int y);
 		void pushXPixel(int rx, int y);
-    
+		void fsListAdd(int x, int y, int z, ROI* theROI);
+    	xListStruct* createNewXList(int x, int y, int z, ROI* theROI);
+    	yListStruct* createNewYList(int y, int z, ROI* theROI);
+    	zListStruct* createNewZList(int z, ROI* theROI);
+    	pixDataStruct* createNewPixDataStruct(ROI* theROI);
+    	
     protected:
         GLView *glview;
         GLContainer *glContainer;

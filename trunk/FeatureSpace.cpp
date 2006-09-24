@@ -150,6 +150,30 @@ void FeatureSpace::getPixelData()
 	}
 	
 	delete fsTileset;
+	
+	//print out our lists
+	list<xListStruct*>::iterator xRun;
+	for(xRun = pixelDataList.begin(); xRun != pixelDataList.end(); xRun++)
+	{
+		Console::write("\n-----\nFinal points readout:\nAt X %d:\n", (*xRun)->x);
+		list<yListStruct*>::iterator yRun;
+		for(yRun = (*xRun)->yList.begin(); yRun!= (*xRun)->yList.end(); yRun++)
+		{
+			Console::write("\tAt Y %d:\n", (*yRun)->y);
+			list<zListStruct*>::iterator zRun;
+			for(zRun = (*yRun)->zList.begin(); zRun!= (*yRun)->zList.end(); zRun++)
+			{
+				Console::write("\t\tAt Z %d:\n", (*zRun)->z);
+				list<pixDataStruct*>::iterator pixRun;
+				int ROInumber = 1;
+				for(pixRun = (*zRun)->pixData.begin(); pixRun!= (*zRun)->pixData.end(); pixRun++)
+				{
+					Console::write("\t\t\tROI %d has %d points of this data value\n", ROInumber, (*pixRun)->count);
+					ROInumber++;
+				}
+			}
+		}
+	}
 }
 
 // -----------------------------------------------------------------------------------------
@@ -179,7 +203,7 @@ void FeatureSpace::getPointData(ROIEntity* theEntity, ROI* theROI)
 	unsigned char b2 = (unsigned char)grabbedData[(fy * tileSize * 3) + (fx*3) + 1];
 	unsigned char b3 = (unsigned char)grabbedData[(fy * tileSize * 3) + (fx*3) + 2];
 	
-	Console::write("Point data is:\n b1 = %u, b2 = %u, b3 = %u\n", b1, b2, b3);
+	fsListAdd(b1, b2, b3, theROI);
 }
 
 // -----------------------------------------------------------------------------------------
@@ -500,9 +524,10 @@ void FeatureSpace::generateBoundaryLine (int x1, int y1, int x2, int y2)
 
 
 // -----------------------------------------------------------------------------------------
-// pushXPixel
+// pushXPixelBounds
 // -----------------------------------------------------------------------------------------
-// Push our given X coord into the list of X coords for Y.
+// Push our given X coord into the list of X coords for Y -- tailored for the
+// boundary points vector.
 // -----------------------------------------------------------------------------------------
 
 void FeatureSpace::pushXPixelBounds(int rx, int y)
@@ -560,6 +585,11 @@ void FeatureSpace::pushXPixelBounds(int rx, int y)
 	}
 }
 
+// -----------------------------------------------------------------------------------------
+// pushXPixel
+// -----------------------------------------------------------------------------------------
+// Push our given X coord into the list of X coords for Y.
+// -----------------------------------------------------------------------------------------
 
 void FeatureSpace::pushXPixel(int rx, int y)
 {
@@ -614,6 +644,212 @@ void FeatureSpace::pushXPixel(int rx, int y)
 			}
 		}
 	}
+}
+
+
+// -----------------------------------------------------------------------------------------
+// fsListAdd
+// -----------------------------------------------------------------------------------------
+// add our new point to our list of x, y and z locations for points in the Feature Space
+// -----------------------------------------------------------------------------------------
+
+void FeatureSpace::fsListAdd(int x, int y, int z, ROI* theROI)
+{
+	list<xListStruct*>::iterator currentX;
+	list<xListStruct*>::iterator nextX;
+	
+	Console::write("Adding X %d, Y %d, Z %d to the fsLists\n", x, y, z);
+	
+	if (!pixelDataList.empty())
+	{
+		Console::write("Pix Data List exists -- adding\n");
+		for(currentX = pixelDataList.begin(); currentX != pixelDataList.end(); currentX++)
+		{
+			nextX = currentX;
+			nextX++;
+			if(nextX == pixelDataList.end())
+			{
+				Console::write("\tAdding X %d at end of list\n", x);
+				nextX = pixelDataList.insert(nextX, createNewXList(x, y, z, theROI));
+				break;
+			}
+			else if ((*currentX)->x < x && (*nextX)->x > x)
+			{
+				Console::write("\tAdding X %d in list\n", x);
+				nextX = pixelDataList.insert(nextX, createNewXList(x, y, z, theROI));
+				break;
+			}
+			else if ((*currentX)->x == x)
+			{
+				xListStruct* theXList = *currentX;
+				list<yListStruct*>::iterator currentY;
+				list<yListStruct*>::iterator nextY;
+				
+				if(!theXList->yList.empty())
+				{
+					Console::write("\t\tY List at X %d exists -- adding\n", x);
+					for(currentY = theXList->yList.begin(); currentY != theXList->yList.end(); currentY++)
+					{
+						nextY = currentY;
+						nextY++;
+						if(nextY == theXList->yList.end())
+						{
+							Console::write("\t\tAdding Y %d at end of list\n", y);
+							nextY = theXList->yList.insert(nextY, createNewYList(y, z, theROI));
+							break;
+						}
+						else if ((*currentY)->y < y && (*nextY)->y > y)
+						{
+							Console::write("\t\tAdding Y %d in list\n", y);
+							nextY = theXList->yList.insert(nextY, createNewYList(y, z, theROI));
+							break;
+						}
+						else if ((*currentY)->y == y)
+						{
+							yListStruct* theYList = *currentY;
+							list<zListStruct*>::iterator currentZ;
+							list<zListStruct*>::iterator nextZ;
+							
+							if(!theYList->zList.empty())
+							{
+								Console::write("\t\t\tZ List at Y %d exists -- adding\n", y);
+								for(currentY = theXList->yList.begin(); currentY != theXList->yList.end(); currentY++)
+								{
+									nextZ = currentZ;
+									nextZ++;
+									if(nextZ == theYList->zList.end())
+									{
+										Console::write("\t\t\tAdding Z %d at end of list\n", z);
+										nextZ = theYList->zList.insert(nextZ, createNewZList(z, theROI));
+										break;
+									}
+									else if ((*currentZ)->z < z && (*nextZ)->z > z)
+									{
+										Console::write("\t\t\tAdding Z %d in list\n", z);
+										nextZ = theYList->zList.insert(nextZ, createNewZList(z, theROI));
+										break;
+									}
+									else if ((*currentZ)->z == z)
+									{
+										zListStruct* theZList = *currentZ;
+										list<pixDataStruct*>::iterator currentPixData;
+										list<pixDataStruct*>::iterator nextPixData;
+										
+										Console::write("\t\t\tFound Z %d -- checking ROIs\n", y);
+										for(currentPixData = theZList->pixData.begin(); currentPixData != theZList->pixData.end(); currentPixData++)
+										{
+											nextPixData = currentPixData;
+											nextPixData++;
+											if(nextPixData == theZList->pixData.end() && (*currentPixData)->pixROI != theROI)
+											{
+												Console::write("\t\t\t\tNo ROI of this type here -- adding\n");
+												nextPixData = theZList->pixData.insert(nextPixData, createNewPixDataStruct(theROI));
+												break;
+											}
+											else if((*currentPixData)->pixROI == theROI)
+											{
+												Console::write("\t\t\t\tFound ROI -- incrementing count\n");
+												(*currentPixData)->count++;
+												break;
+											}
+										}
+									}
+								}
+							}
+							else
+							{
+								Console::write("\t\t\tZ List at Y %d doesn't exist -- creating\n", y);
+								currentZ = theYList->zList.begin();
+								currentZ = theYList->zList.insert(currentZ, createNewZList(z, theROI));
+							}
+						}
+					}
+				}
+				else
+				{
+					Console::write("\t\tY List at X %d doesn't exist -- creating\n", z);
+					currentY = theXList->yList.begin();
+					currentY = theXList->yList.insert(currentY, createNewYList(y, z, theROI));
+				}
+			}
+		}
+	}
+	else
+	{
+		Console::write("\tX list doesn't exist -- creating\n", z);
+		currentX = pixelDataList.begin();
+		currentX = pixelDataList.insert(currentX, createNewXList(x, y, z, theROI));
+	}
+}
+
+
+// -----------------------------------------------------------------------------------------
+// createNewXList
+// -----------------------------------------------------------------------------------------
+// create a new list of xListStruct, with appropriate x value. Will create all lower lists
+// by calling appropriate "createNew*" method.
+// -----------------------------------------------------------------------------------------
+
+xListStruct* FeatureSpace::createNewXList(int x, int y, int z, ROI* theROI)
+{
+	Console::write("\tConstructing new X list for X %d, Y %d, Z %d\n", x, y, z);
+	xListStruct* newXListStruct = new xListStruct;
+	newXListStruct->x = x;
+	list<yListStruct*>::iterator currentYList = newXListStruct->yList.begin();
+	currentYList = newXListStruct->yList.insert(currentYList, createNewYList(y, z, theROI));
+	return newXListStruct;
+}
+
+
+// -----------------------------------------------------------------------------------------
+// createNewYList
+// -----------------------------------------------------------------------------------------
+// create a new list of yListStruct, with appropriate y value. Will create all lower lists
+// by calling appropriate "createNew*" method.
+// -----------------------------------------------------------------------------------------
+
+yListStruct* FeatureSpace::createNewYList(int y, int z, ROI* theROI)
+{
+	Console::write("\t\tConstructing new Y list for Y %d, Z %d\n", y, z);
+	yListStruct* newYListStruct = new yListStruct;
+	newYListStruct->y = y;
+	list<zListStruct*>::iterator currentZList = newYListStruct->zList.begin();
+	currentZList = newYListStruct->zList.insert(currentZList, createNewZList(z, theROI));
+	return newYListStruct;	
+}
+
+
+// -----------------------------------------------------------------------------------------
+// createNewZList
+// -----------------------------------------------------------------------------------------
+// create a new list of zListStruct, with appropriate z value. Will create the lower level
+// pixDataStruct* list by calling createNewPixDataList method.
+// -----------------------------------------------------------------------------------------
+
+zListStruct* FeatureSpace::createNewZList(int z, ROI* theROI)
+{
+	Console::write("\t\t\tConstructing new Z list for Z %d\n", z);
+	zListStruct* newZListStruct = new zListStruct;
+	newZListStruct->z = z;
+	list<pixDataStruct*>::iterator currentPixData = newZListStruct->pixData.begin();
+	currentPixData = newZListStruct->pixData.insert(currentPixData, createNewPixDataStruct(theROI));
+	return newZListStruct;	
+}
+
+
+// -----------------------------------------------------------------------------------------
+// createNewPixDataStruct
+// -----------------------------------------------------------------------------------------
+// create a new pixDataStruct, with appropriate count and ROI.
+// -----------------------------------------------------------------------------------------
+
+pixDataStruct* FeatureSpace::createNewPixDataStruct(ROI* theROI)
+{
+	Console::write("\t\t\t\tConstructing new pix data list\n");
+	pixDataStruct* newPixData = new pixDataStruct;
+	newPixData->count = 1;
+	newPixData->pixROI = theROI;
+	return newPixData;
 }
 
 
