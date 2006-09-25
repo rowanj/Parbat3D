@@ -282,7 +282,7 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                 DeleteObject(win->hNormalFont);
                 DeleteObject(win->hBoldFont);      
 				DeleteObject(win->hHeadingFont);
-				DeleteObject(win->hBackgroundBrush);          
+				//DeleteObject(win->hBackgroundBrush);          
                 win->hwindow=NULL;
                 break;
         }
