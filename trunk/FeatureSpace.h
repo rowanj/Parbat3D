@@ -3,6 +3,7 @@
 
 #include <list>
 #include <vector>
+#include <hash_map>
 #include "console.h"
 #include "Window.h"
 #include "GLView.h"
