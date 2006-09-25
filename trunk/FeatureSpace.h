@@ -3,7 +3,8 @@
 
 #include <list>
 #include <vector>
-#include <hash_map>
+#include <ext/hash_map>
+#include <ext/hash_fun.h>
 #include "console.h"
 #include "Window.h"
 #include "GLView.h"
