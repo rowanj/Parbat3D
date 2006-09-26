@@ -101,8 +101,10 @@ class ROISet {
         /**
             Sets the Region of Interest to work on, based on its name. The
             region must already exist in the set otherwise nothing happens.
+            Returns the current Region of Interest that has just been set. If
+            a new current was not set then NULL is returned.
         */
-        void set_current (string);
+        ROI* set_current (string);
         
 
         

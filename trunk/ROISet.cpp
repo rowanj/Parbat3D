@@ -121,14 +121,15 @@ ROI* ROISet::new_region (string n) {
 }
 
 
-void ROISet::set_current (string c) {
+ROI* ROISet::set_current (string c) {
     for (int i=0; i<regions.size(); i++) {
         ROI* r = regions.at(i);
         if (r->get_name() == c) {
             current_region = r;
-            break;
+            return current_region;
         }
     }
+    return NULL;
 }
 
 

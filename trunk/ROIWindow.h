@@ -38,6 +38,8 @@ class ROIWindow:public Window
         
         static COLORREF customColours[];
         
+        static string *editingROIName;
+        
         /**
             Returns the number of ROI checkboxes that have been checked.
         */
@@ -49,6 +51,11 @@ class ROIWindow:public Window
             nothing is selected.
         */
         int getSelectedItemIndex ();
+        
+        /**
+            Returns the text of the specified item in the ROI list.
+        */
+        string getItemText (int i);
         
         /**
             Returns the text of the selected item in the list. The text is the

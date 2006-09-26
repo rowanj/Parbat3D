@@ -27,6 +27,8 @@ vector<HWND> ROIWindow::roiColourButtonList;
 
 WNDPROC ROIWindow::prevListViewProc;
 
+string *ROIWindow::editingROIName;
+
 // array to store custom colour values as choosen by user (all initilised to grey)
 COLORREF ROIWindow::customColours[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
@@ -379,23 +381,62 @@ void ROIWindow::OnListItemChanged(NMLISTVIEW* pnml)
 /* handle messages/events related to the ROI window */
 LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    RECT rect;                 /* for general use */
-	NMHDR *pnmh;
+    RECT rect;           /* for general use */
+    NMHDR *nmhdr;        /* structure used for WM_NOTIFY events */
+    //LPNMHDR pnmh;
+    LPNMLVDISPINFO pdi;
+    LVITEM lvi;
+    int temp_int;        // general use int
+    string *temp_str;    // general use string pointer
+    ROI* roi;            // general use ROI pointer
+    
     
     ROIWindow* win=(ROIWindow*)Window::GetWindowObject(hwnd);
     
-    switch (message)                  /* handle the messages */
-    {
+    switch (message) {   /* handle the messages */
 		case WM_NOTIFY:
-			pnmh=(NMHDR*)lParam;
-			switch(pnmh->code)
-			{
+            nmhdr = (NMHDR*) lParam;
+            switch (nmhdr->code) {
 				case LVN_ITEMCHANGED:
-					win->OnListItemChanged((NMLISTVIEW*)pnmh);
+					win->OnListItemChanged((NMLISTVIEW*) nmhdr);
 					break;
-			}
+				
+				
+                case LVN_BEGINLABELEDIT:
+                    if (regionsSet->editing())
+                        return true;   // don't allow name changes when an entity is being defined
+                    else {
+                        pdi = (LPNMLVDISPINFO) lParam;
+                        lvi = pdi->item;
+                        temp_int = lvi.iItem;                                     // get the index of item to be edited
+                        editingROIName = new string(win->getItemText(temp_int));  // get the name of the item at the index
+                        return false;  // returning false allows text editing, true does not
+                    }
+                
+                case LVN_ENDLABELEDIT:
+                    pdi = (LPNMLVDISPINFO) lParam;
+                    lvi = pdi->item;
+                    
+                    // make sure the text has been changed and a name was being edited
+                    if (lvi.pszText!=NULL && editingROIName!=NULL) {
+                        temp_int = lvi.iItem;                                // get the index of item being edited
+                        temp_str = new string(lvi.pszText);                  // get the new name
+                        
+                        Console::write("editing\n");
+                        // make sure the new name has not already been used
+                        if (!(regionsSet->name_exists(*temp_str))) {
+                            Console::write("name fine\n");
+                            roi = regionsSet->set_current(*editingROIName);  // find the ROI based on the original name
+                            roi->set_name(*temp_str);                        // set the new name to the ROI
+                            return true;                                     // indicates to accept the new name
+                        } else
+                            return false;                                    // indicates to revert to the original name
+                    } else
+                        return false;                                        // indicates to revert to the original name
+            }
 			break;
-			
+		
+		
         case WM_COMMAND:
             /* Open Button */
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
@@ -432,7 +473,8 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             ROIscrollBox.UpdateScrollBar();
             
 			return 0;
-				
+		
+		
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
             if (wParam)
@@ -489,24 +531,31 @@ int ROIWindow::getSelectedItemIndex () {
 
 string ROIWindow::getSelectedItemText () {
     int items_in_list = SendMessage(hROIListBox, LVM_GETITEMCOUNT, 0, 0);
-    char buffer[256];
-    string *name = new string("");
+    string name;
     
     for (int i=0; i<items_in_list; i++) {
         if (SendMessage(hROIListBox, LVM_GETITEMSTATE, i, LVIS_SELECTED) == LVIS_SELECTED) {
-            LVITEM lvitem;
-            lvitem.mask = LVIF_TEXT;
-            lvitem.iItem = i;
-            lvitem.pszText = buffer;
-            lvitem.cchTextMax = 256;
-            lvitem.iSubItem = 0;
-            
-            ListView_GetItem(hROIListBox, &lvitem);
-            name = new string(buffer);
-            
+            name = getItemText(i);
             break;
         }
     }
+    
+    return name;
+}
+
+string ROIWindow::getItemText (int i) {
+    char buffer[256];
+    string *name = new string("");
+    
+    LVITEM lvitem;
+    lvitem.mask = LVIF_TEXT;
+    lvitem.iItem = i;
+    lvitem.pszText = buffer;
+    lvitem.cchTextMax = 256;
+    lvitem.iSubItem = 0;
+    
+    ListView_GetItem(hROIListBox, &lvitem);
+    name = new string(buffer);
     
     return *name;
 }
