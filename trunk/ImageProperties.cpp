@@ -71,10 +71,14 @@ const char* ImageProperties::getFileName(void)
 	
 	name = imageFileName;
 	position = name.find_last_of("\\");
+	assert(position < name.length());
 	truncName = name.substr(position + 1, name.length() - position);
 	finalName = truncName.c_str();
 	
-    return finalName;
+	// !! This is returning a dynamically-allocated array cast to const (causes access violation) - Rowan
+	//    return finalName;
+	
+	return imageFileName;
 }    
 
 
