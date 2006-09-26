@@ -100,10 +100,12 @@ class FeatureSpace:public Window, public GLContainerHandler
         HWND hRebarControl;
         int Create();
         void OnResize();    
-        
+       
+        virtual void PaintGLContainer();            // draw contents of GLContainer with opengl
+		virtual void OnGLContainerKeyPress(int virtualKey);       
+                
     public:
         FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3);      // create & display new feature space window
-        virtual void PaintGLContainer();            // draw contents of GLContainer with opengl
 };
 
 extern ROISet *regionsSet;

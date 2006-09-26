@@ -49,27 +49,65 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     Show();
 }
 
+// handle key press when GL container is focused
+void FeatureSpace::OnGLContainerKeyPress(int virtualKey)
+{
+	Console::write("feature space key press: %c\n",virtualKey);
+}
+
 // draw contents of GLContainer with opengl
 void FeatureSpace::PaintGLContainer() {
     glview->make_current();
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    bbox_size = 0.9;
-    
+    bbox_size = 0.9;	// bounding box size / 2
+
+	// clear the colour buffer and the Z-buffer
+	glEnable(GL_DEPTH_TEST);		// note: should be done on startup
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	// setup projection
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();    
+    gluPerspective(45.0f,(GLfloat)glview->width()/(GLfloat)glview->height(),0.1f,100.0f);
+	
+	
+	// setup camera			    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(0, 0, -1);
+    glTranslatef(0, 0, -3.5);
     
     glPolygonMode(GL_FRONT, GL_LINE);
     glPolygonMode(GL_BACK, GL_LINE);
     glColor3f(1, 1, 1);
     
+    // draw bounding box
     glBegin(GL_QUADS);
-        glVertex3f( bbox_size,  bbox_size,  0);
-        glVertex3f(-bbox_size,  bbox_size,  0);
-        glVertex3f(-bbox_size, -bbox_size,  0);
-        glVertex3f( bbox_size, -bbox_size,  0);
+    	// front of box
+        glVertex3f( bbox_size,  bbox_size,  bbox_size);	//top-right
+        glVertex3f(-bbox_size,  bbox_size,  bbox_size);	//top-left
+        glVertex3f(-bbox_size, -bbox_size,  bbox_size); //bottom-left
+        glVertex3f( bbox_size, -bbox_size,  bbox_size); //bottom-right
+        // back of box
+        glVertex3f(-bbox_size,  bbox_size,  -bbox_size);	//top-left
+        glVertex3f( bbox_size,  bbox_size,  -bbox_size);	//top-right        
+        glVertex3f( bbox_size, -bbox_size,  -bbox_size); //bottom-right
+        glVertex3f(-bbox_size, -bbox_size,  -bbox_size); //bottom-left        
+        // left of box
+        glVertex3f(-bbox_size,  bbox_size,  -bbox_size);	//top-left
+        glVertex3f(-bbox_size,  bbox_size,  bbox_size);	//top-right        
+        glVertex3f(-bbox_size, -bbox_size,  bbox_size); //bottom-right
+        glVertex3f(-bbox_size, -bbox_size,  -bbox_size); //bottom-left        
+        // right of box
+        glVertex3f(bbox_size,  bbox_size,  -bbox_size);	//top-left
+        glVertex3f(bbox_size,  bbox_size,  bbox_size);	//top-right        
+        glVertex3f(bbox_size, -bbox_size,  bbox_size); //bottom-right
+        glVertex3f(bbox_size, -bbox_size,  -bbox_size); //bottom-left        
+        
     glEnd();
     
     glview->GLswap();
