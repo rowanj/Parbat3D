@@ -194,6 +194,13 @@ bool ROISet::name_exists (string name) {
 }
 
 
+void ROISet::delete_all_regions () {
+    finish_entity(false);   // destroys any entity currently being created
+    current_region = NULL;  // set the current region to none
+    regions.clear();        // removes all the regions from the set
+}
+
+
 void ROISet::combine(ROISet* rs, bool replace) {
     vector<ROI*> rlist = rs->get_regions();
     

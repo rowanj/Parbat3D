@@ -87,7 +87,13 @@ class iniFile {
             allows the position of the section to be kept in the file if all
             the data is being replaced.
         */
-        void removeSection(string, bool);
+        void removeSection (string, bool);
+        
+        
+        /**
+            Empties the file.
+        */
+        void clearFileContents ();
 };
 
 #endif

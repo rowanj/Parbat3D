@@ -258,7 +258,7 @@ void iniFile::removeSection(string section) {
     removeSection(section, false);
 }
 
-void iniFile::removeSection(string section, bool keepTitle) {
+void iniFile::removeSection (string section, bool keepTitle) {
     string sectionLabel ('[' + section + ']');
     string line;
     int phase = 0;
@@ -294,5 +294,14 @@ void iniFile::removeSection(string section, bool keepTitle) {
         // replace the original file with the updated temp one
         remove(fileName.c_str());
         rename(".temp", fileName.c_str());
+    }
+}
+
+
+void iniFile::clearFileContents () {
+    if (gotFileName) {                                     // make sure a filename was given
+        ofstream filePtrO (fileName.c_str(), ios::trunc);  // open the file, erasing the contents
+        if (filePtrO.is_open())
+            filePtrO.close();                              // close the file
     }
 }

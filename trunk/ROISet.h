@@ -150,6 +150,13 @@ class ROISet {
         
         
         /**
+            Removes all the ROIs that are in the set. This can be used to empty
+            the set when a new one is loaded or to clear the set when a new
+            image is loaded.
+        */
+        void delete_all_regions ();
+        
+        /**
             Combines the ROIs from the specified set with the current set. If
             the second parameter is true then any ROIs that have the same name
             in the current set will be replaced by versions from the new set.

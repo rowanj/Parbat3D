@@ -88,13 +88,8 @@ int ROIWindow::Create(HWND parent)
 	lvc.cx = 20;     // width of column in pixels
 	lvc.fmt = LVCFMT_CENTER; 
 	ListView_InsertColumn(hROIListBox,2, &lvc);
-
-
-
-
-
-
-
+	
+	
 	// add ROI check boxes
 /*	int roiInList = regionsSet->get_regions_count();
 	vector<RoI> rList = regionsSet->get_regions();
@@ -618,6 +613,7 @@ void ROIWindow::addNewRoiToList(ROI *rCur,int newId)
 	MoveWindow(hROIListBox,0,0,rect.right-rect.left,newListViewHeight,true);
 }
 
+
 void ROIWindow::loadROI (ROIWindow* win) {
     OPENFILENAME ofn;
     char szFileName[MAX_PATH] = "";
@@ -641,6 +637,7 @@ void ROIWindow::loadROI (ROIWindow* win) {
 		// load the set from the file and combine it with the current set
         ROIFile *rf = new ROIFile();
         ROISet* rs = rf->loadSetFromFile(fn_str);
+        regionsSet->delete_all_regions();          // removes all the regions from the set
         regionsSet->combine(rs, true);
         
         // update the list of checkboxes with the new regions that were loaded
@@ -674,7 +671,7 @@ void ROIWindow::saveROI (ROIWindow* win) {
 		
         // save all the ROIs
         ROIFile *rf = new ROIFile();
-        rf->saveSetToFile(fn_str, regionsSet);
+        rf->saveSetToFile(fn_str, regionsSet, false);  // false erases previous contents, true appends to the file
     }
 }
 
@@ -744,6 +741,26 @@ void ROIWindow::deleteROI (ROIWindow* win) {
         // update the display
         imageWindow.Repaint();
     }
+}
+
+
+void ROIWindow::deleteAllROI () {
+    HWND colBox;
+    
+    for (int i=0; i<roiColourButtonList.size(); i++) {
+        // remove the item from the list
+        SendMessage(hROIListBox, LVM_DELETEITEM, i, 0);
+        
+        // free the colour picker memory
+        colBox = roiColourButtonList.at(i);
+        DestroyWindow(colBox);
+    }
+    
+    // remove all the colour picker pointers from the vector
+    roiColourButtonList.clear();
+    
+    // remove all the ROI from the set
+    regionsSet->delete_all_regions();
 }
 
 

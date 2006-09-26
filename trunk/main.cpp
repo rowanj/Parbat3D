@@ -252,27 +252,26 @@ void loadFile()
 void closeFile()
 {
     /* deallocate variables */
-    if (filename!=NULL) delete(filename);
+    if (filename!=NULL)
+        delete(filename);
     filename=NULL;
     
-	if (image_handler) delete image_handler;
+	if (image_handler)
+        delete image_handler;
     image_handler=NULL;
 	
 	/* destroy tool window */
     if (toolWindow.GetHandle()!=NULL)
-    {
         toolWindow.Destroy();
-    }    
     
     /* hide image window */
     if (imageWindow.GetHandle()!=NULL)
-    {
         imageWindow.Hide();
-    }
+    
 	/* hide roi window */
-    if (roiWindow.GetHandle()!=NULL)
-    {
+    if (roiWindow.GetHandle()!=NULL) {
         roiWindow.Hide();
+        roiWindow.deleteAllROI();
     }
 
     /* disable menu items */
@@ -281,6 +280,7 @@ void closeFile()
     EnableMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,true);
     EnableMenuItem(overviewWindow.hMainMenu,IDM_FILECLOSE,true);    
     EnableMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,true);    
+    
     
     /* repaint main window */
     overviewWindow.overviewWindowDisplay.Repaint();

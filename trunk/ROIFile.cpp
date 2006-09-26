@@ -19,14 +19,17 @@ void ROIFile::close () {
 
 
 /* Set ************************************************************************/
-void ROIFile::saveSetToFile (string filename, ROISet* rs) {
+void ROIFile::saveSetToFile (string filename, ROISet* rs, bool append) {
     openFile.open(filename);
-    saveSetToFile(rs);
+    saveSetToFile(rs, append);
 }
 
-void ROIFile::saveSetToFile (ROISet* rs) {
+void ROIFile::saveSetToFile (ROISet* rs, bool append) {
     vector<ROI*> rlist = rs->get_regions();
     ROI* roi;
+    
+    if (!append)
+        openFile.clearFileContents();
     
     for (int i=0; i<rlist.size(); i++) {
         roi = rlist.at(i);

@@ -28,9 +28,9 @@ class ROIFile {
         void close ();
         
         
-        void saveSetToFile (string, ROISet*);
+        void saveSetToFile (string, ROISet*, bool);
         
-        void saveSetToFile (ROISet*);
+        void saveSetToFile (ROISet*, bool);
         
         
         ROISet* loadSetFromFile (string);

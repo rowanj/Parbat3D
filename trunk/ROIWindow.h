@@ -102,7 +102,8 @@ class ROIWindow:public Window
             other colour pickers up one position.
         */
         void deleteROI (ROIWindow*);
-               
+        
+        
         void updateROIList (ROIWindow*);
         
         
@@ -116,11 +117,20 @@ class ROIWindow:public Window
         
         void addNewRoiToList(ROI *rCur,int newId);
         
+        
     public:
         int Create(HWND parent);
         
         
         void updateButtons (ROIWindow*);
+        
+        
+        /**
+            Deletes all the Regions of Interest from the list and regionsSet.
+            This is called when a new image is opened so that any ROIs from the
+            previous image will be removed.
+        */
+        void deleteAllROI ();
 };
 
 #endif
