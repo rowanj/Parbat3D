@@ -52,6 +52,42 @@ GLText::~GLText(void)
 	gl_view->make_current();
 	glDeleteLists(list_base, 96);
 }
+
+void GLText::draw_string(const char* format, ...)
+{
+	char* text = new char[512];
+	GLboolean depth_test;
+	va_list	ap;
+	
+	assert(format != NULL);
+	
+	va_start(ap, format);
+    vsprintf(text, format, ap);
+	va_end(ap);
+
+	gl_view->make_current();
+	// Save state of depth test
+	depth_test = glIsEnabled(GL_DEPTH_TEST);
+	if (depth_test == GL_TRUE) {
+		glDisable(GL_DEPTH_TEST);
+	}
+
+	// Save list base state
+	glPushAttrib(GL_LIST_BIT);
+	glListBase(list_base - 32);
+	glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);
+	glPopAttrib();
+
+	// Restore state of depth test
+	if (depth_test == GL_TRUE) {
+		glEnable(GL_DEPTH_TEST);
+	}
+	
+	assert(glGetError() == GL_NO_ERROR);
+	
+	delete[] text;
+
+}
 	
 void GLText::draw_string(int x, int y, const char* format, ...)
 {

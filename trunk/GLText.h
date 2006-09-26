@@ -10,6 +10,7 @@ public:
 	GLText(GLView* gl_view_arg, const char* font_arg, int size_arg);
 	virtual ~GLText(void);
 	
+	void draw_string(const char* format, ...);
 	void draw_string(int x, int y, const char* format, ...);
 	
 	void set_color(GLfloat red_arg, GLfloat green_arg, GLfloat blue_arg);
