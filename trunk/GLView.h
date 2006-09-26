@@ -19,6 +19,7 @@ public:
 	void GLswap(void);				/* Calls platform-dependant function
 										to swap OpenGL buffers */
 	
+	GLfloat aspect(void);				/* Gets aspect of current viewport */
 	int width(void);				/* Gets current width of viewport */
 	int height(void);				/* Gets current height of viewport */
 	

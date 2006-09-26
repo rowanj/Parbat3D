@@ -14,6 +14,7 @@
 #include "ROIFile.h"
 #include "ROIWindow.h"
 #include "ImageTileSet.h"
+#include "GLText.h"
 
 #define PIX_COORDS 1
 #define BOUNDS_COORDS 2
@@ -57,7 +58,6 @@ class FeatureSpace:public Window, public GLContainerHandler
         static const int FEATURE_WINDOW_WIDTH;
         static const int FEATURE_WINDOW_HEIGHT;
         static const int TOOLBAR_HEIGHT;
-        float bbox_size;
         
         vector<list<int>*> boundsCoords;
         vector<list<int>*> pixCoords;
@@ -78,6 +78,11 @@ class FeatureSpace:public Window, public GLContainerHandler
 		int band3;
 		list<xListStruct*> pixelDataList;
         
+        /* OpenGL stuff */
+        GLText* gl_text;
+        void InitGL(void);
+        GLuint list_box;
+        
         void getPixelData();
         void getPointData(ROIEntity* theEntity, ROI* theROI);
 		void getRectData(ROIEntity* theEntity, ROI* theROI);
@@ -94,7 +99,7 @@ class FeatureSpace:public Window, public GLContainerHandler
     	pixDataStruct* createNewPixDataStruct(ROI* theROI);
     	
     protected:
-        GLView *glview;
+        GLView *gl_view;
         GLContainer *glContainer;
         HWND hToolbar;
         HWND hRebarControl;
@@ -108,6 +113,5 @@ class FeatureSpace:public Window, public GLContainerHandler
         FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3);      // create & display new feature space window
 };
 
-extern ROISet *regionsSet;
 
 #endif

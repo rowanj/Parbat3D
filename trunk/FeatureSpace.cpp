@@ -16,6 +16,7 @@ const int FeatureSpace::FEATURE_WINDOW_WIDTH=650;       // inital width of featu
 const int FeatureSpace::FEATURE_WINDOW_HEIGHT=550;      // inital height of feature space window
 const int FeatureSpace::TOOLBAR_HEIGHT=30;              // height of toolbar area at bottom of window
 
+extern ROISet *regionsSet;
 
 // timer used for testing
 #include <time.h>   
@@ -40,13 +41,72 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     createSuccess=Create();
     assert(createSuccess);
     
-    glview=new GLView(glContainer->GetHandle());
     numFeatureSpaces++;
 
+	InitGL();
+	
     // todo: setup feature space's data    
     getPixelData();
 	   
     Show();
+}
+
+void FeatureSpace::InitGL(void)
+{
+    gl_view = new GLView(glContainer->GetHandle());
+	gl_text = new GLText(gl_view, "Arial", 12);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	gl_view->make_current();
+	list_box = glGenLists(1);
+	
+	// Get ready to make bounding box list
+	glNewList(list_box, GL_COMPILE);
+	glPushAttrib(GL_MATRIX_MODE);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	
+	glColor3f(1.0, 0.0, 0.0);
+	glRasterPos3f(1.05, -0.05, -0.05);
+	gl_text->draw_string("X");
+
+	glColor3f(0.0, 1.0, 0.0);
+	glRasterPos3f(-0.05, 1.05, -0.05);
+	gl_text->draw_string("Y");
+
+	glColor3f(0.0, 0.0, 1.0);
+	glRasterPos3f(-0.05, -0.05, 1.05);
+	gl_text->draw_string("Z");
+	
+	glColor3f(1.0, 1.0, 1.0);
+	glRasterPos3f(-0.05, -0.05, -0.05);
+	gl_text->draw_string("0");
+
+	glBegin(GL_LINES);
+		glVertex3f(0.0,0.0,0.0);
+		glVertex3f(0.0,0.0,1.0);
+
+		glVertex3f(1.0,0.0,0.0);
+		glVertex3f(1.0,0.0,1.0);
+
+		glVertex3f(1.0,1.0,0.0);
+		glVertex3f(1.0,1.0,1.0);
+
+		glVertex3f(0.0,1.0,0.0);
+		glVertex3f(0.0,1.0,1.0);
+	glEnd();
+	for (short x = 0; x < 2; x++) {
+		glBegin(GL_LINE_LOOP);
+		glVertex2f(0.0,0.0);
+		glVertex2f(1.0,0.0);
+		glVertex2f(1.0,1.0);
+		glVertex2f(0.0,1.0);
+		glEnd();
+		glTranslatef(0.0,0.0,1.0);
+	}
+	glPopMatrix();	
+	glPopAttrib();
+	glEndList(); // Done with the bounding box
 }
 
 // handle key press when GL container is focused
@@ -57,60 +117,27 @@ void FeatureSpace::OnGLContainerKeyPress(int virtualKey)
 
 // draw contents of GLContainer with opengl
 void FeatureSpace::PaintGLContainer() {
-    glview->make_current();
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    gl_view->make_current();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    bbox_size = 0.9;	// bounding box size / 2
-
-	// clear the colour buffer and the Z-buffer
-	glEnable(GL_DEPTH_TEST);		// note: should be done on startup
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
 	// setup projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();    
-    gluPerspective(45.0f,(GLfloat)glview->width()/(GLfloat)glview->height(),0.1f,100.0f);
-	
-	
-	// setup camera			    
+    gluPerspective(45.0f,gl_view->aspect(),0.1f,10.0f);
+    gluLookAt(1.0, -2.0, 1.0,
+				0.0, 0.0, 0.0,
+				0.0, 0.0, 1.0);
+    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(0, 0, -3.5);
     
-    glPolygonMode(GL_FRONT, GL_LINE);
-    glPolygonMode(GL_BACK, GL_LINE);
-    glColor3f(1, 1, 1);
+    // Make old 0,0,0 the centre of the box
+    glTranslatef(-0.5, -0.5, -0.5);
     
-    // draw bounding box
-    glBegin(GL_QUADS);
-    	// front of box
-        glVertex3f( bbox_size,  bbox_size,  bbox_size);	//top-right
-        glVertex3f(-bbox_size,  bbox_size,  bbox_size);	//top-left
-        glVertex3f(-bbox_size, -bbox_size,  bbox_size); //bottom-left
-        glVertex3f( bbox_size, -bbox_size,  bbox_size); //bottom-right
-        // back of box
-        glVertex3f(-bbox_size,  bbox_size,  -bbox_size);	//top-left
-        glVertex3f( bbox_size,  bbox_size,  -bbox_size);	//top-right        
-        glVertex3f( bbox_size, -bbox_size,  -bbox_size); //bottom-right
-        glVertex3f(-bbox_size, -bbox_size,  -bbox_size); //bottom-left        
-        // left of box
-        glVertex3f(-bbox_size,  bbox_size,  -bbox_size);	//top-left
-        glVertex3f(-bbox_size,  bbox_size,  bbox_size);	//top-right        
-        glVertex3f(-bbox_size, -bbox_size,  bbox_size); //bottom-right
-        glVertex3f(-bbox_size, -bbox_size,  -bbox_size); //bottom-left        
-        // right of box
-        glVertex3f(bbox_size,  bbox_size,  -bbox_size);	//top-left
-        glVertex3f(bbox_size,  bbox_size,  bbox_size);	//top-right        
-        glVertex3f(bbox_size, -bbox_size,  bbox_size); //bottom-right
-        glVertex3f(bbox_size, -bbox_size,  -bbox_size); //bottom-left        
+    // draw the bounding box
+    glCallList(list_box);
         
-    glEnd();
-    
-    glview->GLswap();
+    gl_view->GLswap();
 } 
 
 //getPixelData gets all point coordinates from within ROIs, and

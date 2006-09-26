@@ -100,6 +100,11 @@ void GLView::GLswap()
 	SwapBuffers(device_context);
 }
 
+float GLView::aspect()
+{
+	return (float)window_width / (float)window_height;
+}
+
 int GLView::height()
 {
 	return window_height;
