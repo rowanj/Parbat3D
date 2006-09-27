@@ -205,12 +205,17 @@ void FeatureSpace::make_display_lists(void)
 	
 	// Make list_points to benchmark display performance
 #if TRUE
-	int count = 500;
+//	int count = 256 * 256 * 256 / 16;
+	int count = 256 * 256 * 10;
 	const int divisor = RAND_MAX / 256;
 	char r, g, b;
 	srand(time(NULL)); // seed the random number generator
 	glNewList(list_points, GL_COMPILE);
-	glColor4f(1.0, 1.0, 1.0, 0.5);
+	glPushAttrib(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
+	glPointSize(3);
+	glEnable(GL_POINT_SMOOTH);
+	glColor4f(1.0, 1.0, 1.0, 0.05);
 	glBegin(GL_POINTS);
 	while (count) {
 		count--;
@@ -221,6 +226,7 @@ void FeatureSpace::make_display_lists(void)
 		glVertex3f(r/256.0, g/256.0, b/256.0);
 	}
 	glEnd();
+	glPopAttrib();
 	glEndList();
 #endif
 }
