@@ -217,7 +217,7 @@ void FeatureSpace::getPixelData()
 	delete fsTileset;
 	
 	//print out our lists
-	list<xListStruct*>::iterator xRun;
+	/*list<xListStruct*>::iterator xRun;
 	for(xRun = pixelDataList.begin(); xRun != pixelDataList.end(); xRun++)
 	{
 		Console::write("\n-----\nFinal points readout:\nAt X %d:\n", (*xRun)->x);
@@ -238,7 +238,7 @@ void FeatureSpace::getPixelData()
 				}
 			}
 		}
-	}
+	}*/
 }
 
 // -----------------------------------------------------------------------------------------
@@ -301,6 +301,8 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 	yoffset = 0;
 	vectorsize = 0;
 	
+	int time_start, time_end;
+	
 	getPolygonVertices(theEntity);
 	
 	if (!polyPoints.empty())	//if we've got something to rasterise...
@@ -333,11 +335,13 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 		isTurningPoint(secondLastPoint, lastPoint, firstPoint);
 		
 		//get the point coordinates for all points between those lines, if size not odd
+		time_start = GetTickCount();
 		for (int i = 0; i < vectorsize; i++)
 		{
 			//iterators for our "point pairs"
 			if ((boundsCoords[i]->size()%2) == 0 && boundsCoords[i]->size() != 0)
 			{
+				//Console::write("FS::GPD Even number of points at %d -- drawing lines\n", i + yoffset);
 				//Console::write("Drawing lines at Y %d:\n", i + yoffset);
 				list<int>::iterator j1 = boundsCoords[i]->begin();
 				list<int>::iterator j2 = j1;
@@ -384,20 +388,22 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 			}
 			else if (boundsCoords[i]->size() == 1)
 			{
-				//Console::write("Single point at %d -- drawing\n", i + yoffset);
+				//Console::write("FS::GPD Single point at %d -- drawing\n", i + yoffset);
 				pushXPixel(*boundsCoords[i]->begin(), i + yoffset);
 				totalPoints++;
 				//plotPixel((short)*pixCoords[i]->begin(), (short)(i + yoffset));
 			}
-			else
+			/*else
 			{
-				Console::write("Odd number of points at %d\n", i + yoffset);
-			}
+				//Console::write("FS::GPD Odd number of points at %d\n", i + yoffset);
+			}*/
 		}
+		time_end = GetTickCount();
+		Console::write("FS::GPD Time to draw points between pairs was %f seconds\n", (float)(time_end - time_start) / 1000.0);
 	}
 	
 	//write the resultant array
-	Console::write("FeatureSpace -- Total points in poly = %d\n", totalPoints);
+	Console::write("FS::GPD -- Total points in poly = %d\n", totalPoints);
 	
 	//push the values for this data to our lists of values -- TO DO
 	
@@ -433,7 +439,7 @@ void FeatureSpace::getPolygonVertices(ROIEntity* theEntity)
 		thePoint->x = currentCoords.x;
 		thePoint->y = currentCoords.y;
 		polyPoints.push_back(*thePoint);
-		Console::write("Poly point at X %d, Y %d\n", thePoint->x, thePoint->y);
+		//Console::write("FS:GPV Poly point at X %d, Y %d\n", thePoint->x, thePoint->y);
 		
 		//determine if this point is a max or min y value
 		if (thePoint->y > maxy) maxy = thePoint->y;
@@ -454,30 +460,48 @@ void FeatureSpace::isTurningPoint(int first, int middle, int last)
 	if((polyPoints[first].y > polyPoints[middle].y && polyPoints[last].y > polyPoints[middle].y) || //if both neighbour y greater than middle y
 	   (polyPoints[first].y < polyPoints[middle].y && polyPoints[last].y < polyPoints[middle].y)) //or if both neighbour y less than middle y
 	{
-		//Console::write("\tpoint is turning point -- attempting to find pixel values matching\n");
-		for(list<int>::iterator j = boundsCoords[polyPoints[middle].y - yoffset]->begin(); j != boundsCoords[polyPoints[middle].y - yoffset]->end(); j++)
+		//make a new list of int to copy known good points to
+		list<int>* tempList = new list<int>;
+		
+		//Console::write("FS::TP\tpoint is turning point -- attempting to find pixel values matching\n");
+		if (boundsCoords[polyPoints[middle].y - yoffset]->size() == 1)
 		{
-			if(*j == polyPoints[middle].x && boundsCoords[polyPoints[middle].y - yoffset]->size() > 1)
+			//Console::write("FS::TP\t\tSingle point - copying to new list\n");
+			tempList->push_back(*boundsCoords[polyPoints[middle].y - yoffset]->begin());
+		}
+		else
+		{
+			for(list<int>::iterator j = boundsCoords[polyPoints[middle].y - yoffset]->begin(); j != boundsCoords[polyPoints[middle].y - yoffset]->end(); j++)
 			{
-				boundsCoords[polyPoints[middle].y - yoffset]->erase(j);
-				Console::write("\t\tfound point record to erase where X = %d\n", *j);
-				Console::write("\t\tPoint at Y %d:\n", middle + yoffset);
-				for(list<int>::iterator iter = boundsCoords[polyPoints[middle].y - yoffset]->begin(); iter != boundsCoords[polyPoints[middle].y - yoffset]->end(); iter++)
+				/*if(*j == polyPoints[middle].x)
 				{
-					Console::write("\t\t\tX %d\n", *iter);
+					Console::write("FS::TP\t\tNot copying point where X = %d\n", *j);
+					//boundsCoords[polyPoints[middle].y - yoffset]->erase(j);
+					
+					/*Console::write("\t\tPoint at Y %d:\n", middle + yoffset);
+					for(list<int>::iterator iter = boundsCoords[polyPoints[middle].y - yoffset]->begin(); iter != boundsCoords[polyPoints[middle].y - yoffset]->end(); iter++)
+					{
+						Console::write("\t\t\tX %d\n", *iter);
+					}
+					break;*/
+				/*}
+				else*/
+				if(*j != polyPoints[middle].x)
+				{
+					//Console::write("FS::TP\t\tCopying to new list where X = %d\n", *j);
+					tempList->push_back(*j);
 				}
-				break;
-			}
-			else
-			{
-				Console::write("Single point - ignoring\n");
 			}
 		}
+		
+		//write our new list to replace our old list
+		delete boundsCoords[polyPoints[middle].y - yoffset];
+		boundsCoords[polyPoints[middle].y - yoffset] = tempList;
 	}
-	else
+	/*else
 	{
-		Console::write("\tpoint was not turning point\n");
-	}
+		Console::write("FS::TP\tpoint was not turning point\n");
+	}*/
 }
 
 // -----------------------------------------------------------------------------------------
@@ -638,12 +662,12 @@ void FeatureSpace::pushXPixelBounds(int rx, int y)
 			}
 			else if (*i == rx)
 			{
-				Console::write("\t**Y = %d has duplicate X value for X = %d\n", y, rx);
-				Console::write("\t**List of X at Y is:\n");
+				//Console::write("\t**Y = %d has duplicate X value for X = %d\n", y, rx);
+				/*Console::write("\t**List of X at Y is:\n");
 				for(list<int>::iterator iter = boundsCoords[y - yoffset]->begin(); iter != boundsCoords[y - yoffset]->end(); iter++)
 				{
 					Console::write("\t\tX %d\n", *iter);
-				}
+				}*/
 				break;
 			}
 		}
