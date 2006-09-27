@@ -25,30 +25,6 @@ typedef struct myPoint
 	int y;
 };
 
-typedef struct pixDataStruct
-{
-	int count;
-	ROI* pixROI;	
-};
-
-typedef struct zListStruct
-{
-	int z;
-	list<pixDataStruct*> pixData;
-};
-
-typedef struct yListStruct
-{
-	int y;
-	list<zListStruct*> zList;
-};
-
-typedef struct xListStruct
-{
-	int x;
-	list<yListStruct*> yList;
-};
-
 class FeatureSpace:public Window, public GLContainerHandler
 {
     private:
@@ -76,7 +52,6 @@ class FeatureSpace:public Window, public GLContainerHandler
 		int band1;
 		int band2;
 		int band3;
-		list<xListStruct*> pixelDataList;
         
         /* OpenGL stuff */
         int granularity;
@@ -103,11 +78,6 @@ class FeatureSpace:public Window, public GLContainerHandler
 		void generateBoundaryLine(int x1, int y1, int x2, int y2);
 		void pushXPixelBounds(int rx, int y);
 		void pushXPixel(int rx, int y);
-		void fsListAdd(int x, int y, int z, ROI* theROI);
-    	xListStruct* createNewXList(int x, int y, int z, ROI* theROI);
-    	yListStruct* createNewYList(int y, int z, ROI* theROI);
-    	zListStruct* createNewZList(int z, ROI* theROI);
-    	pixDataStruct* createNewPixDataStruct(ROI* theROI);
     	
     protected:
 		/* GUI stuff */
