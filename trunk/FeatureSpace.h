@@ -79,9 +79,12 @@ class FeatureSpace:public Window, public GLContainerHandler
 		list<xListStruct*> pixelDataList;
         
         /* OpenGL stuff */
+        int granularity;
         GLText* gl_text;
         void InitGL(void);
+        void make_display_lists(void);
         GLuint list_box;
+        GLuint list_points;
         GLfloat cam_yaw;
         GLfloat cam_pitch;
         GLfloat cam_dolly;

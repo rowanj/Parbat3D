@@ -48,6 +48,16 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     assert(createSuccess);
     
     numFeatureSpaces++;
+    
+    // Find granularity count
+    {
+		int tLOD = LOD;
+		granularity = 1;
+		while (tLOD) {
+			granularity = granularity * 4;
+			tLOD--;
+		}
+	}
 
 	InitGL();
 	
@@ -62,10 +72,7 @@ void FeatureSpace::InitGL(void)
 	cam_yaw = 270.0 / degs_to_rad;
 	cam_pitch = 0.0;
 	cam_dolly = 2.5;
-	
-	const float edge_opacity = 0.5;
-	const float origin_opacity = 0.8;
-	
+		
     gl_view = new GLView(glContainer->GetHandle());
 	gl_text = new GLText(gl_view, "Arial", 12);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -76,14 +83,52 @@ void FeatureSpace::InitGL(void)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_LINE_SMOOTH);
-	list_box = glGenLists(1);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	
+	make_display_lists();
+}
+
+
+// draw contents of GLContainer with opengl
+void FeatureSpace::PaintGLContainer() {
+    gl_view->make_current();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+	// setup projection
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+    gluPerspective(45.0f,gl_view->aspect(),0.1f,6.0f);
+    gluLookAt(cam_dolly * (cos(cam_yaw)*cos(cam_pitch)), cam_dolly * (sin(cam_yaw)*cos(cam_pitch)), cam_dolly * sin(cam_pitch),
+				0.0, 0.0, 0.0,
+				0.0, 0.0, 1.0);
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+       
+    // Make old 0,0,0 the centre of the box
+    glTranslatef(-0.5, -0.5, -0.5);
+    
+    gl_text->draw_string(5, 20, "Granularity: %d:1", granularity);
+    
+    // draw the bounding box
+    glCallList(list_box);
+    glTranslatef(0.5, 0.5, 0.5);
+    glCallList(list_points);
+        
+    gl_view->GLswap();
+}
+
+void FeatureSpace::make_display_lists(void)
+{
+	gl_view->make_current();
+	const float edge_opacity = 0.5;
+	const float origin_opacity = 0.8;
+
+	list_box = glGenLists(1);
+	list_points = glGenLists(1);
+
 	// Get ready to make bounding box list
 	glNewList(list_box, GL_COMPILE);
-	glPushAttrib(GL_MATRIX_MODE);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	
 	glColor3f(1.0, 0.0, 0.0);
 	glRasterPos3f(1.05, -0.05, -0.05);
 	gl_text->draw_string("Band %d", band1);
@@ -156,37 +201,29 @@ void FeatureSpace::InitGL(void)
 	glVertex3f(1.0, 1.0, 1.0);
 
 	glEnd();
-	glPopMatrix();	
-	glPopAttrib();
 	glEndList(); // Done with the bounding box
+	
+	// Make list_points to benchmark display performance
+#if TRUE
+	int count = 500;
+	const int divisor = RAND_MAX / 256;
+	char r, g, b;
+	srand(time(NULL)); // seed the random number generator
+	glNewList(list_points, GL_COMPILE);
+	glColor4f(1.0, 1.0, 1.0, 0.5);
+	glBegin(GL_POINTS);
+	while (count) {
+		count--;
+		/* generate random coordinates */
+		r = rand() / divisor;
+		g = rand() / divisor;
+		b = rand() / divisor;
+		glVertex3f(r/256.0, g/256.0, b/256.0);
+	}
+	glEnd();
+	glEndList();
+#endif
 }
-
-
-// draw contents of GLContainer with opengl
-void FeatureSpace::PaintGLContainer() {
-    gl_view->make_current();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-	// setup projection
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-    gluPerspective(45.0f,gl_view->aspect(),0.1f,6.0f);
-    gluLookAt(cam_dolly * (cos(cam_yaw)*cos(cam_pitch)), cam_dolly * (sin(cam_yaw)*cos(cam_pitch)), cam_dolly * sin(cam_pitch),
-				0.0, 0.0, 0.0,
-				0.0, 0.0, 1.0);
-    
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-       
-    // Make old 0,0,0 the centre of the box
-    glTranslatef(-0.5, -0.5, -0.5);
-
-    
-    // draw the bounding box
-    glCallList(list_box);
-        
-    gl_view->GLswap();
-} 
 
 //getPixelData gets all point coordinates from within ROIs, and
 //then gets all data values for those pixel coords, and stores
