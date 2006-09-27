@@ -3,7 +3,7 @@
 
 #include <list>
 #include <vector>
-#include <ext/hash_map>
+#include <hash_map.h>
 #include <ext/hash_fun.h>
 #include "console.h"
 #include "Window.h"
@@ -25,6 +25,14 @@ typedef struct myPoint
 	int y;
 };
 
+struct eqUnsignedInt
+{
+	bool operator()(unsigned int u1, unsigned int u2) const
+	{
+		return u1 == u2;
+	}
+};
+
 class FeatureSpace:public Window, public GLContainerHandler
 {
     private:
@@ -43,6 +51,7 @@ class FeatureSpace:public Window, public GLContainerHandler
 		int vectorsize;
 		vector<myPoint> polyPoints;
 		ImageTileSet* fsTileset;
+		hash_map<unsigned int, unsigned int, hash<unsigned int>, eqUnsignedInt> fsPoints;
 		int theLOD;
 		int LODfactor;
 		int LODwidth;
