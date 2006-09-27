@@ -30,6 +30,17 @@ LRESULT CALLBACK GLContainer::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
    
     switch (message)   
     {			
+		case WM_LBUTTONDOWN:
+			Console::write("GLContainer WM_LBUTTONDOWN\n");
+            if (win->handler!=NULL)
+                win->handler->OnGLContainerLeftMouseDown(LOWORD(lParam),HIWORD(lParam));					
+			break;
+
+		case WM_MOUSEMOVE:
+            if (win->handler!=NULL)
+                win->handler->OnGLContainerMouseMove(wParam,LOWORD(lParam),HIWORD(lParam));
+			break;
+			
         case WM_PAINT:
             hdc=BeginPaint(hwnd,&ps);
             if (win->handler!=NULL)

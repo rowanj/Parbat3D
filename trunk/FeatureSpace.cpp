@@ -1147,7 +1147,7 @@ void FeatureSpace::OnResize() {
 
 
 // handle left mouse button down event
-void FeatureSpace::OnLeftMouseDown(int x,int y)
+void FeatureSpace::OnGLContainerLeftMouseDown(int x,int y)
 {
 	// record inital mouse position for rotating/zooming
 	initalMousePosition.x=x;
@@ -1155,16 +1155,13 @@ void FeatureSpace::OnLeftMouseDown(int x,int y)
 	// record current camera rotation amount
 	inital_camera_rotation.x=camera_rotation.x;
 	inital_camera_rotation.y=camera_rotation.y;
-}
-
-void FeatureSpace::OnLeftMouseUp()
-{
-	
+	Console::write("FeatureSpace::OnMouseDown\n");
 }
 
 // handle mouse move event
-void FeatureSpace::OnMouseMove(int virtualKeys,int x,int y)
+void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 {
+	Console::write("FeatureSpace::OnMouseMove\n");
 	// checked if left mouse button is down
 	if ((virtualKeys&MK_LBUTTON)!=0)
 	{
@@ -1175,6 +1172,8 @@ void FeatureSpace::OnMouseMove(int virtualKeys,int x,int y)
 		camera_rotation.y=inital_camera_rotation.y + (y-initalMousePosition.y);
 		if (camera_rotation.y>360)
 			camera_rotation.y-=360;
+		Console::write("camera_rotation.x=%d camera_rotation.y=%d \n",camera_rotation.x,camera_rotation.y);
+		Repaint();
 	}
 	// check if right mouse button is down
 	if ((virtualKeys&MK_RBUTTON)!=0)
@@ -1217,15 +1216,6 @@ LRESULT CALLBACK FeatureSpace::WindowProcedure(HWND hwnd, UINT message, WPARAM w
         /* WM_DESTORY: system is destroying our window */
         case WM_KEYDOWN:
 			win->OnKeyPress(wParam);
-			break;
-		case WM_LBUTTONDOWN:
-			win->OnLeftMouseDown(LOWORD(lParam),HIWORD(lParam));
-			break;
-		case WM_LBUTTONUP:
-			win->OnLeftMouseUp();
-			break;			
-		case WM_MOUSEMOVE:
-			win->OnMouseMove(wParam,LOWORD(lParam),HIWORD(lParam));
 			break;
         case WM_SIZE:
             win->OnResize();

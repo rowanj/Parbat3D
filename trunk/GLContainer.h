@@ -8,6 +8,8 @@ class GLContainerHandler
 {
     public:
     virtual void PaintGLContainer() { };
+    virtual void OnGLContainerLeftMouseDown(int x,int y) { };    
+    virtual void OnGLContainerMouseMove(int vkeys,int x,int y) { }; 
 };
 
 

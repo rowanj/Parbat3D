@@ -112,9 +112,8 @@ class FeatureSpace:public Window, public GLContainerHandler
         void OnResize();    
         virtual void PaintGLContainer();            // draw contents of GLContainer with opengl
 		void OnKeyPress(int virtualKey);			// handle key presses
-		void OnLeftMouseDown(int x,int y);			// handle left mouse button down event
-		void OnLeftMouseUp();						// handle left mouse button up event
-		void OnMouseMove(int vKeys,int x,int y);	// handle mouse move event
+		void OnGLContainerLeftMouseDown(int x,int y);			// handle left mouse button down event
+		void OnGLContainerMouseMove(int vKeys,int x,int y);	// handle mouse move event
 		
     public:
         FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3);      // create & display new feature space window
