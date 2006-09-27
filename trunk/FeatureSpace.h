@@ -87,6 +87,7 @@ class FeatureSpace:public Window, public GLContainerHandler
 		void generateBoundaryLine(int x1, int y1, int x2, int y2);
 		void pushXPixelBounds(int rx, int y);
 		void pushXPixel(int rx, int y);
+		unsigned int catForHash(unsigned char b1, unsigned char b2, unsigned char b3);
     	
     protected:
 		/* GUI stuff */

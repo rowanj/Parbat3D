@@ -318,30 +318,6 @@ void FeatureSpace::getPixelData()
 	delete fsTileset;
 	
 	Console::write("FS::GpixD\tTileset destroyed.\n");
-	
-	//print out our lists
-	/*list<xListStruct*>::iterator xRun;
-	for(xRun = pixelDataList.begin(); xRun != pixelDataList.end(); xRun++)
-	{
-		Console::write("\n-----\nFinal points readout:\nAt X %d:\n", (*xRun)->x);
-		list<yListStruct*>::iterator yRun;
-		for(yRun = (*xRun)->yList.begin(); yRun!= (*xRun)->yList.end(); yRun++)
-		{
-			Console::write("\tAt Y %d:\n", (*yRun)->y);
-			list<zListStruct*>::iterator zRun;
-			for(zRun = (*yRun)->zList.begin(); zRun!= (*yRun)->zList.end(); zRun++)
-			{
-				Console::write("\t\tAt Z %d:\n", (*zRun)->z);
-				list<pixDataStruct*>::iterator pixRun;
-				int ROInumber = 1;
-				for(pixRun = (*zRun)->pixData.begin(); pixRun!= (*zRun)->pixData.end(); pixRun++)
-				{
-					Console::write("\t\t\tROI %d has %d points of this data value\n", ROInumber, (*pixRun)->count);
-					ROInumber++;
-				}
-			}
-		}
-	}*/
 }
 
 // -----------------------------------------------------------------------------------------
@@ -648,19 +624,6 @@ void FeatureSpace::isTurningPoint(int first, int middle, int last)
 		{
 			for(list<int>::iterator j = boundsCoords[polyPoints[middle].y - yoffset]->begin(); j != boundsCoords[polyPoints[middle].y - yoffset]->end(); j++)
 			{
-				/*if(*j == polyPoints[middle].x)
-				{
-					Console::write("FS::TP\t\tNot copying point where X = %d\n", *j);
-					//boundsCoords[polyPoints[middle].y - yoffset]->erase(j);
-					
-					/*Console::write("\t\tPoint at Y %d:\n", middle + yoffset);
-					for(list<int>::iterator iter = boundsCoords[polyPoints[middle].y - yoffset]->begin(); iter != boundsCoords[polyPoints[middle].y - yoffset]->end(); iter++)
-					{
-						Console::write("\t\t\tX %d\n", *iter);
-					}
-					break;*/
-				/*}
-				else*/
 				if(*j != polyPoints[middle].x)
 				{
 					//Console::write("FS::TP\t\tCopying to new list where X = %d\n", *j);
@@ -808,48 +771,6 @@ void FeatureSpace::pushXPixelBounds(int rx, int y)
 	}
 	
 	boundsCoords[y - yoffset]->push_front(rx);
-	
-	/*
-	else
-	{
-		//Console::write("\t\tX list for Y = %d is not empty\n", y);
-		//Console::write("\t\t\tPerforming sorted insert.\n");
-		i = boundsCoords[y - yoffset]->begin();
-		while (i != boundsCoords[y - yoffset]->end())
-		{
-			if (*i < rx)
-			{
-				j = i;
-				j++;
-				if (j == boundsCoords[y - yoffset]->end())
-				{
-					//Console::write("\t\t\t\tX %d is largest yet for %d -- pushing %d to back\n", rx, y, rx);
-					boundsCoords[y - yoffset]->push_back(rx);
-					break;
-				}
-				else
-				{
-					i++;
-				}
-			}
-			else if (*i > rx)
-			{
-				//Console::write("\t\t\t\t%d  is greater than or equal to X = %d -- inserting %d\n", *i, rx, rx);
-				boundsCoords[y - yoffset]->insert(i, rx);
-				break;
-			}
-			else if (*i == rx)
-			{
-				//Console::write("\t**Y = %d has duplicate X value for X = %d\n", y, rx);
-				Console::write("\t**List of X at Y is:\n");
-				for(list<int>::iterator iter = boundsCoords[y - yoffset]->begin(); iter != boundsCoords[y - yoffset]->end(); iter++)
-				{
-					Console::write("\t\tX %d\n", *iter);
-				}
-				break;
-			}
-		}
-	}*/
 }
 
 // -----------------------------------------------------------------------------------------
@@ -872,48 +793,15 @@ void FeatureSpace::pushXPixel(int rx, int y)
 	}
 	
 	pixCoords[y - yoffset]->push_front(rx);
-	
-	/*
-	else
-	{
-		//Console::write("\t\tX list for Y = %d is not empty\n", y);
-		//Console::write("\t\t\tPerforming sorted insert.\n");
-		i = pixCoords[y - yoffset]->begin();
-		while (i != pixCoords[y - yoffset]->end())
-		{
-			if (*i < rx)
-			{
-				j = i;
-				j++;
-				if (j == pixCoords[y - yoffset]->end())
-				{
-					//Console::write("\t\t\t\tX %d is largest yet for %d -- pushing %d to back\n", rx, y, rx);
-					pixCoords[y - yoffset]->push_back(rx);
-					break;
-				}
-				else
-				{
-					i++;
-				}
-			}
-			else if (*i > rx)
-			{
-				//Console::write("\t\t\t\t%d  is greater than or equal to X = %d -- inserting %d\n", *i, rx, rx);
-				pixCoords[y - yoffset]->insert(i, rx);
-				break;
-			}
-			else if (*i == rx)
-			{
-				Console::write("\t**Y = %d has duplicate X value for X = %d\n", y, rx);
-				Console::write("\t**List of X at Y is:\n");
-				for(list<int>::iterator iter = pixCoords[y - yoffset]->begin(); iter != pixCoords[y - yoffset]->end(); iter++)
-				{
-					Console::write("\t\tX %d\n", *iter);
-				}
-				break;
-			}
-		}
-	}*/
+}
+
+// catForHash
+// ----
+// Concatenates three unsigned chars together in preparation for
+// passing as a hash key.
+unsigned int FeatureSpace::catForHash(unsigned char b1, unsigned char b2, unsigned char b3)
+{
+	return (unsigned int)b1 + ((unsigned int)b2 << 8) + ((unsigned int)b3 << 16);
 }
 
 
