@@ -110,6 +110,12 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     return 0;
                 
                 case IDM_FILECLOSE:
+                    // check if there are any ROIs and if they have not been saved
+                    if (!(regionsSet->get_regions()).empty() && regionsSet->unsaved_changes()) {
+                        if (MessageBox(NULL, "Unsaved Regions of Interest will be lost.\nAre you sure you want to close the image?", "Parbat3D", MB_YESNO|MB_ICONQUESTION)!=IDYES)
+                            return 0;
+                    }
+                    
                     closeFile();
                     return 0;                    
                           
@@ -193,6 +199,12 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                      
         /* WM_CLOSE: system or user has requested to close the window/application */
         case WM_CLOSE:
+            // check if there are any ROIs and if they have not been saved
+            if (!(regionsSet->get_regions()).empty() && regionsSet->unsaved_changes()) {
+                if (MessageBox(NULL, "Unsaved Regions of Interest will be lost.\nAre you sure you want to quit?", "Parbat3D", MB_YESNO|MB_ICONQUESTION)!=IDYES)
+                    return 0;
+            }
+            
             // Shut down the image file and OpenGL
 			if (image_handler) { // Was instantiated
                 if (settingsFile->getSettingi("preferences", "displayconfirmwindow", 1) == 1) {
@@ -203,7 +215,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 closeFile();
 			}
             
-			mainWindow.DestroyAll();
+            mainWindow.DestroyAll();
 			
 			/* destroy all the windows that have been created */
 			/*
