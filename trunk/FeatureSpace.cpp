@@ -334,6 +334,16 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 		//calculate last point
 		isTurningPoint(secondLastPoint, lastPoint, firstPoint);
 		
+		//sort our resultant lists
+		int sortstart = GetTickCount();
+		for (int i = 0; i < vectorsize; i++)
+		{
+			boundsCoords[i]->sort();
+		}
+		int sortend = GetTickCount();
+		Console::write("FS::GPD Time to sort lists was %f seconds\n", (float)(sortend - sortstart) / 1000.0);
+		
+		
 		//get the point coordinates for all points between those lines, if size not odd
 		time_start = GetTickCount();
 		for (int i = 0; i < vectorsize; i++)
@@ -341,7 +351,7 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 			//iterators for our "point pairs"
 			if ((boundsCoords[i]->size()%2) == 0 && boundsCoords[i]->size() != 0)
 			{
-				//Console::write("FS::GPD Even number of points at %d -- drawing lines\n", i + yoffset);
+				Console::write("FS::GPD Even number of points at %d -- drawing lines\n", i + yoffset);
 				//Console::write("Drawing lines at Y %d:\n", i + yoffset);
 				list<int>::iterator j1 = boundsCoords[i]->begin();
 				list<int>::iterator j2 = j1;
@@ -388,15 +398,15 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 			}
 			else if (boundsCoords[i]->size() == 1)
 			{
-				//Console::write("FS::GPD Single point at %d -- drawing\n", i + yoffset);
+				Console::write("FS::GPD Single point at %d -- drawing\n", i + yoffset);
 				pushXPixel(*boundsCoords[i]->begin(), i + yoffset);
 				totalPoints++;
 				//plotPixel((short)*pixCoords[i]->begin(), (short)(i + yoffset));
 			}
-			/*else
+			else
 			{
-				//Console::write("FS::GPD Odd number of points at %d\n", i + yoffset);
-			}*/
+				Console::write("FS::GPD Odd number of points at %d\n", i + yoffset);
+			}
 		}
 		time_end = GetTickCount();
 		Console::write("FS::GPD Time to draw points between pairs was %f seconds\n", (float)(time_end - time_start) / 1000.0);
@@ -621,7 +631,7 @@ void FeatureSpace::generateBoundaryLine (int x1, int y1, int x2, int y2)
 
 void FeatureSpace::pushXPixelBounds(int rx, int y)
 {
-	list<int>::iterator i, j;
+	//list<int>::iterator i, j;
 	
 	//Console::write("y - yoffset = %d\n", y - yoffset);
 	if (boundsCoords[y - yoffset]->empty())
@@ -629,9 +639,12 @@ void FeatureSpace::pushXPixelBounds(int rx, int y)
 		//Console::write("\t\tX list for Y = %d is empty\n", y);
 		list<int>* tempxlist = new list<int>;
 		boundsCoords[y - yoffset] = tempxlist;
-		boundsCoords[y - yoffset]->push_front(rx);
 		//Console::write("\t\t\tPushed X = %d to front of list for Y = %d\n", rx, y);
 	}
+	
+	boundsCoords[y - yoffset]->push_front(rx);
+	
+	/*
 	else
 	{
 		//Console::write("\t\tX list for Y = %d is not empty\n", y);
@@ -663,15 +676,15 @@ void FeatureSpace::pushXPixelBounds(int rx, int y)
 			else if (*i == rx)
 			{
 				//Console::write("\t**Y = %d has duplicate X value for X = %d\n", y, rx);
-				/*Console::write("\t**List of X at Y is:\n");
+				Console::write("\t**List of X at Y is:\n");
 				for(list<int>::iterator iter = boundsCoords[y - yoffset]->begin(); iter != boundsCoords[y - yoffset]->end(); iter++)
 				{
 					Console::write("\t\tX %d\n", *iter);
-				}*/
+				}
 				break;
 			}
 		}
-	}
+	}*/
 }
 
 // -----------------------------------------------------------------------------------------
@@ -682,7 +695,7 @@ void FeatureSpace::pushXPixelBounds(int rx, int y)
 
 void FeatureSpace::pushXPixel(int rx, int y)
 {
-	list<int>::iterator i, j;
+	//list<int>::iterator i, j;
 	
 	//Console::write("y - yoffset = %d\n", y - yoffset);
 	if (pixCoords[y - yoffset]->empty())
@@ -690,9 +703,12 @@ void FeatureSpace::pushXPixel(int rx, int y)
 		//Console::write("\t\tX list for Y = %d is empty\n", y);
 		list<int>* tempxlist = new list<int>;
 		pixCoords[y - yoffset] = tempxlist;
-		pixCoords[y - yoffset]->push_front(rx);
 		//Console::write("\t\t\tPushed X = %d to front of list for Y = %d\n", rx, y);
 	}
+	
+	pixCoords[y - yoffset]->push_front(rx);
+	
+	/*
 	else
 	{
 		//Console::write("\t\tX list for Y = %d is not empty\n", y);
@@ -732,7 +748,7 @@ void FeatureSpace::pushXPixel(int rx, int y)
 				break;
 			}
 		}
-	}
+	}*/
 }
 
 
