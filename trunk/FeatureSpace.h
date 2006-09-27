@@ -84,6 +84,7 @@ class FeatureSpace:public Window, public GLContainerHandler
         GLuint list_box;
         GLfloat cam_yaw;
         GLfloat cam_pitch;
+        GLfloat cam_dolly;
    		
    		// Input stuff
    		int prev_mouse_x;

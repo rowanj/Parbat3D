@@ -61,9 +61,13 @@ void FeatureSpace::InitGL(void)
 {
 	cam_yaw = 270.0 / degs_to_rad;
 	cam_pitch = 0.0;
+	cam_dolly = 2.5;
+	
+	const float edge_opacity = 0.5;
+	const float origin_opacity = 0.8;
 	
     gl_view = new GLView(glContainer->GetHandle());
-	gl_text = new GLText(gl_view, "Arial", 10);
+	gl_text = new GLText(gl_view, "Arial", 12);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	gl_view->make_current();
@@ -71,6 +75,7 @@ void FeatureSpace::InitGL(void)
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_LINE_SMOOTH);
 	list_box = glGenLists(1);
 	
 	// Get ready to make bounding box list
@@ -81,15 +86,15 @@ void FeatureSpace::InitGL(void)
 	
 	glColor3f(1.0, 0.0, 0.0);
 	glRasterPos3f(1.05, -0.05, -0.05);
-	gl_text->draw_string("X");
+	gl_text->draw_string("Band %d", band1);
 
 	glColor3f(0.0, 1.0, 0.0);
 	glRasterPos3f(-0.05, 1.05, -0.05);
-	gl_text->draw_string("Y");
+	gl_text->draw_string("Band %d", band2);
 
 	glColor3f(0.0, 0.0, 1.0);
 	glRasterPos3f(-0.05, -0.05, 1.05);
-	gl_text->draw_string("Z");
+	gl_text->draw_string("Band %d", band3);
 	
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos3f(-0.05, -0.05, -0.05);
@@ -98,23 +103,23 @@ void FeatureSpace::InitGL(void)
 	glBegin(GL_LINES);
 	// Lines from origin
 	// x
-	glColor4f(1.0, 0.5, 0.5, 1.0);
+	glColor4f(1.0, 0.0, 0.0, origin_opacity);
 	glVertex3f(0.0, 0.0, 0.0);
-	glColor4f(1.0, 1.0, 1.0, 0.2);
+	glColor4f(1.0, 1.0, 1.0, edge_opacity);
 	glVertex3f(1.0, 0.0, 0.0);
 	// y
-	glColor4f(0.5, 1.0, 0.5, 1.0);
+	glColor4f(0.0, 1.0, 0.0, origin_opacity);
 	glVertex3f(0.0, 0.0, 0.0);
-	glColor4f(1.0, 1.0, 1.0, 0.2);
+	glColor4f(1.0, 1.0, 1.0, edge_opacity);
 	glVertex3f(0.0, 1.0, 0.0);
 	// z
-	glColor4f(0.5, 0.5, 1.0, 1.0);
+	glColor4f(0.0, 0.0, 1.0, origin_opacity);
 	glVertex3f(0.0, 0.0, 0.0);
-	glColor4f(1.0, 1.0, 1.0, 0.2);
+	glColor4f(1.0, 1.0, 1.0, edge_opacity);
 	glVertex3f(0.0, 0.0, 1.0);
 
 	// All other lines in translucent white
-	glColor4f(1.0, 1.0, 1.0, 0.2);
+	glColor4f(1.0, 1.0, 1.0, edge_opacity);
 	// Lines from x1
 	// y
 	glVertex3f(1.0, 0.0, 0.0);
@@ -166,7 +171,7 @@ void FeatureSpace::PaintGLContainer() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
     gluPerspective(45.0f,gl_view->aspect(),0.1f,10.0f);
-    gluLookAt(2.0 * (cos(cam_yaw)*cos(cam_pitch)), 2.0 * (sin(cam_yaw)*cos(cam_pitch)), 2.0 * sin(cam_pitch),
+    gluLookAt(cam_dolly * (cos(cam_yaw)*cos(cam_pitch)), cam_dolly * (sin(cam_yaw)*cos(cam_pitch)), cam_dolly * sin(cam_pitch),
 				0.0, 0.0, 0.0,
 				0.0, 0.0, 1.0);
     
@@ -1237,7 +1242,6 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	// checked if left mouse button is down
 	if ((virtualKeys&MK_LBUTTON)!=0)
 	{
-		Console::write("Yawing by %f radians.\n", x_diff * rads_to_deg);
 		cam_yaw-=x_diff * rads_to_deg / 2.0;
 		cam_pitch+=y_diff * rads_to_deg / 2.0;
 		if (cam_pitch > (M_PI/2.0) - rads_to_deg) cam_pitch = M_PI/2.0 - rads_to_deg;
@@ -1247,7 +1251,9 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	// check if right mouse button is down
 	if ((virtualKeys&MK_RBUTTON)!=0)
 	{
-		// todo: zoom in/out
+		cam_dolly+=y_diff * 0.01;
+		if (cam_dolly < 0.1) cam_dolly = 0.1;
+		glContainer->Repaint();
 	}
 	
 	// Operations are cumulative, so re-set distance
