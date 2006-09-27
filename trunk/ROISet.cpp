@@ -25,6 +25,8 @@ void ROISet::new_entity (const char* t) {
     current_entity = new ROIEntity();
     current_entity->type = t;
     editingEntity = true;
+    
+    unsavedChanges = true;
 }
 
 
@@ -88,8 +90,7 @@ const char* ROISet::editingType () {
         return ROI_NONE;
 }
 
-ROIEntity* ROISet::get_current_entity()
-{
+ROIEntity* ROISet::get_current_entity() {
 	return current_entity;
 }
 
@@ -117,6 +118,8 @@ ROI* ROISet::new_region (string n) {
     current_region->set_name(n);        // gives ROI its name
     regions.push_back(current_region);  // adds the ROI to the set
     
+    unsavedChanges = true;
+    
     return current_region;              // this ROI is returned in case the user wants it
 }
 
@@ -129,6 +132,7 @@ ROI* ROISet::set_current (string c) {
             return current_region;
         }
     }
+    
     return NULL;
 }
 
@@ -145,6 +149,8 @@ void ROISet::add_region_to_set (ROI* roi, bool replace) {
             regions.push_back(roi);
         }
     }
+    
+    unsavedChanges = true;
 }
 
 
@@ -156,6 +162,8 @@ void ROISet::remove_region (ROI* to_go) {
             break;
         }
     }
+    
+    unsavedChanges = true;
 }
 
 void ROISet::remove_region (string to_go) {
@@ -166,6 +174,8 @@ void ROISet::remove_region (string to_go) {
             break;
         }
     }
+    
+    unsavedChanges = true;
 }
 
 
@@ -198,14 +208,18 @@ void ROISet::delete_all_regions () {
     finish_entity(false);   // destroys any entity currently being created
     current_region = NULL;  // set the current region to none
     regions.clear();        // removes all the regions from the set
+    
+    unsavedChanges = true;
 }
 
 
-void ROISet::combine(ROISet* rs, bool replace) {
+void ROISet::combine (ROISet* rs, bool replace) {
     vector<ROI*> rlist = rs->get_regions();
     
     for (int i=0; i<rlist.size(); i++) {
         ROI* roi = rlist.at(i);           // grabs an ROI from the new set
         add_region_to_set(roi, replace);  // adds it to the current one
     }
+    
+    unsavedChanges = true;
 }

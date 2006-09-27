@@ -13,6 +13,7 @@ class ROISet {
         ROI* current_region;        // the Region of Interest currently being worked on
         ROIEntity* current_entity;  // the shape currently being worked on
         bool editingEntity;         // true if currently creating an entity
+        bool unsavedChanges;        // true if there have been changes made after the last save
         
         
     public:
@@ -76,8 +77,10 @@ class ROISet {
             ROI_NONE is returned if no entity is being created at the moment.
         */
         const char* editingType ();
-
+        
+        
         ROIEntity* get_current_entity();        
+        
         
 /* Regions Of Interest ********************************************************/
         /**
@@ -162,6 +165,20 @@ class ROISet {
             in the current set will be replaced by versions from the new set.
         */
         void combine (ROISet*, bool);
+        
+        
+        /**
+            This is called to tell the set that the Regions of Interest have
+            been saved.
+        */
+        void save_done () { unsavedChanges = false; }
+        
+        /**
+            Returns true if there have been changes made since the set was last
+            saved. This is used to prompt the user if they are going to lose
+            any unsaved Regions of Interest.
+        */
+        bool unsaved_changes () { return unsavedChanges; }
 };
 
 

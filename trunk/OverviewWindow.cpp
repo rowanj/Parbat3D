@@ -194,11 +194,15 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
         /* WM_CLOSE: system or user has requested to close the window/application */
         case WM_CLOSE:
             // Shut down the image file and OpenGL
-			if (image_handler && settingsFile->getSettingi("preferences", "displayconfirmwindow", 1) == 1) { // Was instantiated
-                if (MessageBox(hwnd,"Are you sure you wish to quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
-                    return 0;
+			if (image_handler) { // Was instantiated
+                if (settingsFile->getSettingi("preferences", "displayconfirmwindow", 1) == 1) {
+                    if (MessageBox(hwnd,"Are you sure you wish to quit?\nAn image is currently open.","Parbat3D",MB_YESNO|MB_ICONQUESTION)!=IDYES)
+                        return 0;
+                }
+                
                 closeFile();
 			}
+            
 			mainWindow.DestroyAll();
 			
 			/* destroy all the windows that have been created */

@@ -249,8 +249,13 @@ void loadFile()
     }
 }
 
-void closeFile()
-{
+void closeFile() {
+    // check if there are any ROIs and if they have not been saved
+    if (!(regionsSet->get_regions()).empty() && regionsSet->unsaved_changes()) {
+        if (MessageBox(NULL, "Unsaved Regions of Interest will be lost.\nAre you sure you want to quit?", "Parbat3D", MB_YESNO|MB_ICONQUESTION)!=IDYES)
+            return;
+    }
+    
     /* deallocate variables */
     if (filename!=NULL)
         delete(filename);

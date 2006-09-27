@@ -672,6 +672,8 @@ void ROIWindow::saveROI (ROIWindow* win) {
         // save all the ROIs
         ROIFile *rf = new ROIFile();
         rf->saveSetToFile(fn_str, regionsSet, false);  // false erases previous contents, true appends to the file
+        
+        regionsSet->save_done();
     }
 }
 

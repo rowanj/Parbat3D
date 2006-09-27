@@ -122,6 +122,12 @@ class ROIWindow:public Window
         int Create(HWND parent);
         
         
+        /**
+            Make the buttons active or inactive depending on whether an entity
+            is currently being created. This prevents the user from trying to
+            create a new entity while they are editing one or removing the ROI
+            that the entity is being added to.
+        */
         void updateButtons (ROIWindow*);
         
         
