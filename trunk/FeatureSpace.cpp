@@ -170,7 +170,7 @@ void FeatureSpace::PaintGLContainer() {
 	// setup projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-    gluPerspective(45.0f,gl_view->aspect(),0.1f,10.0f);
+    gluPerspective(45.0f,gl_view->aspect(),0.1f,6.0f);
     gluLookAt(cam_dolly * (cos(cam_yaw)*cos(cam_pitch)), cam_dolly * (sin(cam_yaw)*cos(cam_pitch)), cam_dolly * sin(cam_pitch),
 				0.0, 0.0, 0.0,
 				0.0, 0.0, 1.0);
@@ -1253,6 +1253,7 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	{
 		cam_dolly+=y_diff * 0.01;
 		if (cam_dolly < 0.1) cam_dolly = 0.1;
+		if (cam_dolly > 5.0) cam_dolly = 5.0;
 		glContainer->Repaint();
 	}
 	
