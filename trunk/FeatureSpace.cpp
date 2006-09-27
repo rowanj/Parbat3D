@@ -58,6 +58,10 @@ void FeatureSpace::InitGL(void)
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	gl_view->make_current();
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	list_box = glGenLists(1);
 	
 	// Get ready to make bounding box list
@@ -83,27 +87,61 @@ void FeatureSpace::InitGL(void)
 	gl_text->draw_string("0");
 
 	glBegin(GL_LINES);
-		glVertex3f(0.0,0.0,0.0);
-		glVertex3f(0.0,0.0,1.0);
+	// Lines from origin
+	// x
+	glColor4f(1.0, 0.5, 0.5, 1.0);
+	glVertex3f(0.0, 0.0, 0.0);
+	glColor4f(1.0, 1.0, 1.0, 0.2);
+	glVertex3f(1.0, 0.0, 0.0);
+	// y
+	glColor4f(0.5, 1.0, 0.5, 1.0);
+	glVertex3f(0.0, 0.0, 0.0);
+	glColor4f(1.0, 1.0, 1.0, 0.2);
+	glVertex3f(0.0, 1.0, 0.0);
+	// z
+	glColor4f(0.5, 0.5, 1.0, 1.0);
+	glVertex3f(0.0, 0.0, 0.0);
+	glColor4f(1.0, 1.0, 1.0, 0.2);
+	glVertex3f(0.0, 0.0, 1.0);
 
-		glVertex3f(1.0,0.0,0.0);
-		glVertex3f(1.0,0.0,1.0);
+	// All other lines in translucent white
+	glColor4f(1.0, 1.0, 1.0, 0.2);
+	// Lines from x1
+	// y
+	glVertex3f(1.0, 0.0, 0.0);
+	glVertex3f(1.0, 1.0, 0.0);
+	// z
+	glVertex3f(1.0, 0.0, 0.0);
+	glVertex3f(1.0, 0.0, 1.0);
+	
+	// Lines from y1
+	// x
+	glVertex3f(0.0, 1.0, 0.0);
+	glVertex3f(1.0, 1.0, 0.0);
+	// z
+	glVertex3f(0.0, 1.0, 0.0);
+	glVertex3f(0.0, 1.0, 1.0);
 
-		glVertex3f(1.0,1.0,0.0);
-		glVertex3f(1.0,1.0,1.0);
+	// Lines from z1
+	// x
+	glVertex3f(0.0, 0.0, 1.0);
+	glVertex3f(1.0, 0.0, 1.0);
+	// y
+	glVertex3f(0.0, 0.0, 1.0);
+	glVertex3f(0.0, 1.0, 1.0);
+	
+	// Lines to 1,1,1
+	// x0
+	glVertex3f(0.0, 1.0, 1.0);
+	glVertex3f(1.0, 1.0, 1.0);
+	// y0
+	glVertex3f(1.0, 0.0, 1.0);
+	glVertex3f(1.0, 1.0, 1.0);
+	// z0
+	glVertex3f(1.0, 1.0, 0.0);
+	glVertex3f(1.0, 1.0, 1.0);
 
-		glVertex3f(0.0,1.0,0.0);
-		glVertex3f(0.0,1.0,1.0);
 	glEnd();
-	for (short x = 0; x < 2; x++) {
-		glBegin(GL_LINE_LOOP);
-		glVertex2f(0.0,0.0);
-		glVertex2f(1.0,0.0);
-		glVertex2f(1.0,1.0);
-		glVertex2f(0.0,1.0);
-		glEnd();
-		glTranslatef(0.0,0.0,1.0);
-	}
 	glPopMatrix();	
 	glPopAttrib();
 	glEndList(); // Done with the bounding box
