@@ -82,8 +82,12 @@ class FeatureSpace:public Window, public GLContainerHandler
         GLText* gl_text;
         void InitGL(void);
         GLuint list_box;
-   		POINT inital_camera_rotation; 		// camera rotation amount before an mouse drag begins       
-   		POINT camera_rotation;				// camera rotation amount
+        GLfloat cam_yaw;
+        GLfloat cam_pitch;
+   		
+   		// Input stuff
+   		int prev_mouse_x;
+   		int prev_mouse_y;
         
         void getPixelData();
         void getPointData(ROIEntity* theEntity, ROI* theROI);

@@ -1,5 +1,6 @@
 
 #include <Windows.h>
+#include <math.h>
 #include "main.h"
 #include "Window.h"
 #include "FeatureSpace.h"
@@ -11,6 +12,9 @@
 #include <commctrl.h>
 
 #define POLYDATA_DEBUG 0
+
+const float degs_to_rad = 180.0 / M_PI;
+const float rads_to_deg = 1.0 / degs_to_rad;
 
 int FeatureSpace::numFeatureSpaces=0;
 
@@ -45,9 +49,6 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     
     numFeatureSpaces++;
 
-	camera_rotation.x=0;
-	camera_rotation.y=0;
-
 	InitGL();
 	
     // todo: setup feature space's data    
@@ -58,8 +59,11 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
 
 void FeatureSpace::InitGL(void)
 {
+	cam_yaw = 270.0 / degs_to_rad;
+	cam_pitch = 0.0;
+	
     gl_view = new GLView(glContainer->GetHandle());
-	gl_text = new GLText(gl_view, "Arial", 12);
+	gl_text = new GLText(gl_view, "Arial", 10);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	gl_view->make_current();
@@ -162,7 +166,7 @@ void FeatureSpace::PaintGLContainer() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
     gluPerspective(45.0f,gl_view->aspect(),0.1f,10.0f);
-    gluLookAt(1.0, -2.0, 1.0,
+    gluLookAt(2.0 * (cos(cam_yaw)*cos(cam_pitch)), 2.0 * (sin(cam_yaw)*cos(cam_pitch)), 2.0 * sin(cam_pitch),
 				0.0, 0.0, 0.0,
 				0.0, 0.0, 1.0);
     
@@ -1218,11 +1222,8 @@ void FeatureSpace::OnResize() {
 void FeatureSpace::OnGLContainerLeftMouseDown(int x,int y)
 {
 	// record inital mouse position for rotating/zooming
-	initalMousePosition.x=x;
-	initalMousePosition.y=y;
-	// record current camera rotation amount
-	inital_camera_rotation.x=camera_rotation.x;
-	inital_camera_rotation.y=camera_rotation.y;
+	prev_mouse_x=x;
+	prev_mouse_y=y;
 	Console::write("FeatureSpace::OnMouseDown\n");
 }
 
@@ -1230,24 +1231,28 @@ void FeatureSpace::OnGLContainerLeftMouseDown(int x,int y)
 void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 {
 	Console::write("FeatureSpace::OnMouseMove\n");
+	int x_diff = x - prev_mouse_x;
+	int y_diff = y - prev_mouse_y;
+	Console::write("x_diff=%d y_diff=%d \n",x_diff,y_diff);
 	// checked if left mouse button is down
 	if ((virtualKeys&MK_LBUTTON)!=0)
 	{
-		// rotate mouse by an amount determined by the relative mouse position
-		camera_rotation.x=inital_camera_rotation.x + (x-initalMousePosition.x);
-		if (camera_rotation.x>360)
-			camera_rotation.x-=360;
-		camera_rotation.y=inital_camera_rotation.y + (y-initalMousePosition.y);
-		if (camera_rotation.y>360)
-			camera_rotation.y-=360;
-		Console::write("camera_rotation.x=%d camera_rotation.y=%d \n",camera_rotation.x,camera_rotation.y);
-		Repaint();
+		Console::write("Yawing by %f radians.\n", x_diff * rads_to_deg);
+		cam_yaw-=x_diff * rads_to_deg / 2.0;
+		cam_pitch+=y_diff * rads_to_deg / 2.0;
+		if (cam_pitch > (M_PI/2.0) - rads_to_deg) cam_pitch = M_PI/2.0 - rads_to_deg;
+		if (cam_pitch < -(M_PI/2.0) + rads_to_deg) cam_pitch = -M_PI/2.0 + rads_to_deg;
+		glContainer->Repaint();
 	}
 	// check if right mouse button is down
 	if ((virtualKeys&MK_RBUTTON)!=0)
 	{
 		// todo: zoom in/out
 	}
+	
+	// Operations are cumulative, so re-set distance
+	prev_mouse_x=x;
+	prev_mouse_y=y;	
 }
 
 
