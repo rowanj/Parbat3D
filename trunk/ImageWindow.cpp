@@ -243,9 +243,11 @@ void ImageWindow::zoomImage(int nlevels)
     // Sometimes the zoom should be a little more sensitive
     if (zoom >= 0.5) nlevels = nlevels * 2;
     if (zoom >= 1.0) nlevels = nlevels * 2;
+    if (zoom >= 5.0) nlevels = nlevels * 5;
+    if (zoom >= 10.0) nlevels = nlevels * 10;
     zoom+=nlevels/100.0;
-    if (zoom>2.0)
-        zoom=2.0;
+/*    if (zoom>2.0)
+        zoom=2.0; */
     // a per-image minimum is calculated in ImageViwport
 /*    else if (zoom<0.01)
         zoom=0.01; */
