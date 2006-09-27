@@ -82,6 +82,8 @@ class FeatureSpace:public Window, public GLContainerHandler
         GLText* gl_text;
         void InitGL(void);
         GLuint list_box;
+   		POINT inital_camera_rotation; 		// camera rotation amount before an mouse drag begins       
+   		POINT camera_rotation;				// camera rotation amount
         
         void getPixelData();
         void getPointData(ROIEntity* theEntity, ROI* theROI);
@@ -99,16 +101,21 @@ class FeatureSpace:public Window, public GLContainerHandler
     	pixDataStruct* createNewPixDataStruct(ROI* theROI);
     	
     protected:
+		/* GUI stuff */
         GLView *gl_view;
         GLContainer *glContainer;
         HWND hToolbar;
         HWND hRebarControl;
+		POINT initalMousePosition;					// mouse position at the time the mouse button is pushed down
+
         int Create();
         void OnResize();    
-       
         virtual void PaintGLContainer();            // draw contents of GLContainer with opengl
-		virtual void OnGLContainerKeyPress(int virtualKey);       
-                
+		void OnKeyPress(int virtualKey);			// handle key presses
+		void OnLeftMouseDown(int x,int y);			// handle left mouse button down event
+		void OnLeftMouseUp();						// handle left mouse button up event
+		void OnMouseMove(int vKeys,int x,int y);	// handle mouse move event
+		
     public:
         FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3);      // create & display new feature space window
 };

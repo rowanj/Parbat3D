@@ -43,6 +43,9 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     
     numFeatureSpaces++;
 
+	camera_rotation.x=0;
+	camera_rotation.y=0;
+
 	InitGL();
 	
     // todo: setup feature space's data    
@@ -147,11 +150,6 @@ void FeatureSpace::InitGL(void)
 	glEndList(); // Done with the bounding box
 }
 
-// handle key press when GL container is focused
-void FeatureSpace::OnGLContainerKeyPress(int virtualKey)
-{
-	Console::write("feature space key press: %c\n",virtualKey);
-}
 
 // draw contents of GLContainer with opengl
 void FeatureSpace::PaintGLContainer() {
@@ -160,7 +158,7 @@ void FeatureSpace::PaintGLContainer() {
     
 	// setup projection
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();    
+	glLoadIdentity();
     gluPerspective(45.0f,gl_view->aspect(),0.1f,10.0f);
     gluLookAt(1.0, -2.0, 1.0,
 				0.0, 0.0, 0.0,
@@ -168,9 +166,10 @@ void FeatureSpace::PaintGLContainer() {
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
+       
     // Make old 0,0,0 the centre of the box
     glTranslatef(-0.5, -0.5, -0.5);
+
     
     // draw the bounding box
     glCallList(list_box);
@@ -1145,16 +1144,89 @@ void FeatureSpace::OnResize() {
     glLoadIdentity();
     */
 }
+
+
+// handle left mouse button down event
+void FeatureSpace::OnLeftMouseDown(int x,int y)
+{
+	// record inital mouse position for rotating/zooming
+	initalMousePosition.x=x;
+	initalMousePosition.y=y;
+	// record current camera rotation amount
+	inital_camera_rotation.x=camera_rotation.x;
+	inital_camera_rotation.y=camera_rotation.y;
+}
+
+void FeatureSpace::OnLeftMouseUp()
+{
+	
+}
+
+// handle mouse move event
+void FeatureSpace::OnMouseMove(int virtualKeys,int x,int y)
+{
+	// checked if left mouse button is down
+	if ((virtualKeys&MK_LBUTTON)!=0)
+	{
+		// rotate mouse by an amount determined by the relative mouse position
+		camera_rotation.x=inital_camera_rotation.x + (x-initalMousePosition.x);
+		if (camera_rotation.x>360)
+			camera_rotation.x-=360;
+		camera_rotation.y=inital_camera_rotation.y + (y-initalMousePosition.y);
+		if (camera_rotation.y>360)
+			camera_rotation.y-=360;
+	}
+	// check if right mouse button is down
+	if ((virtualKeys&MK_RBUTTON)!=0)
+	{
+		// todo: zoom in/out
+	}
+}
+
+
+// handle key presses on the feature space window
+void FeatureSpace::OnKeyPress(int virtualKey)
+{
+	Console::write("feature space key press: %c\n",virtualKey);
+	switch (virtualKey)
+	{
+		
+		case VK_UP:
+			break;
+			
+		case VK_DOWN:
+			break;
+			
+		case VK_LEFT:
+			break;
+			
+		case VK_RIGHT:
+			break;
+						
+	}
+}
+ 
  
 /* handle events related to the feature space window */
 LRESULT CALLBACK FeatureSpace::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
     FeatureSpace* win=(FeatureSpace*)Window::GetWindowObject(hwnd);
     
-    
     switch (message)                  /* handle the messages */
     {			
         /* WM_DESTORY: system is destroying our window */
+        case WM_KEYDOWN:
+			win->OnKeyPress(wParam);
+			break;
+		case WM_LBUTTONDOWN:
+			win->OnLeftMouseDown(LOWORD(lParam),HIWORD(lParam));
+			break;
+		case WM_LBUTTONUP:
+			win->OnLeftMouseUp();
+			break;			
+		case WM_MOUSEMOVE:
+			win->OnMouseMove(wParam,LOWORD(lParam),HIWORD(lParam));
+			break;
         case WM_SIZE:
             win->OnResize();
             break;

@@ -30,9 +30,6 @@ LRESULT CALLBACK GLContainer::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
    
     switch (message)   
     {			
-		case WM_KEYDOWN:
-			
-			return 0;
         case WM_PAINT:
             hdc=BeginPaint(hwnd,&ps);
             if (win->handler!=NULL)

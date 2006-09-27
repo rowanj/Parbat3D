@@ -8,7 +8,6 @@ class GLContainerHandler
 {
     public:
     virtual void PaintGLContainer() { };
-    virtual void OnGLContainerKeyPress(int virtualKey) { };    
 };
 
 
