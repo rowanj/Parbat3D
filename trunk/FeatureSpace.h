@@ -84,7 +84,8 @@ class FeatureSpace:public Window, public GLContainerHandler
         void InitGL(void);
         void make_display_lists(void);
         GLuint list_box;
-        GLuint list_points;
+        GLuint list_points_base;
+        int	num_points_lists;
         GLfloat cam_yaw;
         GLfloat cam_pitch;
         GLfloat cam_dolly;

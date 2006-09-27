@@ -113,7 +113,9 @@ void FeatureSpace::PaintGLContainer() {
     // draw the bounding box
     glCallList(list_box);
     glTranslatef(0.5, 0.5, 0.5);
-    glCallList(list_points);
+    for (int list = list_points_base; list < list_points_base + num_points_lists; list++) {
+		glCallList(list);
+	}
         
     gl_view->GLswap();
 }
@@ -125,7 +127,6 @@ void FeatureSpace::make_display_lists(void)
 	const float origin_opacity = 0.8;
 
 	list_box = glGenLists(1);
-	list_points = glGenLists(1);
 
 	// Get ready to make bounding box list
 	glNewList(list_box, GL_COMPILE);
@@ -205,19 +206,27 @@ void FeatureSpace::make_display_lists(void)
 	
 	// Make list_points to benchmark display performance
 #if TRUE
-//	int count = 256 * 256 * 256 / 16;
-	int count = 256 * 256 * 10;
 	const int divisor = RAND_MAX / 256;
+	const int points_per_list = 50000;
+//	int count = 256 * 256 * 256 / 16;
+//	int count = 256 * 256 * 10;
+//	int count = 10;
+//	int count = 50000;
+	int count = 100000;
+	num_points_lists = count / points_per_list + 1;
+	list_points_base = glGenLists(num_points_lists);
 	char r, g, b;
 	srand(time(NULL)); // seed the random number generator
-	glNewList(list_points, GL_COMPILE);
+	
+	for (int this_list = num_points_lists - 1; this_list >= 0; this_list--) {
+	glNewList(list_points_base + this_list, GL_COMPILE);
 	glPushAttrib(GL_DEPTH_TEST);
 	glDisable(GL_DEPTH_TEST);
 	glPointSize(3);
-	glEnable(GL_POINT_SMOOTH);
-	glColor4f(1.0, 1.0, 1.0, 0.05);
+//	glEnable(GL_POINT_SMOOTH);
+	glColor4f(1.0, 1.0, 1.0, 0.5);
 	glBegin(GL_POINTS);
-	while (count) {
+	while (count >= points_per_list * this_list) {
 		count--;
 		/* generate random coordinates */
 		r = rand() / divisor;
@@ -228,6 +237,7 @@ void FeatureSpace::make_display_lists(void)
 	glEnd();
 	glPopAttrib();
 	glEndList();
+	}
 #endif
 }
 
