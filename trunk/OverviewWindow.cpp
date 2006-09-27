@@ -125,14 +125,14 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     else
                         ShowWindow(imageWindow.GetHandle(),SW_HIDE);
                     return 0;
-             
+                
                 case IDM_TOOLSWINDOW:
                     if (win->toggleMenuItemTick(win->hMainMenu,IDM_TOOLSWINDOW))
                         toolWindow.Show();
                     else
                         toolWindow.Hide();
                     return 0;
-
+                
                 case IDM_ROIWINDOW:
                     if (win->toggleMenuItemTick(win->hMainMenu,IDM_ROIWINDOW)) {
                         roiWindow.Show();
@@ -142,14 +142,14 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                         settingsFile->setSetting("roi window", "open", "0");  // keep closed on next image load
                     }
                     return 0;
-                    
+                
                 case IDM_PREFSWINDOW:
                     if (win->toggleMenuItemTick(win->hMainMenu,IDM_PREFSWINDOW))
                         prefsWindow.Show();
                     else
                         prefsWindow.Hide();
                     return 0;
-
+                
                 case IDM_CONTSWINDOW:
                     if (win->toggleMenuItemTick(win->hMainMenu,IDM_CONTSWINDOW))
                         contrastWindow.Show();
@@ -157,7 +157,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                         contrastWindow.Hide();
                         contrastAdvWindow.Hide();
                     return 0;
-
+                
                 case IDM_HELPCONTENTS:
 					 // get path to help folder
                      helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");

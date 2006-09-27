@@ -631,6 +631,11 @@ void ROIWindow::addNewRoiToList(ROI *rCur,int newId)
 
 
 void ROIWindow::loadROI (ROIWindow* win) {
+    if (!(regionsSet->get_regions()).empty() && regionsSet->unsaved_changes()) {
+        if (MessageBox(NULL, "Unsaved Regions of Interest will be lost.\nAre you sure you want to continue?", "Parbat3D", MB_YESNO|MB_ICONQUESTION)!=IDYES)
+            return;
+    }
+    
     OPENFILENAME ofn;
     char szFileName[MAX_PATH] = "";
     
