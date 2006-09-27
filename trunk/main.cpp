@@ -133,22 +133,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
         MessageBox(0,"Unable to create main window","Parbat3D Error",MB_OK);
         return 0;
     }
-       
+    
     /* Setup main & image windows */
     //  note: image window must be created before overview window
-
-    if ((!imageWindow.Create(mainWindow.GetHandle())) || (!overviewWindow.Create(imageWindow.GetHandle())) || (!prefsWindow.Create(imageWindow.GetHandle())) || (!contrastAdvWindow.Create(imageWindow.GetHandle())))
+    if ((!imageWindow.Create(mainWindow.GetHandle())) ||
+        (!overviewWindow.Create(imageWindow.GetHandle())) ||
+        (!prefsWindow.Create(imageWindow.GetHandle())) ||
+        (!contrastAdvWindow.Create(imageWindow.GetHandle())) ||
+        (!roiWindow.Create(imageWindow.GetHandle())))
     {
         /* report error if windows could not be setup (note: unlikely to happen) */
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
         return 0;
     }
+    
+    
     stickyWindowManager.SetController(&overviewWindow);    
     stickyWindowManager.AddStickyWindow(&imageWindow);
     stickyWindowManager.AddStickyWindow(&prefsWindow);
     stickyWindowManager.AddStickyWindow(&contrastWindow);
-
     stickyWindowManager.AddStickyWindow(&contrastAdvWindow);
+    stickyWindowManager.AddStickyWindow(&roiWindow);
 
     
     /* Execute the message loop. It will run until GetMessage( ) returns 0 */
@@ -232,7 +237,8 @@ void loadFile()
         // show tool & image windows
         toolWindow.Show();
         imageWindow.Show();
-        //roiWindow.Show();
+        if (atoi(settingsFile->getSetting("roi window", "open").c_str()) == 1)
+            roiWindow.Show();
         orderWindows();                    
         
         // update opengl displays

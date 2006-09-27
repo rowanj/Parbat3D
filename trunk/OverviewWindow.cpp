@@ -134,10 +134,13 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     return 0;
 
                 case IDM_ROIWINDOW:
-                    if (win->toggleMenuItemTick(win->hMainMenu,IDM_ROIWINDOW))
+                    if (win->toggleMenuItemTick(win->hMainMenu,IDM_ROIWINDOW)) {
                         roiWindow.Show();
-                    else
+                        settingsFile->setSetting("roi window", "open", "1");  // have open on next image load
+                    } else {
                         roiWindow.Hide();
+                        settingsFile->setSetting("roi window", "open", "0");  // keep closed on next image load
+                    }
                     return 0;
                     
                 case IDM_PREFSWINDOW:

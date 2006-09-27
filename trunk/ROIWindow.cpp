@@ -32,23 +32,32 @@ string *ROIWindow::editingROIName;
 // array to store custom colour values as choosen by user (all initilised to grey)
 COLORREF ROIWindow::customColours[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-int ROIWindow::Create(HWND parent)
-{
-    
+int ROIWindow::Create(HWND parent) {
+    RECT desktopRect;
     RECT rect;
     int mx,my;
     const int ROI_WINDOW_WIDTH=250;
     const int ROI_WINDOW_HEIGHT=300;
-
-    /* Get Main Window Location for ROI window alignment*/
-    GetWindowRect(overviewWindow.GetHandle(),&rect);
-
-    /* create ROI window */
+    
+    GetWindowRect(hDesktop,&desktopRect);  // Get the width & height of the desktop window
+    
+    // get the stored window position
+    mx = atoi(settingsFile->getSetting("roi window", "x").c_str());
+	my = atoi(settingsFile->getSetting("roi window", "y").c_str());
+	
+	// use the default position if there are now stored values or the values are offscreen
+	if (mx<=0 || mx>(desktopRect.right-50) || my<=0 || my>(desktopRect.bottom-50)) {
+        GetWindowRect(overviewWindow.GetHandle(),&rect);  // get Main Window Location for ROI window alignment
+        mx = rect.left;
+        my = rect.bottom + 30;
+    }
+    
+    // create ROI window
     if (!CreateWin(0, "Parbat3D ROI Window", "Regions of Interest",
 	     WS_POPUP | WS_SYSMENU | WS_CAPTION | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-	     rect.left, rect.bottom+30, 250, 300, parent, NULL))
+	     mx, my, 250, 300, parent, NULL))
 	    return false;
-	    
+	
     prevProc=SetWindowProcedure(&WindowProcedure);
 
 	// Create scroll box 	
@@ -472,21 +481,28 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
 		
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
-            if (wParam)
-                CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_CHECKED|MF_BYCOMMAND);            
-            else
+            if (wParam)  // shown
+                CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_CHECKED|MF_BYCOMMAND);
+            else         // hidden
                 CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             return 0;
-
+        
+        
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
             /* don't destroy this window, but make it invisible */
             ShowWindow(hwnd,SW_HIDE);
-            CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
+            CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
+            settingsFile->setSetting("roi window", "open", "0");  // keep closed on next image load
             return 0;
-
+        
+        
         /* WM_DESTORY: system is destroying our window */
         case WM_DESTROY:
+            /* save the image window attributes */
+            GetWindowRect(hwnd, &rect);
+            settingsFile->setSetting("roi window", "x", rect.left);
+            settingsFile->setSetting("roi window", "y", rect.top);
             break;
     }
     // call next window procedure in chain
@@ -722,11 +738,11 @@ void ROIWindow::deleteROI (ROIWindow* win) {
             //GetWindowRect(colBox,&rect);
             //MoveWindow(colBox, 210-20, rect.top-boxSize+1, rect.right-rect.left, rect.bottom-rect.top, true);
         }
-
+        
 		// get height of each row
 		ListView_GetItemRect(hROIListBox,1,&rect,LVIR_BOUNDS);
 		int rowHeight=rect.bottom-rect.top;
-
+		
 		// get width & height of scrollbox client area
 		GetClientRect(ROIscrollBox.GetHandle(),&rect);
 		
@@ -735,7 +751,7 @@ void ROIWindow::deleteROI (ROIWindow* win) {
 		if (newListViewHeight<rect.bottom-4)
 			newListViewHeight=rect.bottom-4;
 		MoveWindow(hROIListBox,0,0,rect.right-rect.left,newListViewHeight,true);
-
+		
         
         // remove the ROI from the set
         regionsSet->remove_region(name);
