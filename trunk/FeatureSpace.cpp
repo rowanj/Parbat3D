@@ -10,6 +10,8 @@
 #include <gl/glu.h>
 #include <commctrl.h>
 
+#define POLYDATA_DEBUG 0
+
 int FeatureSpace::numFeatureSpaces=0;
 
 const int FeatureSpace::FEATURE_WINDOW_WIDTH=650;       // inital width of feature space window
@@ -183,9 +185,9 @@ void FeatureSpace::PaintGLContainer() {
 void FeatureSpace::getPixelData()
 {
 	vector<ROI*> theROIs = regionsSet->get_regions();
-	Console::write("FeatureSpace -- Count of regions is %d\n", regionsSet->get_regions_count());
+	Console::write("FS::GpixD\tCount of regions is %d\n", regionsSet->get_regions_count());
 	assert(regionsSet != NULL);
-	Console::write("FeatureSpace -- Got vector of ROIs\n");
+	Console::write("FS::GpixD\tGot vector of ROIs\n");
 	
     ROI* currentROI;
 	
@@ -194,46 +196,46 @@ void FeatureSpace::getPixelData()
 	LODwidth = fsTileset->get_LOD_width();
 	LODheight = fsTileset->get_LOD_height();
 	
-	Console::write("FeatureSpace -- LOD factor is %d\n", LODfactor);
+	Console::write("FS::GpixD\tLOD factor is %d\n", LODfactor);
 
 	if (!theROIs.empty()) //if there are some ROIs in the set
 	{
-		Console::write("FeatureSpace -- Got past theROIs empty check\n");
+		Console::write("FS::GpixD\tGot past theROIs empty check\n");
 		for (int cr = 0; cr < theROIs.size(); cr++)
 		{
-			Console::write("FeatureSpace -- Got into the ROIs loop\n");
+			Console::write("FS::GpixD\tGot into the ROIs loop\n");
 			currentROI = theROIs.at(cr);
 			vector<ROIEntity*> theEntities = currentROI->get_entities();
-			Console::write("FeatureSpace -- Got vector of entities\n");
+			Console::write("FS::GpixD\tGot vector of entities\n");
 			if (!theEntities.empty())
 			{
-				Console::write("FeatureSpace -- Set our current ROI\n");
+				Console::write("FS::GpixD\tSet our current ROI\n");
 				ROIEntity* currentEntity;
 				if (currentROI->get_active())
 				{
-					Console::write("FeatureSpace -- Current ROI is active -- checking types\n");
+					Console::write("FS::GpixD\tCurrent ROI is active -- checking types\n");
 					for(int ce = 0; ce < theEntities.size(); ce++)
 					{
 						currentEntity = theEntities.at(ce);
-						Console::write("FeatureSpace -- Set our current entity\n");
+						Console::write("FS::GpixD\tSet our current entity\n");
 						
 						char* theType = (char*)currentEntity->get_type();
 						
 						if(theType == ROI_POINT) //ROI == point
 						{
-							Console::write("FeatureSpace -- Current type is POINT\n");
+							Console::write("FS::GpixD\tCurrent type is POINT\n");
 							//add data at point to data lists
 							getPointData(currentEntity, currentROI);
 						}
 						else if(theType == ROI_RECT) //ROI == rectangle
 						{
-							Console::write("FeatureSpace -- Current type is RECT\n");
+							Console::write("FS::GpixD\tCurrent type is RECT\n");
 							//add data at all points in rectangle to data lists
 							getRectData(currentEntity, currentROI);
 						}
 						else //ROI == polygon
 						{
-							Console::write("FeatureSpace -- Current type is POLYGON\n");
+							Console::write("FS::GpixD\tCurrent type is POLYGON\n");
 							//add data at all points in polygon to data lists
 							getPolygonData(currentEntity, currentROI);
 						}
@@ -242,16 +244,18 @@ void FeatureSpace::getPixelData()
 			}
 			else
 			{
-				Console::write("FeatureSpace -- the entities set is empty\n");	
+				Console::write("FS::GpixD\tthe entities set is empty\n");	
 			}
 		}
 	}
 	else
 	{
-		Console::write("FeatureSpace -- the ROIs set is empty\n");
+		Console::write("FS::GpixD\tthe ROIs set is empty\n");
 	}
 	
 	delete fsTileset;
+	
+	Console::write("FS::GpixD\tTileset destroyed.\n");
 	
 	//print out our lists
 	/*list<xListStruct*>::iterator xRun;
@@ -356,7 +360,46 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 		}
 		generateBoundaryLine(polyPoints[polyPoints.size()-1].x, polyPoints[polyPoints.size()-1].y, polyPoints[0].x, polyPoints[0].y);
 		
-		int firstPoint = 0;
+		#if POLYDATA_DEBUG
+		//print our lists to console
+		Console::write("FS::GPD Before sort:\n");
+		for (int i = 0; i < vectorsize; i++)
+		{
+			Console::write("FS::GPD\tY %d\n", i + yoffset);
+			list<int>::iterator j = boundsCoords[i]->begin();
+			for(j; j != boundsCoords[i]->end(); j++)
+			{
+				Console::write("FS::GPD\t\tX %d\n", *j);
+			}
+		}
+		Console::write("\n");
+		#endif
+		
+		//sort our resultant lists
+		int sortstart = GetTickCount();
+		for (int i = 0; i < vectorsize; i++)
+		{
+			boundsCoords[i]->sort();
+		}
+		int sortend = GetTickCount();
+		Console::write("FS::GPD Time to sort lists was %f seconds\n\n", (float)(sortend - sortstart) / 1000.0);
+		
+		#if POLYDATA_DEBUG
+		//print our lists to console
+		Console::write("FS::GPD After sort:\n");
+		for (int i = 0; i < vectorsize; i++)
+		{
+			Console::write("FS::GPD\tY %d\n", i + yoffset);
+			list<int>::iterator j = boundsCoords[i]->begin();
+			for(j; j != boundsCoords[i]->end(); j++)
+			{
+				Console::write("FS::GPD\t\tX %d\n", *j);
+			}
+		}
+		Console::write("\n");
+		#endif
+		
+		/*int firstPoint = 0;
 		int lastPoint = polyPoints.size() - 1;
 		int secondLastPoint = polyPoints.size() - 2;
 		
@@ -369,81 +412,97 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 			isTurningPoint(i, i+1, i+2);
 		}
 		//calculate last point
-		isTurningPoint(secondLastPoint, lastPoint, firstPoint);
-		
-		//sort our resultant lists
-		int sortstart = GetTickCount();
-		for (int i = 0; i < vectorsize; i++)
-		{
-			boundsCoords[i]->sort();
-		}
-		int sortend = GetTickCount();
-		Console::write("FS::GPD Time to sort lists was %f seconds\n", (float)(sortend - sortstart) / 1000.0);
-		
+		isTurningPoint(secondLastPoint, lastPoint, firstPoint);*/
 		
 		//get the point coordinates for all points between those lines, if size not odd
 		time_start = GetTickCount();
 		for (int i = 0; i < vectorsize; i++)
 		{
+			#if POLYDATA_DEBUG
+			Console::write("FS::GPD\tReckons number of X points at %d is %d\n", i + yoffset, boundsCoords[i]->size());
+			#endif
 			//iterators for our "point pairs"
-			if ((boundsCoords[i]->size()%2) == 0 && boundsCoords[i]->size() != 0)
+			if (boundsCoords[i]->size() > 1)
 			{
-				Console::write("FS::GPD Even number of points at %d -- drawing lines\n", i + yoffset);
+				#if POLYDATA_DEBUG
+				Console::write("FS::GPD\t\tMore than one point at %d -- drawing lines\n", i + yoffset);
+				#endif
 				//Console::write("Drawing lines at Y %d:\n", i + yoffset);
 				list<int>::iterator j1 = boundsCoords[i]->begin();
 				list<int>::iterator j2 = j1;
 				//set our second point to the next point in the list
-				j2++;
-				
-				//loop until we reach the end of the point list
-				while(true)
+				while(*j1 == *j2)
 				{
-					//if our points are identical, just get the one copy of it
-					//Console::write("\tFilling line from %d to %d\n", *j1, *j2);
-					if (*j1 == *j2)
+					j2++;
+				}
+				if(j2 == boundsCoords[i]->end()) j2--;
+				
+				#if POLYDATA_DEBUG
+				Console::write("FS::GPD\t*j1 = %d, *j2 = %d, size = %d\n", *j1, *j2, boundsCoords[i]->size());
+				#endif
+				//loop until we reach the end of the point list
+				if ((*j1 == *j2) && (boundsCoords[i]->size() == 2))
+				{
+					#if POLYDATA_DEBUG
+					Console::write("FS::GPD\t\tIdentical pair %d & %d -- drawing\n", *j1, *j2);
+					#endif
+					pushXPixel(*j1, i + yoffset);
+					totalPoints++;
+				}
+				else
+				{
+					while(true)
 					{
-						pushXPixel(*j1, i + yoffset);
-						totalPoints++;
-						//Console::write("Fill point at X %d, Y %d\n", *j1, i + yoffset);
-					}
-					else //get all points between them (inclusive)
-					{
-						for(int k = *j1; k <= *j2; k++)
+						#if POLYDATA_DEBUG
+						Console::write("FS::GPD\t\tFilling line from %d to %d\n", *j1, *j2);
+						#endif
+						/*if (*j1 == *j2)
 						{
-							pushXPixel(k, i + yoffset);
+							pushXPixel(*j1, i + yoffset);
 							totalPoints++;
-							//plotPixel((short)k, (short)(i + yoffset));
-							//Console::write("Fill point at X %d, Y %d\n", Y, i + yoffset);
+							//Console::write("Fill point at X %d, Y %d\n", *j1, i + yoffset);
 						}
-					}
-					
-					//move j2 on to the next point in the list
-					j2++;
-					if(j2 == boundsCoords[i]->end()) //if we're at the end of the list, break
-					{
-						break;
-					}
-					//otherwise, set j1 to be the next point as well, and
-					//move j2 on to the next point in the pair
-					j1 = j2;
-					j2++;
-					if(j2 == boundsCoords[i]->end()) //if we're at the end of the list, break
-					{
-						break;
+						else //get all points between them (inclusive)
+						{*/
+							for(int k = *j1; k <= *j2; k++)
+							{
+								pushXPixel(k, i + yoffset);
+								totalPoints++;
+								//plotPixel((short)k, (short)(i + yoffset));
+								//Console::write("Fill point at X %d, Y %d\n", Y, i + yoffset);
+							}
+						//}
+						
+						//move j2 on to the next point in the list
+						j2++;
+						if(j2 == boundsCoords[i]->end()) //if we're at the end of the list, break
+						{
+							break;
+						}
+						//otherwise, set j1 to be the next point as well, and
+						//move j2 on to the next point in the pair
+						j1 = j2;
+						j2++;
+						if(j2 == boundsCoords[i]->end()) //if we're at the end of the list, break
+						{
+							break;
+						}
 					}
 				}
 			}
-			else if (boundsCoords[i]->size() == 1)
+			else //if (boundsCoords[i]->size() == 1)
 			{
-				Console::write("FS::GPD Single point at %d -- drawing\n", i + yoffset);
+				#if POLYDATA_DEBUG
+				Console::write("FS::GPD\t\tSingle point at %d -- drawing %d\n", i + yoffset, *boundsCoords[i]->begin());
+				#endif
 				pushXPixel(*boundsCoords[i]->begin(), i + yoffset);
 				totalPoints++;
 				//plotPixel((short)*pixCoords[i]->begin(), (short)(i + yoffset));
 			}
-			else
+			/*else
 			{
 				Console::write("FS::GPD Odd number of points at %d\n", i + yoffset);
-			}
+			}*/
 		}
 		time_end = GetTickCount();
 		Console::write("FS::GPD Time to draw points between pairs was %f seconds\n", (float)(time_end - time_start) / 1000.0);
@@ -455,6 +514,15 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 	//push the values for this data to our lists of values -- TO DO
 	
 	//we're finished -- clear our data for the next run
+	time_start = GetTickCount();
+	for (int i = 0; i < vectorsize; i++)
+	{
+		delete boundsCoords[i];
+		delete pixCoords[i];
+	}
+	time_end = GetTickCount();
+	Console::write("FS::GPD Time to clear vectors was %f seconds\n", (float)(time_end - time_start) / 1000.0);
+	
 	boundsCoords.clear();
 	pixCoords.clear();
 	maxy = 0; 
