@@ -19,7 +19,7 @@ class ImageGL : public ViewportListener
 	
 	void resize_window(void);
 	
-	unsigned int* get_pixel_values(int image_x, int image_y); // remember to delete[]
+	unsigned char* get_pixel_values(int image_x, int image_y); // remember to delete[]
 	
 	void notify_viewport(void);
 	void notify_bands(void);

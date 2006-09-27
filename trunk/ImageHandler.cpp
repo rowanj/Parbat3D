@@ -73,12 +73,12 @@ void ImageHandler::resize_image_window(void)
 }
 
 /* This function gets pixel values in absolute image coordinates */
-unsigned int* ImageHandler::get_image_pixel_values(int x, int y)
+unsigned char* ImageHandler::get_image_pixel_values(int x, int y)
 {
 	return image_gl->get_pixel_values(x,y);
 }
 /* This function gets pixel values from absolute coordinates at zoom scaling*/
-unsigned int* ImageHandler::get_zoom_pixel_values(int x, int y)
+unsigned char* ImageHandler::get_zoom_pixel_values(int x, int y)
 {
 	float zoom_factor = image_viewport->get_zoom_level() / 100.0;
 	/* Translate zoom coordinates to image coordinates */
@@ -91,7 +91,7 @@ unsigned int* ImageHandler::get_zoom_pixel_values(int x, int y)
 
 
 /* This function gets pixel values from the current viewport */
-unsigned int* ImageHandler::get_window_pixel_values(int x, int y)
+unsigned char* ImageHandler::get_window_pixel_values(int x, int y)
 {
 	int ix, iy;
 	image_viewport->translate_window_to_image(x, y, &ix, &iy);

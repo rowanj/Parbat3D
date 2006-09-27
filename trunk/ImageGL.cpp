@@ -566,7 +566,7 @@ void ImageGL::add_new_texture(void)
 	free_textures.push_back(new_tex);
 }
 
-unsigned int* ImageGL::get_pixel_values(int image_x, int image_y)
+unsigned char* ImageGL::get_pixel_values(int image_x, int image_y)
 {
 	if (tileset != NULL)
 		return tileset->get_pixel_values(image_x, image_y);
@@ -575,7 +575,7 @@ unsigned int* ImageGL::get_pixel_values(int image_x, int image_y)
 		so we should just avoid delete[]'ing memory we haven't new[]'ed.
 		This might occur for a few instants between the window being shown and
 		the tileset being loaded... or something */
-	return new unsigned int[image_file->getImageProperties()->getNumBands()];
+	return new unsigned char[image_file->getImageProperties()->getNumBands()];
 }
 
 // Return the texture id of a tile at column/row index:

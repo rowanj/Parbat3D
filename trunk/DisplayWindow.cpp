@@ -75,7 +75,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                 int mx = (short)LOWORD(lParam);
                 int my = (short)HIWORD(lParam);
                 int ix, iy;
-                unsigned int* bv;
+                unsigned char* bv;
                 
                 //Console::write("DisplayWindow WM_MOUSEMOVE\n mx=%d my=%d\n",mx,my);
                 

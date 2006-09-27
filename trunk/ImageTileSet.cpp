@@ -311,36 +311,34 @@ int ImageTileSet::load_tile(int x, int y)
 }
 
 /* Coords are in image pixels */
-unsigned int* ImageTileSet::get_pixel_values(int x, int y)
+unsigned char* ImageTileSet::get_pixel_values(int x, int y)
 {
-	unsigned int* return_values = new unsigned int[num_bands];
-	int tmp, tile_index, pixel_start;
-	char* tile_data;
+	unsigned char* return_values = new unsigned char[num_bands];
+	int tile_index, pixel_start;
+	unsigned char* tile_data;
 
 	if ((x >= image_width) || (y >= image_height) || (x < 0) || (y < 0)) {
-		for (tmp = 0; tmp < num_bands; tmp++) {
+		for (short tmp = 0; tmp < num_bands; tmp++) {
 			return_values[tmp] = 0;
 		}
 		return return_values;
 	}
 	
 	tile_index = load_tile(x,y);
-	tile_data = tiles[tile_index].data;
+	tile_data = (unsigned char*) tiles[tile_index].data;
+
 
 	/* Find index in tile */
-	x = (x / MathUtils::ipow(2,LOD)) % tex_size;
-	y = (y / MathUtils::ipow(2,LOD)) % tex_size;	
+	x = (x / LOD_factor) % tex_size;
+	y = (y / LOD_factor) % tex_size;	
 
-	
-	pixel_start = (x + (y*tex_size)) * (num_bands * sample_size);
-	return_values[2] = pixel_start;
-	for (tmp = 0; tmp < num_bands; tmp++) {
-		return_values[tmp] = 0;
-		return_values[tmp] = (unsigned int)tile_data[pixel_start + tmp];
-		return_values[tmp] = return_values[tmp] & 0xFF; //!! will need to be
+	// !! will need to compensate for sample_size for multi-byte samples
+	pixel_start = (x*num_bands) + (y*tex_size*num_bands);
+//	return_values[2] = pixel_start;
+	for (short tmp = 0; tmp < num_bands; tmp++) {
+		return_values[tmp] = tile_data[pixel_start + tmp];
 	}
-	
-	/* This finds values by image pixels */
+
 	return return_values;
 }
 

@@ -33,11 +33,11 @@ public:
 	ImageFile* get_image_file(void);
 	
 	// get pixel values from window co-ordinates
-	unsigned int* get_window_pixel_values(int x, int y); // remember to delete[]
+	unsigned char* get_window_pixel_values(int x, int y); // remember to delete[]
 	// get pixel values from absolute coordinates at this zoom level
-	unsigned int* get_zoom_pixel_values(int x, int y); // remember to delete[]
+	unsigned char* get_zoom_pixel_values(int x, int y); // remember to delete[]
     // get pixel values from absolute image coordinates (from displayed LOD)
-    unsigned int* get_image_pixel_values(int x, int y); // remember to delete[]
+    unsigned char* get_image_pixel_values(int x, int y); // remember to delete[]
        
     /* Status operators */
 	int get_status(void);
