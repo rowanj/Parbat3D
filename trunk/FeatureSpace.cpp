@@ -818,7 +818,9 @@ void FeatureSpace::OnResize() {
     
     MoveWindow(glContainer->GetHandle(), x, y, width, height, true);
     MoveWindow(hToolbar, x, rect.bottom-TOOLBAR_HEIGHT, rect.right, TOOLBAR_HEIGHT, true);    
-
+    
+    if (fsgl!=NULL)
+		fsgl->resize();
     glContainer->Repaint();
 }
 

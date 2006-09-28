@@ -1,4 +1,5 @@
 #include "config.h"
+#include "console.h"
 #include "GLView.h"
 
 #include <cassert>
@@ -74,7 +75,7 @@ void GLView::resize(void)
 	GLuint width, height;
 	LPRECT window_rect;
 	window_rect = new RECT;
-	GetWindowRect(window_handle, window_rect);
+	GetClientRect(window_handle, window_rect);
 	width = window_rect->right - window_rect->left;
 	height = window_rect->bottom - window_rect->top;
 	delete window_rect; 

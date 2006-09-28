@@ -308,5 +308,6 @@ void FeatureSpaceGL::cam_translate(float x, float y)
 
 void FeatureSpaceGL::resize(void)
 {
-	gl_view->resize();
+	if (gl_view!=NULL)
+		gl_view->resize();
 }
