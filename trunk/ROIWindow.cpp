@@ -625,6 +625,10 @@ void ROIWindow::addNewRoiToList(ROI *rCur,int newId)
 		newListViewHeight=rect.bottom-4;
 	MoveWindow(hROIListBox,0,0,rect.right-rect.left,newListViewHeight,true);
 	
+	// make the ROI active as soon as it is created
+	ListView_SetCheckState(hROIListBox, newId, true);  // make its checkbox selected
+	rCur->set_active(true);                            // set the actual ROI to active
+	
 	// select the ROI that was just created so new entities will be added to it
 	LVITEM lvi;
     lvi.stateMask = LVIS_SELECTED;
@@ -767,7 +771,7 @@ void ROIWindow::deleteROI (ROIWindow* win) {
         // update the display
         imageWindow.Repaint();
         
-        // select the next ROI in the set
+        // select the next ROI in the set (allows continuous deletion without extra selections)
         int items_in_list = SendMessage(hROIListBox, LVM_GETITEMCOUNT, 0, 0);
         if (items_in_list > 0) {
             LVITEM lvi;
