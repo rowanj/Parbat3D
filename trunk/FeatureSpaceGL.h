@@ -12,6 +12,7 @@ public:
 	FeatureSpaceGL(HWND hwnd_arg, int LOD_arg, int band1, int band2, int band3);
 	void draw(void);
 	void resize(void);
+	void cam_translate(float x, float y);
 		
     GLfloat cam_yaw;
     GLfloat cam_pitch;

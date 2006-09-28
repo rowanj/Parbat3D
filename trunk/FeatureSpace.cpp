@@ -847,7 +847,7 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	int y_diff = y - prev_mouse_y;
 	Console::write("x_diff=%d y_diff=%d \n",x_diff,y_diff);
 	// checked if left mouse button is down
-	if ((virtualKeys&MK_LBUTTON)!=0)
+	if ((virtualKeys&MK_LBUTTON) && !(virtualKeys&MK_RBUTTON))
 	{
 		float cam_yaw = fsgl->cam_yaw;
 		float cam_pitch = fsgl->cam_pitch;
@@ -863,8 +863,14 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 		
 		glContainer->Repaint();
 	}
-	// check if right mouse button is down
-	if ((virtualKeys&MK_RBUTTON)!=0)
+/*	if ((virtualKeys&MK_RBUTTON) && !(virtualKeys&MK_LBUTTON))
+	{
+		float nx = (float)x_diff/100.0;
+		float ny = (float)y_diff/100.0;
+		fsgl->cam_translate(nx, ny);
+	} */
+	// check if left & right mouse button is down
+	if ((virtualKeys&MK_RBUTTON) && !(virtualKeys&MK_LBUTTON))
 	{
 		float cam_dolly = fsgl->cam_dolly;
 		

@@ -177,14 +177,14 @@ void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 	glNewList(list_points_base, GL_COMPILE);
 	glPushAttrib(GL_DEPTH_TEST);
 	glDisable(GL_DEPTH_TEST);
-	glPointSize(2);
+	glPointSize(3);
 	glEnable(GL_POINT_SMOOTH);
 	glColor4f(1.0, 1.0, 1.0, 0.5);
 	glBegin(GL_POINTS);
 	for(hashi = points_hash.begin(); hashi != points_hash.end(); hashi++) {
 		point = hashi->first;
 		count = hashi->second;
-		glColor4f(1.0, 1.0, 1.0, ((float)count/(float)maxvalue)*0.7 + 0.3);
+		glColor4f(1.0, 1.0, 1.0, 0.9 * (float)count/(float)maxvalue + 0.1);
 		glVertex3f(*pointx/256.0, *pointy/256.0, *pointz/256.0);
 		//value = hashi->second;
 		vertices++;
@@ -230,6 +230,15 @@ void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 	}
 #endif
 
+}
+
+void FeatureSpaceGL::cam_translate(float x, float y)
+{
+	gl_view->make_current();
+	glPushAttrib(GL_MATRIX_MODE);
+	glMatrixMode(GL_PROJECTION);
+	glTranslatef(x, y, 0.0);
+	glPopAttrib();
 }
 
 void FeatureSpaceGL::resize(void)
