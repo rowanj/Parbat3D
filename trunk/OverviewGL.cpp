@@ -38,7 +38,7 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* i
 	LOD_height = tileset->get_LOD_height();
 	LOD_width = tileset->get_LOD_width();
 	
-	gl_overview->GLresize();
+	gl_overview->resize();
 
 	/* compile display list for textured tile */
 	list_tile = glGenLists(1);
@@ -177,7 +177,7 @@ void OverviewGL::notify_viewport(void)
 		
 		glPopMatrix(); /* Restore tile transform */
 	}
-	gl_overview->GLswap();
+	gl_overview->swap();
 }
 
 void OverviewGL::notify_bands(void)

@@ -14,9 +14,9 @@ public:
 	void make_current(void);		/* Selects this rendering context for
 										use.  Only necessary if multiple
 										instances of this class are used. */
-	void GLresize(void);			/* Re-sizes OpenGL viewport to fit
+	void resize(void);			/* Re-sizes OpenGL viewport to fit
 										current size of the window */
-	void GLswap(void);				/* Calls platform-dependant function
+	void swap(void);				/* Calls platform-dependant function
 										to swap OpenGL buffers */
 	
 	GLfloat aspect(void);				/* Gets aspect of current viewport */

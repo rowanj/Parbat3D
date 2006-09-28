@@ -47,25 +47,9 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     
     numFeatureSpaces++;
     
-	fsgl = new FeatureSpaceGL(glContainer->GetHandle(), LOD, band1, band2, band3);
-	
-    // todo: setup feature space's data    
     getPixelData();
-	
-	/*//test hash map
-	unsigned int test[8] = {123, 100, 80, 90, 100, 100, 90, 65};
-	
-	for (int i = 0; i < 8; i++)
-	{
-		Console::write("FS::Test - Attempting to add element %d (%d) to hash table\n", i, test[i]);
-		fsPoints[test[i]] = fsPoints[test[i]] + 1;
-		Console::write("FS::Test - incrementing %d\n", test[i]);
-	}
-	for (hashiter = fsPoints.begin(); hashiter != fsPoints.end(); hashiter++)
-	{
-		Console::write("FS::Test - Hash value for %d = %d\n", hashiter->first, hashiter->second);
-	}*/
-	
+    
+	fsgl = new FeatureSpaceGL(glContainer->GetHandle(), LOD, band1, band2, band3);
 	fsgl->make_points_lists(fsPoints, maxPixelCount);
 	fsgl->num_points = numberPoints;
 	
@@ -81,7 +65,7 @@ void FeatureSpace::PaintGLContainer() {
 //getPixelData gets all point coordinates from within ROIs, and
 //then gets all data values for those pixel coords, and stores
 //them, ready for display list generation.
-void FeatureSpace::getPixelData()
+void FeatureSpace::getPixelData(void)
 {
 	vector<ROI*> theROIs = regionsSet->get_regions();
 	Console::write("FS::GpixD\tCount of regions is %d\n", regionsSet->get_regions_count());
@@ -167,13 +151,18 @@ void FeatureSpace::getImageData(void)
 	int ncols = fsTileset->get_columns();
 	int nrows = fsTileset->get_rows();
 	unsigned char* tile;
+//	const unsigned char top_clip = 250;
+//	const unsigned char bottom_clip = 5;
 
 	for (int row = 0; row < nrows; row++) {
 		for (int col = 0; col < ncols; col++) {
 			tile = (unsigned char*) fsTileset->get_tile_RGB_LOD(col * tileSize, row * tileSize, band1, band2, band3);
 			for (int pos = 0; pos < tileSize * tileSize * 3; pos = pos + 3) {
-				addToFSTable(tile[pos], tile[pos+1], tile[pos+2]);
-				numberPoints++;
+//				if (tile[pos] < top_clip && tile[pos+1] < top_clip && tile[pos+2] < top_clip &&
+//				    tile[pos] > bottom_clip && tile[pos+1] > bottom_clip && tile[pos+2] > bottom_clip) {
+					addToFSTable(tile[pos], tile[pos+1], tile[pos+2]);
+					numberPoints++;
+//				}
 			}
 		}
 	}
@@ -204,9 +193,10 @@ void FeatureSpace::getPointData(ROIEntity* theEntity, ROI* theROI)
 	
 	Console::write("got past tile load\n");
 	
-	unsigned char b1 = (unsigned char)grabbedData[(tiley * tileSize * 3) + (tilex*3)];
-	unsigned char b2 = (unsigned char)grabbedData[(tiley * tileSize * 3) + (tilex*3) + 1];
-	unsigned char b3 = (unsigned char)grabbedData[(tiley * tileSize * 3) + (tilex*3) + 2];
+	int offset = (tiley * tileSize * 3) + (tilex * 3);
+	unsigned char b1 = (unsigned char)grabbedData[offset];
+	unsigned char b2 = (unsigned char)grabbedData[offset + 1];
+	unsigned char b3 = (unsigned char)grabbedData[offset + 2];
 	
 	addToFSTable(b1, b2, b3);
 }
@@ -929,6 +919,7 @@ LRESULT CALLBACK FeatureSpace::WindowProcedure(HWND hwnd, UINT message, WPARAM w
 			break;
         case WM_SIZE:
             win->OnResize();
+            win->fsgl->resize();
             break;
         case WM_DESTROY:
             stickyWindowManager.RemoveStickyWindow(win);

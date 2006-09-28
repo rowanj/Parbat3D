@@ -54,15 +54,12 @@ class FeatureSpace:public Window, public GLContainerHandler
 		int band1;
 		int band2;
 		int band3;
-        
-        /* OpenGL stuff */
-        FeatureSpaceGL* fsgl;
    		
    		// Input stuff
    		int prev_mouse_x;
    		int prev_mouse_y;
-        
-        void getPixelData();
+
+        void getPixelData(void);
         void getImageData(void);
         void getPointData(ROIEntity* theEntity, ROI* theROI);
 		void getRectData(ROIEntity* theEntity, ROI* theROI);
@@ -92,7 +89,9 @@ class FeatureSpace:public Window, public GLContainerHandler
 		
     public:
         FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3);      // create & display new feature space window
-};
 
+        /* OpenGL stuff */
+        FeatureSpaceGL* fsgl;
+};
 
 #endif

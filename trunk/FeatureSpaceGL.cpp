@@ -67,7 +67,7 @@ void FeatureSpaceGL::draw()
 		glCallList(list);
 	}
         
-    gl_view->GLswap();
+    gl_view->swap();
 }
 
 void FeatureSpaceGL::make_box_list()
@@ -170,19 +170,21 @@ void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 	pointx = (unsigned char*)&point + 0;
 	pointy = (unsigned char*)&point + 1;
 	pointz = (unsigned char*)&point + 2;
-	unsigned int value;
+	unsigned int count;
 	
 	num_points_lists = 1;
 	list_points_base = glGenLists(num_points_lists);
 	glNewList(list_points_base, GL_COMPILE);
 	glPushAttrib(GL_DEPTH_TEST);
 	glDisable(GL_DEPTH_TEST);
-	glPointSize(5);
+	glPointSize(2);
 	glEnable(GL_POINT_SMOOTH);
 	glColor4f(1.0, 1.0, 1.0, 0.5);
 	glBegin(GL_POINTS);
 	for(hashi = points_hash.begin(); hashi != points_hash.end(); hashi++) {
 		point = hashi->first;
+		count = hashi->second;
+		glColor4f(1.0, 1.0, 1.0, ((float)count/(float)maxvalue)*0.7 + 0.3);
 		glVertex3f(*pointx/256.0, *pointy/256.0, *pointz/256.0);
 		//value = hashi->second;
 		vertices++;
@@ -228,4 +230,9 @@ void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 	}
 #endif
 
+}
+
+void FeatureSpaceGL::resize(void)
+{
+	gl_view->resize();
 }

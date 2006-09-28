@@ -85,7 +85,7 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 		texture_size = min(user_texture_size, max_texture_size);
 	}
 
-	gl_image->GLresize();
+	gl_image->resize();
 
 	/* compile display list for textured tile */
 	list_tile = glGenLists(1);
@@ -191,7 +191,7 @@ void ImageGL::notify_viewport(void)
 
 	draw_rois();
 
-	gl_image->GLswap();
+	gl_image->swap();
 }
 
 /* Draw ROI outlines */
@@ -522,7 +522,7 @@ void ImageGL::resize_window(void)
 	int new_tex_count; */
 	
 	/* Re-size the OpenGL context */
-	gl_image->GLresize();
+	gl_image->resize();
 
 	/* Number how many textures at near-next LOD cover the screen? */
 /*	new_tex_cols = (gl_image->width() / (texture_size / 2)) + 1;

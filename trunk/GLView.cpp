@@ -58,7 +58,7 @@ GLView::GLView(HWND hWindow)
 		error_text = "Could not make rendering context current.";
 	}
 	
-	this->GLresize();
+	this->resize();
 }
 
 GLView::~GLView()
@@ -69,7 +69,7 @@ GLView::~GLView()
 }
 
 /* Call on window re-size to adjust OpenGL context to fit */
-void GLView::GLresize(void)
+void GLView::resize(void)
 {
 	GLuint width, height;
 	LPRECT window_rect;
@@ -94,7 +94,7 @@ void GLView::make_current()
 	wglMakeCurrent(device_context, rendering_context);
 }
 
-void GLView::GLswap()
+void GLView::swap()
 {
 	this->make_current();
 	SwapBuffers(device_context);
