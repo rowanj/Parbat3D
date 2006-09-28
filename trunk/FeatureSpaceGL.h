@@ -32,6 +32,7 @@ private:
 
 	int LOD;
     int	num_points_lists;
+    int vertices;
     GLuint list_box;
     GLuint list_points_base;
     

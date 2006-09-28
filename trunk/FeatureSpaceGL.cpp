@@ -14,6 +14,7 @@ FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_
 	band3 = band3_arg;
 	
 	num_points = 0;
+	vertices = 0;
 	LOD = LOD_arg;
 	granularity = 1;
 	while (LOD_arg) {
@@ -56,7 +57,8 @@ void FeatureSpaceGL::draw()
     glTranslatef(-0.5, -0.5, -0.5);
     
     gl_text->draw_string(5, 20, "Granularity: %d:1", granularity);
-    gl_text->draw_string(5, 40, "Number of Points: %d", num_points);
+    gl_text->draw_string(5, 40, "Image Points: %d", num_points);
+    gl_text->draw_string(5, 60, "Unique Points: %d", vertices);
     
     // draw the bounding box
     glCallList(list_box);
@@ -175,7 +177,7 @@ void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 	glNewList(list_points_base, GL_COMPILE);
 	glPushAttrib(GL_DEPTH_TEST);
 	glDisable(GL_DEPTH_TEST);
-	glPointSize(3);
+	glPointSize(5);
 	glEnable(GL_POINT_SMOOTH);
 	glColor4f(1.0, 1.0, 1.0, 0.5);
 	glBegin(GL_POINTS);
@@ -183,6 +185,7 @@ void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 		point = hashi->first;
 		glVertex3f(*pointx/256.0, *pointy/256.0, *pointz/256.0);
 		//value = hashi->second;
+		vertices++;
 	}
 	glEnd();
 	glPopAttrib();
