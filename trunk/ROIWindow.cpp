@@ -383,26 +383,25 @@ void ROIWindow::OnListItemChanged(NMLISTVIEW* pnml)
 }
 
 /* handle messages/events related to the ROI window */
-LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
+LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     RECT rect;           /* for general use */
     NMHDR *nmhdr;        /* structure used for WM_NOTIFY events */
     //LPNMHDR pnmh;
     LPNMLVDISPINFO pdi;
-    LVITEM lvi;
+    LVITEM lvi;          // list item that is referenced by a message
     int temp_int;        // general use int
     string *temp_str;    // general use string pointer
     ROI* roi;            // general use ROI pointer
     
     
-    ROIWindow* win=(ROIWindow*)Window::GetWindowObject(hwnd);
+    ROIWindow* win = (ROIWindow*) Window::GetWindowObject(hwnd);
     
     switch (message) {   /* handle the messages */
 		case WM_NOTIFY:
             nmhdr = (NMHDR*) lParam;
             switch (nmhdr->code) {
 				case LVN_ITEMCHANGED:
-					win->OnListItemChanged((NMLISTVIEW*) nmhdr);
+                    win->OnListItemChanged((NMLISTVIEW*) nmhdr);
 					break;
 				
 				
@@ -426,10 +425,8 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
                         temp_int = lvi.iItem;                                // get the index of item being edited
                         temp_str = new string(lvi.pszText);                  // get the new name
                         
-                        Console::write("editing\n");
                         // make sure the new name has not already been used
                         if (!(regionsSet->name_exists(*temp_str))) {
-                            Console::write("name fine\n");
                             roi = regionsSet->set_current(*editingROIName);  // find the ROI based on the original name
                             roi->set_name(*temp_str);                        // set the new name to the ROI
                             return true;                                     // indicates to accept the new name
@@ -763,6 +760,21 @@ void ROIWindow::deleteROI (ROIWindow* win) {
         
         // update the display
         imageWindow.Repaint();
+        
+        int items_in_list = SendMessage(hROIListBox, LVM_GETITEMCOUNT, 0, 0);
+        if (items_in_list > 0) {
+            LVITEM lvi;
+            lvi.stateMask = LVIS_SELECTED;
+            lvi.state = LVIS_SELECTED;
+            
+            if (i<items_in_list) {
+                SendMessage(hROIListBox, LVM_SETITEMSTATE, (WPARAM) i, (LPARAM) &lvi);
+                //ListView_SetItemState(hROIListBox, i, LVIS_SELECTED, LVIS_OVERLAYMASK);
+            } else {
+                SendMessage(hROIListBox, LVM_SETITEMSTATE, (WPARAM) (items_in_list-1), (LPARAM) &lvi);
+                //ListView_SetItemState(hROIListBox, items_in_list-1, LVIS_SELECTED, LVIS_OVERLAYMASK);
+            }
+        }
     }
 }
 
