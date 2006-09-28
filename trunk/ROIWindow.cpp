@@ -597,8 +597,8 @@ void ROIWindow::addNewRoiToList(ROI *rCur,int newId)
     item.iSubItem=0;
     item.pszText=copyString((rCur->get_name()).c_str());
     item.lParam=(LPARAM)rCur;
-    ListView_InsertItem(hROIListBox,&item);    
-
+    ListView_InsertItem(hROIListBox,&item);
+    
 	// get coords of new row in list box
 	RECT rect;
 	ListView_GetItemRect(hROIListBox,newId,&rect,LVIR_BOUNDS);
@@ -613,9 +613,9 @@ void ROIWindow::addNewRoiToList(ROI *rCur,int newId)
                         210-20, rect.top+1,
                         20, boxSize, hROIListBox, (HMENU)NULL,
                 		Window::GetAppInstance(), NULL);
-
+    
     roiColourButtonList.push_back(hColourButton);    // add the ROI colour button to the list	
-
+    
 	// get width & height of scrollbox client area
 	GetClientRect(ROIscrollBox.GetHandle(),&rect);
 	
@@ -624,6 +624,12 @@ void ROIWindow::addNewRoiToList(ROI *rCur,int newId)
 	if (newListViewHeight<rect.bottom-4)
 		newListViewHeight=rect.bottom-4;
 	MoveWindow(hROIListBox,0,0,rect.right-rect.left,newListViewHeight,true);
+	
+	// select the ROI that was just created so new entities will be added to it
+	LVITEM lvi;
+    lvi.stateMask = LVIS_SELECTED;
+    lvi.state = LVIS_SELECTED;
+    SendMessage(hROIListBox, LVM_SETITEMSTATE, (WPARAM) newId, (LPARAM) &lvi);
 }
 
 
@@ -761,15 +767,19 @@ void ROIWindow::deleteROI (ROIWindow* win) {
         // update the display
         imageWindow.Repaint();
         
+        // select the next ROI in the set
         int items_in_list = SendMessage(hROIListBox, LVM_GETITEMCOUNT, 0, 0);
         if (items_in_list > 0) {
             LVITEM lvi;
             lvi.stateMask = LVIS_SELECTED;
             lvi.state = LVIS_SELECTED;
             
+            // if the deleted ROI was not last then select the next one
             if (i<items_in_list) {
                 SendMessage(hROIListBox, LVM_SETITEMSTATE, (WPARAM) i, (LPARAM) &lvi);
                 //ListView_SetItemState(hROIListBox, i, LVIS_SELECTED, LVIS_OVERLAYMASK);
+            
+            // if the deleted ROI was last then select the second last one (now last one)
             } else {
                 SendMessage(hROIListBox, LVM_SETITEMSTATE, (WPARAM) (items_in_list-1), (LPARAM) &lvi);
                 //ListView_SetItemState(hROIListBox, items_in_list-1, LVIS_SELECTED, LVIS_OVERLAYMASK);
