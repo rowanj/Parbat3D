@@ -818,15 +818,8 @@ void FeatureSpace::OnResize() {
     
     MoveWindow(glContainer->GetHandle(), x, y, width, height, true);
     MoveWindow(hToolbar, x, rect.bottom-TOOLBAR_HEIGHT, rect.right, TOOLBAR_HEIGHT, true);    
-    
-    /*
-    glViewport(0,0,width,height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,100.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    */
+
+    glContainer->Repaint();
 }
 
 
