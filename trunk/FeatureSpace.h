@@ -7,14 +7,13 @@
 #include <ext/hash_fun.h>
 #include "console.h"
 #include "Window.h"
-#include "GLView.h"
 #include "GLContainer.h"
 #include "ROI.h"
 #include "ROISet.h"
 #include "ROIFile.h"
 #include "ROIWindow.h"
 #include "ImageTileSet.h"
-#include "GLText.h"
+#include "FeatureSpaceGL.h"
 
 #define PIX_COORDS 1
 #define BOUNDS_COORDS 2
@@ -65,16 +64,7 @@ class FeatureSpace:public Window, public GLContainerHandler
 		int band3;
         
         /* OpenGL stuff */
-        int granularity;
-        GLText* gl_text;
-        void InitGL(void);
-        void make_display_lists(void);
-        GLuint list_box;
-        GLuint list_points_base;
-        int	num_points_lists;
-        GLfloat cam_yaw;
-        GLfloat cam_pitch;
-        GLfloat cam_dolly;
+        FeatureSpaceGL* fsgl;
    		
    		// Input stuff
    		int prev_mouse_x;
@@ -95,7 +85,6 @@ class FeatureSpace:public Window, public GLContainerHandler
     	
     protected:
 		/* GUI stuff */
-        GLView *gl_view;
         GLContainer *glContainer;
         HWND hToolbar;
         HWND hRebarControl;
