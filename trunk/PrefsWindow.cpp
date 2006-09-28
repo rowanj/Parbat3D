@@ -75,10 +75,10 @@ int PrefsWindow::Create(HWND parent)
 		LRESULT theResult = SendMessage(displayCloseConfirmCheckbox, BM_SETCHECK, BST_UNCHECKED, 0);	
 	}
 	
-	okButton = CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | WS_BORDER, 60,
+	okButton = CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE, 60,
 			85, 55, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
 			
-	cancelButton = CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE | WS_BORDER, 120,
+	cancelButton = CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE, 120,
 			85, 55, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);		
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
