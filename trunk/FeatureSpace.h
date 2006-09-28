@@ -52,6 +52,8 @@ class FeatureSpace:public Window, public GLContainerHandler
 		vector<myPoint> polyPoints;
 		ImageTileSet* fsTileset;
 		hash_map<unsigned int, unsigned int, hash<unsigned int>, eqUnsignedInt> fsPoints;
+		hash_map<unsigned int, unsigned int, hash<unsigned int>, eqUnsignedInt>::iterator hashiter;
+		unsigned int maxPixelCount;
 		int theLOD;
 		int LODfactor;
 		int LODwidth;
@@ -88,6 +90,8 @@ class FeatureSpace:public Window, public GLContainerHandler
 		void pushXPixelBounds(int rx, int y);
 		void pushXPixel(int rx, int y);
 		unsigned int catForHash(unsigned char b1, unsigned char b2, unsigned char b3);
+		void addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3);
+		void addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3, ROI* theROI);
     	
     protected:
 		/* GUI stuff */

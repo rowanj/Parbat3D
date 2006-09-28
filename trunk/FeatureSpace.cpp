@@ -39,6 +39,7 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     band2 = b2;
     band3 = b3;
     tileSize = 512;
+    maxPixelCount = 0;
     Console::write("FeatureSpace -- Our LOD is %d\n", theLOD);
     Console::write("FeatureSpace -- Band 1 = %d, Band 2 = %d, Band 3 = %d\n", band1, band2, band3);
     
@@ -63,7 +64,21 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
 	
     // todo: setup feature space's data    
     getPixelData();
-	   
+	
+	/*//test hash map
+	unsigned int test[8] = {123, 100, 80, 90, 100, 100, 90, 65};
+	
+	for (int i = 0; i < 8; i++)
+	{
+		Console::write("FS::Test - Attempting to add element %d (%d) to hash table\n", i, test[i]);
+		fsPoints[test[i]] = fsPoints[test[i]] + 1;
+		Console::write("FS::Test - incrementing %d\n", test[i]);
+	}
+	for (hashiter = fsPoints.begin(); hashiter != fsPoints.end(); hashiter++)
+	{
+		Console::write("FS::Test - Hash value for %d = %d\n", hashiter->first, hashiter->second);
+	}*/
+	
     Show();
 }
 
@@ -343,9 +358,13 @@ void FeatureSpace::getPointData(ROIEntity* theEntity, ROI* theROI)
 	
 	char* grabbedData = fsTileset->get_tile_RGB_LOD(fx, fy, band1, band2, band3);
 	
-	unsigned char b1 = (unsigned char)grabbedData[(fy * tileSize * 3) + (fx*3)];
-	unsigned char b2 = (unsigned char)grabbedData[(fy * tileSize * 3) + (fx*3) + 1];
-	unsigned char b3 = (unsigned char)grabbedData[(fy * tileSize * 3) + (fx*3) + 2];
+	Console::write("got past tile load\n");
+	
+	unsigned char b1 = (unsigned char)grabbedData[(tiley * tileSize * 3) + (tilex*3)];
+	unsigned char b2 = (unsigned char)grabbedData[(tiley * tileSize * 3) + (tilex*3) + 1];
+	unsigned char b3 = (unsigned char)grabbedData[(tiley * tileSize * 3) + (tilex*3) + 2];
+	
+	addToFSTable(b1, b2, b3);
 }
 
 // -----------------------------------------------------------------------------------------
@@ -804,6 +823,27 @@ unsigned int FeatureSpace::catForHash(unsigned char b1, unsigned char b2, unsign
 	return (unsigned int)b1 + ((unsigned int)b2 << 8) + ((unsigned int)b3 << 16);
 }
 
+
+//addToFSTable
+//-------
+//Adds a point to our FS hash table.
+void FeatureSpace::addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3)
+{
+	unsigned int catBands = catForHash(b1, b2, b3);
+	unsigned int temp = fsPoints[catBands] + 1;
+	fsPoints[catBands] = temp;
+	if(maxPixelCount < temp) maxPixelCount = temp;
+	return;
+}
+
+
+//addToFSTable
+//-------
+//Adds a point to our FS hash table, with ROI **UNIMPLEMENTED**
+void FeatureSpace::addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3, ROI* theROI)
+{
+	return;
+}
 
 // create feature space window 
 int FeatureSpace::Create() {
