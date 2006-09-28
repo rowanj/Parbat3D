@@ -86,34 +86,34 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 	
 	// Create Trackbar (slider)
 	hTrackbar = CreateWindowEx( 
-    0,                             // no extended styles 
-    "msctls_trackbar32",                // class name TRACKBAR_CLASS
-    "Granularity",            // title (caption) 
+    0,                            // no extended styles 
+    "msctls_trackbar32",          // class name TRACKBAR_CLASS
+    "Granularity",                // title (caption) 
     WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,  // style  | TBS_AUTOTICKS | TBS_ENABLESELRANGE
-    5, 190,                        // position 
+    5, 190,                       // position 
     215, 35,                      // size 
-    GetHandle(),                       // parent window 
-    NULL, //(HMENU) ID_TRACKBAR,             // control identifier  ID_TRACKBAR
-    Window::GetAppInstance(),                       // instance 
-    NULL                           // no WM_CREATE parameter 
+    GetHandle(),                  // parent window 
+    NULL, //(HMENU) ID_TRACKBAR,  // control identifier  ID_TRACKBAR
+    Window::GetAppInstance(),     // instance 
+    NULL                          // no WM_CREATE parameter 
     ); 
     
     // Trackbar range - number of positions
     SendMessage(hTrackbar, TBM_SETRANGE, 
-        (WPARAM) TRUE,                   // redraw flag 
-        (LPARAM) MAKELONG(1, 8));  // min. & max. positions
+        (WPARAM) TRUE,                       // redraw flag 
+        (LPARAM) MAKELONG(1, 7));            // min. & max. positions
         
     // Trackbar steps taken when clicking to the side of the pointer or scroll wheel
     SendMessage(hTrackbar, TBM_SETPAGESIZE, 
-        0, (LPARAM) 1);                  // new page size 
+        0, (LPARAM) 1);                      // new page size 
         
 	//Trackbar - sets initial position
     SendMessage(hTrackbar, TBM_SETPOS, 
-        (WPARAM) TRUE,                   // redraw flag 
+        (WPARAM) TRUE,                       // redraw flag 
         (LPARAM) 1); 
 	
 	//Trackbar ratios
-	HWND hratios=CreateWindowEx(0, szStaticControl, "1       2       4       8      16    32     64     128",
+	HWND hratios=CreateWindowEx(0, szStaticControl, "1        4        16      64      256   1024   4096",
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 225, 210, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hratios,STATIC_FONT_NORMAL);
