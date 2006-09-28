@@ -1,5 +1,6 @@
 #include "FeatureSpaceGL.h"
 #include <cassert>
+#include "console.h"
 
 FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_arg, int band3_arg)
 {
@@ -33,7 +34,6 @@ FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	
 	make_box_list();
-	make_points_lists();
 }
 
 void FeatureSpaceGL::draw()
@@ -59,7 +59,7 @@ void FeatureSpaceGL::draw()
     
     // draw the bounding box
     glCallList(list_box);
-    glTranslatef(0.5, 0.5, 0.5);
+//    glTranslatef(0.5, 0.5, 0.5);
     for (int list = list_points_base; list < list_points_base + num_points_lists; list++) {
 		glCallList(list);
 	}
@@ -154,11 +154,38 @@ void FeatureSpaceGL::make_box_list()
 
 }
 
-void FeatureSpaceGL::make_points_lists()
+void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 {
 	gl_view->make_current();
-		// Make list_points to benchmark display performance
+	// Use points hash
 #if TRUE
+	points_hash_t::iterator hashi;
+	unsigned int point;
+	unsigned char* pointx;
+	unsigned char* pointy;
+	unsigned char* pointz;
+	pointx = (unsigned char*)&point + 0;
+	pointy = (unsigned char*)&point + 1;
+	pointz = (unsigned char*)&point + 2;
+	unsigned int value;
+	
+	num_points_lists = 1;
+	list_points_base = glGenLists(num_points_lists);
+	glNewList(list_points_base, GL_COMPILE);
+	glColor4f(1.0, 1.0, 1.0, 0.5);
+	glPointSize(4);
+	glBegin(GL_POINTS);
+	for(hashi = points_hash.begin(); hashi != points_hash.end(); hashi++) {
+		point = hashi->first;
+		glVertex3f(*pointx/256.0, *pointy/256.0, *pointz/256.0);
+		//value = hashi->second;
+	}
+	glEnd();
+	glEndList();
+#endif
+
+	// Make list_points to benchmark display performance
+#if FALSE
 	const int divisor = RAND_MAX / 256;
 	const int points_per_list = 50000;
 //	int count = 256 * 256 * 256 / 16;

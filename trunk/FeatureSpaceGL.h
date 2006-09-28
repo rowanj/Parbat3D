@@ -4,6 +4,7 @@
 #include <math.h>
 #include "GLText.h"
 #include "GLView.h"
+#include "PointsHash.h"
 
 class FeatureSpaceGL
 {
@@ -21,12 +22,13 @@ public:
    	static const float degs_to_rad = 180.0 / M_PI;
 	static const float rads_to_deg = 1.0 / (180 / M_PI);
 
+	void make_points_lists(points_hash_t points_hash, int maxvalue);
+
 private:
 	GLText* gl_text;
 	GLView* gl_view;
 		
 	void make_box_list(void);
-	void make_points_lists(void);
 
 	int LOD;
     int	num_points_lists;

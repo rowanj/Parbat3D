@@ -65,6 +65,8 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
 		Console::write("FS::Test - Hash value for %d = %d\n", hashiter->first, hashiter->second);
 	}*/
 	
+	fsgl->make_points_lists(fsPoints, maxPixelCount);
+	
     Show();
 }
 
