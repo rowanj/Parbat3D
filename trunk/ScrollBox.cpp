@@ -151,7 +151,7 @@ LRESULT CALLBACK ScrollBox::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
 			static HWND parent=GetParentHandle(hwnd);
 			if (parent!=NULL)
 			{
-				SendMessage(parent,message,wParam,lParam);
+				return SendMessage(parent,message,wParam,lParam);
 			}
 			break;
 			
