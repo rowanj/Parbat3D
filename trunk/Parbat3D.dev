@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=89
+UnitCount=90
 Type=0
 Ver=1
 ObjFiles=
@@ -929,6 +929,16 @@ BuildCmd=
 
 [Unit88]
 FileName=FeatureSpaceGL.h
+CompileCpp=1
+Folder=Feature_Space_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit90]
+FileName=PointsHash.h
 CompileCpp=1
 Folder=Feature_Space_PKG
 Compile=1

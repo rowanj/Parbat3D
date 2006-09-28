@@ -3,8 +3,6 @@
 
 #include <list>
 #include <vector>
-#include <hash_map.h>
-#include <ext/hash_fun.h>
 #include "console.h"
 #include "Window.h"
 #include "GLContainer.h"
@@ -13,6 +11,7 @@
 #include "ROIFile.h"
 #include "ROIWindow.h"
 #include "ImageTileSet.h"
+#include "PointsHash.h"
 #include "FeatureSpaceGL.h"
 
 #define PIX_COORDS 1
@@ -22,14 +21,6 @@ typedef struct myPoint
 {
 	int x;
 	int y;
-};
-
-struct eqUnsignedInt
-{
-	bool operator()(unsigned int u1, unsigned int u2) const
-	{
-		return u1 == u2;
-	}
 };
 
 class FeatureSpace:public Window, public GLContainerHandler
@@ -50,8 +41,8 @@ class FeatureSpace:public Window, public GLContainerHandler
 		int vectorsize;
 		vector<myPoint> polyPoints;
 		ImageTileSet* fsTileset;
-		hash_map<unsigned int, unsigned int, hash<unsigned int>, eqUnsignedInt> fsPoints;
-		hash_map<unsigned int, unsigned int, hash<unsigned int>, eqUnsignedInt>::iterator hashiter;
+		points_hash_t fsPoints;
+		points_hash_t::iterator hashiter;
 		unsigned int maxPixelCount;
 		int theLOD;
 		int LODfactor;
