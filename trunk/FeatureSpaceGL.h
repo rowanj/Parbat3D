@@ -36,6 +36,7 @@ private:
     int	num_points_lists;
     int vertices;
     GLuint list_box;
+    GLuint list_line_square;
     GLuint list_points_base;
     
     int band1, band2, band3;

@@ -45,6 +45,7 @@ void FeatureSpaceGL::draw()
 	// setup projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+	glViewport(0,0,gl_view->width(),gl_view->height());
     gluPerspective(45.0f,gl_view->aspect(),0.1f,6.0f);
     gluLookAt(cam_dolly * (cos(cam_yaw)*cos(cam_pitch)), cam_dolly * (sin(cam_yaw)*cos(cam_pitch)), cam_dolly * sin(cam_pitch),
 				0.0, 0.0, 0.0,
@@ -55,7 +56,7 @@ void FeatureSpaceGL::draw()
        
     // Make old 0,0,0 the centre of the box
     glTranslatef(-0.5, -0.5, -0.5);
-    
+
     gl_text->draw_string(5, 20, "Granularity: %d:1", granularity);
     gl_text->draw_string(5, 40, "Image Points: %d", num_points);
     gl_text->draw_string(5, 60, "Unique Points: %d", vertices);
@@ -66,7 +67,61 @@ void FeatureSpaceGL::draw()
     for (int list = list_points_base; list < list_points_base + num_points_lists; list++) {
 		glCallList(list);
 	}
-        
+	
+#if TRUE
+	assert(glGetError() == GL_NO_ERROR);
+	
+	const int viewport_size = 130;
+	const float viewport_bound = 0.55;
+	// Top viewport
+	glViewport(0,0,viewport_size,viewport_size);
+	gl_text->draw_string(5, 0, "Top");
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-viewport_bound,viewport_bound,-viewport_bound,viewport_bound,1.0,-1.0);
+	glCallList(list_line_square);
+//	glCallList(list_box);
+    for (int list = list_points_base; list < list_points_base + num_points_lists; list++) {
+		glCallList(list);
+	}
+	
+	assert(glGetError() == GL_NO_ERROR);
+
+	// Right viewport
+	glViewport(gl_view->width()-viewport_size,0,viewport_size,viewport_size);
+	gl_text->draw_string(5, 20, "Right");
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-viewport_bound,viewport_bound,-viewport_bound,viewport_bound,1.0,-1.0);
+	glCallList(list_line_square);
+	glRotatef(-90.0,0.0,1.0,0.0);
+	glRotatef(-90.0,1.0,0.0,0.0);
+//	glCallList(list_box);
+    for (int list = list_points_base; list < list_points_base + num_points_lists; list++) {
+		glCallList(list);
+	}
+
+	assert(glGetError() == GL_NO_ERROR);
+
+	// Front viewport
+	glViewport(gl_view->width()-viewport_size,gl_view->height()-viewport_size,viewport_size,viewport_size);
+	gl_text->draw_string(5, 40, "Front");
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-viewport_bound,viewport_bound,-viewport_bound,viewport_bound,1.0,-1.0);
+	glRotatef(-90.0,1.0,0.0,0.0);
+//	glCallList(list_box);
+    for (int list = list_points_base; list < list_points_base + num_points_lists; list++) {
+		glCallList(list);
+	}
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(-0.5,-0.5,-0.5);
+	glRotatef(90.0,1.0,0.0,0.0);
+	glCallList(list_line_square);
+#endif
+
+	assert(glGetError() == GL_NO_ERROR);
     gl_view->swap();
 }
 
@@ -82,15 +137,15 @@ void FeatureSpaceGL::make_box_list()
 	glNewList(list_box, GL_COMPILE);
 	glColor3f(1.0, 0.0, 0.0);
 	glRasterPos3f(1.05, -0.05, -0.05);
-	gl_text->draw_string("Band %d", band1);
+	if (band1) gl_text->draw_string("X: Band %d", band1);
 
 	glColor3f(0.0, 1.0, 0.0);
 	glRasterPos3f(-0.05, 1.05, -0.05);
-	gl_text->draw_string("Band %d", band2);
+	if (band2) gl_text->draw_string("Y: Band %d", band2);
 
 	glColor3f(0.0, 0.0, 1.0);
 	glRasterPos3f(-0.05, -0.05, 1.05);
-	gl_text->draw_string("Band %d", band3);
+	if (band3) gl_text->draw_string("Z: Band %d", band3);
 	
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos3f(-0.05, -0.05, -0.05);
@@ -154,7 +209,17 @@ void FeatureSpaceGL::make_box_list()
 	glEnd();
 	glEndList(); // Done with the bounding box
 	
-
+	list_line_square = glGenLists(1);
+	glNewList(list_line_square, GL_COMPILE);
+	glColor4f(1.0, 1.0, 1.0, edge_opacity);
+	glBegin(GL_LINE_LOOP);
+	glVertex2i(0,0);
+	glVertex2i(1,0);
+	glVertex2i(1,1);
+	glVertex2i(0,1);
+	glEnd();
+	glEndList();
+	assert(glGetError() == GL_NO_ERROR);
 }
 
 void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
