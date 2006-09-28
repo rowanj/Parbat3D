@@ -6,6 +6,8 @@
 #include <cassert>
 #include "MathUtils.h"
 
+#define DEBUG_IMAGE_TILESET 0
+
 /* NB: tex_size is size of tile in memory,
 	tile_size is size of tile on image */
 
@@ -331,6 +333,36 @@ unsigned char* ImageTileSet::get_pixel_values(int x, int y)
 	/* Find index in tile */
 	x = (x / LOD_factor) % tex_size;
 	y = (y / LOD_factor) % tex_size;	
+
+	// !! will need to compensate for sample_size for multi-byte samples
+	pixel_start = (x*num_bands) + (y*tex_size*num_bands);
+//	return_values[2] = pixel_start;
+	for (short tmp = 0; tmp < num_bands; tmp++) {
+		return_values[tmp] = tile_data[pixel_start + tmp];
+	}
+
+	return return_values;
+}
+unsigned char* ImageTileSet::get_pixel_values_LOD(int x, int y)
+{
+	unsigned char* return_values = new unsigned char[num_bands];
+	int tile_index, pixel_start;
+	unsigned char* tile_data;
+
+	if ((x >= LOD_width) || (y >= LOD_height) || (x < 0) || (y < 0)) {
+		for (short tmp = 0; tmp < num_bands; tmp++) {
+			return_values[tmp] = 0;
+		}
+		return return_values;
+	}
+	
+	tile_index = load_tile(x * LOD_factor,y * LOD_factor);
+	tile_data = (unsigned char*) tiles[tile_index].data;
+
+
+	/* Find index in tile */
+	x = x % tex_size;
+	y = y % tex_size;	
 
 	// !! will need to compensate for sample_size for multi-byte samples
 	pixel_start = (x*num_bands) + (y*tex_size*num_bands);

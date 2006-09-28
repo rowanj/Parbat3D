@@ -172,8 +172,11 @@ void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 	num_points_lists = 1;
 	list_points_base = glGenLists(num_points_lists);
 	glNewList(list_points_base, GL_COMPILE);
+	glPushAttrib(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
+	glPointSize(3);
+	glEnable(GL_POINT_SMOOTH);
 	glColor4f(1.0, 1.0, 1.0, 0.5);
-	glPointSize(4);
 	glBegin(GL_POINTS);
 	for(hashi = points_hash.begin(); hashi != points_hash.end(); hashi++) {
 		point = hashi->first;
@@ -181,6 +184,7 @@ void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 		//value = hashi->second;
 	}
 	glEnd();
+	glPopAttrib();
 	glEndList();
 #endif
 

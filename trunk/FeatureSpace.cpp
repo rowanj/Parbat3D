@@ -94,6 +94,15 @@ void FeatureSpace::getPixelData()
 	LODheight = fsTileset->get_LOD_height();
 	
 	Console::write("FS::GpixD\tLOD factor is %d\n", LODfactor);
+	
+	// Grab every image point
+	for (int y = 0; y < LODheight; y++) {
+		for (int x = 0; x < LODwidth; x++) {
+			unsigned char* point_values = fsTileset->get_pixel_values_LOD(x,y);
+			addToFSTable(point_values[0], point_values[1], point_values[2]);
+			delete [] point_values;
+		}
+	}
 
 	if (!theROIs.empty()) //if there are some ROIs in the set
 	{
@@ -659,7 +668,7 @@ void FeatureSpace::addToFSTable(unsigned char b1, unsigned char b2, unsigned cha
 
 //addToFSTable
 //-------
-//Adds a point to our FS hash table, with ROI **UNIMPLEMENTED**
+//Adds a point to our FS hash table, with ROI **UNIMPLEMENTED** !!
 void FeatureSpace::addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3, ROI* theROI)
 {
 	return;
