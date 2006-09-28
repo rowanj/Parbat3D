@@ -36,6 +36,7 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     band3 = b3;
     tileSize = 512;
     maxPixelCount = 0;
+    numberPoints = 0;
     Console::write("FeatureSpace -- Our LOD is %d\n", theLOD);
     Console::write("FeatureSpace -- Band 1 = %d, Band 2 = %d, Band 3 = %d\n", band1, band2, band3);
     
@@ -66,6 +67,7 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
 	}*/
 	
 	fsgl->make_points_lists(fsPoints, maxPixelCount);
+	fsgl->num_points = numberPoints;
 	
     Show();
 }
@@ -94,15 +96,6 @@ void FeatureSpace::getPixelData()
 	LODheight = fsTileset->get_LOD_height();
 	
 	Console::write("FS::GpixD\tLOD factor is %d\n", LODfactor);
-	
-	// Grab every image point
-	for (int y = 0; y < LODheight; y++) {
-		for (int x = 0; x < LODwidth; x++) {
-			unsigned char* point_values = fsTileset->get_pixel_values_LOD(x,y);
-			addToFSTable(point_values[0], point_values[1], point_values[2]);
-			delete [] point_values;
-		}
-	}
 
 	if (!theROIs.empty()) //if there are some ROIs in the set
 	{
@@ -159,9 +152,31 @@ void FeatureSpace::getPixelData()
 		Console::write("FS::GpixD\tthe ROIs set is empty\n");
 	}
 	
+	// !! if not only ROIs
+	getImageData();
+	
+	
 	delete fsTileset;
 	
 	Console::write("FS::GpixD\tTileset destroyed.\n");
+}
+
+// Get entire image into ROI
+void FeatureSpace::getImageData(void)
+{
+	int ncols = fsTileset->get_columns();
+	int nrows = fsTileset->get_rows();
+	unsigned char* tile;
+
+	for (int row = 0; row < nrows; row++) {
+		for (int col = 0; col < ncols; col++) {
+			tile = (unsigned char*) fsTileset->get_tile_RGB_LOD(col * tileSize, row * tileSize, band1, band2, band3);
+			for (int pos = 0; pos < tileSize * tileSize * 3; pos = pos + 3) {
+				addToFSTable(tile[pos], tile[pos+1], tile[pos+2]);
+				numberPoints++;
+			}
+		}
+	}
 }
 
 // -----------------------------------------------------------------------------------------

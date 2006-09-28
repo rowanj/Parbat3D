@@ -44,6 +44,7 @@ class FeatureSpace:public Window, public GLContainerHandler
 		points_hash_t fsPoints;
 		points_hash_t::iterator hashiter;
 		unsigned int maxPixelCount;
+		unsigned int numberPoints;
 		int theLOD;
 		int LODfactor;
 		int LODwidth;
@@ -62,6 +63,7 @@ class FeatureSpace:public Window, public GLContainerHandler
    		int prev_mouse_y;
         
         void getPixelData();
+        void getImageData(void);
         void getPointData(ROIEntity* theEntity, ROI* theROI);
 		void getRectData(ROIEntity* theEntity, ROI* theROI);
 		void getPolygonData(ROIEntity* theEntity, ROI* theROI);

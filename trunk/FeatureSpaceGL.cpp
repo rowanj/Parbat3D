@@ -56,6 +56,7 @@ void FeatureSpaceGL::draw()
     glTranslatef(-0.5, -0.5, -0.5);
     
     gl_text->draw_string(5, 20, "Granularity: %d:1", granularity);
+    gl_text->draw_string(5, 40, "Number of Points: %d", num_points);
     
     // draw the bounding box
     glCallList(list_box);
