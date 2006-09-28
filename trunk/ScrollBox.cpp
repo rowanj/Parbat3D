@@ -142,13 +142,13 @@ void ScrollBox::Scroll(int msg)
 /* handle events related to the main window */
 LRESULT CALLBACK ScrollBox::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    
+	HWND parent;
     ScrollBox* win=(ScrollBox*)Window::GetWindowObject(hwnd);
     switch (message)
     {
 		case WM_NOTIFY:
 			// forward notification messages to scrollbox's parent window
-			static HWND parent=GetParentHandle(hwnd);
+			parent=GetParentHandle(hwnd);            
 			if (parent!=NULL)
 			{
 				return SendMessage(parent,message,wParam,lParam);
