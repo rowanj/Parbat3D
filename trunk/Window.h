@@ -101,6 +101,47 @@ class Window
 	    static void SetBackgroundBrush(HWND hwin,HBRUSH hbrush) {SetClassLong(hwin,GCL_HBRBACKGROUND,(long)hbrush);};    
 	    void Repaint() {InvalidateRect(hwindow,0,false); UpdateWindow(hwindow);};
 	    static HWND GetParentHandle(HWND hwnd) {return (HWND)GetWindowLong(hwnd,GWL_HWNDPARENT);};	// Get Handle To Parent Window From a Handle To a Child Window 
+        
+        
+        static const int NUMBER_OF_SHORTCUTS = 9;
+        static int keyboardShortcutKeys[NUMBER_OF_SHORTCUTS];
+        
+        
+        /**
+            Sets all the keyboard shortcuts to the defaults that they start
+            with when the program is first run.
+        */
+        static void setDefaultKeyboardShortcuts ();
+        
+        
+        /**
+            Returns the key that corresponds to a particular keyboard shortcut.
+            The first parameter should be one of the constant KEY_* values to
+            indicate which shortcut to change.
+        */
+        static int getKeyboardShortcut (int key);
+        
+        
+        /**
+            Sets a particular keyboard shortcut to a given value. The first
+            parameter should be one of the constant KEY_* values to indicate
+            which shortcut to change. The second parameter should be the new key
+            which will trigger the shortcut.
+        */
+        static void setKeyboardShortcut (int key, int value);
+        
+        
+        static const int KEY_IMAGE_WINDOW = 0;
+        static const int KEY_TOOLS_WINDOW = 1;
+        static const int KEY_ROI_WINDOW = 2;
+        static const int KEY_PREFERENCES_WINDOW = 3;
+        static const int KEY_CONTRAST_WINDOW = 4;
+        
+        static const int KEY_HELP = 5;
+        
+        static const int KEY_ROI_POINT = 6;
+        static const int KEY_ROI_RECT = 7;
+        static const int KEY_ROI_POLY = 8;
 };
 
 

@@ -154,7 +154,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     stickyWindowManager.AddStickyWindow(&contrastWindow);
     stickyWindowManager.AddStickyWindow(&contrastAdvWindow);
     stickyWindowManager.AddStickyWindow(&roiWindow);
-
+    
+    
+    // setup the keyboard shortcuts
+    
+    Window::setDefaultKeyboardShortcuts();  // set the default keyboard shortcuts first
+    
+    int keyNew;         // new key for the shortcut
+    string keyNameStr;  // name of the shortcut
+    for (int i=0; i<Window::NUMBER_OF_SHORTCUTS; i++) {
+        keyNameStr = makeString("", i);          // create the name of this shortcut
+        keyNew = settingsFile->getSettingi("keyboard shortcuts", keyNameStr, Window::getKeyboardShortcut(i));
+        Window::setKeyboardShortcut(i, keyNew);  // set the shortcut (whether or not it has a new value)
+    }
+    
     
     /* Execute the message loop. It will run until GetMessage( ) returns 0 */
     while(GetMessage(&messages, NULL, 0, 0))

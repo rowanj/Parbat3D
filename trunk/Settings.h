@@ -37,13 +37,26 @@ class settings {
             not exist in the file then an empty string is returned.
         */
         string getSetting (string section, string key);
+        
+        /**
+            Returns a string containing the value of the key. If the key does
+            not exist in the file then the third parameter is set as the new
+            value in the file. In this case the third parameter is also
+            returned.
+        */
         string getSetting (string section, string key, string defaultSetting);
+        
+        
         int getSettingi(string section, string key);
+        
         int getSettingi (string section, string key, int defaultSetting);
+        
+        
         /**
             Adds the setting to the file.
         */
         void setSetting (string, string, string);
+        
         
         /**
             Adds the setting to the file. Since the file can only be updated

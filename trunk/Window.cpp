@@ -5,9 +5,12 @@
 #include "config.h"
 #include <commctrl.h>
 
+
 WNDPROC Window::stPrevWindowProcedure=NULL;
 HINSTANCE Window::hInstance=NULL;
 HICON Window::hIcon=NULL;
+int Window::keyboardShortcutKeys[NUMBER_OF_SHORTCUTS];
+
 
 Window::Window()
 {
@@ -194,78 +197,90 @@ void Window::OnKeyDown(int virtualKey)
 {
 	const char *helpPath; // Used for accessing the help folder
 	
-	// toggle tool window
-	switch (virtualKey) {
-		case 'T':
-			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_TOOLSWINDOW))
-		        toolWindow.Show();
-		    else
-		        toolWindow.Hide();
-		    break;
-		    
-		// toggle Image window
-		case 'I':	
+	int keyMatch = -1;
+	
+	for (int i=0; i<Window::NUMBER_OF_SHORTCUTS; i++) {
+        if (virtualKey == Window::keyboardShortcutKeys[i]) {
+            keyMatch = i;
+            break;
+        }
+    }
+    
+    switch (keyMatch) {
+        // open/close windows --------------------------------------------------
+        
+        // toggle Image window
+        case Window::KEY_IMAGE_WINDOW:
 			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_IMAGEWINDOW))
 		        ShowWindow(imageWindow.GetHandle(),SW_SHOW);
 		    else
 		        ShowWindow(imageWindow.GetHandle(),SW_HIDE);
 		    break;
-		    
+		
+		// toggle tool window
+		case Window::KEY_TOOLS_WINDOW:
+			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_TOOLSWINDOW))
+		        toolWindow.Show();
+		    else
+		        toolWindow.Hide();
+		    break;
+		
 		// toggle ROI window
-		case 'R':
+		case Window::KEY_ROI_WINDOW:
 			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_ROIWINDOW))
 		    	roiWindow.Show();
 		    else
 		        roiWindow.Hide();
 		    break;
-		    
+		
 		// toggle Preferences window
-		case 'P':
+		case Window::KEY_PREFERENCES_WINDOW:
 			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_PREFSWINDOW))
 		        prefsWindow.Show();
 		    else
 		        prefsWindow.Hide();
 		    break;
-		    
+		
 		// toggle Contrast window
-		case 'C':
-			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_CONTSWINDOW))
-		        contrastWindow.Show();
-		    else
-		        contrastWindow.Hide();
-		        contrastAdvWindow.Hide();
-		    break;
-		
+        case Window::KEY_CONTRAST_WINDOW:
+            if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_CONTSWINDOW))
+                contrastWindow.Show();
+            else
+                contrastWindow.Hide();
+                contrastAdvWindow.Hide();
+            break;
+        
+        
+		// help ----------------------------------------------------------------
+        case Window::KEY_HELP:
+            // get path to help folder
+            helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");
             
-		case VK_F1:
-			// get path to help folder
-		    helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");
-		
-		    // launch default browser
-		    ShellExecute(NULL, "open", helpPath, NULL, "help", SW_SHOWNORMAL);
-		    break;
-		
-		
-		// Regions of Interest -------------------------------------------------
-		
-		// create point entity
-		case 'D':
+            // launch default browser
+            ShellExecute(NULL, "open", helpPath, NULL, "help", SW_SHOWNORMAL);
+            break;
+        
+        
+        // Regions of Interest -------------------------------------------------
+        
+        // create point entity
+        case Window::KEY_ROI_POINT:
             if (!regionsSet->editing())
                 roiWindow.newEntity(&roiWindow, ROI_POINT);
             break;
         
         // create rect entity
-		case 'S':
+        case Window::KEY_ROI_RECT:
             if (!regionsSet->editing())
                 roiWindow.newEntity(&roiWindow, ROI_RECT);
             break;
         
         // create poly entity
-		case 'A':
+        case Window::KEY_ROI_POLY:
             if (!regionsSet->editing())
                 roiWindow.newEntity(&roiWindow, ROI_POLY);
             break;
-	}
+    }
 }
 
 
@@ -407,6 +422,31 @@ void Window::CreateTooltip (HWND hwnd,char *text)
     SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti);	
 
 } 
+
+
+void Window::setDefaultKeyboardShortcuts () {
+    Window::keyboardShortcutKeys[Window::KEY_IMAGE_WINDOW] = 'I';
+    Window::keyboardShortcutKeys[Window::KEY_TOOLS_WINDOW] = 'T';
+    Window::keyboardShortcutKeys[Window::KEY_ROI_WINDOW] = 'R';
+    Window::keyboardShortcutKeys[Window::KEY_PREFERENCES_WINDOW] = 'P';
+    Window::keyboardShortcutKeys[Window::KEY_CONTRAST_WINDOW] = 'C';
+    
+    Window::keyboardShortcutKeys[Window::KEY_HELP] = VK_F1;
+    
+    Window::keyboardShortcutKeys[Window::KEY_ROI_POINT] = 'D';
+    Window::keyboardShortcutKeys[Window::KEY_ROI_RECT] = 'S';
+    Window::keyboardShortcutKeys[Window::KEY_ROI_POLY] = 'A';
+}
+
+
+int Window::getKeyboardShortcut (int key) {
+    return Window::keyboardShortcutKeys[key];
+}
+
+void Window::setKeyboardShortcut (int key, int value) {
+    Window::keyboardShortcutKeys[key] = value;
+}
+
 
 // get z value of a window 
 // note: value returned may be different to what was passed in to SetZValue
