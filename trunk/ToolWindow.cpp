@@ -51,6 +51,9 @@ int ToolWindow::Create(HWND)
         return false;
     setupDrawingObjects(GetHandle());
     prevProc=SetWindowProcedure(&ToolWindow::WindowProcedure);
+
+	/* set Z order position */
+   	SetZValue(30);
     
     stickyWindowManager.AddStickyWindow(this);  // make the window stick to others    
 

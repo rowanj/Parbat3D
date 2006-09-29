@@ -146,8 +146,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
         return 0;
     }
-    
-    
+       
+    /* make windows to stick to each other & move around with overview window */
     stickyWindowManager.SetController(&overviewWindow);    
     stickyWindowManager.AddStickyWindow(&imageWindow);
     stickyWindowManager.AddStickyWindow(&prefsWindow);
@@ -233,6 +233,7 @@ void loadFile()
         toolWindow.Create(imageWindow.GetHandle());
         roiWindow.Create(imageWindow.GetHandle());
         contrastWindow.Create(imageWindow.GetHandle());
+
         
         // show tool & image windows
         toolWindow.Show();

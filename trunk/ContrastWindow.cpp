@@ -39,6 +39,9 @@ int ContrastWindow::Create(HWND parent)
 	     rect.left+50, rect.bottom-150, CONTS_WINDOW_WIDTH, CONTS_WINDOW_HEIGHT, parent, NULL))
 	    return false;
 
+	/* set Z order position */
+   	SetZValue(50);
+
 	/* Brightness Trackbar */
 
 	//Brightness Trackbar title

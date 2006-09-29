@@ -60,6 +60,9 @@ int OverviewWindow::Create(HWND parent)
     /* create a child window that will be used by OpenGL */
     overviewWindowDisplay.Create(GetHandle());
    
+   	/* set Z order position */
+   	SetZValue(20);
+   
     /* Make the window visible on the screen */
     Show();
        
