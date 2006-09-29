@@ -40,6 +40,7 @@ class ROIWindow:public Window
         
         static string *editingROIName;
         
+        
         /**
             Returns the number of ROI checkboxes that have been checked.
         */
@@ -57,6 +58,7 @@ class ROIWindow:public Window
         */
         string getItemText (int i);
         
+        
         /**
             Returns the text of the selected item in the list. The text is the
             name of the ROI that the list item represents. Returns a blank
@@ -73,6 +75,7 @@ class ROIWindow:public Window
         */
         void newROI (ROIWindow*, const char*);
         
+        
         /**
             Contains the procedure for loading a set of Regions of Interest
             from a file. This includes opening a dialog box, getting the
@@ -80,20 +83,13 @@ class ROIWindow:public Window
         */
         void loadROI (ROIWindow*);
         
+        
         /**
             Contains the procedure for saving a set of Regions of Interest to a
             file. This includes opening a dialog box, getting the filename and
             saving the set to the file.
         */
         void saveROI (ROIWindow*);
-        
-        /**
-            Contains the procedure for adding a new entity to the set of Regions
-            of Interest. If no region is selected in the list then a new region
-            is created, with the entity inside it. The second parameter
-            specifies the type of entity to create.
-        */
-        void newEntity (ROIWindow*, const char*);
         
         
         /**
@@ -123,20 +119,29 @@ class ROIWindow:public Window
         
         
         /**
+            Deletes all the Regions of Interest from the list and regionsSet.
+            This is called when a new image is opened so that any ROIs from the
+            previous image will be removed.
+        */
+        void deleteAllROI ();
+        
+        
+        /**
+            Contains the procedure for adding a new entity to the set of Regions
+            of Interest. If no region is selected in the list then a new region
+            is created, with the entity inside it. The second parameter
+            specifies the type of entity to create.
+        */
+        void newEntity (ROIWindow*, const char*);
+        
+        
+        /**
             Make the buttons active or inactive depending on whether an entity
             is currently being created. This prevents the user from trying to
             create a new entity while they are editing one or removing the ROI
             that the entity is being added to.
         */
         void updateButtons (ROIWindow*);
-        
-        
-        /**
-            Deletes all the Regions of Interest from the list and regionsSet.
-            This is called when a new image is opened so that any ROIs from the
-            previous image will be removed.
-        */
-        void deleteAllROI ();
 };
 
 #endif

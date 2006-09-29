@@ -194,14 +194,14 @@ void Window::OnKeyDown(int virtualKey)
 	const char *helpPath; // Used for accessing the help folder
 	
 	// toggle tool window
-	switch (virtualKey)
-	{
+	switch (virtualKey) {
 		case 'T':
 			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_TOOLSWINDOW))
 		        toolWindow.Show();
 		    else
 		        toolWindow.Hide();
 		    break;
+		    
 		// toggle Image window
 		case 'I':	
 			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_IMAGEWINDOW))
@@ -209,6 +209,7 @@ void Window::OnKeyDown(int virtualKey)
 		    else
 		        ShowWindow(imageWindow.GetHandle(),SW_HIDE);
 		    break;
+		    
 		// toggle ROI window
 		case 'R':
 			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_ROIWINDOW))
@@ -216,6 +217,7 @@ void Window::OnKeyDown(int virtualKey)
 		    else
 		        roiWindow.Hide();
 		    break;
+		    
 		// toggle Preferences window
 		case 'P':
 			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_PREFSWINDOW))
@@ -223,6 +225,7 @@ void Window::OnKeyDown(int virtualKey)
 		    else
 		        prefsWindow.Hide();
 		    break;
+		    
 		// toggle Contrast window
 		case 'C':
 			if (overviewWindow.toggleMenuItemTick(overviewWindow.hMainMenu,IDM_CONTSWINDOW))
@@ -231,6 +234,8 @@ void Window::OnKeyDown(int virtualKey)
 		        contrastWindow.Hide();
 		        contrastAdvWindow.Hide();
 		    break;
+		
+            
 		case VK_F1:
 			// get path to help folder
 		    helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");
@@ -238,6 +243,27 @@ void Window::OnKeyDown(int virtualKey)
 		    // launch default browser
 		    ShellExecute(NULL, "open", helpPath, NULL, "help", SW_SHOWNORMAL);
 		    break;
+		
+		
+		// Regions of Interest -------------------------------------------------
+		
+		// create point entity
+		case 'D':
+            if (!regionsSet->editing())
+                roiWindow.newEntity(&roiWindow, ROI_POINT);
+            break;
+        
+        // create rect entity
+		case 'S':
+            if (!regionsSet->editing())
+                roiWindow.newEntity(&roiWindow, ROI_RECT);
+            break;
+        
+        // create poly entity
+		case 'A':
+            if (!regionsSet->editing())
+                roiWindow.newEntity(&roiWindow, ROI_POLY);
+            break;
 	}
 }
 
