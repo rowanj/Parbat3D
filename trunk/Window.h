@@ -8,25 +8,6 @@
 #include <queue>
 using namespace std;
 
-//int compareZOrder( const Window *p1,const Window *p2 ) {return (p1->zValue < p2->zValue)};
-
-
-class ZWindow
-{
-	public:
-		HWND hwnd;
-		int zValue;
-
-		ZWindow(HWND hwin,int z) {hwnd=hwin; zValue=z;}
-		bool operator < (ZWindow w) const
-		{
-			//Console::write("ZWindow < operator\n");
-			return zValue < w.zValue;
-		}
-};
-
-
-
 
 class Window
 {
@@ -42,10 +23,6 @@ class Window
 	    int zValue;							// window's Z-order value (for setting which windows appear in front or behind)
 	    HDWP hdwp_reorder;					// handle used for re-ordering windows
 
-        priority_queue<ZWindow> zWindows;		// ordered list of windows, used for re-ordering windows   
-    	unsigned int static GetZValue(HWND hwnd);									// Get window's zValue, if set
-    	static BOOL CALLBACK AddZWindowCallback(HWND hwnd,LPARAM lParam);	// callback function to create zWindow queue
-		HWND GetInsertAfterByZ(HWND hwnd);
 	
 	    void drawStatic(DRAWITEMSTRUCT *dis); // draw static text control
 
@@ -61,13 +38,8 @@ class Window
     
     public:
 	    Window::Window();
-	
-		bool operator<(Window *w2)  const
-		{
-			Console::write("Window < operator-----------------");
-			return zValue < w2->zValue;
-		}
 
+		void SetZValue (unsigned int value) { };						// not implemented
 	
 	    inline HWND GetHandle() {return hwindow;};      /* get object's window handle */
 	    virtual int Create();        /* create this object's window - overwritten by subclasses */
@@ -88,9 +60,6 @@ class Window
 	    static const int STATIC_FONT_HEADING=32454;       
 	
 	    static void CreateTooltip (HWND hwnd,char *text);   // create a tooltip message when the user moves the mouse over a control
-
-		void SetZValue(unsigned int zLevel);				// Set the window's Z-value (for positing windows in front of others)
-															// zLevel must be between 1 & 2^16-1. higher values=futher in front, lower values=further behind.	    
 	
 	    /* window api wrappers */
 	    void Destroy() {DestroyWindow(hwindow);};
@@ -143,13 +112,5 @@ class Window
         static const int KEY_ROI_RECT = 7;
         static const int KEY_ROI_POLY = 8;
 };
-
-
-/*bool operator<(Window w1,Window w2)  
-{
-	Console::write("Window < operator\n");
-	return w1.zValue < w2.zValue;
-}*/
-
 
 #endif

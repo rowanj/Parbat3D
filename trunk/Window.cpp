@@ -305,19 +305,6 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                     win->drawStatic((DRAWITEMSTRUCT*)lParam);
                 }
                 return 0;
-                
-			case WM_WINDOWPOSCHANGING:
-				windowPos=(WINDOWPOS*)lParam;
-				//if (windowPos->hwndInsertAfter==HWND_NOTOPMOST)
-				//	Console::write("HWND_NOTOPMOST request\n");
-				//if (windowPos->hwndInsertAfter==HWND_BOTTOM)
-				//	Console::write("HWND_BOTTOM request\n");
-				if ((windowPos->hwndInsertAfter!=HWND_NOTOPMOST) && (windowPos->hwndInsertAfter!=HWND_BOTTOM))
-				{
-					windowPos->hwndInsertAfter=win->GetInsertAfterByZ(hwnd);
-					return 0;
-				}
-				break;       
 				         
             case WM_NCLBUTTONDOWN:
                 switch(wParam)
@@ -448,81 +435,3 @@ void Window::setKeyboardShortcut (int key, int value) {
 }
 
 
-// get z value of a window 
-// note: value returned may be different to what was passed in to SetZValue
-// returns 0 on error, or not zValue set
-unsigned int Window::GetZValue(HWND hwnd)
-{
-	return (unsigned int)GetProp(hwnd,"ParbatZValue");
-}
-
-
-// add a ZWindow object to the zWindow queue for each window that has a zValue set
-// called by EnumThreadWindows(...)
-BOOL CALLBACK Window::AddZWindowCallback(HWND hwnd,LPARAM lParam)
-{
-	Window *win=(Window*)lParam;
-	
-	int zValue=GetZValue(hwnd);
-	if (zValue!=0)
-		win->zWindows.push(ZWindow(hwnd,zValue));
-}
-
-
-// set z value of a window
-// calculates a unique z value based on a z level
-// zLevel must be between 1 & 2^16-1
-void Window::SetZValue(unsigned int zLevel)
-{
-	// create unique z value (assumming < 2^16-1 windows per zValue, and < 2^16-1 zValues)
-	unsigned int zValue=(zLevel<<16);
-
-	// Get all windows with zValues set
-	EnumThreadWindows(GetCurrentThreadId(),&AddZWindowCallback,(LPARAM)this);
-	
-	// find a unique z value
-	int lowerZValue=0;
-	while (!zWindows.empty())
-	{
-		// check if the window is at the same z level
-		if ((zWindows.top().zValue & 0xFFFF0000)==zValue)
-		{
-			lowerZValue++;
-			break;
-		}
-		zWindows.pop();
-	}
-//	Console::write("setting z index: z=%d,%d",(zValue>>16),lowerZValue);
-	zValue+=lowerZValue;
-
-	SetProp(GetHandle(),"ParbatZValue",(void*)zValue);
-}
-
-
-HWND Window::GetInsertAfterByZ(HWND hwnd)
-{
-	char buffer[256];
-//	Console::write("GetInsertAfterByZ()\n");
-	EnumThreadWindows(GetCurrentThreadId(),&AddZWindowCallback,(LPARAM)this);
-
-	
-	int zValue=GetZValue(hwnd);
-	int prevZValue=-1;			// used for debugging only
-	HWND hprev=HWND_NOTOPMOST;
-	while (!zWindows.empty())
-	{
-		if (zWindows.top().zValue<=zValue)
-		{
-			Console::write("Window at z=%d,%d positioned behind window with z=%d,%d\n",(zValue>>16),(zValue&0xFFFF),(prevZValue>>16),(prevZValue&0xFFFF));
-			break;
-		}
-		hprev=zWindows.top().hwnd;
-		prevZValue=zWindows.top().zValue;
-		zWindows.pop();
-	}
-	if (hprev==HWND_NOTOPMOST)
-		Console::write("Window at z=%d positioned in front \n",zValue);
-	
-	return hprev;
-	
-}
