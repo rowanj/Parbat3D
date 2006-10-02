@@ -75,7 +75,7 @@ void GLView::resize(void)
 	GLuint width, height;
 	LPRECT window_rect;
 	window_rect = new RECT;
-	GetClientRect(window_handle, window_rect);
+	assert(GetClientRect(window_handle, window_rect) != 0);
 	width = window_rect->right - window_rect->left;
 	height = window_rect->bottom - window_rect->top;
 	delete window_rect; 
@@ -92,7 +92,7 @@ void GLView::make_current()
 {
 	assert(device_context != NULL);
 	assert(rendering_context != NULL);
-	wglMakeCurrent(device_context, rendering_context);
+	assert(wglMakeCurrent(device_context, rendering_context) != FALSE);
 }
 
 void GLView::swap()
