@@ -27,8 +27,9 @@ FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	gl_view->make_current();
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+/*	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS); */
+	glPointSize(3);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_LINE_SMOOTH);
@@ -63,12 +64,13 @@ void FeatureSpaceGL::draw()
     
     // draw the bounding box
     glCallList(list_box);
-//    glTranslatef(0.5, 0.5, 0.5);
-    for (int list = list_points_base; list < list_points_base + num_points_lists; list++) {
-		glCallList(list);
+    // Draw the points
+    Console::write("Drawing %d lists\n", points_lists.size());
+	for (int pos = 0; pos < points_lists.size(); pos++) {
+		glCallList(points_lists.at(pos));
 	}
 	
-#if TRUE
+#if FALSE // DRAW EXTRA VIEWPORTS
 	assert(glGetError() == GL_NO_ERROR);
 	
 	const int viewport_size = 130;
@@ -222,6 +224,73 @@ void FeatureSpaceGL::make_box_list()
 	assert(glGetError() == GL_NO_ERROR);
 }
 
+void FeatureSpaceGL::add_points(points_hash_t points_hash, unsigned char red, unsigned char green, unsigned char blue)
+{
+	Console::write("FeatureSpaceGL::add_points(size = %d, r = %d, g = %d, b = %d\n",
+	        points_hash.size(), red, green, blue);
+	const unsigned int points_per_list = 5000;
+	// How many new display lists do we need?
+	unsigned int new_lists_count = (points_hash.size()/points_per_list) + 1;
+	unsigned int average_count = 0;
+	points_hash_t::iterator hashi;
+
+	// Variables for the point coordinates
+	unsigned int point; // The value of it
+	unsigned char* pointx = (unsigned char*)&point; // pointers to the useful bytes within it
+	unsigned char* pointy = (unsigned char*)&point + 1;
+	unsigned char* pointz = (unsigned char*)&point + 2;
+	unsigned int count;
+	GLfloat r = (float)red/255.0;
+	GLfloat g = (float)green/255.0;
+	GLfloat b = (float)blue/255.0;
+	
+	assert(points_hash.size() > 0);
+	
+	// Find average point density
+	unsigned int total_count = 0;
+	hashi = points_hash.begin();
+	while (hashi != points_hash.end()) {
+		total_count = total_count + hashi->second;
+		hashi++;
+	}
+	vertices += total_count;
+	average_count = total_count / points_hash.size();
+
+	Console::write("total = %d, average_count = %d\n", total_count, average_count);
+	
+	// Make them
+	gl_view->make_current();
+	GLuint new_list_base = glGenLists(new_lists_count);
+
+	// For each list
+	hashi = points_hash.begin();
+	for(GLuint list = new_list_base; list < new_list_base + new_lists_count; list++) {
+		unsigned int this_list_count = 0;
+
+		glNewList(list, GL_COMPILE);
+
+		glBegin(GL_POINTS);
+		// While space in the list and points left to add
+		while ((this_list_count <= points_per_list) && (hashi != points_hash.end())) {
+			point = hashi->first;
+			count = hashi->second;
+			if (count != 0) {
+				glColor4f(r, g, b, (((float)count/(float)average_count) * 0.45) + 0.1);
+				glVertex3f(*pointx/255.0, *pointy/255.0, *pointz/255.0);
+				num_points = num_points + count;
+				this_list_count++;
+			}
+			hashi++;
+		}
+		glEnd();
+		glEndList();
+		
+		points_lists.push_back(list);
+	}
+}
+
+
+#if FALSE
 void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 {
 	gl_view->make_current();
@@ -296,6 +365,7 @@ void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
 #endif
 
 }
+#endif
 
 void FeatureSpaceGL::cam_translate(float x, float y)
 {

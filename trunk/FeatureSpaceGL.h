@@ -5,6 +5,9 @@
 #include "GLText.h"
 #include "GLView.h"
 #include "PointsHash.h"
+#include <vector>
+
+using namespace std;
 
 class FeatureSpaceGL
 {
@@ -19,12 +22,13 @@ public:
     GLfloat cam_dolly;
     
     int granularity;
-    int num_points;
         
    	static const float degs_to_rad = 180.0 / M_PI;
 	static const float rads_to_deg = 1.0 / (180 / M_PI);
 
-	void make_points_lists(points_hash_t points_hash, int maxvalue);
+//	void make_points_lists(points_hash_t points_hash, int maxvalue); // !! DEPRECATED
+	void add_points(points_hash_t points_hash,
+			unsigned char red, unsigned char green, unsigned char blue);
 
 private:
 	GLText* gl_text;
@@ -33,11 +37,11 @@ private:
 	void make_box_list(void);
 
 	int LOD;
-    int	num_points_lists;
-    int vertices;
+    unsigned int vertices;
+    unsigned int num_points;
     GLuint list_box;
     GLuint list_line_square;
-    GLuint list_points_base;
+    vector<GLuint> points_lists;
     
     int band1, band2, band3;
 };

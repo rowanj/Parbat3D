@@ -50,8 +50,7 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     getPixelData();
     
 	fsgl = new FeatureSpaceGL(glContainer->GetHandle(), LOD, band1, band2, band3);
-	fsgl->make_points_lists(fsPoints, maxPixelCount);
-	fsgl->num_points = numberPoints;
+	fsgl->add_points(fsPoints, 255, 255, 255);
 	
     Show();
 }
@@ -81,6 +80,7 @@ void FeatureSpace::getPixelData(void)
 	
 	Console::write("FS::GpixD\tLOD factor is %d\n", LODfactor);
 
+	#if ENABLE_ROI_POINTS
 	if (!theROIs.empty()) //if there are some ROIs in the set
 	{
 		Console::write("FS::GpixD\tGot past theROIs empty check\n");
@@ -135,6 +135,7 @@ void FeatureSpace::getPixelData(void)
 	{
 		Console::write("FS::GpixD\tthe ROIs set is empty\n");
 	}
+	#endif // ENABLE_ROI_POINTS
 	
 	// !! if not only ROIs
 	getImageData();
@@ -663,11 +664,10 @@ unsigned int FeatureSpace::catForHash(unsigned char b1, unsigned char b2, unsign
 //Adds a point to our FS hash table.
 void FeatureSpace::addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3)
 {
-	unsigned int catBands = catForHash(b1, b2, b3);
-	unsigned int temp = fsPoints[catBands] + 1;
-	fsPoints[catBands] = temp;
-	if(maxPixelCount < temp) maxPixelCount = temp;
-	return;
+	unsigned int hash = catForHash(b1, b2, b3);
+	fsPoints[hash]++;
+	unsigned int count = fsPoints[hash];
+	if (count > maxPixelCount) maxPixelCount = count;
 }
 
 
