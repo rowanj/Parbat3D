@@ -65,7 +65,7 @@ private:
 	int tex_size, tile_memory_size;
 
 	/* This stores the actual tile information */
-	vector<tile_t> tiles;
+	vector<tile_t*> tiles;
 };
 
 #endif

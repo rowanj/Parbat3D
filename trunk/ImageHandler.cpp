@@ -49,6 +49,7 @@ ImageHandler::~ImageHandler(void)
 	delete overview_gl;
 	delete image_gl;
 	delete image_file;
+	Console::write("(II) ImageHandler shutdown complete.\n");
 }
 
 void ImageHandler::redraw(void)

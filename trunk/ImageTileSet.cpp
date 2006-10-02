@@ -76,14 +76,14 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 
 ImageTileSet::~ImageTileSet(void)
 {
-	char buffer[256];
-	sprintf(buffer, "(II) ImageTileset (LOD:%d) de-allocating.\n", LOD);
-	Console::write(buffer);
+	Console::write("(II) ImageTileset (LOD:%d) de-allocating... ", LOD);
 	/* De-allocate tiles */
 	while (!tiles.empty()) {
-		delete[] tiles.back().data;
+		delete[] tiles.back()->data;
+		delete tiles.back();
 		tiles.pop_back();
 	}
+	Console::write("done.\n");
 }
 
 char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_B)
@@ -109,7 +109,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	Console::write(message);
 	#endif
 	tile_index = this->load_tile(x,y);
-	tile = tiles[tile_index].data;
+	tile = tiles[tile_index]->data;
 
 	
 
@@ -193,7 +193,7 @@ int ImageTileSet::load_tile(int x, int y)
 	#if DEBUG_IMAGE_TILESET
 	char buffer[256];
 	#endif
-	tile new_tile;
+	tile_t* new_tile;
 	int tile_index, tile_index_x, tile_index_y;
 	int tile_size_x, tile_size_y;
 	int data_size_x, data_size_y;
@@ -225,17 +225,17 @@ int ImageTileSet::load_tile(int x, int y)
 		/* traverse tile vector */
 		while (tile_check < tiles.size()) {
 			/* increment tile age */
-			tiles[tile_check].age++;
-			int tile_check_age = tiles[tile_check].age;
+			tiles[tile_check]->age++;
+			int tile_check_age = tiles[tile_check]->age;
 			if (tile_check_age > oldest_age) {
 				oldest_tile = tile_check;
 				oldest_age = tile_check_age;
 			}
 			// If this is the one we're after...
-			if (tiles[tile_check].tile_index == tile_index) {
+			if (tiles[tile_check]->tile_index == tile_index) {
 				cached_tile = tile_check;
 				// reset its age
-				tiles[tile_check].age = 0;
+				tiles[tile_check]->age = 0;
 				cache_hits++;
 			}
 			tile_check++;
@@ -247,10 +247,10 @@ int ImageTileSet::load_tile(int x, int y)
 	{ // Tile wasn't in cache
 		cache_misses++;
 		/* Allocate tile */
-		new_tile = *(new tile_t);
-		new_tile.tile_index = tile_index;
-		new_tile.age = 0;
-		new_tile.data = new char[tile_memory_size];
+		new_tile = new tile_t;
+		new_tile->tile_index = tile_index;
+		new_tile->age = 0;
+		new_tile->data = new char[tile_memory_size];
 		/* Check cache space, deallocate head if oversize */
 		cache_fill = cache_fill + tile_memory_size;
 		if (cache_fill > cache_size) {
@@ -258,13 +258,15 @@ int ImageTileSet::load_tile(int x, int y)
 				/* This is the cache dropping algorithm */
 #if FALSE
 				/* FIFO */
-				delete[] tiles[0].data; /* Delete data */
+				delete[] tiles[0]->data; /* Delete data */
+				delete tiles[0];
 				tiles.erase(tiles.begin());
 #else
 				/* LRU */
-				delete[] tiles[oldest_tile].data; /* Delete data */
-				vector<tile_t>::iterator cacheIterator = tiles.begin();
-				cacheIterator+= oldest_tile;
+				delete[] tiles[oldest_tile]->data; /* Delete data */
+				vector<tile_t*>::iterator cacheIterator = tiles.begin();
+				cacheIterator+=oldest_tile;
+				delete tiles.at(oldest_tile);
 				tiles.erase(cacheIterator);
 #endif
 				cache_fill = cache_fill - tile_memory_size;
@@ -290,17 +292,17 @@ int ImageTileSet::load_tile(int x, int y)
 			/* X & Y are now tile top-left position */
 			x = (x/tile_size) * tile_size;
 			y = (y/tile_size) * tile_size;
-			image_file->getRasterData(tile_size_x, tile_size_y, x, y, new_tile.data, data_size_x, data_size_y);
+			image_file->getRasterData(tile_size_x, tile_size_y, x, y, new_tile->data, data_size_x, data_size_y);
 			/* Shuffle data for edge tiles */
 			if (!((tile_size_y == tile_size) && (tile_size_x == tile_size))) {
-				align_tile(&(new_tile.data), tex_size, data_size_x, data_size_y);
+				align_tile(&(new_tile->data), tex_size, data_size_x, data_size_y);
 			}
 		} else {
 			data_size_x = tex_size;
 			data_size_y = tex_size;
-			image_file->getRasterData(image_width, image_height, 0, 0, new_tile.data, LOD_width, LOD_height);
+			image_file->getRasterData(image_width, image_height, 0, 0, new_tile->data, LOD_width, LOD_height);
 			if (!((LOD_height == tex_size) && (LOD_width == tex_size))) {
-				align_tile(&(new_tile.data), tex_size, LOD_width, LOD_height);
+				align_tile(&(new_tile->data), tex_size, LOD_width, LOD_height);
 			}
 		}
 		
@@ -327,7 +329,7 @@ unsigned char* ImageTileSet::get_pixel_values(int x, int y)
 	}
 	
 	tile_index = load_tile(x,y);
-	tile_data = (unsigned char*) tiles[tile_index].data;
+	tile_data = (unsigned char*) tiles[tile_index]->data;
 
 
 	/* Find index in tile */
@@ -357,7 +359,7 @@ unsigned char* ImageTileSet::get_pixel_values_LOD(int x, int y)
 	}
 	
 	tile_index = load_tile(x * LOD_factor,y * LOD_factor);
-	tile_data = (unsigned char*) tiles[tile_index].data;
+	tile_data = (unsigned char*) tiles[tile_index]->data;
 
 
 	/* Find index in tile */
