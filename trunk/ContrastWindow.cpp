@@ -135,7 +135,8 @@ int ContrastWindow::Create(HWND parent)
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 139, 310, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hCValues,STATIC_FONT_NORMAL);
-	
+
+	#ifndef TMP_DISABLE_FEATURES_FOR_DEMO_DAY	
 	hPerChannel = CreateWindowEx( 0, "BUTTON", "Per Channel", 
     BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 18, 160, 100, 16,
 	GetHandle(),(HMENU) 9, Window::GetAppInstance(), NULL);
@@ -143,6 +144,10 @@ int ContrastWindow::Create(HWND parent)
 	hPreview = CreateWindowEx( 0, "BUTTON", "Preview", 
     BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 18, 180, 100, 16,
 	GetHandle(),NULL, Window::GetAppInstance(), NULL);
+	#else
+	hPerChannel=NULL;
+	hPreview=NULL;
+	#endif
 	
 	// Insert 'OK' button 
 	hCSOKButton =  CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE,

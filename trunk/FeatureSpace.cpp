@@ -698,7 +698,8 @@ int FeatureSpace::Create() {
     glContainer=new GLContainer(GetHandle(),this,0,0,FEATURE_WINDOW_WIDTH,FEATURE_WINDOW_HEIGHT-TOOLBAR_HEIGHT);       
 
     // create toolbar
-    RECT rc;
+    #ifndef TMP_DISABLE_FEATURES_FOR_DEMO_DAY	
+	RECT rc;
     GetClientRect(GetHandle(),&rc);
     hToolbar=CreateWindowEx(0, TOOLBARCLASSNAME, (LPSTR) NULL, 
         WS_CHILD | CCS_ADJUSTABLE | WS_VISIBLE | CCS_NOPARENTALIGN | CCS_NORESIZE , 0, rc.bottom-TOOLBAR_HEIGHT,rc.right,TOOLBAR_HEIGHT, GetHandle(), 
@@ -738,60 +739,10 @@ int FeatureSpace::Create() {
     
 //   SendMessage(hToolbar, TB_AUTOSIZE, 0, 0); 
 
-   ShowWindow(hToolbar, SW_SHOW);    
-   
-   /*
-   REBARINFO     rbi;
-   REBARBANDINFO rbBand;
-   RECT          rc;
-   HWND   hwndCB, hwndTB;
-   DWORD  dwBtnSize;
-
-   hRebarControl = CreateWindowEx(WS_EX_CLIENTEDGE, //WS_EX_TOOLWINDOW
-                           REBARCLASSNAME, //REBARCLASSNAME
-                           "rebar",
-                           WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|
-                           WS_CLIPCHILDREN|RBS_VARHEIGHT|
-                           CCS_NODIVIDER,
-                           0,0,0,0,
-                           GetHandle(),
-                           NULL,
-                           GetAppInstance(),
-                           NULL);
-
-   assert(hRebarControl!=NULL);
-
-   // Initialize and send the REBARINFO structure.
-   rbi.cbSize = sizeof(REBARINFO);  // Required when using this
-                                    // structure.
-   rbi.fMask  = 0;
-   rbi.himl   = (HIMAGELIST)NULL;
-   SendMessage(hRebarControl, RB_SETBARINFO, 0, (LPARAM)&rbi);
-
-   // Initialize structure members that both bands will share.
-   rbBand.cbSize = sizeof(REBARBANDINFO);  // Required
-   rbBand.fMask  = RBBIM_COLORS | RBBIM_TEXT |  //| RBBIM_BACKGROUND
-                   RBBIM_STYLE | RBBIM_CHILD  | RBBIM_CHILDSIZE | 
-                   RBBIM_SIZE;
-   rbBand.fStyle = RBBS_CHILDEDGE | RBBS_FIXEDBMP;
-   rbBand.hbmBack=NULL;
-
-   // Create the combo box control to be added.
-   hwndCB = CreateWindowEx( 0, szStaticControl, "test", 
-		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0,
-		0, 100, 20, hRebarControl, NULL,
-		GetAppInstance(), NULL);
-   // Set values unique to the band with the combo box.
-   GetWindowRect(hwndCB, &rc);
-   rbBand.lpText     = "Combo Box";
-   rbBand.hwndChild  = hwndCB;
-   rbBand.cxMinChild = 0;
-   rbBand.cyMinChild = rc.bottom - rc.top;
-   rbBand.cx         = 200;
-   
-   // Add the band that has the combo box.
-   SendMessage(hRebarControl, RB_INSERTBAND, (WPARAM)-1, (LPARAM)&rbBand);
-*/   
+	ShowWindow(hToolbar, SW_SHOW);    
+	#else
+	hToolbar=NULL;
+	#endif   
 
 
     // make this window snap to others
@@ -814,10 +765,15 @@ void FeatureSpace::OnResize() {
     x = rect.left;
     y = rect.top;
     width = rect.right - rect.left;
-    height = rect.bottom - rect.top - TOOLBAR_HEIGHT;
-    
+    #ifndef TMP_DISABLE_FEATURES_FOR_DEMO_DAY
+	height = rect.bottom - rect.top - TOOLBAR_HEIGHT;
+    #else
+    height = rect.bottom - rect.top;
+    #endif
     MoveWindow(glContainer->GetHandle(), x, y, width, height, true);
+    #ifndef TMP_DISABLE_FEATURES_FOR_DEMO_DAY	
     MoveWindow(hToolbar, x, rect.bottom-TOOLBAR_HEIGHT, rect.right, TOOLBAR_HEIGHT, true);    
+    #endif
     
     if (fsgl!=NULL)
 		fsgl->resize();
