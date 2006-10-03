@@ -71,6 +71,7 @@ BOOL CALLBACK MainWindow::EnableWindowCallback(HWND hwnd,LPARAM lparam)
 {
 	// check that this window is not the one we want to keep enabled
 	EnableWindow(hwnd,true);
+	return true;
 }
 
 // destroy all windows owned by the main window

@@ -42,40 +42,15 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     Console::write("FeatureSpace -- Our LOD is %d\n", theLOD);
     Console::write("FeatureSpace -- Band 1 = %d, Band 2 = %d, Band 3 = %d\n", band1, band2, band3);
 
-	progressWindow.Show();
-    mainWindow.DisableAll(); // disable windows to prevent user from doing anything while loading   
-
-	DWORD threadId;
-	HANDLE hBackgroundThread=CreateThread(NULL,0,&ThreadMain,(LPVOID)this,0,&threadId);    
+	progressWindow.turnOn(); 	// show progress window & disable other windows
+	init();						// setup feature space
+	progressWindow.turnOff();   // hide progress window & enable other windows
 
     Console::write("FeatureSpace -- done\n");  
 }
 
 
-// main execution function for feature space thread
-DWORD WINAPI FeatureSpace::ThreadMain(LPVOID lpParameter)
-{
-	FeatureSpace *thisobj=(FeatureSpace*)lpParameter;
-    MSG messages;
- 
-  	thisobj->init();	// setup feature space
- 
- 	progressWindow.Hide();
- 	mainWindow.EnableAll();	// re-enable all of the windows owned by the main thread	
- 
- 	// message loop   
-    while(GetMessage(&messages, NULL, 0, 0))
-    {
-        // Translate keyboard events 
-        TranslateMessage(&messages);
-        // Send message to the associated window procedure 
-  	    DispatchMessage(&messages);  	    
-    }	
-}
-
-
 // setup feature space
-// this is called by the feature space's own thread
 void FeatureSpace::init()
 {
 	int createSuccess;

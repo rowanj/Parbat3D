@@ -150,7 +150,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
         return 0;
     }
     
-    progressWindow.Create(mainWindow.GetHandle());
+    progressWindow.Create();
        
     /* make windows to stick to each other & move around with overview window */
     stickyWindowManager.SetController(&overviewWindow);    

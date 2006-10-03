@@ -57,8 +57,6 @@ int ImageWindow::Create(HWND parent)
 
     prevProc=SetWindowProcedure(&WindowProcedure);
 
-	/* set Z order position */
-   	SetZValue(20);
 
     /* create a child window that will be used by OpenGL */
     imageWindowDisplay.Create(GetHandle());

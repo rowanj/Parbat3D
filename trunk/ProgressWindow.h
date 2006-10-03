@@ -16,9 +16,13 @@ class ProgressWindow:public Window {
         int current_steps;
         int total_steps;
         
+        int turn_on_count;
+        
         bool loop_at_end;
         
-        
+		static DWORD WINAPI ThreadMain(LPVOID lpParameter);
+		void init();
+		
     public:
         //DisplayWindow ProgressWindowDisplay;
         
@@ -30,10 +34,21 @@ class ProgressWindow:public Window {
         
         /**
             Create the progress bar window and sets up all the components that
-            are inside it.
+            are inside it. Starts new thread to handle progress window.
         */
-        int Create (HWND parent);
+        int Create ();
         
+        /**
+        	Shows the progress window & disables all other windows
+        */
+        void turnOn();
+
+
+        /**
+        	Hides the progress window & re-enables all other windows
+        */
+        void turnOff();
+
         
         /**
             Handles any events that are related to the progress window.

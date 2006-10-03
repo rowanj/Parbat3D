@@ -2,8 +2,64 @@
 
 #include "main.h"
 
+// create the progress window
+int ProgressWindow::Create () 
+{
+	turn_on_count=0;
+	
+	// create a new thread that will create the window & handle its messages
+	DWORD threadId;
+	HANDLE hBackgroundThread=CreateThread(NULL,0,&ThreadMain,(LPVOID)this,0,&threadId);    
+}
 
-int ProgressWindow::Create (HWND parent) {
+// main execution function for progress window's thread
+DWORD WINAPI ProgressWindow::ThreadMain(LPVOID lpParameter)
+{
+	ProgressWindow* thiswin=(ProgressWindow*)lpParameter;
+    MSG messages;
+ 
+ 	thiswin->init();
+ 
+ 	// message loop   
+    while(GetMessage(&messages, NULL, 0, 0))
+    {
+        // Translate keyboard events 
+        TranslateMessage(&messages);
+        // Send message to the associated window procedure 
+  	    DispatchMessage(&messages);  	    
+    }
+}
+
+// shows the progress window & disables all other windows
+void ProgressWindow::turnOn()
+{
+	turn_on_count++;
+	Console::write("ProgressWindow -- turn_on_count=%d\n",turn_on_count);	
+	if (turn_on_count==1)
+	{
+		reset();
+	 	Show();
+	 	mainWindow.DisableAll();	// disable all of the windows owned by the main thread		
+	}
+}
+
+// hides the progress window & re-enables all other windows
+void ProgressWindow::turnOff()
+{
+	turn_on_count--;
+	Console::write("ProgressWindow -- turn_on_count=%d\n",turn_on_count);
+	if (turn_on_count==0)
+	{
+	 	mainWindow.EnableAll();	// re-enable all of the windows owned by the main thread		
+	 	Hide();	 	
+	}
+}
+
+
+// setup progress window
+// called from progress window's own thread
+void ProgressWindow::init()
+{
     RECT rect;
     int mx,my;
     const int PROGRESS_WINDOW_WIDTH=175;
@@ -14,12 +70,14 @@ int ProgressWindow::Create (HWND parent) {
     GetWindowRect(overviewWindow.GetHandle(),&rect);
     
     // create prefs window
-    if (!CreateWin(0, "Parbat3D Progress Bar Window", "Loading",
-        WS_POPUP+WS_SYSMENU+WS_CAPTION,
+    int result;
+    result=CreateWin(0, "Parbat3D Progress Bar Window", "Loading",
+        WS_POPUP+WS_CAPTION,
 	    10, 10, //rect.left+50, rect.bottom-150,
         PROGRESS_WINDOW_WIDTH, PROGRESS_WINDOW_HEIGHT,
-        parent, NULL))
-	    return false;
+        mainWindow.GetHandle(), NULL);
+    assert(result==true);
+	    
     
    	// set the background colour
 	HBRUSH backBrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
@@ -50,7 +108,7 @@ int ProgressWindow::Create (HWND parent) {
     // turn off looping once the end is reached
     loop_at_end = false;
     
-    return true;
+    return;	
 }
 
 
