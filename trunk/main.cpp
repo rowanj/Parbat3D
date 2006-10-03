@@ -271,27 +271,36 @@ void loadFile()
 
 void closeFile() {
     /* deallocate variables */
-    if (filename!=NULL)
+    Console::write("closeFile()...\n");
+
+    Console::write("deleting filename...\n");    
+	if (filename!=NULL)
         delete(filename);
     filename=NULL;
-    
+
+    Console::write("deleting image handler...\n");    
 	if (image_handler)
         delete image_handler;
     image_handler=NULL;
-	
+
+    Console::write("destroying too window...\n");	
 	/* destroy tool window */
     if (toolWindow.GetHandle()!=NULL)
         toolWindow.Destroy();
-    
+
+    Console::write("hiding image window...\n");	    
     /* hide image window */
     if (imageWindow.GetHandle()!=NULL)
         imageWindow.Hide();
-    
+
+    Console::write("hiding roi window & deleting ROIs...\n");	    
 	/* hide roi window */
     if (roiWindow.GetHandle()!=NULL) {
         roiWindow.Hide();
         roiWindow.deleteAllROI();
     }
+
+    Console::write("disabling menu items...\n");	
 
     /* disable menu items */
     EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,true);
@@ -303,4 +312,6 @@ void closeFile() {
     
     /* repaint main window */
     overviewWindow.overviewWindowDisplay.Repaint();
+    
+    Console::write("closeFile() done\n");
 }

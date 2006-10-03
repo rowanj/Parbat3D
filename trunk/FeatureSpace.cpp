@@ -42,17 +42,28 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     
 	int createSuccess;
     
+    fsgl=NULL;
     createSuccess=Create();
     assert(createSuccess);
     
     numFeatureSpaces++;
     
+    Console::write("FeatureSpace -- getting pixel data...\n");
+    
     getPixelData();
+
+    Console::write("FeatureSpace -- seting up opengl stuff...\n");
     
 	fsgl = new FeatureSpaceGL(glContainer->GetHandle(), LOD, band1, band2, band3);
 	fsgl->add_points(fsPoints, 255, 255, 255);
+
+	Console::write("FeatureSpace -- calling OnResize\n");    
+    
+    OnResize();  
 	
     Show();
+    
+    Console::write("FeatureSpace -- done\n");  
 }
 
 
@@ -693,7 +704,8 @@ int FeatureSpace::Create() {
 	     rect.right, rect.top, FEATURE_WINDOW_WIDTH, FEATURE_WINDOW_HEIGHT, NULL, NULL))
         return false;
     delete(title);
-       
+
+      
     // create child windows
     glContainer=new GLContainer(GetHandle(),this,0,0,FEATURE_WINDOW_WIDTH,FEATURE_WINDOW_HEIGHT-TOOLBAR_HEIGHT);       
 
@@ -744,15 +756,13 @@ int FeatureSpace::Create() {
 	hToolbar=NULL;
 	#endif   
 
-
     // make this window snap to others
     stickyWindowManager.AddStickyWindow(this);
 
     // handle events for the window
     prevProc=SetWindowProcedure(&WindowProcedure);	
+ 
     
-    
-    OnResize();    
     return true;    
 }
  
@@ -774,9 +784,10 @@ void FeatureSpace::OnResize() {
     #ifndef TMP_DISABLE_FEATURES_FOR_DEMO_DAY	
     MoveWindow(hToolbar, x, rect.bottom-TOOLBAR_HEIGHT, rect.right, TOOLBAR_HEIGHT, true);    
     #endif
-    
+
     if (fsgl!=NULL)
 		fsgl->resize();
+		
     glContainer->Repaint();
 }
 
