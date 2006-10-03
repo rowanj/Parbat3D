@@ -1,8 +1,10 @@
 #ifndef POINTS_HASH_H
 #define POINTS_HASH_H
 
-#include <hash_map.h>
-#include <ext/hash_fun.h>
+#include <ext/hash_map>
+//#include <ext/hash_fun.h>
+
+using namespace __gnu_cxx;
 
 struct eqUnsignedInt
 {
