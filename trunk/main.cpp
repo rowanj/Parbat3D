@@ -223,8 +223,7 @@ void loadFile() {
         closeFile();	
         
         // starts the progress bar (shows the window)
-//        progressWindow.start(100);
-//        progressWindow.setLooping(true);
+        progressWindow.start(100,true);
         
         // load image & setup windows
         int ih_status;
@@ -277,7 +276,7 @@ void loadFile() {
         
         
         // stops the progress bar (hides the window)
-//        progressWindow.end();
+        progressWindow.end();
     }
 }
 

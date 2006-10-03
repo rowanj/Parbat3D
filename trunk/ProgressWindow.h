@@ -16,9 +16,11 @@ class ProgressWindow:public Window {
         int current_steps;
         int total_steps;
         
-        int turn_on_count;
+        int start_count;
         
         bool loop_at_end;
+        
+        bool autoIncrement;
         
 		static DWORD WINAPI ThreadMain(LPVOID lpParameter);
 		void init();
@@ -38,17 +40,6 @@ class ProgressWindow:public Window {
         */
         int Create ();
         
-        /**
-        	Shows the progress window & disables all other windows
-        */
-        void turnOn();
-
-
-        /**
-        	Hides the progress window & re-enables all other windows
-        */
-        void turnOff();
-
         
         /**
             Handles any events that are related to the progress window.
@@ -58,15 +49,15 @@ class ProgressWindow:public Window {
         
         /**
             Opens the progress bar window with a set number of steps to
-            complete.
+            complete. Disables all other windows until end is called.
         */
-        void start (int steps);
+        void start (int steps, bool auto_increment);
         
         
         /**
             Closes the progress bar window to show that progress is complete.
             This can be called even if the required number of steps have not
-            been completed yet.
+            been completed yet. Re-enables all windows.
         */
         void end ();
         

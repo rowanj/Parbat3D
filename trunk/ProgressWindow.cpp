@@ -5,7 +5,8 @@
 // create the progress window
 int ProgressWindow::Create () 
 {
-	turn_on_count=0;
+	start_count=0;
+	autoIncrement=false;
 	
 	// create a new thread that will create the window & handle its messages
 	DWORD threadId;
@@ -29,32 +30,6 @@ DWORD WINAPI ProgressWindow::ThreadMain(LPVOID lpParameter)
   	    DispatchMessage(&messages);  	    
     }
 }
-
-// shows the progress window & disables all other windows
-void ProgressWindow::turnOn()
-{
-	turn_on_count++;
-	Console::write("ProgressWindow -- turn_on_count=%d\n",turn_on_count);	
-	if (turn_on_count==1)
-	{
-		reset();
-	 	Show();
-	 	mainWindow.DisableAll();	// disable all of the windows owned by the main thread		
-	}
-}
-
-// hides the progress window & re-enables all other windows
-void ProgressWindow::turnOff()
-{
-	turn_on_count--;
-	Console::write("ProgressWindow -- turn_on_count=%d\n",turn_on_count);
-	if (turn_on_count==0)
-	{
-	 	mainWindow.EnableAll();	// re-enable all of the windows owned by the main thread		
-	 	Hide();	 	
-	}
-}
-
 
 // setup progress window
 // called from progress window's own thread
@@ -104,6 +79,8 @@ void ProgressWindow::init()
     // progress bar will stick to screen edges even without being added to the manager
     //stickyWindowManager.AddStickyWindow(this);  // make the window stick to others
     
+    // create timer for auto incrementing
+    SetTimer(GetHandle(),1,100,NULL);
     
     // turn off looping once the end is reached
     loop_at_end = false;
@@ -119,30 +96,14 @@ LRESULT CALLBACK ProgressWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     ProgressWindow* win = (ProgressWindow*) Window::GetWindowObject(hwnd);
     
     
-//    switch (message) {  // handle the messages
-//        case WM_COMMAND:
-//            if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED) {
-//                // handle the user cancelling the loading
-//            }
-//            return 0;
-//        
-//        case WM_SHOWWINDOW:
-//            // update window menu item depending on whether window is shown or hidden
-//            if (wParam) {  // show
-//            } else {       // hide
-//            }
-//            return 0;
-//        
-//        // WM_CLOSE: system or user has requested to close the window/application
-//        case WM_CLOSE:
-//            // don't destroy this window, but make it invisible
-//            ShowWindow(hwnd,SW_HIDE);
-//            return 0;
-//        
-//        // WM_DESTORY: system is destroying our window
-//        case WM_DESTROY:
-//            break;
-//    }
+    switch (message) {  // handle the messages
+    	case WM_TIMER:
+			if (win->autoIncrement)
+			{
+				win->increment();
+			}
+			break;
+    }
     
     
     // call the next procedure in the chain
@@ -150,20 +111,40 @@ LRESULT CALLBACK ProgressWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 }
 
 
-void ProgressWindow::start (int steps) {
-    total_steps = steps;  // set the total number of steps in the bar
-    current_steps = 0;    // initialise the current amount the bar has loaded
-    
-    // sends a message to the progress bar to set the size and reset the position
-    SendMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, steps));  // resize
-    SendMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);              // reset position
-    
-    Show();               // opens the window
+void ProgressWindow::start (int steps, bool auto_increment) {
+
+	start_count++;
+	
+	if (start_count==1)
+	{
+		autoIncrement=auto_increment;
+		if (autoIncrement)
+			loop_at_end=true;
+		else
+			loop_at_end=false;
+
+	    total_steps = steps;  // set the total number of steps in the bar
+	    current_steps = 0;    // initialise the current amount the bar has loaded
+	    
+	    // sends a message to the progress bar to set the size and reset the position
+	    SendMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, steps));  // resize
+	    SendMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);              // reset position
+	    
+	    Show();               		// shows the window
+	 	mainWindow.DisableAll();	// disable all of the windows owned by the main thread		
+	}
+
 }
 
 
 void ProgressWindow::end () {
-    Hide();               // hides the window
+	start_count--;
+
+	if (start_count==0)
+	{
+	 	mainWindow.EnableAll();	// re-enable all of the windows owned by the main thread		
+	 	Hide();	 				// hides the window
+	}	
 }
 
 

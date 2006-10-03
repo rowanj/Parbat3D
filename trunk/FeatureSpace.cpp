@@ -42,9 +42,9 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     Console::write("FeatureSpace -- Our LOD is %d\n", theLOD);
     Console::write("FeatureSpace -- Band 1 = %d, Band 2 = %d, Band 3 = %d\n", band1, band2, band3);
 
-	progressWindow.turnOn(); 	// show progress window & disable other windows
+	progressWindow.start(100,true); 	// show progress window & disable other windows
 	init();						// setup feature space
-	progressWindow.turnOff();   // hide progress window & enable other windows
+	progressWindow.end();   // hide progress window & enable other windows
 
     Console::write("FeatureSpace -- done\n");  
 }
