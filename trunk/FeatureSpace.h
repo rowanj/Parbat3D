@@ -43,7 +43,7 @@ class FeatureSpace:public Window, public GLContainerHandler
 		int vectorsize;
 		vector<myPoint> polyPoints;
 		ImageTileSet* fsTileset;
-		points_hash_t fsPoints;
+		points_hash_t fsAllPoints;
 		points_hash_t::iterator hashiter;
 		unsigned int maxPixelCount;
 		unsigned int numberPoints;

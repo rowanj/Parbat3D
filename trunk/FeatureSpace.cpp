@@ -68,7 +68,8 @@ void FeatureSpace::init()
     Console::write("FeatureSpace -- seting up opengl stuff...\n");
     
 	fsgl = new FeatureSpaceGL(glContainer->GetHandle(), theLOD, band1, band2, band3);
-	fsgl->add_points(fsPoints, 255, 255, 255);
+	fsgl->add_points(fsAllPoints, 255, 255, 255);
+	fsAllPoints.clear();
 
 	Console::write("FeatureSpace -- calling OnResize\n");    
     
@@ -687,8 +688,8 @@ unsigned int FeatureSpace::catForHash(unsigned char b1, unsigned char b2, unsign
 void FeatureSpace::addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3)
 {
 	unsigned int hash = catForHash(b1, b2, b3);
-	fsPoints[hash]++;
-	unsigned int count = fsPoints[hash];
+	fsAllPoints[hash]++;
+	unsigned int count = fsAllPoints[hash];
 	if (count > maxPixelCount) maxPixelCount = count;
 }
 
