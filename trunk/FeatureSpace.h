@@ -43,9 +43,9 @@ class FeatureSpace:public Window, public GLContainerHandler
 		int vectorsize;
 		vector<myPoint> polyPoints;
 		ImageTileSet* fsTileset;
-		points_hash_t fsAllPoints;
+		points_hash_t fsImagePoints;
+		points_hash_t fsROIPoints;
 		points_hash_t::iterator hashiter;
-		unsigned int maxPixelCount;
 		unsigned int numberPoints;
 		int theLOD;
 		int LODfactor;
@@ -72,8 +72,8 @@ class FeatureSpace:public Window, public GLContainerHandler
 		void pushXPixelBounds(int rx, int y);
 		void pushXPixel(int rx, int y);
 		unsigned int catForHash(unsigned char b1, unsigned char b2, unsigned char b3);
-		void addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3);
-		void addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3, ROI* theROI);
+		void addToImageFSTable(unsigned char b1, unsigned char b2, unsigned char b3);
+		void addToROIFSTable(unsigned char b1, unsigned char b2, unsigned char b3);
     	
     protected:
 		/* GUI stuff */

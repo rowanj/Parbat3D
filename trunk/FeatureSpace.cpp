@@ -37,7 +37,6 @@ FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     band2 = b2;
     band3 = b3;
     tileSize = 512;
-    maxPixelCount = 0;
     numberPoints = 0;
     Console::write("FeatureSpace -- Our LOD is %d\n", theLOD);
     Console::write("FeatureSpace -- Band 1 = %d, Band 2 = %d, Band 3 = %d\n", band1, band2, band3);
@@ -61,22 +60,16 @@ void FeatureSpace::init()
        
     numFeatureSpaces++;
     
+    Console::write("FeatureSpace -- seting up opengl stuff...\n");
+	fsgl = new FeatureSpaceGL(glContainer->GetHandle(), theLOD, band1, band2, band3);
+
     Console::write("FeatureSpace -- getting pixel data...\n");
-    
     getPixelData();
 
-    Console::write("FeatureSpace -- seting up opengl stuff...\n");
-    
-	fsgl = new FeatureSpaceGL(glContainer->GetHandle(), theLOD, band1, band2, band3);
-	fsgl->add_points(fsAllPoints, 255, 255, 255);
-	fsAllPoints.clear();
-
 	Console::write("FeatureSpace -- calling OnResize\n");    
-    
-    OnResize();  
+    OnResize();
 	
     Show();
-    
 }
 
 // draw contents of GLContainer with opengl
@@ -101,6 +94,8 @@ void FeatureSpace::getPixelData(void)
 	LODwidth = fsTileset->get_LOD_width();
 	LODheight = fsTileset->get_LOD_height();
 	
+	getImageData(); // Populate fsAllPoints, as
+	
 	Console::write("FS::GpixD\tLOD factor is %d\n", LODfactor);
 
 	#if ENABLE_ROI_POINTS
@@ -109,6 +104,7 @@ void FeatureSpace::getPixelData(void)
 		Console::write("FS::GpixD\tGot past theROIs empty check\n");
 		for (int cr = 0; cr < theROIs.size(); cr++)
 		{
+			fsROIPoints.clear(); // Clear the ROI hash
 			Console::write("FS::GpixD\tGot into the ROIs loop\n");
 			currentROI = theROIs.at(cr);
 			vector<ROIEntity*> theEntities = currentROI->get_entities();
@@ -160,10 +156,9 @@ void FeatureSpace::getPixelData(void)
 	}
 	#endif // ENABLE_ROI_POINTS
 	
-	// !! if not only ROIs
-	getImageData();
-	
-	
+	fsgl->add_points(fsImagePoints, 255, 255, 255);
+	fsImagePoints.clear();
+
 	delete fsTileset;
 	
 	Console::write("FS::GpixD\tTileset destroyed.\n");
@@ -184,7 +179,7 @@ void FeatureSpace::getImageData(void)
 			for (int pos = 0; pos < tileSize * tileSize * 3; pos = pos + 3) {
 //				if (tile[pos] < top_clip && tile[pos+1] < top_clip && tile[pos+2] < top_clip &&
 //				    tile[pos] > bottom_clip && tile[pos+1] > bottom_clip && tile[pos+2] > bottom_clip) {
-					addToFSTable(tile[pos], tile[pos+1], tile[pos+2]);
+					addToImageFSTable(tile[pos], tile[pos+1], tile[pos+2]);
 					numberPoints++;
 //				}
 			}
@@ -222,7 +217,7 @@ void FeatureSpace::getPointData(ROIEntity* theEntity, ROI* theROI)
 	unsigned char b2 = (unsigned char)grabbedData[offset + 1];
 	unsigned char b3 = (unsigned char)grabbedData[offset + 2];
 	
-	addToFSTable(b1, b2, b3);
+	addToROIFSTable(b1, b2, b3);
 }
 
 // -----------------------------------------------------------------------------------------
@@ -685,21 +680,17 @@ unsigned int FeatureSpace::catForHash(unsigned char b1, unsigned char b2, unsign
 //addToFSTable
 //-------
 //Adds a point to our FS hash table.
-void FeatureSpace::addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3)
+void FeatureSpace::addToImageFSTable(unsigned char b1, unsigned char b2, unsigned char b3)
 {
 	unsigned int hash = catForHash(b1, b2, b3);
-	fsAllPoints[hash]++;
-	unsigned int count = fsAllPoints[hash];
-	if (count > maxPixelCount) maxPixelCount = count;
+	fsImagePoints[hash]++;
 }
 
-
-//addToFSTable
-//-------
-//Adds a point to our FS hash table, with ROI **UNIMPLEMENTED** !!
-void FeatureSpace::addToFSTable(unsigned char b1, unsigned char b2, unsigned char b3, ROI* theROI)
+void FeatureSpace::addToROIFSTable(unsigned char b1, unsigned char b2, unsigned char b3)
 {
-	return;
+	unsigned int hash = catForHash(b1, b2, b3);
+	fsROIPoints[hash]++;
+	fsImagePoints.erase(hash);
 }
 
 // create feature space window 
