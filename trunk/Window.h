@@ -22,7 +22,7 @@ class Window
 	    HBRUSH hBackgroundBrush;			// window's background brush used for painting background
 	    int zValue;							// window's Z-order value (for setting which windows appear in front or behind)
 	    HDWP hdwp_reorder;					// handle used for re-ordering windows
-
+		DWORD threadId;						// id of thread that created the window
 	
 	    void drawStatic(DRAWITEMSTRUCT *dis); // draw static text control
 
@@ -38,6 +38,8 @@ class Window
     
     public:
 	    Window::Window();
+	    
+	    DWORD GetThreadId() {return threadId;}							// returns the id of the thread that created the window
 
 		void SetZValue (unsigned int value) { };						// not implemented
 	

@@ -45,7 +45,7 @@ enum {DISPLAY_TAB_ID,QUERY_TAB_ID,IMAGE_TAB_ID,FEATURE_TAB_ID};
 void loadFile();
 void closeFile();
 void orderWindows();
-
+void HandleWindowMessagesInBackground();
 
 
 #endif

@@ -16,6 +16,8 @@ class MainWindow:public Window
     int *windowStates; 
     
     static BOOL CALLBACK MainWindow::SaveAndHideWindow(HWND hwnd, LPARAM lparam);
+	static BOOL CALLBACK MainWindow::EnableWindowCallback(HWND hwnd,LPARAM lparam);
+	static BOOL CALLBACK MainWindow::DisableWindowCallback(HWND hwnd,LPARAM lparam);
        
     public:
     virtual int Create();        
@@ -23,6 +25,9 @@ class MainWindow:public Window
     void RestoreAll();      /* restore all windows back to their original state */
     void MinimizeAll();     /* hide all windows owned by the current thread */
     void DestroyAll();		/* destroy all windows owned by current thread */
+    void DisableAll();		/* disable all windows owned by main thread */
+    void DisableAll(HWND);	/* disable all windows except for a particular window */
+    void EnableAll();		/* enable all windows owned by main thread */
 };
 
 

@@ -18,6 +18,7 @@ Window::Window()
     prevWindowProcedure=NULL; 
     hInstance=NULL;
 	zValue=0;
+	threadId=0;
 }
 
 void Window::Init(HINSTANCE hInst)
@@ -122,7 +123,9 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
         prevWindowProcedure=(WNDPROC)SetWindowLongPtr(hwindow,GWLP_WNDPROC,(LONG)&Window::WindowProcedure);
         stPrevWindowProcedure=prevWindowProcedure;
     }
-        
+    
+    threadId=::GetCurrentThreadId();
+    
     return true;
 }
 

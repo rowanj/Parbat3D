@@ -29,6 +29,9 @@ class FeatureSpace:public Window, public GLContainerHandler
         WNDPROC prevProc;
         static int numFeatureSpaces;
         static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+		static DWORD WINAPI ThreadMain(LPVOID lpParameter);
+		void init();
+		
         static const int FEATURE_WINDOW_WIDTH;
         static const int FEATURE_WINDOW_HEIGHT;
         static const int TOOLBAR_HEIGHT;

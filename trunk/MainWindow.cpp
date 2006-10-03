@@ -33,7 +33,7 @@ int MainWindow::Create()
     return true;
 }
 
-// save a window's visibility state & hide it (callback function)
+// save a window's visibility state & hide it (called by windows API)
 BOOL CALLBACK MainWindow::SaveAndHideWindow(HWND hwnd, LPARAM lparam)
 {
     MainWindow *win=(MainWindow*)lparam;
@@ -55,11 +55,49 @@ BOOL CALLBACK MainWindow::SaveAndHideWindow(HWND hwnd, LPARAM lparam)
     return true;
 }
 
+// disable a particular window as long as it is not (called by windows API for every window)
+BOOL CALLBACK MainWindow::DisableWindowCallback(HWND hwnd,LPARAM lparam)
+{
+	// check that this window is not the one we want to keep enabled
+	if (hwnd!=(HWND)lparam)
+	{
+		::EnableWindow(hwnd,false);
+	}
+	return true;
+}
+
+// enable a particular window (called by windows API for every window)
+BOOL CALLBACK MainWindow::EnableWindowCallback(HWND hwnd,LPARAM lparam)
+{
+	// check that this window is not the one we want to keep enabled
+	EnableWindow(hwnd,true);
+}
 
 // destroy all windows owned by the main window
 void MainWindow::DestroyAll()
 {
     DestroyWindow(GetHandle());		// destory main window, which will destroy all others
+}
+
+// disable all windows, except for window with handle hKeepEnabled (if not NULL)
+void MainWindow::DisableAll(HWND hKeepEnabled)
+{
+	// call callback function for every window owned by the main window's thread
+	EnumThreadWindows(Window::GetThreadId(),(WNDENUMPROC)&DisableWindowCallback,(LPARAM)hKeepEnabled);
+}
+
+// disable all windows
+void MainWindow::DisableAll()
+{
+	// call callback function for every window owned by the main window's thread
+	EnumThreadWindows(Window::GetThreadId(),(WNDENUMPROC)&DisableWindowCallback,(LPARAM)0);
+}
+
+// enable all windows
+void MainWindow::EnableAll()
+{
+	// call callback function for every window owned by the main window's thread
+	EnumThreadWindows(Window::GetThreadId(),(WNDENUMPROC)&EnableWindowCallback,(LPARAM)0);	
 }
 
 void MainWindow::RestoreAll()
@@ -77,6 +115,8 @@ void MainWindow::MinimizeAll()
 {
     mainWindow.savedWindows.clear();
     mainWindow.restoreStates.clear();
+
+    // call callback function for every window owned by current thread
     EnumThreadWindows(GetCurrentThreadId(),(WNDENUMPROC)&SaveAndHideWindow,(LPARAM)&mainWindow);
 }
 
