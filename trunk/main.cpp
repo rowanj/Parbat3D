@@ -21,6 +21,7 @@
 #include "PrefsWindow.h"
 #include "ContrastWindow.h"
 #include "ContrastAdvWindow.h"
+#include "ProgressWindow.h"
 
 #include "ROISet.h"
 
@@ -46,6 +47,8 @@ ROIWindow roiWindow;
 PrefsWindow prefsWindow;
 ContrastWindow contrastWindow;
 ContrastAdvWindow contrastAdvWindow;
+ProgressWindow progressWindow;
+
 StickyWindowManager stickyWindowManager;
 vector<FeatureSpace*> featureSpaceWindows;
 
@@ -146,6 +149,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
         MessageBox(0,"Unable to create window","Parbat3D Error",MB_OK);
         return 0;
     }
+    
+    progressWindow.Create(mainWindow.GetHandle());
        
     /* make windows to stick to each other & move around with overview window */
     stickyWindowManager.SetController(&overviewWindow);    
@@ -197,13 +202,12 @@ void orderWindows()
 	//SetWindowPos(imageWindow.GetHandle(),contrastWindow.GetHandle(),0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOACTIVATE+SWP_NOSENDCHANGING);        
 }    
 
-void loadFile()
-{
+void loadFile() {
     OPENFILENAME ofn;
     char szFileName[MAX_PATH] = "";
-
+    
     ZeroMemory(&ofn, sizeof(ofn));
-
+    
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = overviewWindow.GetHandle();
     ofn.lpstrFilter =  "All Supported Images\0*.ecw;*.jpg;*.tif;*.j2k;*.jp2\0ERMapper Compressed Wavelets (*.ecw)\0*.ecw\0JPEG (*.jpg)\0*.jpg\0JPEG 2000 (*.j2k,*.jp2)\0*.j2k;*.jp2\0TIFF / GeoTIFF (*.tif)\0*.tif\0All Files (*.*)\0*.*\0";
@@ -211,13 +215,16 @@ void loadFile()
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
     ofn.lpstrDefExt = "txt";
-
-
-    if(GetOpenFileName(&ofn))
-    {
-		// Clean up any previous instance
-		closeFile();
-
+    
+    
+    if(GetOpenFileName(&ofn)) {
+        // Clean up any previous instance
+        closeFile();	
+        
+        // starts the progress bar (shows the window)
+//        progressWindow.start(100);
+//        progressWindow.setLooping(true);
+        
         // load image & setup windows
         int ih_status;
         assert(image_handler == NULL);
@@ -246,7 +253,7 @@ void loadFile()
         toolWindow.Create(imageWindow.GetHandle());
         roiWindow.Create(imageWindow.GetHandle());
         contrastWindow.Create(imageWindow.GetHandle());
-
+        
         
         // show tool & image windows
         toolWindow.Show();
@@ -266,6 +273,10 @@ void loadFile()
         EnableMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,false);
         EnableMenuItem(overviewWindow.hMainMenu,IDM_FILECLOSE,false);
         EnableMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,false);
+        
+        
+        // stops the progress bar (hides the window)
+//        progressWindow.end();
     }
 }
 

@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=90
+UnitCount=92
 Type=0
 Ver=1
 ObjFiles=
@@ -941,6 +941,26 @@ BuildCmd=
 FileName=PointsHash.h
 CompileCpp=1
 Folder=Feature_Space_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit91]
+FileName=ProgressWindow.cpp
+CompileCpp=1
+Folder=View_PKG/Window Classes
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit92]
+FileName=ProgressWindow.h
+CompileCpp=1
+Folder=View_PKG/Window Classes
 Compile=1
 Link=1
 Priority=1000

@@ -72,7 +72,7 @@ class Window
 	    static HWND GetParentHandle(HWND hwnd) {return (HWND)GetWindowLong(hwnd,GWL_HWNDPARENT);};	// Get Handle To Parent Window From a Handle To a Child Window 
         
         
-        static const int NUMBER_OF_SHORTCUTS = 9;
+        static const int NUMBER_OF_SHORTCUTS = 10;
         static int keyboardShortcutKeys[NUMBER_OF_SHORTCUTS];
         
         
@@ -111,6 +111,8 @@ class Window
         static const int KEY_ROI_POINT = 6;
         static const int KEY_ROI_RECT = 7;
         static const int KEY_ROI_POLY = 8;
+        
+        static const int KEY_SET_ZOOM_LEVEL = 9;
 };
 
 #endif

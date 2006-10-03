@@ -280,6 +280,14 @@ void Window::OnKeyDown(int virtualKey)
             if (!regionsSet->editing())
                 roiWindow.newEntity(&roiWindow, ROI_POLY);
             break;
+        
+        
+        // Misc ----------------------------------------------------------------
+        
+        // set zoom level
+        case Window::KEY_SET_ZOOM_LEVEL:
+//            MessageBox(NULL, "Set zoom", "Parbat3D", MB_YESNO|MB_ICONQUESTION);
+            break;
     }
 }
 
@@ -423,6 +431,8 @@ void Window::setDefaultKeyboardShortcuts () {
     Window::keyboardShortcutKeys[Window::KEY_ROI_POINT] = 'D';
     Window::keyboardShortcutKeys[Window::KEY_ROI_RECT] = 'S';
     Window::keyboardShortcutKeys[Window::KEY_ROI_POLY] = 'A';
+    
+    Window::keyboardShortcutKeys[Window::KEY_SET_ZOOM_LEVEL] = 'Z';
 }
 
 
