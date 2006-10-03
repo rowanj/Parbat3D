@@ -39,6 +39,8 @@ class FeatureSpace:public Window, public GLContainerHandler
         vector<list<int>*> pixCoords;
 		int maxy; 
 		int miny;
+		int maxx;
+		int minx;
 		int yoffset;
 		int vectorsize;
 		vector<myPoint> polyPoints;
