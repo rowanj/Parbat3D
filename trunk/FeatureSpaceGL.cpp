@@ -13,6 +13,7 @@ FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_
 	band2 = band2_arg;
 	band3 = band3_arg;
 	
+	smooth = false;
 	num_points = 0;
 	vertices = 0;
 	LOD = LOD_arg;
@@ -66,6 +67,11 @@ void FeatureSpaceGL::draw()
     glCallList(list_box);
     // Draw the points
     Console::write("Drawing %d lists\n", points_lists.size());
+	if (smooth) {
+		glEnable(GL_POINT_SMOOTH);
+	} else {
+		glDisable(GL_POINT_SMOOTH);
+	}
 	for (int pos = 0; pos < points_lists.size(); pos++) {
 		glCallList(points_lists.at(pos));
 	}
@@ -380,4 +386,10 @@ void FeatureSpaceGL::resize(void)
 {
 	if (gl_view!=NULL)
 		gl_view->resize();
+}
+
+void FeatureSpaceGL::toggle_smooth(void)
+{
+	smooth = !smooth;
+	draw();
 }

@@ -29,6 +29,8 @@ public:
 //	void make_points_lists(points_hash_t points_hash, int maxvalue); // !! DEPRECATED
 	void add_points(points_hash_t points_hash,
 			unsigned char red, unsigned char green, unsigned char blue);
+			
+	void toggle_smooth(void);
 
 private:
 	GLText* gl_text;
@@ -42,6 +44,8 @@ private:
     GLuint list_box;
     GLuint list_line_square;
     vector<GLuint> points_lists;
+    
+    bool smooth;
     
     int band1, band2, band3;
 };

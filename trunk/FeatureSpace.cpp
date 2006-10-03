@@ -905,6 +905,10 @@ void FeatureSpace::OnKeyPress(int virtualKey)
 			
 		case VK_RIGHT:
 			break;
+
+		case VK_SPACE:
+			fsgl->toggle_smooth();
+			break;
 						
 	}
 }
