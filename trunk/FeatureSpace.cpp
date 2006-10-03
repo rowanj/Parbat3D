@@ -11,6 +11,7 @@
 #include <commctrl.h>
 
 #define POLYDATA_DEBUG 0
+#define ENABLE_ROI_POINTS 1
 
 int FeatureSpace::numFeatureSpaces=0;
 
@@ -134,13 +135,13 @@ void FeatureSpace::getPixelData(void)
 							Console::write("FS::GpixD\tCurrent type is RECT\n");
 							//add data at all points in rectangle to data lists
 							getRectData(currentEntity, currentROI);
-						}
+						}/*
 						else //ROI == polygon
 						{
 							Console::write("FS::GpixD\tCurrent type is POLYGON\n");
 							//add data at all points in polygon to data lists
 							getPolygonData(currentEntity, currentROI);
-						}
+						}*/
 					}
 				}
 			}
@@ -148,7 +149,11 @@ void FeatureSpace::getPixelData(void)
 			{
 				Console::write("FS::GpixD\tthe entities set is empty\n");	
 			}
+			int red, green, blue;
+			currentROI->get_colour(&red, &green, &blue);
+			fsgl->add_points(fsROIPoints, red, green, blue);
 		}
+		fsROIPoints.clear(); // Clear the ROI hash
 	}
 	else
 	{
@@ -183,6 +188,7 @@ void FeatureSpace::getImageData(void)
 					numberPoints++;
 //				}
 			}
+			delete[] tile;
 		}
 	}
 }
@@ -218,6 +224,7 @@ void FeatureSpace::getPointData(ROIEntity* theEntity, ROI* theROI)
 	unsigned char b3 = (unsigned char)grabbedData[offset + 2];
 	
 	addToROIFSTable(b1, b2, b3);
+	delete[] grabbedData;
 }
 
 // -----------------------------------------------------------------------------------------
@@ -228,7 +235,74 @@ void FeatureSpace::getPointData(ROIEntity* theEntity, ROI* theROI)
 
 void FeatureSpace::getRectData(ROIEntity* theEntity, ROI* theROI)
 {
+	vector<coords> theCoords = theEntity->get_points();
+	int x1, x2, y1, y2;
+	int fx1, fx2, fy1, fy2;
+	int startx, starty, endx, endy;
 	
+	//init our rectangle coords
+	x1 = theCoords[0].x;
+	y1 = theCoords[0].y;
+	x2 = theCoords[1].x;
+	y2 = theCoords[1].y;
+	
+	//swap the coords if p2 points greater than p1
+	if (x2 < x1)
+	{
+		int temp = x1;
+		x1 = x2;
+		x2 = temp;
+	}
+	if (y2 < y1)
+	{
+		int temp = y1;
+		y1 = y2;
+		y2 = temp;
+	}
+	
+	//get our x and y in terms of the LOD
+	fx1 = x1 / LODfactor;
+	fy1 = y1 / LODfactor;
+	fx2 = x2 / LODfactor;
+	fy2 = y2 / LODfactor;
+	
+	Console::write("FS::Rect - Rect LOD coords are x1 = %d, y1 = %d, x2 = %d, y2 = %d\n", fx1, fy1, fx2, fy2);
+	
+	//work out the origin points of our start and end tiles
+	startx = (fx1 / tileSize) * tileSize;
+	starty = (fy1 / tileSize) * tileSize;
+	endx = (fx2 / tileSize) * tileSize;
+	endy = (fy2 / tileSize) * tileSize;
+	
+	Console::write("FS::Rect - StartX = %d, StartY = %d, EndX = %d, EndY = %d\n", startx, starty, endx, endy);
+	
+	//loop through all tiles that have some points we're interested in
+	for(int tiley = starty; tiley <= endy; tiley+=tileSize)
+	{
+		for(int tilex = startx; tilex <= endx; tilex+=tileSize)
+		{
+			Console::write("FS::Rect - In tile starting at x %d, y %d\n", tilex, tiley);
+			int x, y;
+			
+			char* grabbedData = fsTileset->get_tile_RGB_LOD(tilex, tiley, band1, band2, band3);
+			
+			for(y = max(tiley, fy1); y < min((fy2 + 1), tiley + tileSize); y++)
+			{
+				for(x = max(tilex, fx1); x < min((fx2 + 1), tilex + tileSize); x++)
+				{
+					Console::write("FS::Rect - Getting point at x %d, y %d\n", x, y);
+					int offx = x % tileSize;
+					int offy = y % tileSize;
+					int offset = (offy * tileSize * 3) + (offx * 3);
+					unsigned char b1 = (unsigned char)grabbedData[offset];
+					unsigned char b2 = (unsigned char)grabbedData[offset + 1];
+					unsigned char b3 = (unsigned char)grabbedData[offset + 2];
+					addToROIFSTable(b1, b2, b3);
+				}
+			}
+			delete[] grabbedData;
+		}
+	}
 }
 
 // -----------------------------------------------------------------------------------------
@@ -645,6 +719,7 @@ void FeatureSpace::pushXPixelBounds(int rx, int y)
 	boundsCoords[y - yoffset]->push_front(rx);
 }
 
+
 // -----------------------------------------------------------------------------------------
 // pushXPixel
 // -----------------------------------------------------------------------------------------
@@ -667,31 +742,44 @@ void FeatureSpace::pushXPixel(int rx, int y)
 	pixCoords[y - yoffset]->push_front(rx);
 }
 
+
+// -----------------------------------------------------------------------------------------
 // catForHash
-// ----
+// -----------------------------------------------------------------------------------------
 // Concatenates three unsigned chars together in preparation for
 // passing as a hash key.
+// -----------------------------------------------------------------------------------------
+
 unsigned int FeatureSpace::catForHash(unsigned char b1, unsigned char b2, unsigned char b3)
 {
 	return (unsigned int)b1 + ((unsigned int)b2 << 8) + ((unsigned int)b3 << 16);
 }
 
 
-//addToFSTable
-//-------
-//Adds a point to our FS hash table.
+// -----------------------------------------------------------------------------------------
+//addToImageFSTable
+// -----------------------------------------------------------------------------------------
+//Adds a point to our Image FS hash table.
+// -----------------------------------------------------------------------------------------
 void FeatureSpace::addToImageFSTable(unsigned char b1, unsigned char b2, unsigned char b3)
 {
 	unsigned int hash = catForHash(b1, b2, b3);
 	fsImagePoints[hash]++;
 }
 
+
+// -----------------------------------------------------------------------------------------
+//addToROIFSTable
+// -----------------------------------------------------------------------------------------
+//Adds a point to current ROI FS hash table
+// -----------------------------------------------------------------------------------------
 void FeatureSpace::addToROIFSTable(unsigned char b1, unsigned char b2, unsigned char b3)
 {
 	unsigned int hash = catForHash(b1, b2, b3);
 	fsROIPoints[hash]++;
 	fsImagePoints.erase(hash);
 }
+
 
 // create feature space window 
 int FeatureSpace::Create() {
@@ -807,10 +895,10 @@ void FeatureSpace::OnGLContainerLeftMouseDown(int x,int y)
 // handle mouse move event
 void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 {
-	Console::write("FeatureSpace::OnMouseMove\n");
+//	Console::write("FeatureSpace::OnMouseMove\n");
 	int x_diff = x - prev_mouse_x;
 	int y_diff = y - prev_mouse_y;
-	Console::write("x_diff=%d y_diff=%d \n",x_diff,y_diff);
+//	Console::write("x_diff=%d y_diff=%d \n",x_diff,y_diff);
 	// checked if left mouse button is down
 	if ((virtualKeys&MK_LBUTTON) && !(virtualKeys&MK_RBUTTON))
 	{
