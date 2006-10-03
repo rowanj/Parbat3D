@@ -259,7 +259,7 @@ void FeatureSpaceGL::add_points(points_hash_t points_hash, unsigned char red, un
 		total_count = total_count + hashi->second;
 		hashi++;
 	}
-	vertices += total_count;
+	vertices += points_hash.size();
 	average_count = total_count / points_hash.size();
 
 	Console::write("total = %d, average_count = %d\n", total_count, average_count);
@@ -295,83 +295,6 @@ void FeatureSpaceGL::add_points(points_hash_t points_hash, unsigned char red, un
 	}
 }
 
-
-#if FALSE
-void FeatureSpaceGL::make_points_lists(points_hash_t points_hash, int maxvalue)
-{
-	gl_view->make_current();
-	// Use points hash
-#if TRUE
-	points_hash_t::iterator hashi;
-	unsigned int point;
-	unsigned char* pointx;
-	unsigned char* pointy;
-	unsigned char* pointz;
-	pointx = (unsigned char*)&point + 0;
-	pointy = (unsigned char*)&point + 1;
-	pointz = (unsigned char*)&point + 2;
-	unsigned int count;
-	
-	num_points_lists = 1;
-	list_points_base = glGenLists(num_points_lists);
-	glNewList(list_points_base, GL_COMPILE);
-	glPushAttrib(GL_DEPTH_TEST);
-	glDisable(GL_DEPTH_TEST);
-	glPointSize(3);
-	glEnable(GL_POINT_SMOOTH);
-	glColor4f(1.0, 1.0, 1.0, 0.5);
-	glBegin(GL_POINTS);
-	for(hashi = points_hash.begin(); hashi != points_hash.end(); hashi++) {
-		point = hashi->first;
-		count = hashi->second;
-		glColor4f(1.0, 1.0, 1.0, 0.9 * (float)count/(float)maxvalue + 0.1);
-		glVertex3f(*pointx/256.0, *pointy/256.0, *pointz/256.0);
-		//value = hashi->second;
-		vertices++;
-	}
-	glEnd();
-	glPopAttrib();
-	glEndList();
-#endif
-
-	// Make list_points to benchmark display performance
-#if FALSE
-	const int divisor = RAND_MAX / 256;
-	const int points_per_list = 50000;
-//	int count = 256 * 256 * 256 / 16;
-//	int count = 256 * 256 * 10;
-//	int count = 10;
-//	int count = 50000;
-	int count = 100000;
-	num_points_lists = count / points_per_list + 1;
-	list_points_base = glGenLists(num_points_lists);
-	char r, g, b;
-	srand(0); // seed the random number generator
-	
-	for (int this_list = num_points_lists - 1; this_list >= 0; this_list--) {
-	glNewList(list_points_base + this_list, GL_COMPILE);
-	glPushAttrib(GL_DEPTH_TEST);
-	glDisable(GL_DEPTH_TEST);
-	glPointSize(3);
-	glEnable(GL_POINT_SMOOTH);
-	glColor4f(1.0, 1.0, 1.0, 0.5);
-	glBegin(GL_POINTS);
-	while (count >= points_per_list * this_list) {
-		count--;
-		/* generate random coordinates */
-		r = rand() / divisor;
-		g = rand() / divisor;
-		b = rand() / divisor;
-		glVertex3f(r/256.0, g/256.0, b/256.0);
-	}
-	glEnd();
-	glPopAttrib();
-	glEndList();
-	}
-#endif
-
-}
-#endif
 
 void FeatureSpaceGL::cam_translate(float x, float y)
 {
