@@ -294,7 +294,7 @@ void closeFile() {
         delete image_handler;
     image_handler=NULL;
 
-    Console::write("destroying too window...\n");	
+    Console::write("destroying tool window... toolwindow handle=%d\n",toolWindow.GetHandle());	
 	/* destroy tool window */
     if (toolWindow.GetHandle()!=NULL)
         toolWindow.Destroy();
