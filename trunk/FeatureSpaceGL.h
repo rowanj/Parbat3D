@@ -7,6 +7,11 @@
 #include "PointsHash.h"
 #include <vector>
 
+#define USE_POINT_SPRITES 1
+#if USE_POINT_SPRITES
+#include <GL/glext.h>
+#endif
+
 using namespace std;
 
 class FeatureSpaceGL
@@ -31,6 +36,9 @@ public:
 			unsigned char red, unsigned char green, unsigned char blue);
 			
 	void toggle_smooth(void);
+#if USE_POINT_SPRITES
+	void setup_point_sprites(void);
+#endif
 
 private:
 	GLText* gl_text;
@@ -44,6 +52,10 @@ private:
     GLuint list_box;
     GLuint list_line_square;
     vector<GLuint> points_lists;
+#if USE_POINT_SPRITES
+	GLuint points_texture_id;
+	static const GLfloat point_sprite_max_size = 3.0;
+#endif
     
     bool smooth;
     

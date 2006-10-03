@@ -1,6 +1,15 @@
 #include "FeatureSpaceGL.h"
 #include <cassert>
 #include "console.h"
+#include <mmsystem.h>
+
+#if USE_POINT_SPRITES
+#include "point_texture.c"
+#define GL_POINT_SPRITE_ARB               0x8861
+#define GL_COORD_REPLACE_ARB              0x8862
+PFNGLPOINTPARAMETERFARBPROC  glPointParameterfARB  = NULL;
+PFNGLPOINTPARAMETERFVARBPROC glPointParameterfvARB = NULL;
+#endif
 
 FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_arg, int band3_arg)
 {
@@ -28,16 +37,58 @@ FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	gl_view->make_current();
-/*	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS); */
+//	glEnable(GL_DEPTH_TEST);
+//	glDepthFunc(GL_LESS);
+#if USE_POINT_SPRITES
+	setup_point_sprites();
+	glPointSize(point_sprite_max_size);
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+#else
 	glPointSize(3);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+#endif
 	glEnable(GL_LINE_SMOOTH);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	
 	make_box_list();
 }
+
+#if USE_POINT_SPRITES
+void FeatureSpaceGL::setup_point_sprites(void)
+{
+	Console::write("(II) Setting up point sprites...\n");
+
+	gl_view->make_current();
+	glEnable(GL_TEXTURE_2D);
+    glGenTextures( 1, &points_texture_id );
+
+	glBindTexture( GL_TEXTURE_2D, points_texture_id );
+	glTexParameteri( GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+	glTexImage2D( GL_TEXTURE_2D, 0, 3, points_texture.width, points_texture.height, 0,
+			     GL_RGB, GL_UNSIGNED_BYTE, points_texture.pixel_data);
+
+	char *ext = (char*)glGetString( GL_EXTENSIONS );
+
+    if( strstr( ext, "GL_ARB_point_parameters" ) == NULL )
+    {
+        MessageBox(NULL,"GL_ARB_point_parameters extension was not found",
+            "ERROR",MB_OK|MB_ICONEXCLAMATION);
+    }
+    else
+    {
+        glPointParameterfARB  = (PFNGLPOINTPARAMETERFARBPROC)wglGetProcAddress("glPointParameterfARB");
+        glPointParameterfvARB = (PFNGLPOINTPARAMETERFVARBPROC)wglGetProcAddress("glPointParameterfvARB");
+    }
+
+    assert (glPointParameterfARB != NULL);
+    assert (glPointParameterfvARB != NULL);
+
+	assert(glGetError() == GL_NO_ERROR);
+}
+#endif // USE_POINT_SPRITES
 
 void FeatureSpaceGL::draw()
 {
@@ -64,17 +115,38 @@ void FeatureSpaceGL::draw()
     gl_text->draw_string(5, 60, "Unique Points: %d", vertices);
     
     // draw the bounding box
+    glDisable(GL_TEXTURE_2D);
     glCallList(list_box);
     // Draw the points
-    Console::write("Drawing %d lists\n", points_lists.size());
+//    Console::write("Drawing %d lists\n", points_lists.size());
 	if (smooth) {
 		glEnable(GL_POINT_SMOOTH);
 	} else {
 		glDisable(GL_POINT_SMOOTH);
 	}
+	
+#if USE_POINT_SPRITES
+	glEnable(GL_TEXTURE_2D);
+    glEnable( GL_POINT_SPRITE_ARB );
+    glBindTexture(GL_TEXTURE_2D, points_texture_id);
+
+   	float quadratic[] =  { 1.0f, 0.0f, 0.001f };
+    glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, quadratic );
+
+    glPointParameterfARB( GL_POINT_FADE_THRESHOLD_SIZE_ARB, 2.0f );
+
+    glPointParameterfARB( GL_POINT_SIZE_MIN_ARB, 1.0f );
+    glPointParameterfARB( GL_POINT_SIZE_MAX_ARB, point_sprite_max_size);
+
+    glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
+
+#endif
 	for (int pos = 0; pos < points_lists.size(); pos++) {
 		glCallList(points_lists.at(pos));
 	}
+#if USE_POINT_SPRITES
+    glDisable( GL_POINT_SPRITE_ARB );
+#endif
 	
 #if FALSE // DRAW EXTRA VIEWPORTS
 	assert(glGetError() == GL_NO_ERROR);
