@@ -74,8 +74,8 @@ void ProgressWindow::init()
 	                                  GetHandle(), (HMENU) 0, Window::GetAppInstance(), NULL);
 	    
 	    // set initial values for the progress bar
-	    SendMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, 100)); 
-	    SendMessage(hProgressBar, PBM_SETSTEP, (WPARAM) 1, 0);
+	    PostMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, 100)); 
+	    PostMessage(hProgressBar, PBM_SETSTEP, (WPARAM) 1, 0);
 	}	
 	// allow other thread to update progress bar
     LeaveCriticalSection(&updating_progress_bar);
@@ -146,8 +146,8 @@ void ProgressWindow::start (int steps, bool auto_increment) {
 		EnterCriticalSection(&updating_progress_bar);
 	    {
 		    // sends a message to the progress bar to set the size and reset the position
-		    SendMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, steps));  // resize
-		    SendMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);              // reset position
+		    PostMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, steps));  // resize
+		    PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);              // reset position
 		}
 		// allow other thread to update progress bar
 	    LeaveCriticalSection(&updating_progress_bar);
@@ -184,7 +184,7 @@ void ProgressWindow::reset () {
 	EnterCriticalSection(&updating_progress_bar);
 	{
 	    current_steps = 0;
-	    SendMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);  // update the progress bar with the reset position
+	    PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);  // update the progress bar with the reset position
 	}
 	// allow other thread to update progress bar
     LeaveCriticalSection(&updating_progress_bar);
@@ -202,8 +202,8 @@ void ProgressWindow::reset (int steps) {
 	EnterCriticalSection(&updating_progress_bar);
     {
 	    // sends a message to the progress bar to set the size and reset the position
-	    SendMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, steps));  // resize
-	    SendMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);              // reset position
+	    PostMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, steps));  // resize
+	    PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);              // reset position
 	}
 	// allow other thread update progress bar
     LeaveCriticalSection(&updating_progress_bar);
@@ -226,7 +226,7 @@ void ProgressWindow::increment () {
 	    }
     
 	    // update the progress bar with the new value
-	    SendMessage(hProgressBar, PBM_SETPOS, (WPARAM) current_steps, 0);
+	    PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) current_steps, 0);
 	}	
 	// allow other thread update progress bar
     LeaveCriticalSection(&updating_progress_bar);
@@ -250,7 +250,7 @@ void ProgressWindow::increment (int steps) {
 	    }
     
 	    // update the progress bar with the new value
-	    SendMessage(hProgressBar, PBM_SETPOS, (WPARAM) current_steps, 0);
+	    PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) current_steps, 0);
 	}
 	// allow other thread update progress bar
     LeaveCriticalSection(&updating_progress_bar);
