@@ -30,8 +30,6 @@ int ContrastAdvWindow::Create(HWND parent)
 	     rect.left+50, rect.bottom-150, CONTSADV_WINDOW_WIDTH, CONTSADV_WINDOW_HEIGHT, parent, NULL))
 	    return false;
 	
-	/* set Z order position */
-   	SetZValue(50);
 	
 	////////////////////////////////////////
 	

@@ -60,8 +60,6 @@ int ROIWindow::Create(HWND parent) {
 	
     prevProc=SetWindowProcedure(&WindowProcedure);
 
-	/* set Z order position */
-   	SetZValue(40);
 
 	// Create scroll box 	
 	RECT rect2;

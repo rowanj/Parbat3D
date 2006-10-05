@@ -22,16 +22,20 @@ class ProgressWindow:public Window {
         
         bool autoIncrement;
         
+   		CRITICAL_SECTION updating_progress_bar;
+        
 		static DWORD WINAPI ThreadMain(LPVOID lpParameter);
-		void init();
 		
+		void init();
+				
     public:
         //DisplayWindow ProgressWindowDisplay;
         
         /**
-            Empty constructor.
+            Construct a progress window object.
+            Sets up initial values before creation.
         */
-        ProgressWindow () {}
+        ProgressWindow ();
         
         
         /**

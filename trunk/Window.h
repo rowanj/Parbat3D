@@ -41,7 +41,7 @@ class Window
 	    
 	    DWORD GetThreadId() {return threadId;}							// returns the id of the thread that created the window
 
-		void SetZValue (unsigned int value) { };						// not implemented
+		//void SetZValue (unsigned int value) { };						// not implemented
 	
 	    inline HWND GetHandle() {return hwindow;};      /* get object's window handle */
 	    virtual int Create();        /* create this object's window - overwritten by subclasses */

@@ -29,8 +29,6 @@ int PrefsWindow::Create(HWND parent)
 	     rect.left+50, rect.bottom-150, PREFS_WINDOW_WIDTH, PREFS_WINDOW_HEIGHT, parent, NULL))
 	    return false;
 
-	/* set Z order position */
-   	SetZValue(50);
 
 	HBRUSH backBrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
     SetBackgroundBrush(backBrush);
