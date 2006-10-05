@@ -7,18 +7,19 @@
 class OverviewWindow:public Window
 {
     private:
-    WNDPROC prevProc;
-    
+        WNDPROC prevProc;
+        
+        //bool moving_viewport;
+        //int prev_viewport_x, prev_viewport_y;
         
     public:
-    HMENU hMainMenu;
-    DisplayWindow overviewWindowDisplay;
-    static const int OVERVIEW_WINDOW_WIDTH=250;    /* width of the overview window in pixels */
-
-    virtual int Create(HWND);        
-    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
-    int toggleMenuItemTick(HMENU hMenu,int itemId); 
-
+        HMENU hMainMenu;
+        DisplayWindow overviewWindowDisplay;
+        static const int OVERVIEW_WINDOW_WIDTH=250;  // width of the overview window in pixels
+        
+        virtual int Create(HWND);        
+        static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+        int toggleMenuItemTick(HMENU hMenu,int itemId);
 };
 
 #endif

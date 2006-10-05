@@ -12,54 +12,49 @@
 #include "Window.h"
 
 
-//bool moving_viewport;
-//int prev_viewport_x, prev_viewport_y;
-
-
-DisplayWindow::DisplayWindow()
-{
+DisplayWindow::DisplayWindow() {
     text="No Image Loaded";
     textLen=15;
     
-    moving_viewport = false;
+    moving_viewport = false;  // not currently scrolling using the mouse
 }
 
-int DisplayWindow::Create(HWND hparent)
-{
+
+int DisplayWindow::Create(HWND hparent) {
     RECT rect;
     
     GetClientRect(hparent,&rect);    
     CreateWin(0, "Parbat3D Display Window", NULL, WS_CHILD+WS_VISIBLE,
-		rect.left, rect.top, rect.right, rect.bottom, hparent, NULL);    
-
+        rect.left, rect.top, rect.right, rect.bottom, hparent, NULL);
+    
 	SetDefaultCursor(LoadCursor(NULL, IDC_CROSS));
 	SetBackgroundBrush(NULL);
 	prevProc=SetWindowProcedure(&WindowProcedure);
-	
-    /* init variables used for painting "No Image Loaded" message */
+    
+    // init variables used for painting "No Image Loaded" message
     hbrush=CreateSolidBrush(0);
     HDC hdc=GetDC(GetHandle());                                                                 /* get device context (drawing) object */
     hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma                
     SelectObject(hdc,hNormalFont);                                                   /* set font that will be used for drawing text */    
     GetTextExtentPoint32(hdc,text,textLen,&textSize);                                /* get width & height of string in pixels */          
     ReleaseDC(GetHandle(),hdc);
-
+    
     GetClientRect(GetHandle(),&rect);
     textPos.x=(rect.right-rect.left)/2 - textSize.cx/2;
-    textPos.y=(rect.bottom-rect.top)/2 - textSize.cy/2;            
-    
-	
+    textPos.y=(rect.bottom-rect.top)/2 - textSize.cy/2;
 }
 
 
-/* Handle messages/events related to the display window */
-LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
+// Handle messages/events related to the display window
+LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     static PAINTSTRUCT ps;
     static HDC hdc;
     static RECT rect;
-
+    int mx, my;             // mouse position
+    int ix, iy;             // image position (based on the mouse position)
+    
     DisplayWindow* win=(DisplayWindow*)Window::GetWindowObject(hwnd);
+    
     
     switch (message) {
         case WM_SIZE:           
@@ -76,14 +71,14 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
         
         
         case WM_MOUSEMOVE:
-            // check if image is open, mouse has moved on image window
-            if ((image_handler)&&(win==&imageWindow.imageWindowDisplay)) {
+            // get the current mouse position
+            mx = (short) LOWORD(lParam);
+            my = (short) HIWORD(lParam);
+            
+            // check if an image is open and that mouse movement is in the image window (not the overview one)
+            if (image_handler && win==&imageWindow.imageWindowDisplay) {
                 // check if the query tab is displayed in the tool window
                 if (toolWindow.hToolWindowCurrentTabContainer==toolWindow.queryTab.GetHandle()) {
-                    // Get mouse screen position
-                    int mx = (short)LOWORD(lParam);
-                    int my = (short)HIWORD(lParam);
-                    int ix, iy;
                     unsigned char* bv;
                     
                     //Console::write("DisplayWindow WM_MOUSEMOVE\n mx=%d my=%d\n",mx,my);
@@ -94,7 +89,6 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                     // if cursor is outside of image bounds then display 0,0 as coordinates
                     ImageProperties* ip = image_handler->get_image_properties();
                     if (ix>=0 && iy>=0 && ix<(ip->getWidth()) && iy<(ip->getHeight())) {
-    
                         // Update display of cursor position
                         toolWindow.SetCursorPosition(ix,iy);
                         //SetWindowText(toolWindow.cursorXPos, );
@@ -110,22 +104,15 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                     delete[] bv;
                 }
                 
+                // check if an ROI is currently being created
                 if (regionsSet->editing()) {
-    	            int mx = (short)LOWORD(lParam);
-                    int my = (short)HIWORD(lParam);
-                    int ix, iy;
-                    
-                    // update current mouse position (for drawing new ROIs)
-                    image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);				
+    	            // update current mouse position (for drawing new ROIs)
+                    image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
                     image_handler->set_mouse_position(ix,iy);
                     imageWindow.Repaint();
                 }
                 
                 if (win->moving_viewport) {
-                    // get the current mouse position
-                    int mx = (short) LOWORD(lParam);
-                    int my = (short) HIWORD(lParam);
-                    
                     // calculate the distance from the last mouse position to the current mouse position
                     int xd = win->prev_viewport_x - mx;
                     int yd = win->prev_viewport_y - my;
@@ -143,15 +130,14 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
         
         
         case WM_LBUTTONDOWN:
+            // get position of mouse on screen
+            mx = (short)LOWORD(lParam);
+            my = (short)HIWORD(lParam);
+            
             if ((image_handler) && (win==&imageWindow.imageWindowDisplay)) {
                 // check if an ROI is currently being created
                 if (regionsSet->editing()) {
-                    // get position of mouse on screen
-                    int mx = (short)LOWORD(lParam);
-                    int my = (short)HIWORD(lParam);
-                    
                     // get position of mouse in image
-                    int ix, iy;
                     image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
                     
                     // check if cursor is outside of image bounds
@@ -164,6 +150,7 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
                         imageWindow.Repaint();                    
                     }
                     
+                // if nothing else is using mouse clicks then we can scroll
                 } else {
                     // start scrolling
                     win->moving_viewport = true;

@@ -17,9 +17,7 @@ bool advanced;
 DisplayWindow overviewWindowDisplay;
 
 /* setup overview window */
-int OverviewWindow::Create(HWND parent)
-{
-
+int OverviewWindow::Create(HWND parent) {
     RECT rect;
     RECT imageRect;
     int mx,my;
@@ -69,16 +67,13 @@ int OverviewWindow::Create(HWND parent)
 
 /* toggles a menu item between a checked & unchecked state */
 /* returns true if new state is checked, else false if unchecked */
-int OverviewWindow::toggleMenuItemTick(HMENU hMenu,int itemId)
-{
-    int menuState=GetMenuState(hMenu,itemId,MF_BYCOMMAND);
-    if (menuState&MF_CHECKED)
-    {
+int OverviewWindow::toggleMenuItemTick(HMENU hMenu,int itemId) {
+    int menuState = GetMenuState(hMenu,itemId,MF_BYCOMMAND);
+    
+    if (menuState&MF_CHECKED) {
         CheckMenuItem(hMenu,itemId,MF_UNCHECKED|MF_BYCOMMAND);
         return false;
-    }
-    else
-    {
+    } else {
         CheckMenuItem(hMenu,itemId,MF_CHECKED|MF_BYCOMMAND);
         return true;
     }
@@ -86,23 +81,21 @@ int OverviewWindow::toggleMenuItemTick(HMENU hMenu,int itemId)
 
 /* This function is called by the Windows function DispatchMessage( ) */
 /* All messages/events related to the main window (or it's controls) are sent to this procedure */
-LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    static RECT rect;                       /* for general use */
+LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    static RECT rect;  // for general use
+    int mx, my;        // mouse position
     
-    OverviewWindow* win=(OverviewWindow*)Window::GetWindowObject(hwnd);
-        
-    switch (message)                  /* handle the messages */
-    {
-			
-        /* WM_COMMAND: some command has been preformed by user, eg. menu item clicked */            
+    OverviewWindow* win = (OverviewWindow*) Window::GetWindowObject(hwnd);
+    
+    
+    switch (message) {  // handle the messages
+        // WM_COMMAND: some command has been preformed by user, eg. menu item clicked
         case WM_COMMAND:
-            switch( wParam )
-            {
+            switch( wParam ) {
                 case IDM_FILEOPEN:
                     loadFile();
                     return 0;
-                  
+                
                 case IDM_FILESAVE:
                 case IDM_FILESAVEAS:
 					MessageBox( hwnd, (LPSTR) "This will be greyed out if no file open, else will say \"Where do you want to store such a big file?\"",
@@ -119,7 +112,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     
                     closeFile();
                     return 0;                    
-                          
+                
              	case IDM_IMAGEWINDOW:
                     if (win->toggleMenuItemTick(win->hMainMenu,IDM_IMAGEWINDOW))
                         ShowWindow(imageWindow.GetHandle(),SW_SHOW);
@@ -175,19 +168,17 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     MessageBox (NULL, "Created by Team Imagery, 2006" , "Parbat3D", 0);
                     return 0;
 			}
-           
- 
+            break;
+        
+        
         // WM_SIZE: the window has been re-sized, minimized, maximised or restored
         case WM_SIZE:
-                
             /* resize display/opengl window to fit new size */
             GetClientRect(win->GetHandle(),&rect);
             MoveWindow(win->overviewWindowDisplay.GetHandle(),rect.left,rect.top,rect.right,rect.bottom,true);
-
+            
             /* handle minimizing and restoring the child windows */            
-		    switch(wParam)
-		    {
-                
+		    switch(wParam) {
                 case SIZE_RESTORED:
                     // restore windows to their previous state 
                     mainWindow.RestoreAll();
@@ -199,9 +190,49 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 					return 0;
 		    }    
   	        return 0;
-
-                     
-        /* WM_CLOSE: system or user has requested to close the window/application */
+        
+        /*
+        case WM_MOUSEMOVE:
+            // get the current mouse position
+            mx = (short) LOWORD(lParam);
+            my = (short) HIWORD(lParam);
+            
+            if (image_handler) {
+                if (win->moving_viewport) {
+                    // calculate the distance from the last mouse position to the current mouse position
+                    int xd = win->prev_viewport_x - mx;
+                    int yd = win->prev_viewport_y - my;
+                    
+                    // scroll the appropriate amount vertically and horizontally
+                    if (xd != 0) imageWindow.scrollImage(false, xd);  // horizontal scroll
+                    if (yd != 0) imageWindow.scrollImage(true, yd);   // vertical scroll
+                    
+                    // store the current viewport position as the previous (for next scroll message)
+                    win->prev_viewport_x = mx;
+                    win->prev_viewport_y = my;
+                }
+            }
+            break;
+        
+        
+        case WM_LBUTTONDOWN:
+            if (image_handler) {
+                // start scrolling
+                win->moving_viewport = true;
+                
+                // store the current mouse position to use for calculating scroll amount
+                win->prev_viewport_x = (short) LOWORD(lParam);
+                win->prev_viewport_y = (short) HIWORD(lParam);
+            }
+            break;
+        
+        case WM_LBUTTONUP:
+            // stop scrolling
+            win->moving_viewport = false;
+            break;
+        */
+        
+        // WM_CLOSE: system or user has requested to close the window/application
         case WM_CLOSE:
             // check if there are any ROIs and if they have not been saved
             if (!(regionsSet->get_regions()).empty() && regionsSet->unsaved_changes()) {
@@ -238,19 +269,22 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             /* destroy this window */
             //DestroyWindow( hwnd );
             return 0;
-            
-        /* WM_DESTROY: window is being destroyed */
+        
+        
+        // WM_DESTROY: window is being destroyed
         case WM_DESTROY:
-            /* Save the window location */
+            // Save the window location
             RECT r;
             GetWindowRect(hwnd,&r);
             settingsFile->setSetting("overview window","x", r.left);
             settingsFile->setSetting("overview window","y", r.top);
             
-            /* post a message that will cause WinMain to exit from the message loop */
+            // post a message that will cause WinMain to exit from the message loop
             PostQuitMessage (0);
             break;
     }
+    
+    
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }
 
