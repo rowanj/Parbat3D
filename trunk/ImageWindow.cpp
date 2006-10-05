@@ -128,6 +128,7 @@ void ImageWindow::updateImageScrollbar()
       
 }
 
+
 /* scroll image window horizontally */
 void ImageWindow::scrollImageX(int scrollMsg)
 {
@@ -178,8 +179,7 @@ void ImageWindow::scrollImageX(int scrollMsg)
 }
 
 /* scroll image window vertically */
-void ImageWindow::scrollImageY(int scrollMsg)
-{
+void ImageWindow::scrollImageY(int scrollMsg) {
     SCROLLINFO info;
 	ImageViewport* viewport;
     viewport = image_handler->get_image_viewport();
@@ -231,6 +231,38 @@ void ImageWindow::scrollImageY(int scrollMsg)
     Console::write("\n");
     viewport->set_zoom_y(info.nPos);
 }
+
+void ImageWindow::scrollImage(bool vert, int amount) {
+    SCROLLINFO info;
+	ImageViewport* viewport;
+    viewport = image_handler->get_image_viewport();
+    
+    // get current scroll position & range
+    info.cbSize=sizeof(SCROLLINFO);
+    info.fMask=SIF_ALL;
+    if (vert) GetScrollInfo(GetHandle(),SB_VERT,&info);
+    else GetScrollInfo(GetHandle(),SB_HORZ,&info);
+    
+    // move the desired amount
+    info.nPos += amount;
+    
+    // check new position is within scroll range
+    if (info.nPos<info.nMin)
+        info.nPos=info.nMin;
+    else if (info.nPos>(info.nMax-info.nPage))
+        info.nPos=info.nMax-info.nPage;
+    
+    // update scroll position
+    info.fMask=SIF_POS;
+    if (vert) {
+        SetScrollInfo(GetHandle(),SB_VERT,&info,true);
+        viewport->set_zoom_y(info.nPos);
+    } else {
+        SetScrollInfo(GetHandle(),SB_HORZ,&info,true);
+        viewport->set_zoom_x(info.nPos);
+    }
+}
+
 
 /* zoom the image in/out */
 void ImageWindow::zoomImage(int nlevels)

@@ -17,7 +17,7 @@
 //  This is to allow other packages to build for testing.
 #define TMP_USE_SETTINGS 0
 #define TMP_WAIT_FOR_KEYPRESS_ON_CLOSE 0 //wait for user to press a key in console window before closing on/off
-#define TMP_DISABLE_FEATURES_FOR_DEMO_DAY	//Disable some features for demo day release. Comment out line to re-enable features.
+//#define TMP_DISABLE_FEATURES_FOR_DEMO_DAY	//Disable some features for demo day release. Comment out line to re-enable features.
 
 #define _WIN32_IE 0x0600    // project compatible with comctrl32.dll up to v6.0
                             // required in order to use certain common controls functions & constants

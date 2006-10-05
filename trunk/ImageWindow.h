@@ -7,19 +7,22 @@ extern char* imageWindowTitle;
 class ImageWindow:public Window
 {
     private:
-    WNDPROC prevProc;
+        WNDPROC prevProc;
         
     public:
-    DisplayWindow imageWindowDisplay;
-
-    int Create(HWND parent);
-    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
-    void updateImageWindowTitle();
-    void updateImageScrollbar();
-    void scrollImageX(int scrollMsg);
-    void scrollImageY(int scrollMsg);    
-    void zoomImage(int nlevels);
-	void onKeyDown(int virtualKey);    
+        DisplayWindow imageWindowDisplay;
+    
+        int Create(HWND parent);
+        static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+        void updateImageWindowTitle();
+        void updateImageScrollbar();
+        
+        void scrollImageX(int scrollMsg);
+        void scrollImageY(int scrollMsg);
+        void scrollImage(bool vert, int amount);
+        
+        void zoomImage(int nlevels);
+    	void onKeyDown(int virtualKey);    
 };
 
 #endif

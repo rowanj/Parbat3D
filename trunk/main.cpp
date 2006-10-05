@@ -260,7 +260,6 @@ void loadFile() {
         imageWindow.Show();
         if (atoi(settingsFile->getSetting("roi window", "open").c_str()) == 1)
             roiWindow.Show();
-        orderWindows();                    
         
         // update opengl displays
         overviewWindow.Repaint();

@@ -11,10 +11,17 @@
 #include "ToolWindow.h"
 #include "Window.h"
 
+
+//bool moving_viewport;
+//int prev_viewport_x, prev_viewport_y;
+
+
 DisplayWindow::DisplayWindow()
 {
     text="No Image Loaded";
     textLen=15;
+    
+    moving_viewport = false;
 }
 
 int DisplayWindow::Create(HWND hparent)
@@ -69,72 +76,115 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
         
         
         case WM_MOUSEMOVE:
-            /* check if image is open, mouse has moved on image window & the query tab is displayed in the tool window */
-            if ((image_handler)&&(win==&imageWindow.imageWindowDisplay)&&(toolWindow.hToolWindowCurrentTabContainer==toolWindow.queryTab.GetHandle())) {
-                /* Get mouse screen position */
-                int mx = (short)LOWORD(lParam);
-                int my = (short)HIWORD(lParam);
-                int ix, iy;
-                unsigned char* bv;
-                
-                //Console::write("DisplayWindow WM_MOUSEMOVE\n mx=%d my=%d\n",mx,my);
-                
-                bv = image_handler->get_window_pixel_values(mx, my);
-                image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
-                
-                /* if cursor is outside of image bounds then display 0,0 as coordinates */
-                ImageProperties* ip = image_handler->get_image_properties();
-                if (ix>=0 && iy>=0 && ix<(ip->getWidth()) && iy<(ip->getHeight())) {
-
-                    /* Update display of cursor position */
-                    toolWindow.SetCursorPosition(ix,iy);
-                    //SetWindowText(toolWindow.cursorXPos, );
-                    //SetWindowText(toolWindow.cursorYPos, );
+            // check if image is open, mouse has moved on image window
+            if ((image_handler)&&(win==&imageWindow.imageWindowDisplay)) {
+                // check if the query tab is displayed in the tool window
+                if (toolWindow.hToolWindowCurrentTabContainer==toolWindow.queryTab.GetHandle()) {
+                    // Get mouse screen position
+                    int mx = (short)LOWORD(lParam);
+                    int my = (short)HIWORD(lParam);
+                    int ix, iy;
+                    unsigned char* bv;
                     
-                    /* Update display of pixel values under query tab */                    
-                    if (bv && (ix!=0 || iy!=0)) { /* make sure the band values were returned */
-                        for (int i=1; i<=toolWindow.bands; i++)
-                            toolWindow.SetImageBandValue(i,bv[i-1]);
-                            //SetWindowText(toolWindow.imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
+                    //Console::write("DisplayWindow WM_MOUSEMOVE\n mx=%d my=%d\n",mx,my);
+                    
+                    bv = image_handler->get_window_pixel_values(mx, my);
+                    image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
+                    
+                    // if cursor is outside of image bounds then display 0,0 as coordinates
+                    ImageProperties* ip = image_handler->get_image_properties();
+                    if (ix>=0 && iy>=0 && ix<(ip->getWidth()) && iy<(ip->getHeight())) {
+    
+                        // Update display of cursor position
+                        toolWindow.SetCursorPosition(ix,iy);
+                        //SetWindowText(toolWindow.cursorXPos, );
+                        //SetWindowText(toolWindow.cursorYPos, );
+                        
+                        // Update display of pixel values under query tab
+                        if (bv && (ix!=0 || iy!=0)) { /* make sure the band values were returned */
+                            for (int i=1; i<=toolWindow.bands; i++)
+                                toolWindow.SetImageBandValue(i,bv[i-1]);
+                                //SetWindowText(toolWindow.imageBandValues[i], (char *) makeMessage(leader, bv[i-1]));
+                        }
                     }
+                    delete[] bv;
                 }
-                delete[] bv;
                 
-            }
-            if ((image_handler) && (win==&imageWindow.imageWindowDisplay) && regionsSet->editing()) {
-	            int mx = (short)LOWORD(lParam);
-                int my = (short)HIWORD(lParam);
-                int ix, iy;
-
-                /* update current mouse position (for drawing new ROIs) */               
-                image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);				
-                image_handler->set_mouse_position(ix,iy);
-                imageWindow.Repaint();           
+                if (regionsSet->editing()) {
+    	            int mx = (short)LOWORD(lParam);
+                    int my = (short)HIWORD(lParam);
+                    int ix, iy;
+                    
+                    // update current mouse position (for drawing new ROIs)
+                    image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);				
+                    image_handler->set_mouse_position(ix,iy);
+                    imageWindow.Repaint();
+                }
+                
+                if (win->moving_viewport) {
+                    // get the current mouse position
+                    int mx = (short) LOWORD(lParam);
+                    int my = (short) HIWORD(lParam);
+                    
+                    // calculate the distance from the last mouse position to the current mouse position
+                    int xd = win->prev_viewport_x - mx;
+                    int yd = win->prev_viewport_y - my;
+                    
+                    // scroll the appropriate amount vertically and horizontally
+                    if (xd != 0) imageWindow.scrollImage(false, xd);  // horizontal scroll
+                    if (yd != 0) imageWindow.scrollImage(true, yd);   // vertical scroll
+                    
+                    // store the current viewport position as the previous (for next scroll message)
+                    win->prev_viewport_x = mx;
+                    win->prev_viewport_y = my;
+                }
             }
             break;
         
         
         case WM_LBUTTONDOWN:
-            if ((image_handler) && (win==&imageWindow.imageWindowDisplay) && regionsSet->editing()) {
-                // get position of mouse on screen
-                int mx = (short)LOWORD(lParam);
-                int my = (short)HIWORD(lParam);
-                
-                // get position of mouse in image
-                int ix, iy;
-                image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
-                
-                // check if cursor is outside of image bounds
-                ImageProperties* ip = image_handler->get_image_properties();
-                if (ix>=0 && iy>=0 && ix<(ip->getWidth()) && iy<(ip->getHeight())) {
-                    regionsSet->add_point(ix, iy);
-                    //regionsSet->add_entity_to_current();
-                    ROIWindow* roiwin = (ROIWindow*)Window::GetWindowObject(roiWindow.GetHandle());
-                    roiwin->updateButtons(roiwin);
-                    imageWindow.Repaint();                    
+            if ((image_handler) && (win==&imageWindow.imageWindowDisplay)) {
+                // check if an ROI is currently being created
+                if (regionsSet->editing()) {
+                    // get position of mouse on screen
+                    int mx = (short)LOWORD(lParam);
+                    int my = (short)HIWORD(lParam);
+                    
+                    // get position of mouse in image
+                    int ix, iy;
+                    image_handler->get_image_viewport()->translate_window_to_image(mx, my, &ix, &iy);
+                    
+                    // check if cursor is outside of image bounds
+                    ImageProperties* ip = image_handler->get_image_properties();
+                    if (ix>=0 && iy>=0 && ix<(ip->getWidth()) && iy<(ip->getHeight())) {
+                        regionsSet->add_point(ix, iy);
+                        //regionsSet->add_entity_to_current();
+                        ROIWindow* roiwin = (ROIWindow*)Window::GetWindowObject(roiWindow.GetHandle());
+                        roiwin->updateButtons(roiwin);
+                        imageWindow.Repaint();                    
+                    }
+                    
+                } else {
+                    // start scrolling
+                    win->moving_viewport = true;
+                    
+                    // store the current mouse position to use for calculating scroll amount
+                    win->prev_viewport_x = (short) LOWORD(lParam);
+                    win->prev_viewport_y = (short) HIWORD(lParam);
                 }
             }
             break;
+        
+        
+        case WM_LBUTTONUP:
+            // stop scrolling
+            win->moving_viewport = false;
+            break;
+        
+        // mouse left client area of the window - this doesn't seem to work for disabling the scrolling
+//        case WM_MOUSELEAVE:
+//            win->moving_viewport = false;
+//            break;
         
         
         case WM_LBUTTONDBLCLK:
