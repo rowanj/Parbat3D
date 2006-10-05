@@ -1,7 +1,7 @@
 #ifndef _CONSOLE_H
 #define _CONSOLE_H
 
-#define USE_CONSOLE 0
+#define USE_CONSOLE 1
 
 #include <Windows.h>
 #include <string>
@@ -19,7 +19,7 @@ class Console
     static void write(const char *msg_format, ...);
     static void write(std::string *msg);
     static void write(int msg);
-    static void writeRECT(uint *rect); // ?? why is this cast to uint?
+    static void writeRECT(RECT *rect); 
     static void waitForEnter();
     #else
     static void open() {return;}

@@ -55,9 +55,9 @@ void Console::write(string *msg)
 }
 
 // write a RECT structure to console window
-void Console::writeRECT(uint *rect)
+void Console::writeRECT(RECT *rect)
 {
-    Console::write("top: %d, left: %d, right: %d, bottom: %d\n", rect[0], rect[1], rect[2], rect[3]);
+    Console::write("top: %d, left: %d, right: %d, bottom: %d\n", rect->top, rect->left, rect->right, rect->bottom);
 }
 
 // write integer to console window

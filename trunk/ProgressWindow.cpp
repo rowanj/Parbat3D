@@ -143,7 +143,7 @@ void ProgressWindow::end () {
 	if (start_count==0)
 	{
 	 	mainWindow.EnableAll();	// re-enable all of the windows owned by the main thread		
-	 	Hide();	 				// hides the window
+	 	progressWindow.Hide();	 				// hides the window
 	}	
 }
 

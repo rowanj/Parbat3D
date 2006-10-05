@@ -52,8 +52,6 @@ int ToolWindow::Create(HWND)
     setupDrawingObjects(GetHandle());
     prevProc=SetWindowProcedure(&ToolWindow::WindowProcedure);
 
-	/* set Z order position */
-   	SetZValue(30);
     
     stickyWindowManager.AddStickyWindow(this);  // make the window stick to others    
 
@@ -229,10 +227,9 @@ LRESULT CALLBACK ToolWindow::ToolWindowTabControlProcedure(HWND hwnd, UINT messa
             for (int i=0;i<win->tabs.size();i++)
             {
                 DestroyWindow(win->tabs.at(i)->GetHandle());
-                delete(win->tabs.at(i));
             }
             /* remove tabs from vector */
-            win->tabs.clear();
+            win->tabs.clear();        
             break;                  
         default:
             break;

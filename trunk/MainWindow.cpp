@@ -55,12 +55,13 @@ BOOL CALLBACK MainWindow::SaveAndHideWindow(HWND hwnd, LPARAM lparam)
     return true;
 }
 
-// disable a particular window as long as it is not (called by windows API for every window)
+// disable a particular window as long as it is not a particular window (called by windows API for every window)
 BOOL CALLBACK MainWindow::DisableWindowCallback(HWND hwnd,LPARAM lparam)
 {
 	// check that this window is not the one we want to keep enabled
 	if (hwnd!=(HWND)lparam)
 	{
+		Console::write("MainWindow::DisableWindowCallback\n");
 		::EnableWindow(hwnd,false);
 	}
 	return true;
@@ -70,6 +71,7 @@ BOOL CALLBACK MainWindow::DisableWindowCallback(HWND hwnd,LPARAM lparam)
 BOOL CALLBACK MainWindow::EnableWindowCallback(HWND hwnd,LPARAM lparam)
 {
 	// check that this window is not the one we want to keep enabled
+	Console::write("MainWindow::EnableWindowCallback\n");	
 	EnableWindow(hwnd,true);
 	return true;
 }

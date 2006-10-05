@@ -334,13 +334,9 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                 stickyWindowManager.OnMoving(win,(RECT*)lParam);
                 return TRUE;
             case WM_DESTROY: 
-				/*Console::write("Window WM_DESTROY");
-				GetWindowText(hwnd,buffer,256);
-				Console::write("\twindow title:%s\n",buffer);*/
                 DeleteObject(win->hNormalFont);
                 DeleteObject(win->hBoldFont);      
 				DeleteObject(win->hHeadingFont);
-				//DeleteObject(win->hBackgroundBrush);          
                 win->hwindow=NULL;
                 break;
         }
