@@ -171,7 +171,7 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     switch (message)                  /* handle the messages */
     {
 		case WM_COMMAND:
-             
+            // OK button
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
 	        {
 //				MessageBox( hwnd, (LPSTR) "Contrast Stretch complete", (LPSTR) "Contrast / brightness", MB_ICONINFORMATION | MB_OK );
@@ -189,11 +189,13 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 				}
 			}
 			
+			// cancel button
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
 				ShowWindow(hwnd,SW_HIDE);
 			}
-					
+			
+			// per channel clicked		
 		    if (LOWORD(wParam) == 9 && HIWORD(wParam) == BN_CLICKED)
 			{
                 contrastWindow.Hide();
@@ -211,6 +213,14 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
+			
+			//image_handler->get_brightness_contrast();
+			
+			//if (!(slider position==set value)) {
+                if (MessageBox(NULL, "All changes will be lost! Do you wish to continue?", "Parbat3D", MB_YESNO|MB_ICONQUESTION)!=IDYES)
+                    return 0;
+			
+			
             /* don't destroy this window, but make it invisible */
             ShowWindow(hwnd,SW_HIDE);
             CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
