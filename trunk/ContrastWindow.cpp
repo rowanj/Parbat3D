@@ -10,9 +10,9 @@
 #include <commctrl.h>
 #include "OverviewWindow.h"
 
-/* ------------------------------------------------------------------------------------------------------------------------ */
-/* Prefs Window Functions */
-
+// Contrast and brightness values for resetting
+int brightnessValue;
+int contrastValue;
 
 /* create main window */
 int ContrastWindow::Create(HWND parent)
@@ -56,7 +56,7 @@ int ContrastWindow::Create(HWND parent)
     5, 27,                        // position 
     310, 35,                      // size 
     GetHandle(),                       // parent window 
-    NULL, //(HMENU) ID_TRACKBAR,             // control identifier  ID_TRACKBAR
+    (HMENU) 5,//NULL,              // control identifier  ID_TRACKBAR
     Window::GetAppInstance(),                       // instance 
     NULL                           // no WM_CREATE parameter 
     ); 
@@ -133,19 +133,18 @@ int ContrastWindow::Create(HWND parent)
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hCValues,STATIC_FONT_NORMAL);
 
-	#ifndef TMP_DISABLE_FEATURES_FOR_DEMO_DAY	
+	/* This function is for a checkbox that allows switching to a per channel contrast stretch window */	
+	/*
 	hPerChannel = CreateWindowEx( 0, "BUTTON", "Per Channel", 
     BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 18, 160, 100, 16,
 	GetHandle(),(HMENU) 9, Window::GetAppInstance(), NULL);
+	*/
+	hPerChannel=NULL;// delete this line when above function is implemented
 	
 	hPreview = CreateWindowEx( 0, "BUTTON", "Preview", 
     BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 18, 180, 100, 16,
 	GetHandle(),NULL, Window::GetAppInstance(), NULL);
-	#else
-	hPerChannel=NULL;
-	hPreview=NULL;
-	#endif
-	
+		
 	// Insert 'OK' button 
 	hCSOKButton =  CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE,
 		140, 180, 80, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
@@ -171,6 +170,12 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     switch (message)                  /* handle the messages */
     {
 		case WM_COMMAND:
+			/*
+			if (LOWORD(wParam) == 5 && HIWORD(wParam) == TB_THUMBTRACK)
+	        {
+				MessageBox( hwnd, (LPSTR) "My message", (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+			}*/
+			
             // OK button
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
 	        {
@@ -192,7 +197,13 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 			// cancel button
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
-				ShowWindow(hwnd,SW_HIDE);
+	            //reset slider positions
+				image_handler->get_brightness_contrast(&brightnessValue, &contrastValue);
+				SendMessage(win->hBrightnessTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) brightnessValue);
+		        SendMessage(win->hContrastTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) contrastValue);
+			
+	            /* don't destroy this window, but make it invisible */
+	            ShowWindow(hwnd,SW_HIDE);
 			}
 			
 			// per channel clicked		
@@ -203,6 +214,7 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 contrastAdvWindow.Show();
             }
 			return 0;
+			
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
             if (wParam)
@@ -214,16 +226,13 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
 			
-			//image_handler->get_brightness_contrast();
-			
-			//if (!(slider position==set value)) {
-                if (MessageBox(NULL, "All changes will be lost! Do you wish to continue?", "Parbat3D", MB_YESNO|MB_ICONQUESTION)!=IDYES)
-                    return 0;
-			
+            //reset slider positions
+			image_handler->get_brightness_contrast(&brightnessValue, &contrastValue);
+			SendMessage(win->hBrightnessTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) brightnessValue);
+	        SendMessage(win->hContrastTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) contrastValue);
 			
             /* don't destroy this window, but make it invisible */
             ShowWindow(hwnd,SW_HIDE);
-            CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);            
             return 0;
 
         /* WM_DESTORY: system is destroying our window */
