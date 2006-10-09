@@ -43,7 +43,9 @@ FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_
 	setup_point_sprites();
 	glPointSize(point_sprite_max_size);
 	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+//	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glBlendFunc( GL_SRC_ALPHA, GL_DST_ALPHA );
+//	glBlendFunc( GL_SRC_ALPHA, GL_ZERO );
 #else
 	glPointSize(3);
 	glEnable(GL_BLEND);
@@ -130,7 +132,7 @@ void FeatureSpaceGL::draw()
     glEnable( GL_POINT_SPRITE_ARB );
     glBindTexture(GL_TEXTURE_2D, points_texture_id);
 
-   	float quadratic[] =  { 1.0f, 0.0f, 0.001f };
+   	float quadratic[] =  { 0.0f, 0.0f, 0.001f };
     glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, quadratic );
 
     glPointParameterfARB( GL_POINT_FADE_THRESHOLD_SIZE_ARB, 2.0f );
@@ -385,6 +387,7 @@ void FeatureSpaceGL::resize(void)
 
 void FeatureSpaceGL::toggle_smooth(void)
 {
+	Console::write("Toggling FS Smoothing\n");
 	smooth = !smooth;
 	draw();
 }

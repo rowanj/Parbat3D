@@ -2,7 +2,7 @@
 #include "console.h"
 #include <cassert>
 
-#define DEBUG_GL 1
+#define DEBUG_GL 0
 
 OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* image_viewport_param)
 {

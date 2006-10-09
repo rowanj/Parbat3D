@@ -54,7 +54,7 @@ private:
     vector<GLuint> points_lists;
 #if USE_POINT_SPRITES
 	GLuint points_texture_id;
-	static const GLfloat point_sprite_max_size = 3.0;
+	static const GLfloat point_sprite_max_size = 10.0;
 #endif
     
     bool smooth;
