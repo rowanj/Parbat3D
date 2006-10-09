@@ -118,6 +118,7 @@ void ImageHandler::set_brightness_contrast(int new_brightness, int new_contrast)
 	contrast_value = new_contrast;
 	
 	image_gl->set_brightness_contrast((float(brightness_value) / 250.0) - 1.0, float(contrast_value) / 250.0);
+	overview_gl->set_brightness_contrast((float(brightness_value) / 250.0) - 1.0, float(contrast_value) / 250.0);
 }
 void ImageHandler::get_brightness_contrast(int* brightness_return, int* contrast_return)
 {

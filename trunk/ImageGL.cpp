@@ -518,22 +518,9 @@ void ImageGL::resize_window(void)
 	#if DEBUG_GL
 	Console::write("(II) Resize window triggered.\n");
 	#endif
-/*	int new_tex_rows, new_tex_cols;
-	int new_tex_count; */
-	
+
 	/* Re-size the OpenGL context */
 	gl_image->resize();
-
-	/* Number how many textures at near-next LOD cover the screen? */
-/*	new_tex_cols = (gl_image->width() / (texture_size / 2)) + 1;
-	new_tex_rows = (gl_image->height() / (texture_size / 2)) + 1;
-	new_tex_count = new_tex_rows * new_tex_cols; */
-	
-	/* Do we need more texture IDs?  Allocate them */
-/*	gl_image->make_current();
-	while (textures.size() < new_tex_count) {
-		add_new_texture();
-	} */
 
 	// We use this as an invalid test case later, so we don't want it to work...
 	assert(glIsTexture(0) == GL_FALSE);
@@ -619,7 +606,6 @@ void ImageGL::set_brightness_contrast(float brightness_arg, float contrast_arg)
 	#if DEBUG_GL
 	Console::write("ImageGL::set_brightness_contrast(%1.4f,%1.4f)\n", brightness_arg, contrast_arg);
 	#endif
-	GLfloat brightness_factor, contrast_factor;
 	
 	glPushAttrib(GL_MATRIX_MODE);
 	glMatrixMode(GL_COLOR);

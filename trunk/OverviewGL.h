@@ -15,6 +15,8 @@ class OverviewGL : public ViewportListener
 	void notify_viewport(void);
 	void notify_bands(void);
 
+	void set_brightness_contrast(float brightnes_arg, float contrast_arg);
+	
   private:
 	void make_texture(void);
 	

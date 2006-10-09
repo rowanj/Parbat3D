@@ -2,7 +2,7 @@
 #include "console.h"
 #include <cassert>
 
-#include "config.h"
+#define DEBUG_GL 1
 
 OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* image_viewport_param)
 {
@@ -187,7 +187,8 @@ void OverviewGL::notify_bands(void)
 	Console::write("(II) OverviewGL re-texturing.\n");
 #endif
 	/* Make a texture if it doesn't exist */
-	gl_overview->make_current();	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	gl_overview->make_current();
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	if (glIsTexture(tex_overview_id) != GL_TRUE) {
 		GLint proxy_width;
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -217,4 +218,23 @@ void OverviewGL::notify_bands(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
 	/* remember to free the RGB memory */
 	delete[] tex_overview;
+}
+
+void OverviewGL::set_brightness_contrast(float brightness_arg, float contrast_arg)
+{
+	#if DEBUG_GL
+	Console::write("OverviewGL::set_brightness_contrast(%1.4f,%1.4f)\n", brightness_arg, contrast_arg);
+	#endif
+
+	glPushAttrib(GL_MATRIX_MODE);
+	glMatrixMode(GL_COLOR);
+	glLoadIdentity();
+
+	// Set brightness
+	glTranslatef(brightness_arg,brightness_arg,brightness_arg);
+	// Set contrast
+	glScalef(contrast_arg,contrast_arg,contrast_arg);
+
+	glPopAttrib();
+	notify_bands();
 }
