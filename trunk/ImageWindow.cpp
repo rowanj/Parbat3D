@@ -267,25 +267,12 @@ void ImageWindow::scrollImage(bool vert, int amount) {
 /* zoom the image in/out */
 void ImageWindow::zoomImage(int nlevels)
 {
-    float zoom;
- 
-    Console::write("zoomImage() nlevels=");   
-    Console::write(nlevels);
-    Console::write("\n");
-    zoom=image_handler->get_image_viewport()->get_zoom_level();
-    // Sometimes the zoom should be a little more sensitive
-    if (zoom >= 0.5) nlevels = nlevels * 2;
-    if (zoom >= 1.0) nlevels = nlevels * 2;
-    if (zoom >= 5.0) nlevels = nlevels * 5;
-    if (zoom >= 10.0) nlevels = nlevels * 10;
-    zoom+=nlevels/100.0;
-/*    if (zoom>2.0)
-        zoom=2.0; */
-    // a per-image minimum is calculated in ImageViwport
-/*    else if (zoom<0.01)
-        zoom=0.01; */
-    image_handler->get_image_viewport()->set_zoom_level(zoom);
-    //image_handler->get_image_viewport()->set_zoom_level(1.0);	// *****for testing only*****
+    float zoom=image_handler->get_image_viewport()->get_zoom_level();
+    float increment = ((float)nlevels * zoom) / 50.0;
+
+    Console::write("zoomImage() nlevels=%d, increment=%f, new_zoom=%f\n", nlevels, increment, zoom);
+    image_handler->get_image_viewport()->set_zoom_level(zoom+increment);
+
     updateImageWindowTitle();
     updateImageScrollbar();
 }

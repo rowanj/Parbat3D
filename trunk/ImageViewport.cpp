@@ -12,7 +12,7 @@ ImageViewport::ImageViewport(ImageProperties* image_properties)
 	viewport_height = 0;
 	window_height = 0;
 	window_width = 0;
-	zoom_level = 0.75;
+	zoom_level = 0.0;
 	zoom_minimum = 0.01;
 	
 	assert(image_properties != NULL);
@@ -40,7 +40,7 @@ float ImageViewport::set_zoom_level(float zoom_value)
 	int old_viewport_width = viewport_width;
 	int old_viewport_height = viewport_height;
 	
-	zoom_value = round(zoom_value*100.0)/100.0;
+//	zoom_value = round(zoom_value*100.0)/100.0;
 	zoom_level = max(zoom_minimum, zoom_value);
 	zoom_image_width = int(round(image_width * zoom_level));
 	zoom_image_height = int(round(image_height * zoom_level));
@@ -92,6 +92,7 @@ void ImageViewport::set_window_size(int new_window_width, int new_window_height)
 	viewport_width = int(round((float)window_width / zoom_level));
 	viewport_height = int(round((float)window_height / zoom_level));
 	get_zoom_minimum();
+	if (zoom_level < zoom_minimum) set_zoom_level(zoom_minimum);
 	notify_viewport_listeners();
 }
 
