@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Parbat 3D Reference Manual: Text File Format</title>
+  <link rel="stylesheet" href="assets/main.css" type="text/css">
+</head>
+
+
+<body>
+<h1>Text File Format</h1>
+
+
+<h2>General File Format</h2>
+
+<h3>General Format</h3>
+
+<p>The data is stored in a plain ASCII text-based format that is compatible with standard Microsoft Windows .ini information files. This format consists of multiple named sections which each contain a number of named keys and values. A piece of data is identified by the section name and the key and the combination of these 2 names must be unique. The order of sections in the file and keys in the sections do not matter. The settings can still be found no matter where they exist.
+
+<h3>Sections</h3>
+<p>Each section in the file contains similar information grouped under a common heading. The start of a section is defined by a line that contains the name of the section inside square brackets. An example of a section definition is the shown on the following line:
+<p>[SectionName]</p>
+<p>The section name may contain any standard characters from the ASCII character set, including letters, numbers, spaces, full stops and even square brackets. The only character not allowed is the new line character. Not printable characters are not recommended for use but are still allowed. The following section names are all legitimate:<p>
+<p>[section name]
+<br/>[SECTION-nAmE]
+<br/>[.a5_]
+<br/>[ ]</p>
+
+<h4>Restrictions</h4>
+<p>The only restrictions that are placed on the section names are as follows.</p>
+<ul>
+<li>It must be unique in the text file.</li>
+<li>The first character on the line must be an opening square bracket ([) and the last character on the line must be a closing square bracket (]).</li>
+<li>The section name must be the only text on the line. There must not be any leading or trailing spaces or other characters.</li>
+<li>It must contain at least one character. Blank section names (ie. []) are not allowed. There is no upper limit on the amount of characters but sensible lengths, such as below 255 characters, should be used.</li>
+<li>It must all be on the same line. In other words, it cannot contain a new line character in the name.</li>
+</ul>
+
+
+<h2>Keys and Data</h2>
+<p>The actual information in the file is stored in key and data combinations. Each piece of data has a corresponding key that is used to identify it. Because the key is used for identification it must be unique in the section. The key and data are on a single line and are separated by an equals (=) sign. Everything before the equals sign is considered to be the key and everything after is considered to be the data. An example of a key-data combination definition is the shown on the following line:</p>
+<p>key=data</p>
+<p>Examples of legitimate key and data combinations are as follows.</p>
+<p>field=value
+<br/>a string=yet another piece of pointless data
+<br/>numbers=2,3,42,3.14
+<br/>_this_=.one,"seven"</p>
+
+<h4>Key Restrictions</h4>
+<ul>
+<li>It must be unique in the section. The exception to this is that same key name may be used in different sections.</li>
+<li>It must not contain the equals (=) sign. This is because everything after the equals sign is considered to be the data.</li>
+<li>It must contain at least one character. Blank keys (ie. "=data") are not allowed. There is no upper limit on the amount of characters but sensible lengths, such as below 255 characters, should be used.</li>
+<li>The key cannot spread across multiple lines. In other words, it cannot contain a new line character.</li>
+<li>The first character must not be an opening square bracket ([). This will make the line appear to the text file reader as a section and will cause problems.</li>
+</ul>
+
+<h4>Data Restrictions</h4>
+<ul>
+<li>The data cannot spread across multiple lines. In other words, it cannot contain a new line character.</li>
+<li>Although they are allowed, equals (=) signs should not be used in the data because it may lead to confusion when reading the data.</li>
+</ul>
+
+
+
+<h2>Settings</h2>
+<p>Various settings in Parbat3D are preserved by saving and loading them to and from a settings file. The settings are divided into groups (such a windows, preferences, keyboard shortcuts, etc) and each one of these groups is turned into a section heading. The name of the setting is used as the key and the actual setting becomes the data. The following is a example</p>
+<p>To save the position of the overview window, the overview window would be used as the group and each axis that the window is position on (x, y) becomes a key. The actual positions become the data. The way this data would be stored is the shown on the following lines:</p>
+<p>[overview window]
+<br/>x=200
+<br/>y=50</p>
+
+<h3>Location of the File</h3>
+<p>To allow different users to have their own settings, the file is stored in their Application Data folder. An example path to the settings file is shown below. This example considers that the user is logged onto the computer using an account called "User".</p>
+<p>C:\Documents and Settings\User\Application Data\Imagery\Parbat3D\settings.ini</p>
+
+<h3>Settings</h3>
+<p>Here is a list of the settings that are saved as they would be seen in the settings.ini file. Next to each setting is an explanation of what the setting is used for</p>
+
+<table>
+<tr><th colspan="2">[preferences]</th></tr>
+<tr><td>cachesize</td>
+    <td>The amount of memory used for the texture cache in megabytes (MB)</td></tr>
+<tr><td>texsize</td>
+    <td>The vertical and horizontal size in pixels of the textures</td></tr>
+<tr><td>displayconfirmwindow</td>
+    <td>If the user is prompted on exit if they really want to quit (1 prompt on quit, 0 no prompt)</td></tr>
+
+<tr><th colspan="2">[overview window]</th></tr>
+<tr><td>x</td>
+    <td>The horizontal position of the window in pixels</td></tr>
+<tr><td>y</td>
+    <td>The vertical position of the window in pixels</td></tr>
+
+<tr><th colspan="2">[image window]</th></tr>
+<tr><td>x</td>
+    <td>The horizontal position of the window in pixels</td></tr>
+<tr><td>y</td>
+    <td>The vertical position of the window in pixels</td></tr>
+<tr><td>width</td>
+    <td>The width of the window in pixels</td></tr>
+<tr><td>height</td>
+    <td>The height of the window in pixels</td></tr>
+
+<tr><th colspan="2">[tool window]</th></tr>
+<tr><td>x</td>
+    <td>The horizontal position of the window in pixels</td></tr>
+<tr><td>y</td>
+    <td>The vertical position of the window in pixels</td></tr>
+
+<tr><th colspan="2">[roi window]</th></tr>
+<tr><td>x</td>
+    <td>The horizontal position of the window in pixels</td></tr>
+<tr><td>y</td>
+    <td>The vertical position of the window in pixels</td></tr>
+<tr><td>open</td>
+    <td>whether the window should be opened when an image is opened (1 open, 0 leave closed)</td></tr>
+
+<tr><th colspan="2">[keyboard shortcuts]</th></tr>
+<tr><td>0...9</td>
+    <td>Each key represents a shortcut function (defined in window.h) and the data represents the shortcut that triggers it</td></tr>
+</table>
+
+
+
+<h2>Regions of Interest</h2>
+<p>Parbat3D is able to save and load Regions Of Interests (ROIs) to and from a file. This section documents the format of the file that will be used by the program in order to represent the ROIs. The ROI definition file may contain one or more definitions of Regions Of Interest for a particular image. All the ROIs that exist in a file make up a ROI set.</p>
+
+<h3>Set Information</h3>
+<p>The start of the file contains information on the set that is used to access the rest of the file. This information is contained in a section called "ROI List" and contains the total number of ROIs and the names of the ROIs that are in the file.</p>
+
+<h4>Count</h4>
+<p>The number of ROIs is stored under the key "count". If there are 3 ROIs in the set then the count will read as follows:</p>
+<p>count=3</p>
+
+<h4>Names</h4>
+<p>All the names of the ROIs are stored as data under different keys. The key to each ROI name starts with "ROI " and then has a number to uniquely identify it. The numbering of ROIs starts at 0 and will end at a number one less than the total count. If the 3rd ROI name (called "trees" for example) was going to be stored it would have the format "ROI 2=trees".</p>
+<p>An example of how this section would look in the file is as follows. This set has 3 ROIs called "trees", "water" and "buildings".</p>
+<p>[ROI List]
+<br/>count=3
+<br/>ROI 0=trees
+<br/>ROI 1=water
+<br/>ROI 2=buildings</p>
+
+
+<h3>Region of Interest</h3>
+<h4>Name</h4>
+<p>Each ROI is stored in a separate section. The name of the ROI becomes the section name, so if the ROI is called "grass" then the section would be titled "[grass]".</p>
+<h4>Colour</h4>
+<p>The colour of the ROI is stored under the key "colour" and the values that make up the colour (the red, green and blue values) are stored as the data. A yellow ROI would be stored as "colour=255 255 0". The rest of the data in the section represents the entities that make up the ROI.</p>
+<h4>Entities Numbering</h4>
+<p>The total number of entities that are stored in the ROI are stored under the key "entities". An ROI with 10 entities would be stored as "entities=10". The information on each entity has a key with a prefix of the number of the ROI. The numbers start at 0. All the information on the 7th entity in the ROI would start with the prefix "entity 6".</p>
+<h4>Type of Entity</h4>
+<p>Each entity has a type that is stored under the key "entity n type=", where n represents the number of the ROI. If the 4th entity was rectangular, its type would be stored as "entity 3 type=RECT".</p>
+<h4>Points</h4>
+<p>Each entity is made up of a number of points. A POINT entity only needs 1 point, a RECT requires 2 points (top-left and bottom-right) and a POLY can have any number of points, but requires at least 3. The total number of points in the entity are stored in the following format:</p>
+<p>entity n points=p</p>
+<p>Where n is the entity number and p is the total number of points. Each point is represented by the following line:</p>
+<p>entity n point p=x y</p>
+<p>Where n is the entity number, p is the point number and x and y make up the position that the point is at in the image. Depending on how many points were specified in the entity that will correspond to the number of lines that are needed in the file.</p>
+
+<h3>Example</h3>
+<p>The following is an example of the contents of an ROI text file. The following set contains 2 ROIs, called water and grass. Water is coloured blue and grass is coloured green. The water ROI has a single POLY entity with 4 points. The grass ROI has 3 entities - a POINT, a RECT and a POLY with 3 points.</p>
+
+<p>[ROI List]
+<br/>count=2
+<br/>ROI 0=water
+<br/>ROI 1=grass</p>
+
+<p>[water]
+<br/>colour=0 0 255
+<br/>entities=1
+<br/>entity 0 type=POLY
+<br/>entity 0 points=4
+<br/>entity 0 point 0=117 419
+<br/>entity 0 point 1=255 213
+<br/>entity 0 point 2=443 345
+<br/>entity 0 point 3=279 505</p>
+
+<p>[grass]
+<br/>colour=0 255 0
+<br/>entities=3
+<br/>entity 0 type=RECT
+<br/>entity 0 points=2
+<br/>entity 0 point 0=79 221
+<br/>entity 0 point 1=211 408
+<br/>entity 1 type=POINT
+<br/>entity 1 points=1
+<br/>entity 1 point 0=79 221
+<br/>entity 2 type=POLY
+<br/>entity 2 points=4
+<br/>entity 2 point 0=23 42
+<br/>entity 2 point 1=214 2
+<br/>entity 2 point 1=703 33</p>
+
+</body>
+</html>
