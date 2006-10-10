@@ -80,7 +80,8 @@ int DisplayTab::Create(HWND parent,RECT *parentRect)
            
 		// Insert 'Update' button under radio buttons. Location based on band number 
 		hupdate =  CreateWindowEx(0, "BUTTON", "Update", WS_CHILD | WS_VISIBLE, 80,
-			247, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
+			247, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);  
+		CreateTooltip(hupdate,"Update Image");   
     
 	}    
 	

@@ -119,7 +119,8 @@ int ROIWindow::Create(HWND parent) {
 		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 5,
 		237, 28, 28, GetHandle(), (HMENU) 1,
 		Window::GetAppInstance(), NULL);
-		
+	CreateTooltip(hOpenButton,"Open ROI Set");
+	
 	hOpenIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hOpenButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "open.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
 	
@@ -128,6 +129,7 @@ int ROIWindow::Create(HWND parent) {
 		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 38,
 		237, 28, 28, GetHandle(),  (HMENU) 2,
 		Window::GetAppInstance(), NULL);
+	CreateTooltip(hSaveButton,"Save ROI Set");
 		
 	hSaveIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hSaveButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "save.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
@@ -137,6 +139,7 @@ int ROIWindow::Create(HWND parent) {
 		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 75,
 		237, 28, 28, GetHandle(),  (HMENU) 3,
 		Window::GetAppInstance(), NULL);
+	CreateTooltip(hNewButton,"New ROI");
 		
 	hNewIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hNewButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "new.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
@@ -146,6 +149,7 @@ int ROIWindow::Create(HWND parent) {
 		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 108,
 		237, 28, 28, GetHandle(),  (HMENU) 4,
 		Window::GetAppInstance(), NULL);
+	CreateTooltip(hDeleteButton,"Delete ROI");
 		
 	hDeleteIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hDeleteButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "delete.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
@@ -155,6 +159,7 @@ int ROIWindow::Create(HWND parent) {
 		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 146,
 		237, 28, 28, GetHandle(),  (HMENU) 5,
 		Window::GetAppInstance(), NULL);
+	CreateTooltip(hPolyButton,"Polygon Selection Tool");
 		
 	hPolyIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hPolyButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "poly.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
@@ -164,6 +169,7 @@ int ROIWindow::Create(HWND parent) {
 		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 179,
 		237, 28, 28, GetHandle(),  (HMENU) 6,
 		Window::GetAppInstance(), NULL);
+	CreateTooltip(hRectButton,"Rectangle Selection Tool");
 		
 	hRectIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hRectButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "rect.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
@@ -173,6 +179,7 @@ int ROIWindow::Create(HWND parent) {
 		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 212,
 		237, 28, 28, GetHandle(),  (HMENU) 7,
 		Window::GetAppInstance(), NULL);
+	CreateTooltip(hSingleButton,"Single Point Selection Tool");
 		
 	hSingleIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hSingleButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "single.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));

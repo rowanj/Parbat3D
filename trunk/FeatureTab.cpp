@@ -117,11 +117,16 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 225, 210, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hratios,STATIC_FONT_NORMAL);
-	 
+	
+	// Insert ROI only checkbox
+	hROIOnly = CreateWindowEx( 0, "BUTTON",
+    "ROIs Only", BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
+	18, 247, 90, 25, GetHandle(),NULL, Window::GetAppInstance(), NULL);
+	SetStaticFont(hROIOnly,STATIC_FONT_NORMAL);
 
 	// Insert 'Generate' button under radio buttons. Location based on band number 
-	hgenerate =  CreateWindowEx(0, "BUTTON", "Generate", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE, 80,
-		247, 80, 25, GetHandle(), NULL, Window::GetAppInstance(), NULL);     
+	hgenerate =  CreateWindowEx(0, "BUTTON", "Generate", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE,
+	130, 247, 80, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);     
 	CreateTooltip(hgenerate,"Generate a feature space");
 	    
 	if (toolWindow.bands == 1) {
@@ -177,7 +182,7 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
         case WM_COMMAND:
         {
 			
-			if (HIWORD(wParam)==BN_CLICKED)
+			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
 			{
                 // find out which bands are selected
 				int x, y, z;
@@ -195,6 +200,10 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 					if(state==BST_CHECKED)
 						z = i;
 				}
+				LRESULT state = SendMessageA(win->hROIOnly, BM_GETCHECK, 0, 0);
+				if(state==BST_CHECKED)
+					MessageBox( hwnd, (LPSTR) "ROI only Checkbox selected", (LPSTR) "ROI Checked", MB_ICONINFORMATION | MB_OK );
+
 				
             DWORD GranState = SendMessageA(win->hTrackbar, TBM_GETPOS, 0, 0);
             win->OnGenerateClicked((int)GranState, x, y, z);
