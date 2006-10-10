@@ -136,12 +136,6 @@ void FeatureSpace::getPixelData(void)
 							//add data at all points in rectangle to data lists
 							getRectData(currentEntity, currentROI);
 						}
-						/*else //ROI == polygon
-						{
-							Console::write("FS::GpixD\tCurrent type is POLYGON\n");
-							//add data at all points in polygon to data lists
-							getPolygonData(currentEntity, currentROI);
-						}*/
 					}
 				}
 			}
@@ -878,53 +872,6 @@ int FeatureSpace::Create() {
     // create child windows
     glContainer=new GLContainer(GetHandle(),this,0,0,FEATURE_WINDOW_WIDTH,FEATURE_WINDOW_HEIGHT-TOOLBAR_HEIGHT);       
 
-    // create toolbar
-    #ifndef TMP_DISABLE_FEATURES_FOR_DEMO_DAY	
-	RECT rc;
-    GetClientRect(GetHandle(),&rc);
-    hToolbar=CreateWindowEx(0, TOOLBARCLASSNAME, (LPSTR) NULL, 
-        WS_CHILD | CCS_ADJUSTABLE | WS_VISIBLE | CCS_NOPARENTALIGN | CCS_NORESIZE , 0, rc.bottom-TOOLBAR_HEIGHT,rc.right,TOOLBAR_HEIGHT, GetHandle(), 
-        (HMENU) 1, GetAppInstance(), NULL);    
-    
-    SendMessage(hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0);         
-
-    TBBUTTON tbb[7];       
-    const int NUM_BUTTONS=7;
-    int i;
-    
-    char *buttonText[7]={"RL","RR","RU","RD",NULL,"ZI","ZO"};
-    for (i=0;i<NUM_BUTTONS;i++)
-    {
-        if (buttonText[i]!=NULL)
-        {
-           tbb[i].iString= SendMessage(hToolbar, TB_ADDSTRING, 0, (LPARAM) (LPSTR) "A");     //buttonText[i]
-           tbb[i].iBitmap = 0; 
-           tbb[i].idCommand = i; 
-           tbb[i].fsState = TBSTATE_ENABLED; 
-           tbb[i].fsStyle = TBSTYLE_TOOLTIPS; //BTNS_BUTTON 
-           tbb[i].dwData = 0; 
-        }
-        else
-        {
-            tbb[i].iString= 0;
-            tbb[i].iBitmap = 0; 
-            tbb[i].idCommand = -1; 
-            tbb[i].fsState = TBSTATE_ENABLED; 
-            tbb[i].fsStyle = BTNS_SEP;
-            tbb[i].dwData = 0; 
-        }
-    }
-
-    SendMessage(hToolbar, TB_ADDBUTTONS, (WPARAM) NUM_BUTTONS, (LPARAM) (LPTBBUTTON) &tbb);    
-    SendMessage(hToolbar, TB_SETBUTTONSIZE, (WPARAM) 100, (LPARAM)30);        
-    
-//   SendMessage(hToolbar, TB_AUTOSIZE, 0, 0); 
-
-	ShowWindow(hToolbar, SW_SHOW);    
-	#else
-	hToolbar=NULL;
-	#endif   
-
     // make this window snap to others
     stickyWindowManager.AddStickyWindow(this);
 
@@ -944,15 +891,9 @@ void FeatureSpace::OnResize() {
     x = rect.left;
     y = rect.top;
     width = rect.right - rect.left;
-    #ifndef TMP_DISABLE_FEATURES_FOR_DEMO_DAY
-	height = rect.bottom - rect.top - TOOLBAR_HEIGHT;
-    #else
     height = rect.bottom - rect.top;
-    #endif
+
     MoveWindow(glContainer->GetHandle(), x, y, width, height, true);
-    #ifndef TMP_DISABLE_FEATURES_FOR_DEMO_DAY	
-    MoveWindow(hToolbar, x, rect.bottom-TOOLBAR_HEIGHT, rect.right, TOOLBAR_HEIGHT, true);    
-    #endif
 
     if (fsgl!=NULL)
 		fsgl->resize();
@@ -1003,15 +944,7 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	// check if left & right mouse button is down
 	if ((virtualKeys&MK_RBUTTON) && !(virtualKeys&MK_LBUTTON))
 	{
-		float cam_dolly = fsgl->cam_dolly;
-		
-		cam_dolly+=y_diff * 0.01;
-		if (cam_dolly < 0.1) cam_dolly = 0.1;
-		if (cam_dolly > 5.0) cam_dolly = 5.0;
-		
-		fsgl->cam_dolly = cam_dolly;
-		
-		glContainer->Repaint();
+		ChangeCameraZoom(y_diff * 0.01);
 	}
 	
 	// Operations are cumulative, so re-set distance
@@ -1019,6 +952,19 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	prev_mouse_y=y;	
 }
 
+/* change the camera zoom level by a +/- amount */
+void FeatureSpace::ChangeCameraZoom(float amount)
+{
+		float cam_dolly = fsgl->cam_dolly;
+		
+		cam_dolly+=amount;
+		if (cam_dolly < 0.1) cam_dolly = 0.1;
+		if (cam_dolly > 5.0) cam_dolly = 5.0;
+		
+		fsgl->cam_dolly = cam_dolly;
+		
+		glContainer->Repaint();
+}
 
 // handle key presses on the feature space window
 void FeatureSpace::OnKeyPress(int virtualKey)
@@ -1037,6 +983,14 @@ void FeatureSpace::OnKeyPress(int virtualKey)
 			break;
 			
 		case VK_RIGHT:
+			break;
+			
+		case VK_PRIOR:	// page-up key
+			ChangeCameraZoom(-0.2);
+			break;
+			
+		case VK_NEXT:	// page-down key
+			ChangeCameraZoom(+0.2);
 			break;
 
 		case VK_SPACE:

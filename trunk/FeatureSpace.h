@@ -80,19 +80,19 @@ class FeatureSpace:public Window, public GLContainerHandler
     protected:
 		/* GUI stuff */
         GLContainer *glContainer;
-        HWND hToolbar;
         HWND hRebarControl;
-		POINT initalMousePosition;					// mouse position at the time the mouse button is pushed down
+		POINT initalMousePosition;								// mouse position at the time the mouse button is pushed down
 
         int Create();
         void OnResize();    
-        virtual void PaintGLContainer();            // draw contents of GLContainer with opengl
-		void OnKeyPress(int virtualKey);			// handle key presses
+        virtual void PaintGLContainer();            			// draw contents of GLContainer with opengl
+		void OnKeyPress(int virtualKey);						// handle key presses
 		void OnGLContainerLeftMouseDown(int x,int y);			// handle left mouse button down event
-		void OnGLContainerMouseMove(int vKeys,int x,int y);	// handle mouse move event
+		void OnGLContainerMouseMove(int vKeys,int x,int y);		// handle mouse move event
+		void ChangeCameraZoom(float amount);
 		
     public:
-        FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3);      // create & display new feature space window
+        FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3);	// create & display new feature space window
 
         /* OpenGL stuff */
         FeatureSpaceGL* fsgl;
