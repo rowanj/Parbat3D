@@ -966,6 +966,8 @@ void FeatureSpace::ChangeCameraZoom(float amount)
 		glContainer->Repaint();
 }
 
+
+
 // handle key presses on the feature space window
 void FeatureSpace::OnKeyPress(int virtualKey)
 {
@@ -974,23 +976,27 @@ void FeatureSpace::OnKeyPress(int virtualKey)
 	{
 		
 		case VK_UP:
+			//PanY(+0.1);
 			break;
 			
 		case VK_DOWN:
+			//PanY(-0.1);
 			break;
 			
 		case VK_LEFT:
+			//PanX(+0.1);
 			break;
 			
 		case VK_RIGHT:
+			//PanX(-0.1);			
 			break;
 			
 		case VK_PRIOR:	// page-up key
-			ChangeCameraZoom(-0.2);
+			ChangeCameraZoom(-0.1);
 			break;
 			
 		case VK_NEXT:	// page-down key
-			ChangeCameraZoom(+0.2);
+			ChangeCameraZoom(+0.1);
 			break;
 
 		case VK_SPACE:
