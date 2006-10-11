@@ -14,9 +14,10 @@ class FeatureTab:public ToolTab
         HWND *yRadiobuttons;
         HWND *zRadiobuttons;
         HWND hROIOnly;
+        HWND htitle;
         void OnGenerateClicked(int lod,int x, int y, int z);
         void OnUserMessage();
-        int guessPoints(int slider_pos);
+        static int guessPoints(int slider_pos);
     public:
         char* GetTabName() {return "Feature";};
         char* GetTabHeading() {return "Feature Space";};

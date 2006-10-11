@@ -169,34 +169,43 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     
     switch (message)                  /* handle the messages */
     {
-		case WM_HSCROLL:
-			if (LOWORD(wParam) == TB_THUMBTRACK)
-	        {
-				//HIWORD(wParam)=pos
-				//lParam=hSlider of whatever
-				MessageBox( hwnd, (LPSTR) "My message", (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
-			}
+		
+        // Scroll bars moved
+        case WM_HSCROLL:
+        {
+            // Ifs preview checked
+            LRESULT state = SendMessageA(win->hPreview, BM_GETCHECK, 0, 0);
+            if(state==BST_CHECKED)
+            {
+    			// Contrast or Brightness trackbar moved
+    			if (LOWORD(wParam) == TB_THUMBTRACK)
+    			{
+                    //MessageBox( hwnd, (LPSTR) "trackbar", (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+                    // Get Slider values
+    				DWORD Bstate = SendMessageA(win->hBrightnessTrackbar, TBM_GETPOS, 0, 0);
+    				DWORD Cstate = SendMessageA(win->hContrastTrackbar, TBM_GETPOS, 0, 0);
+                    //Set Contrast and brightness values
+    				assert(image_handler != NULL);
+    				if (image_handler != NULL) {
+    					image_handler->set_brightness_contrast((int)Bstate, (int)Cstate);
+				    }
+                }
+            }
 			
 			break;
+        }
 		case WM_COMMAND:
-			/*
-			if (LOWORD(wParam) == 5 && HIWORD(wParam) == TB_THUMBTRACK)
-	        {
-				MessageBox( hwnd, (LPSTR) "My message", (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
-			}*/
 			
             // OK button
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
 	        {
-//				MessageBox( hwnd, (LPSTR) "Contrast Stretch complete", (LPSTR) "Contrast / brightness", MB_ICONINFORMATION | MB_OK );
+                //Hide Contrast Window
 				ShowWindow(hwnd,SW_HIDE);
 				
 				// Get Slider values
 				DWORD Bstate = SendMessageA(win->hBrightnessTrackbar, TBM_GETPOS, 0, 0);
-				// note: MessageBox expects char*, state is int
-//				MessageBox( hwnd, (LPSTR) makeMessage("Bstate:",(int)Bstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
 				DWORD Cstate = SendMessageA(win->hContrastTrackbar, TBM_GETPOS, 0, 0);
-//				MessageBox( hwnd, (LPSTR) makeMessage("Cstate:",(int)Cstate), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+                //Set Contrast and brightness values
 				assert(image_handler != NULL);
 				if (image_handler != NULL) {
 					image_handler->set_brightness_contrast((int)Bstate, (int)Cstate);
@@ -204,6 +213,7 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 			}
 			
 			// cancel button
+			
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
 	            //reset slider positions

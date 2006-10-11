@@ -118,7 +118,7 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
     titleAndPoints = catcstrings( (char*) "Granularity        No. Points: ", (char*) inttocstring(points));
 	
     //Trackbar titles and number of points
-	HWND htitle=CreateWindowEx(0, szStaticControl, titleAndPoints,
+	htitle=CreateWindowEx(0, szStaticControl, titleAndPoints,
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 176, 210, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(htitle,STATIC_FONT_NORMAL);
@@ -186,6 +186,19 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
     
     switch(message)
     {
+        case WM_HSCROLL:
+        {
+			// trackbar moved
+			if (LOWORD(wParam) == TB_THUMBTRACK)
+			{
+                	const long points = guessPoints(SendMessageA(win->hTrackbar, TBM_GETPOS, 0, 0));
+                    // Add points to title
+                    const char* titleAndPoints;
+                    titleAndPoints = catcstrings( (char*) "Granularity        No. Points: ", (char*) inttocstring(points));
+                    SetWindowText(win->htitle,titleAndPoints);
+            }
+        }
+
         case WM_COMMAND:
         {
 			
