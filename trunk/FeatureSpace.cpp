@@ -921,14 +921,14 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	// checked if left mouse button is down
 	if ((virtualKeys&MK_LBUTTON) && !(virtualKeys&MK_RBUTTON))
 	{
-		Rotate(x_diff * fsgl->rads_to_deg / 2.0, y_diff * fsgl->rads_to_deg / 2.0);
+		fsgl->rot_cam(x_diff, y_diff);
 	}
-/*	if ((virtualKeys&MK_RBUTTON) && !(virtualKeys&MK_LBUTTON))
+	if ((virtualKeys&MK_RBUTTON) && (virtualKeys&MK_LBUTTON))
 	{
-		float nx = (float)x_diff/100.0;
-		float ny = (float)y_diff/100.0;
-		fsgl->cam_translate(nx, ny);
-	} */
+		float nx = (float)x_diff/10.0;
+		float ny = (float)y_diff/10.0;
+		fsgl->translate_cam(nx, ny);
+	} 
 	// check if left & right mouse button is down
 	if ((virtualKeys&MK_RBUTTON) && !(virtualKeys&MK_LBUTTON))
 	{
@@ -961,7 +961,7 @@ void FeatureSpace::Rotate(float yaw_amount, float pitch_amount)
 /* change the camera zoom level by a +/- amount */
 void FeatureSpace::ChangeCameraZoom(float amount)
 {
-		float cam_dolly = fsgl->cam_dolly;
+/* 		float cam_dolly = fsgl->cam_dolly;
 		
 		cam_dolly+=amount;
 		if (cam_dolly < 0.1) cam_dolly = 0.1;
@@ -969,7 +969,7 @@ void FeatureSpace::ChangeCameraZoom(float amount)
 		
 		fsgl->cam_dolly = cam_dolly;
 		
-		glContainer->Repaint();
+		glContainer->Repaint(); */
 }
 
 

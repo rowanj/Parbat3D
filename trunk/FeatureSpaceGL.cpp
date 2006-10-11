@@ -12,13 +12,14 @@ PFNGLPOINTPARAMETERFVARBPROC glPointParameterfvARB = NULL;
 #endif
 
 #define FS_USE_MIPMAPS 1
+#define FS_USE_EXTRA_VIEWPORTS 0
 
 FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_arg, int band3_arg)
 {
 	// Set initial camera position
-	cam_yaw = 270.0 / degs_to_rad;
+/*	cam_yaw = 270.0 / degs_to_rad;
 	cam_pitch = 0.0;
-	cam_dolly = 2.5;
+	cam_dolly = -2.5; /* */
 	
 	band1 = band1_arg;
 	band2 = band2_arg;
@@ -55,7 +56,15 @@ FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_
 #endif
 	glEnable(GL_LINE_SMOOTH);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+				
 	make_box_list();
+	
+	glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    // Make world 0,0,0 the centre of the box
+    glTranslatef(-0.5, -0.5, -0.5);
+    
+
 }
 
 #if USE_POINT_SPRITES
@@ -71,7 +80,7 @@ void FeatureSpaceGL::setup_point_sprites(void)
 	glTexParameteri( GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-	glTexImage2D( GL_TEXTURE_2D, 0, 3, points_texture.width, points_texture.height, 0,
+	glTexImage2D( GL_TEXTURE_2D, 0, points_texture.bytes_per_pixel, points_texture.width, points_texture.height, 0,
 			     GL_RGB, GL_UNSIGNED_BYTE, points_texture.pixel_data);
 
 	char *ext = (char*)glGetString( GL_EXTENSIONS );
@@ -92,6 +101,17 @@ void FeatureSpaceGL::setup_point_sprites(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
     gluBuild2DMipmaps(GL_TEXTURE_2D, points_texture.bytes_per_pixel, points_texture.width, points_texture.height, GL_RGB, GL_UNSIGNED_BYTE, points_texture.pixel_data);
     #endif
+    
+
+   	float quadratic[] =  {0.1f, 0.0f, 50.0f };
+    glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, quadratic );
+
+    glPointParameterfARB( GL_POINT_FADE_THRESHOLD_SIZE_ARB, 2.0f );
+
+    glPointParameterfARB( GL_POINT_SIZE_MIN_ARB, 1.0f );
+    glPointParameterfARB( GL_POINT_SIZE_MAX_ARB, point_sprite_max_size);
+
+    glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
 
     assert (glPointParameterfARB != NULL);
     assert (glPointParameterfvARB != NULL);
@@ -106,20 +126,14 @@ void FeatureSpaceGL::draw()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
 	// setup projection
-	glMatrixMode(GL_PROJECTION);
+/*	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glViewport(0,0,gl_view->width(),gl_view->height());
     gluPerspective(45.0f,gl_view->aspect(),0.1f,6.0f);
     gluLookAt(cam_dolly * (cos(cam_yaw)*cos(cam_pitch)), cam_dolly * (sin(cam_yaw)*cos(cam_pitch)), cam_dolly * sin(cam_pitch),
 				0.0, 0.0, 0.0,
-				0.0, 0.0, 1.0);
+				0.0, 0.0, 1.0); /* */
     
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-       
-    // Make old 0,0,0 the centre of the box
-    glTranslatef(-0.5, -0.5, -0.5);
-
     gl_text->draw_string(5, 20, "Granularity: %d:1", granularity);
     gl_text->draw_string(5, 40, "Image Points: %d", num_points);
     gl_text->draw_string(5, 60, "Unique Points: %d", vertices);
@@ -140,16 +154,6 @@ void FeatureSpaceGL::draw()
     glEnable( GL_POINT_SPRITE_ARB );
     glBindTexture(GL_TEXTURE_2D, points_texture_id);
 
-   	float quadratic[] =  { 0.0f, 0.0f, 50.0f };
-    glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, quadratic );
-
-    glPointParameterfARB( GL_POINT_FADE_THRESHOLD_SIZE_ARB, 2.0f );
-
-    glPointParameterfARB( GL_POINT_SIZE_MIN_ARB, 1.0f );
-    glPointParameterfARB( GL_POINT_SIZE_MAX_ARB, point_sprite_max_size);
-
-    glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
-
 #endif
 	for (int pos = 0; pos < points_lists.size(); pos++) {
 		glCallList(points_lists.at(pos));
@@ -158,7 +162,7 @@ void FeatureSpaceGL::draw()
     glDisable( GL_POINT_SPRITE_ARB );
 #endif
 	
-#if FALSE // DRAW EXTRA VIEWPORTS
+#if FS_USE_EXTRA_VIEWPORTS // DRAW EXTRA VIEWPORTS
 	assert(glGetError() == GL_NO_ERROR);
 	
 	const int viewport_size = 130;
@@ -378,19 +382,70 @@ void FeatureSpaceGL::add_points(points_hash_t points_hash, unsigned char red, un
 }
 
 
-void FeatureSpaceGL::cam_translate(float x, float y)
+void FeatureSpaceGL::translate_cam(float x, float y)
 {
+	Console::write("translate_cam(%f,%f);\n", x, y);
 	gl_view->make_current();
 	glPushAttrib(GL_MATRIX_MODE);
 	glMatrixMode(GL_PROJECTION);
-	glTranslatef(x, y, 0.0);
+	glTranslatef(x, 0.0, -y);
 	glPopAttrib();
+	draw();
 }
+void FeatureSpaceGL::rot_cam(int x_diff, int y_diff)
+{
+		/* float cam_yaw = fsgl->cam_yaw;
+		float cam_pitch = fsgl->cam_pitch;
+		float rads_to_deg = fsgl->rads_to_deg;
+		
+		cam_yaw-=x_diff * rads_to_deg / 2.0;
+		cam_pitch+=y_diff * rads_to_deg / 2.0;
+		if (cam_pitch > (M_PI/2.0) - rads_to_deg) cam_pitch = M_PI/2.0 - rads_to_deg;
+		if (cam_pitch < -(M_PI/2.0) + rads_to_deg) cam_pitch = -M_PI/2.0 + rads_to_deg;
+		
+		fsgl->cam_yaw = cam_yaw;
+		fsgl->cam_pitch = cam_pitch; */
+	gl_view->make_current();
+	glPushAttrib(GL_MATRIX_MODE);
+	glMatrixMode(GL_MODELVIEW);
+	glTranslatef(0.5,0.5,0.5);
+	glRotatef(x_diff, 0.0, 0.0, 1.0);
+	glTranslatef(-0.5,-0.5,-0.5);
+	glMatrixMode(GL_PROJECTION);
+	glRotatef(y_diff, 1.0, 0.0, 0.0);
+	glPopAttrib();
+	draw();
+}		
+
 
 void FeatureSpaceGL::resize(void)
 {
 	if (gl_view!=NULL)
 		gl_view->resize();
+	glViewport(0,0,gl_view->width(),gl_view->height());
+	update_viewport();
+}
+
+void FeatureSpaceGL::update_viewport(void)
+{
+	gl_view->make_current();
+	glPushAttrib(GL_MATRIX_MODE);
+   	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	// !! restore prev. settings
+    gluPerspective(50.0f,gl_view->aspect(),0.01f,6.0f);
+//    glTranslatef(0.0, -2.0, 0.0);
+/*    gluLookAt(cam_dolly * (cos(cam_yaw)*cos(cam_pitch)), cam_dolly * (sin(cam_yaw)*cos(cam_pitch)), cam_dolly * sin(cam_pitch),
+				128.0, 128.0, 128.0,
+				0.0, 0.0, 1.0); /* */
+/*	gluLookAt(0.0, cam_dolly, 0.0,
+			0.0, 0.0, 0.0,
+			0.0, 0.0, 1.0); /* */
+	
+	gluLookAt(0.0, -3.0, 0.0,
+			 0.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0);
+	glPopAttrib();
 }
 
 void FeatureSpaceGL::toggle_smooth(void)

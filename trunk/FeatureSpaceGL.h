@@ -20,18 +20,16 @@ public:
 	FeatureSpaceGL(HWND hwnd_arg, int LOD_arg, int band1, int band2, int band3);
 	void draw(void);
 	void resize(void);
-	void cam_translate(float x, float y);
-		
-    GLfloat cam_yaw;
-    GLfloat cam_pitch;
-    GLfloat cam_dolly;
+	
+	void translate_cam(float x, float y);
+	void dolly_cam(float diff);
+	void rot_cam(int x_diff, int y_diff);
     
     int granularity;
         
    	static const float degs_to_rad = 180.0 / M_PI;
 	static const float rads_to_deg = 1.0 / (180 / M_PI);
 
-//	void make_points_lists(points_hash_t points_hash, int maxvalue); // !! DEPRECATED
 	void add_points(points_hash_t points_hash,
 			unsigned char red, unsigned char green, unsigned char blue);
 			
@@ -45,6 +43,7 @@ private:
 	GLView* gl_view;
 		
 	void make_box_list(void);
+	void update_viewport(void);
 
 	int LOD;
     unsigned int vertices;
@@ -54,8 +53,13 @@ private:
     vector<GLuint> points_lists;
 #if USE_POINT_SPRITES
 	GLuint points_texture_id;
-	static const GLfloat point_sprite_max_size = 10.0;
+	static const GLfloat point_sprite_max_size = 30.0;
 #endif
+    
+/*    GLfloat cam_yaw;
+    GLfloat cam_pitch; 
+    GLfloat cam_dolly; */
+//    GLfloat x_rotation;
     
     bool smooth;
     
