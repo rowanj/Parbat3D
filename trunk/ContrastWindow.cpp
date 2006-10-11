@@ -169,6 +169,13 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     
     switch (message)                  /* handle the messages */
     {
+		case WM_HSCROLL:
+			if (LOWORD(wParam) == TB_THUMBTRACK)
+	        {
+				MessageBox( hwnd, (LPSTR) "My message", (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
+			}
+			
+			break;
 		case WM_COMMAND:
 			/*
 			if (LOWORD(wParam) == 5 && HIWORD(wParam) == TB_THUMBTRACK)
