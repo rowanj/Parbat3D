@@ -345,6 +345,7 @@ void ImageGL::notify_bands(void)
 	
 	tile_textures.assign(tile_count, 0);
 	free_textures = textures;
+	notify_viewport();
 }
 
 void ImageGL::check_textures(void)

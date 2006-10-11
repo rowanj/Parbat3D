@@ -218,6 +218,8 @@ void OverviewGL::notify_bands(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_size, texture_size, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_overview);
 	/* remember to free the RGB memory */
 	delete[] tex_overview;
+	
+	notify_viewport();
 }
 
 void OverviewGL::set_brightness_contrast(float brightness_arg, float contrast_arg)
