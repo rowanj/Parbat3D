@@ -141,7 +141,6 @@ void ImageViewport::set_display_bands(int band_R, int band_G, int band_B)
 	band_green = min(band_G,num_bands);
 	band_blue = min(band_B,num_bands);
 	notify_band_listeners();
-	notify_viewport_listeners();
 }
 void ImageViewport::get_display_bands(int* red_return, int* green_return, int* blue_return)
 {

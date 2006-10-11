@@ -608,6 +608,7 @@ void ImageGL::set_brightness_contrast(float brightness_arg, float contrast_arg)
 	Console::write("ImageGL::set_brightness_contrast(%1.4f,%1.4f)\n", brightness_arg, contrast_arg);
 	#endif
 	
+	gl_image->make_current();
 	glPushAttrib(GL_MATRIX_MODE);
 	glMatrixMode(GL_COLOR);
 	glLoadIdentity();
