@@ -29,10 +29,15 @@ int DisplayTab::Create(HWND parent,RECT *parentRect)
 
     hRed = CreateWindowEx(0, "BUTTON", "R", WS_CHILD | BS_GROUPBOX | WS_VISIBLE , 118, 5,
 		26, 20 + (20 * toolWindow.bands), hDScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetFont(hRed,FONT_BOLD);
+	
 	hGreen = CreateWindowEx(0, "BUTTON", "G", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 144, 5,
 		26, 20 + (20 * toolWindow.bands), hDScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetFont(hGreen,FONT_BOLD);	
+		
     hBlue = CreateWindowEx(0, "BUTTON", "B", WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 170, 5,
 		26, 20 + (20 * toolWindow.bands), hDScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetFont(hBlue,FONT_BOLD);		
 
 	/* Dynamically add Radio buttons  */
 	redRadiobuttons=new HWND[toolWindow.bands];

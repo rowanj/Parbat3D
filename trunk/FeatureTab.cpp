@@ -47,14 +47,17 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 		xRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
 			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16,
 			hX, NULL, hThisInstance, NULL);
-			
+		SetFont(xRadiobuttons[i],FONT_BOLD);	
+		
 		yRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
 			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16,
 			hY, NULL, hThisInstance, NULL);
+		SetFont(yRadiobuttons[i],FONT_BOLD);	
 			
 		zRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
 		WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16,
 		 hZ, NULL, hThisInstance, NULL);
+		SetFont(zRadiobuttons[i],FONT_BOLD);	
 		
 		const char* name;
 		if (i>0) { 

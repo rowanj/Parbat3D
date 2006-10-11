@@ -30,8 +30,9 @@ int QueryTab::Create(HWND parent,RECT *parentRect)
 
 	/* Create container for band values */
 	HWND queryValueContainer = CreateWindowEx(0, "BUTTON", "Values",
-		WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 118, 5, 66, 20 + (20 * (toolWindow.bands-1)),
+		WS_CHILD | BS_GROUPBOX | WS_VISIBLE | SS_CENTER, 118, 5, 66, 20 + (20 * (toolWindow.bands-1)),
 		hQScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetFont(queryValueContainer,FONT_BOLD);
 	
 	/* Dynamically add image band values */
 	imageBandValues = new HWND[toolWindow.bands];
