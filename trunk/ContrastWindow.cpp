@@ -10,9 +10,7 @@
 #include <commctrl.h>
 #include "OverviewWindow.h"
 
-// Contrast and brightness values for resetting
-int brightnessValue;
-int contrastValue;
+ 
 
 /* create main window */
 int ContrastWindow::Create(HWND parent)
@@ -143,7 +141,7 @@ int ContrastWindow::Create(HWND parent)
 	
 	hPreview = CreateWindowEx( 0, "BUTTON", "Preview", 
     BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 18, 180, 100, 16,
-	GetHandle(),NULL, Window::GetAppInstance(), NULL);
+	GetHandle(),(HMENU) 3, Window::GetAppInstance(), NULL);
 		
 	// Insert 'OK' button 
 	hCSOKButton =  CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE,
@@ -170,17 +168,16 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     switch (message)                  /* handle the messages */
     {
 		
-        // Scroll bars moved
+        // Track bar moved
         case WM_HSCROLL:
         {
-            // Ifs preview checked
+            // If preview is checked update image on the fly
             LRESULT state = SendMessageA(win->hPreview, BM_GETCHECK, 0, 0);
             if(state==BST_CHECKED)
             {
     			// Contrast or Brightness trackbar moved
     			if (LOWORD(wParam) == TB_THUMBTRACK)
     			{
-                    //MessageBox( hwnd, (LPSTR) "trackbar", (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
                     // Get Slider values
     				DWORD Bstate = SendMessageA(win->hBrightnessTrackbar, TBM_GETPOS, 0, 0);
     				DWORD Cstate = SendMessageA(win->hContrastTrackbar, TBM_GETPOS, 0, 0);
@@ -196,13 +193,35 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
         }
 		case WM_COMMAND:
 			
-            // OK button
+            // If preview checkbox clicked
+		    if (LOWORD(wParam) == 3 && HIWORD(wParam) == BN_CLICKED)
+			{
+                // If preview clicked, update contrast/brightness incase sliders were moved before hand
+                LRESULT state = SendMessageA(win->hPreview, BM_GETCHECK, 0, 0);
+				if(state==BST_CHECKED)
+				{
+                    // Get Slider values
+    				DWORD Bstate = SendMessageA(win->hBrightnessTrackbar, TBM_GETPOS, 0, 0);
+    				DWORD Cstate = SendMessageA(win->hContrastTrackbar, TBM_GETPOS, 0, 0);
+                    //Set Contrast and brightness values
+    				assert(image_handler != NULL);
+    				if (image_handler != NULL) {
+    					image_handler->set_brightness_contrast((int)Bstate, (int)Cstate);
+    			    }
+                }
+                else //if preview unclicked restore contrast/brightness values
+                {
+                    assert(image_handler != NULL);
+    				if (image_handler != NULL) {
+    					image_handler->set_brightness_contrast(win->brightnessCancel, win->contrastCancel);
+    				}
+                }
+            }
+            
+            // OK button pressed
 			if (LOWORD(wParam) == 1 && HIWORD(wParam) == BN_CLICKED)
 	        {
-                //Hide Contrast Window
-				ShowWindow(hwnd,SW_HIDE);
-				
-				// Get Slider values
+                // Get Slider values
 				DWORD Bstate = SendMessageA(win->hBrightnessTrackbar, TBM_GETPOS, 0, 0);
 				DWORD Cstate = SendMessageA(win->hContrastTrackbar, TBM_GETPOS, 0, 0);
                 //Set Contrast and brightness values
@@ -210,16 +229,18 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 				if (image_handler != NULL) {
 					image_handler->set_brightness_contrast((int)Bstate, (int)Cstate);
 				}
+				// Save for restore
+				image_handler->get_brightness_contrast(&win->brightnessCancel, &win->contrastCancel);
+				//Hide Contrast Window
+				ShowWindow(hwnd,SW_HIDE);
 			}
 			
 			// cancel button
-			
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
 	            //reset slider positions
-				image_handler->get_brightness_contrast(&brightnessValue, &contrastValue);
-				SendMessage(win->hBrightnessTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) brightnessValue);
-		        SendMessage(win->hContrastTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) contrastValue);
+				SendMessage(win->hBrightnessTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) win->brightnessCancel);
+		        SendMessage(win->hContrastTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) win->contrastCancel);
 			
 	            /* don't destroy this window, but make it invisible */
 	            ShowWindow(hwnd,SW_HIDE);
@@ -236,19 +257,25 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 			
         case WM_SHOWWINDOW:
             /* update window menu item depending on whether window is shown or hidden */
-            if (wParam)
-                CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_CHECKED|MF_BYCOMMAND);            
-            else
+            // Save or restore Contrast and brightness values
+            if (wParam) //window opened
+            {
+                CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_CHECKED|MF_BYCOMMAND);
+                image_handler->get_brightness_contrast(&win->brightnessCancel, &win->contrastCancel);
+            }
+            else // window closed
+            {
                 CheckMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
+                image_handler->set_brightness_contrast(win->brightnessCancel, win->contrastCancel);
+            }
             return 0;
 
         /* WM_CLOSE: system or user has requested to close the window/application */             
         case WM_CLOSE:
 			
             //reset slider positions
-			image_handler->get_brightness_contrast(&brightnessValue, &contrastValue);
-			SendMessage(win->hBrightnessTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) brightnessValue);
-	        SendMessage(win->hContrastTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) contrastValue);
+			SendMessage(win->hBrightnessTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) win->brightnessCancel);
+            SendMessage(win->hContrastTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) win->contrastCancel);
 			
             /* don't destroy this window, but make it invisible */
             ShowWindow(hwnd,SW_HIDE);

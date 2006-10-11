@@ -11,13 +11,14 @@ class ContrastWindow:public Window
 	HWND hContrastTrackbar;
 	HWND hCSOKButton;
 	HWND hCSCancelButton;
-	
 	HWND hPreview;
 	
-    
+    int brightnessCancel;
+    int contrastCancel;
+   	
     public:
     HWND hPerChannel;
-    
+
     int Create(HWND parent);
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 };
