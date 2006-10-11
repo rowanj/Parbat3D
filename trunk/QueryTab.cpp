@@ -30,7 +30,7 @@ int QueryTab::Create(HWND parent,RECT *parentRect)
 
 	/* Create container for band values */
 	HWND queryValueContainer = CreateWindowEx(0, "BUTTON", "Values",
-		WS_CHILD | BS_GROUPBOX | WS_VISIBLE | SS_CENTER, 118, 5, 66, 20 + (20 * (toolWindow.bands-1)),
+		WS_CHILD | BS_GROUPBOX | WS_VISIBLE, 118, 5, 66, 20 + (20 * (toolWindow.bands-1)),
 		hQScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetFont(queryValueContainer,FONT_BOLD);
 	
@@ -64,7 +64,7 @@ int QueryTab::Create(HWND parent,RECT *parentRect)
 
 		// add the band values to the value container under the query tab
         char tempBandValue[4] = "0"; // temporary storage for the band value
-        imageBandValues[i] = CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE | SS_CENTER, 5, 15 + (20 * (i-1)),
+        imageBandValues[i] = CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * (i-1)),
 			50, 18, queryValueContainer, NULL, Window::GetAppInstance(), NULL);
 		SetFont(imageBandValues[i],Window::FONT_NORMAL);                 			
     }
