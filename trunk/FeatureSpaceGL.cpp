@@ -11,6 +11,8 @@ PFNGLPOINTPARAMETERFARBPROC  glPointParameterfARB  = NULL;
 PFNGLPOINTPARAMETERFVARBPROC glPointParameterfvARB = NULL;
 #endif
 
+#define FS_USE_MIPMAPS 1
+
 FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_arg, int band3_arg)
 {
 	// Set initial camera position
@@ -84,6 +86,12 @@ void FeatureSpaceGL::setup_point_sprites(void)
         glPointParameterfARB  = (PFNGLPOINTPARAMETERFARBPROC)wglGetProcAddress("glPointParameterfARB");
         glPointParameterfvARB = (PFNGLPOINTPARAMETERFVARBPROC)wglGetProcAddress("glPointParameterfvARB");
     }
+    
+    // Enable point sprite mipmapping
+    #if FS_USE_MIPMAPS
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, points_texture.bytes_per_pixel, points_texture.width, points_texture.height, GL_RGB, GL_UNSIGNED_BYTE, points_texture.pixel_data);
+    #endif
 
     assert (glPointParameterfARB != NULL);
     assert (glPointParameterfvARB != NULL);
@@ -132,7 +140,7 @@ void FeatureSpaceGL::draw()
     glEnable( GL_POINT_SPRITE_ARB );
     glBindTexture(GL_TEXTURE_2D, points_texture_id);
 
-   	float quadratic[] =  { 0.0f, 0.0f, 0.001f };
+   	float quadratic[] =  { 0.0f, 0.0f, 50.0f };
     glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, quadratic );
 
     glPointParameterfARB( GL_POINT_FADE_THRESHOLD_SIZE_ARB, 2.0f );
