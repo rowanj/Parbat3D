@@ -91,7 +91,8 @@ class FeatureSpace:public Window, public GLContainerHandler
 		void OnGLContainerMouseMove(int vKeys,int x,int y);		// handle mouse move event
 		void ChangeCameraZoom(float amount);
 		void PanX(float amount);
-		void PanY(float amount);		
+		void PanY(float amount);
+		void Rotate(float yaw_amount, float pitch_amount);
 		
     public:
         FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3);	// create & display new feature space window

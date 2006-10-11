@@ -37,7 +37,7 @@ DWORD WINAPI ProgressWindow::ThreadMain(LPVOID lpParameter)
  	thiswin->init();
  
  	// message loop   
-    while(GetMessage(&messages, NULL, 0, 0))
+    while(GetMessage(&messages, thiswin->GetHandle(), 0, 0))
     {
         // Translate keyboard events 
         TranslateMessage(&messages);

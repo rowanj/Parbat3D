@@ -921,19 +921,7 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	// checked if left mouse button is down
 	if ((virtualKeys&MK_LBUTTON) && !(virtualKeys&MK_RBUTTON))
 	{
-		float cam_yaw = fsgl->cam_yaw;
-		float cam_pitch = fsgl->cam_pitch;
-		float rads_to_deg = fsgl->rads_to_deg;
-		
-		cam_yaw-=x_diff * rads_to_deg / 2.0;
-		cam_pitch+=y_diff * rads_to_deg / 2.0;
-		if (cam_pitch > (M_PI/2.0) - rads_to_deg) cam_pitch = M_PI/2.0 - rads_to_deg;
-		if (cam_pitch < -(M_PI/2.0) + rads_to_deg) cam_pitch = -M_PI/2.0 + rads_to_deg;
-		
-		fsgl->cam_yaw = cam_yaw;
-		fsgl->cam_pitch = cam_pitch;
-		
-		glContainer->Repaint();
+		Rotate(x_diff * fsgl->rads_to_deg / 2.0, y_diff * fsgl->rads_to_deg / 2.0);
 	}
 /*	if ((virtualKeys&MK_RBUTTON) && !(virtualKeys&MK_LBUTTON))
 	{
@@ -950,6 +938,24 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	// Operations are cumulative, so re-set distance
 	prev_mouse_x=x;
 	prev_mouse_y=y;	
+}
+
+/* rotate the feature space */
+void FeatureSpace::Rotate(float yaw_amount, float pitch_amount)
+{
+		float cam_yaw = fsgl->cam_yaw;
+		float cam_pitch = fsgl->cam_pitch;
+		float rads_to_deg = fsgl->rads_to_deg;
+		
+		cam_yaw-=yaw_amount;
+		cam_pitch+=pitch_amount;
+		if (cam_pitch > (M_PI/2.0) - rads_to_deg) cam_pitch = M_PI/2.0 - rads_to_deg;
+		if (cam_pitch < -(M_PI/2.0) + rads_to_deg) cam_pitch = -M_PI/2.0 + rads_to_deg;
+		
+		fsgl->cam_yaw = cam_yaw;
+		fsgl->cam_pitch = cam_pitch;
+		
+		glContainer->Repaint();	
 }
 
 /* change the camera zoom level by a +/- amount */
@@ -971,24 +977,57 @@ void FeatureSpace::ChangeCameraZoom(float amount)
 // handle key presses on the feature space window
 void FeatureSpace::OnKeyPress(int virtualKey)
 {
-	Console::write("feature space key press: %c\n",virtualKey);
+	// check whether control is currently down
+	bool control_pressed=(bool)(GetKeyState(VK_CONTROL)&128);
+
+	// check whether shift is currently down
+	bool shift_pressed=(bool)(GetKeyState(VK_SHIFT)&128);	
+	
 	switch (virtualKey)
 	{
 		
 		case VK_UP:
-			//PanY(+0.1);
+			if (control_pressed)
+			{
+				Rotate(0, 5 * fsgl->rads_to_deg / 2.0);
+			}
+			else if (shift_pressed)
+			{
+				ChangeCameraZoom(-0.1);			
+			}
+			//else
+			//	PanY(+0.1);
 			break;
 			
 		case VK_DOWN:
-			//PanY(-0.1);
+			if (control_pressed)
+			{
+				Rotate(0, -5 * fsgl->rads_to_deg / 2.0);
+			}
+			else if (shift_pressed)
+			{
+				ChangeCameraZoom(+0.1);
+			}
+			//else
+			//	PanY(-0.1);
 			break;
 			
 		case VK_LEFT:
-			//PanX(+0.1);
+			if (control_pressed)
+			{
+				Rotate(5 * fsgl->rads_to_deg / 2.0, 0);
+			}
+			// else			
+			//	PanX(+0.1);
 			break;
 			
 		case VK_RIGHT:
-			//PanX(-0.1);			
+			if (control_pressed)
+			{
+				Rotate(-5 * fsgl->rads_to_deg / 2.0, 0);
+			}			
+			//else
+			//	PanX(-0.1);			
 			break;
 			
 		case VK_PRIOR:	// page-up key

@@ -326,6 +326,7 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                 }
                 break;
 
+				
 			case WM_KEYDOWN:
 				win->OnKeyDown(wParam);
 				break;
