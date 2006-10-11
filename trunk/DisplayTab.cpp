@@ -55,7 +55,7 @@ int DisplayTab::Create(HWND parent,RECT *parentRect)
 			sprintf(tooltip,"Click if you do not wish to display anything in the red channel.\n"); 		
 		else
 			sprintf(tooltip,"Click to display Band %d in the red channel.\n",i); 
-		CreateTooltip(redRadiobuttons[i],tooltip);	
+		//CreateTooltip(redRadiobuttons[i],tooltip);	
 			
 		greenRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
 			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16,
@@ -64,7 +64,7 @@ int DisplayTab::Create(HWND parent,RECT *parentRect)
 			sprintf(tooltip,"Click if you do not wish to display anything in the green channel.\n"); 		
 		else
 			sprintf(tooltip,"Click to display Band %d in the green channel.\n",i); 
-		CreateTooltip(greenRadiobuttons[i],tooltip);	
+		//CreateTooltip(greenRadiobuttons[i],tooltip);	
 			
 		blueRadiobuttons[i] = CreateWindowEx(WS_EX_TRANSPARENT, "BUTTON", NULL,
 		WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, 7, 15 + (20 * i), 16, 16, hBlue, NULL,
@@ -73,7 +73,7 @@ int DisplayTab::Create(HWND parent,RECT *parentRect)
 			sprintf(tooltip,"Click if you do not wish to display anything in the blue channel.\n"); 		
 		else
 			sprintf(tooltip,"Click to display Band %d in the blue channel.\n",i); 
-		CreateTooltip(blueRadiobuttons[i],tooltip);	
+		//CreateTooltip(blueRadiobuttons[i],tooltip);	
 		
 		const char* name;
 		if (i>0) { 

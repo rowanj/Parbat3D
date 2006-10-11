@@ -22,9 +22,14 @@ class ProgressWindow:public Window {
         
         bool autoIncrement;
         
-   		static CRITICAL_SECTION updating_progress_bar;
         
-		static DWORD WINAPI ThreadMain(LPVOID lpParameter);
+    	/* the following functions are executed by progress window's own thread */
+		static DWORD WINAPI ThreadMain(LPVOID lpParameter);	
+		void message_start(int steps, bool auto_increment);
+		void message_end();
+		void message_reset();
+		void message_increment (int steps);
+		void message_increment ();		
 		
 		void init();
 				

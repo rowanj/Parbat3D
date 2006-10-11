@@ -943,7 +943,7 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 /* rotate the feature space */
 void FeatureSpace::Rotate(float yaw_amount, float pitch_amount)
 {
-		float cam_yaw = fsgl->cam_yaw;
+		/*float cam_yaw = fsgl->cam_yaw;
 		float cam_pitch = fsgl->cam_pitch;
 		float rads_to_deg = fsgl->rads_to_deg;
 		
@@ -955,7 +955,8 @@ void FeatureSpace::Rotate(float yaw_amount, float pitch_amount)
 		fsgl->cam_yaw = cam_yaw;
 		fsgl->cam_pitch = cam_pitch;
 		
-		glContainer->Repaint();	
+		glContainer->Repaint();	*/
+		
 }
 
 /* change the camera zoom level by a +/- amount */
