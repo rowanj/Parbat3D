@@ -16,6 +16,7 @@ class FeatureTab:public ToolTab
         HWND hROIOnly;
         void OnGenerateClicked(int lod,int x, int y, int z);
         void OnUserMessage();
+        int guessPoints(int slider_pos);
     public:
         char* GetTabName() {return "Feature";};
         char* GetTabHeading() {return "Feature Space";};

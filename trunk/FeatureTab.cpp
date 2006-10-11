@@ -8,6 +8,7 @@
 #include "ToolWindow.h"
 #include <commctrl.h>
 #include "Console.h"
+#include "ImageProperties.h"
 
 ScrollBox hFSScrollBox;
 
@@ -72,17 +73,6 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 		SetStaticFont(hstatic,STATIC_FONT_NORMAL);
 	}    
 	
-	// number of points temp variable
-	const long points = 1234567890;
-    // Add points to title
-    const char* titleAndPoints;
-    titleAndPoints = catcstrings( (char*) "Granularity        No. Points: ", (char*) inttocstring(points));
-	
-    //Trackbar titles and number of points
-	HWND htitle=CreateWindowEx(0, szStaticControl, titleAndPoints,
-	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 176, 210, 18,
-	GetHandle(), NULL, Window::GetAppInstance(), NULL);
-	SetStaticFont(htitle,STATIC_FONT_NORMAL);
 	
 	// Create Trackbar (slider)
 	hTrackbar = CreateWindowEx( 
@@ -117,6 +107,18 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 225, 210, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
 	SetStaticFont(hratios,STATIC_FONT_NORMAL);
+	
+	// number of points temp variable
+	const long points = guessPoints(SendMessageA(hTrackbar, TBM_GETPOS, 0, 0));
+    // Add points to title
+    const char* titleAndPoints;
+    titleAndPoints = catcstrings( (char*) "Granularity        No. Points: ", (char*) inttocstring(points));
+	
+    //Trackbar titles and number of points
+	HWND htitle=CreateWindowEx(0, szStaticControl, titleAndPoints,
+	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 176, 210, 18,
+	GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetStaticFont(htitle,STATIC_FONT_NORMAL);
 	
 	// Insert ROI only checkbox
 	hROIOnly = CreateWindowEx( 0, "BUTTON",
@@ -216,4 +218,21 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
             win->OnUserMessage();
     }
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
+}
+
+int FeatureTab::guessPoints(int slider_pos)
+{
+	ImageProperties* im_prop = image_handler->get_image_properties();
+	int my_guess, granularity = 1;
+	
+	Console::write("guessPoints - slider_pos = %d, ",slider_pos);
+	slider_pos--;
+	while (slider_pos) {
+		granularity *= 4;
+		slider_pos--;
+	}
+
+	Console::write("granularity = %d, width = %d, height = %d\n", granularity, im_prop->getWidth(), im_prop->getHeight());
+	my_guess = im_prop->getWidth() * im_prop->getHeight() / granularity;
+	return my_guess;
 }
