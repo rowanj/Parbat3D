@@ -67,7 +67,7 @@ void ProgressWindow::init()
         PROGRESS_WINDOW_WIDTH, PROGRESS_WINDOW_HEIGHT,
         mainWindow.GetHandle(), NULL);
     assert(result==true);
-	    
+	   
     
    	// set the background colour
 	HBRUSH backBrush=CreateSolidBrush(GetSysColor(COLOR_3DFACE));
@@ -166,6 +166,7 @@ void ProgressWindow::start (int steps, bool auto_increment) {
 			    
 		    Show();               		// shows the window
 		 	mainWindow.DisableAll();	// disable all of the windows owned by the main thread		
+			EnableWindow(GetHandle(),false);	// disable this window
 		}
 
 	}

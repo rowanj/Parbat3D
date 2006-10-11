@@ -106,7 +106,7 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 	HWND hratios=CreateWindowEx(0, szStaticControl, "1        4        16      64      256   1024   4096",
 	WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 16, 225, 210, 18,
 	GetHandle(), NULL, Window::GetAppInstance(), NULL);
-	SetStaticFont(hratios,STATIC_FONT_NORMAL);
+	SetFont(hratios,FONT_NORMAL);
 	
 	// number of points temp variable
 	const long points = guessPoints(SendMessageA(hTrackbar, TBM_GETPOS, 0, 0));
@@ -124,12 +124,14 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
 	hROIOnly = CreateWindowEx( 0, "BUTTON",
     "ROIs Only", BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
 	18, 247, 90, 25, GetHandle(),NULL, Window::GetAppInstance(), NULL);
-	SetStaticFont(hROIOnly,STATIC_FONT_NORMAL);
+	SetFont(hROIOnly,FONT_NORMAL);
 
 	// Insert 'Generate' button under radio buttons. Location based on band number 
 	hgenerate =  CreateWindowEx(0, "BUTTON", "Generate", WS_CHILD | WS_VISIBLE | BS_CHECKBOX  | BS_PUSHLIKE,
 	130, 247, 80, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);     
 	CreateTooltip(hgenerate,"Generate a feature space");
+
+	SetFont(hgenerate, FONT_BOLD);
 	    
 	if (toolWindow.bands == 1) {
     	SendMessage(xRadiobuttons[1],BM_SETCHECK,BST_CHECKED,0);

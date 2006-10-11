@@ -55,11 +55,15 @@ class Window
 	    static Window* GetWindowObject(HWND);           /* obtain "this" object from window handle */
 	    static void SetWindowObject(HWND,Window*);      /* associcate "this" object with window handle */
 	    
-	    static void SetStaticFont(HWND,int);      /* associcate a font with a static text control 
-	                                                    note: SetStaticFont & SetWindowObject store data in the same location */
+	    static void SetStaticFont(HWND,int);      		/* now same as SetFont, left here to prevent breaking code */
 	    static const int STATIC_FONT_NORMAL=0;
 	    static const int STATIC_FONT_BOLD=32453;   
 	    static const int STATIC_FONT_HEADING=32454;       
+
+	    static void SetFont(HWND,int);					/* set font of a control */
+	    static const int FONT_NORMAL=0;
+	    static const int FONT_BOLD=32453;   
+	    static const int FONT_HEADING=32454;       
 	
 	    static void CreateTooltip (HWND hwnd,char *text);   // create a tooltip message when the user moves the mouse over a control
 	

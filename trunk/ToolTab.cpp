@@ -28,7 +28,7 @@ int ToolTab::Create(HWND parent,RECT *parentRect)
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 0,
 		0, parentRect->right-SCROLLBAR_WIDTH, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
-	SetStaticFont(hHeading,STATIC_FONT_HEADING);
+	SetFont(hHeading,Window::FONT_HEADING);
 
 	return true;
 }

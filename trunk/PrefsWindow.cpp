@@ -38,29 +38,35 @@ int PrefsWindow::Create(HWND parent)
 		6, 120, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
 	
-	SetStaticFont(cacheLabel, STATIC_FONT_NORMAL);
+	SetFont(cacheLabel, FONT_NORMAL);
 
 	cacheEntry =CreateWindowEx( WS_EX_CLIENTEDGE, "EDIT", (settingsFile->getSetting("preferences", "cachesize")).c_str(), 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | SS_OWNERDRAW, 138,
 		6, 40, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
 
+	SetFont(cacheEntry, FONT_NORMAL);
+
 	texSizeLabel =CreateWindowEx( 0, szStaticControl, "Texture dimension (pixels):", 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 6,
 		29, 130, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
 	
-	SetStaticFont(texSizeLabel, STATIC_FONT_NORMAL);
+	SetFont(texSizeLabel, FONT_NORMAL);
 
 	texSizeEntry =CreateWindowEx( WS_EX_CLIENTEDGE, "EDIT", (settingsFile->getSetting("preferences", "texsize")).c_str(), 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | ES_LEFT | SS_OWNERDRAW, 138,
 		29, 40, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
+
+	SetFont(texSizeEntry, FONT_NORMAL);
 	
 	displayCloseConfirmLabel =CreateWindowEx( 0, szStaticControl, "Display \'open file\' warning", 
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SS_OWNERDRAW, 6,
 		52, 130, 20, GetHandle(), NULL,
 		GetAppInstance(), NULL);
+
+	SetFont(displayCloseConfirmLabel, FONT_NORMAL);
 	
 	displayCloseConfirmCheckbox = CreateWindowEx( 0, "BUTTON", NULL,
         BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 138,
@@ -78,9 +84,13 @@ int PrefsWindow::Create(HWND parent)
 	
 	okButton = CreateWindowEx(0, "BUTTON", "OK", WS_CHILD | WS_VISIBLE, 60,
 			85, 55, 25, GetHandle(), (HMENU) 1, Window::GetAppInstance(), NULL);
+
+	SetFont(okButton, FONT_BOLD);
 			
 	cancelButton = CreateWindowEx(0, "BUTTON", "Cancel", WS_CHILD | WS_VISIBLE, 120,
 			85, 55, 25, GetHandle(), (HMENU) 2, Window::GetAppInstance(), NULL);		
+
+	SetFont(cancelButton, FONT_BOLD);
 
     prevProc=SetWindowProcedure(&WindowProcedure);	
 

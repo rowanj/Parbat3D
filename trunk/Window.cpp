@@ -155,9 +155,32 @@ void Window::SetWindowObject(HWND hwnd,Window* obj)
     SetWindowLong(hwnd,GWL_USERDATA,(long)obj);
 }
 
+// now same as SetFont, left here to prevent breaking old code that uses it
 void Window::SetStaticFont(HWND hwnd,int font)
 {
-    SetWindowLong(hwnd,GWL_USERDATA,(long) font);
+    SetFont(hwnd,font);
+}
+
+// set the default font of a window/control
+void Window::SetFont(HWND hwnd,int font)
+{
+	HDC hdc;
+    HFONT hfont;
+    
+    hdc=GetDC(hwnd);
+    switch(font)
+    {
+        case STATIC_FONT_BOLD:
+            hfont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); 
+            break;
+        case STATIC_FONT_HEADING:
+            hfont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma");
+            break;
+        default:
+            hfont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma");
+    }
+	SendMessage(hwnd,WM_SETFONT,(WPARAM)hfont,0);
+	DeleteObject(hdc);
 }
 
 Window* Window::GetWindowObject(HWND hwnd)
@@ -177,7 +200,7 @@ void Window::drawStatic(DRAWITEMSTRUCT *dis)
     GetWindowText(dis->hwndItem,(LPSTR)str,(int)255);
     len=strlen(str);
 
-    font=(int)GetWindowObject(dis->hwndItem);
+   /* font=(int)GetWindowObject(dis->hwndItem);
     HFONT hfont;
     switch(font)
     {
@@ -190,7 +213,7 @@ void Window::drawStatic(DRAWITEMSTRUCT *dis)
         default:
             hfont=hNormalFont;
     }
-    SelectObject(dis->hDC,hfont);
+    SelectObject(dis->hDC,hfont);*/
     SetTextColor(dis->hDC,0);                                                                   // set text colour to black
     TextOut(dis->hDC,dis->rcItem.left,dis->rcItem.top,(char*)str,len);                          // display text
 }

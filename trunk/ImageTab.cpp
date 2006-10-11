@@ -52,14 +52,17 @@ int ImageTab::Create(HWND parent,RECT *parentRect)
 	n[3]="Height"; v[3]=makeMessage(leader, ip->getHeight());
 	n[4]="Bands"; v[4]=makeMessage(leader, ip->getNumBands());
 	
+	HWND hstatic;
 	for (int i=0; i<ipItems; i++) {
-		CreateWindowEx(0, szStaticControl, (char*) n[i].c_str(),
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 20, 40+(i*20), 50, 18,
+		hstatic=CreateWindowEx(0, szStaticControl, (char*) n[i].c_str(),
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 20, 40+(i*20), 50, 18,
 			GetHandle(), NULL, Window::GetAppInstance(), NULL);
+		SetFont(hstatic,Window::FONT_NORMAL);
 		
-		CreateWindowEx(0, szStaticControl, (char*) v[i].c_str(),
-			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 78, 40+(i*20), 160, 18,
+		hstatic=CreateWindowEx(0, szStaticControl, (char*) v[i].c_str(),
+			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 78, 40+(i*20), 160, 18,
 			GetHandle(), NULL, Window::GetAppInstance(), NULL);
+		SetFont(hstatic,Window::FONT_NORMAL);
     }
     
 

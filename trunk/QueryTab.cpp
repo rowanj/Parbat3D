@@ -17,6 +17,8 @@ int QueryTab::GetContainerHeight()
 
 int QueryTab::Create(HWND parent,RECT *parentRect)
 {
+	HWND hstatic;
+	
     ToolTab::Create(parent,parentRect);
     
     RECT rect;
@@ -54,26 +56,35 @@ int QueryTab::Create(HWND parent,RECT *parentRect)
         name = catcstrings( (char*) "Band ", (char*) name);
 
         // add channel names under the query tab
-        CreateWindowEx(0, szStaticControl, name,
+        hstatic=CreateWindowEx(0, szStaticControl, name,
 			WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW, 10, 0 + (20 * i), 100, 18,
 			hQScrollBox.GetHandle(), NULL, Window::GetAppInstance(), NULL);
+		SetFont(hstatic,Window::FONT_NORMAL);
 
 		// add the band values to the value container under the query tab
         char tempBandValue[4] = "0"; // temporary storage for the band value
-        imageBandValues[i] = CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE, 5, 15 + (20 * (i-1)),
+        imageBandValues[i] = CreateWindowEx(0, szStaticControl, tempBandValue, WS_CHILD | WS_VISIBLE | SS_CENTER, 5, 15 + (20 * (i-1)),
 			50, 18, queryValueContainer, NULL, Window::GetAppInstance(), NULL);
+		SetFont(imageBandValues[i],Window::FONT_NORMAL);                 			
     }
 
 	
 	/* display cursor position under query tab */
-	CreateWindowEx(0, szStaticControl, "X", WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW,
+	hstatic=CreateWindowEx(0, szStaticControl, "X", WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
                  20, 235, 100, 18, GetHandle(), NULL, Window::GetAppInstance(), NULL);
-	CreateWindowEx(0, szStaticControl, "Y", WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE  | SS_OWNERDRAW,
+	SetFont(hstatic,Window::FONT_NORMAL);    
+	             
+	hstatic=CreateWindowEx(0, szStaticControl, "Y", WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
                  20, 255, 100, 18, GetHandle(), NULL, Window::GetAppInstance(), NULL);
-    cursorXPos = CreateWindowEx(0, szStaticControl, "-", WS_CHILD | WS_VISIBLE,
+	SetFont(hstatic,Window::FONT_NORMAL); 
+	                                 
+    hstatic=cursorXPos = CreateWindowEx(0, szStaticControl, "-", WS_CHILD | WS_VISIBLE,
                  50, 235, 50, 18, GetHandle(), NULL, Window::GetAppInstance(), NULL);			
-    cursorYPos = CreateWindowEx(0, szStaticControl, "-", WS_CHILD | WS_VISIBLE,
+	SetFont(hstatic,Window::FONT_NORMAL);  
+	                                
+    hstatic=cursorYPos = CreateWindowEx(0, szStaticControl, "-", WS_CHILD | WS_VISIBLE,
                  50, 255, 50, 18, GetHandle(), NULL, Window::GetAppInstance(), NULL);
+	SetFont(hstatic,Window::FONT_NORMAL);                                  
 				 
 	hQScrollBox.UpdateScrollBar();		
 }
