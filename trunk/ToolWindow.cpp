@@ -318,22 +318,18 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 
         /* WM_DESTORY: system is destroying our window */                
         case WM_DESTROY:
-			
-            RECT tool_window_rect;
-            Console::write("ToolWIndow WM_DESTROY - geting window cords\n");
-            GetWindowRect(hwnd, &tool_window_rect);
-            Console::write("ToolWIndow WM_DESTROY -saving settings\n");            
-            settingsFile->setSetting("tool window", "x", tool_window_rect.left);
-            settingsFile->setSetting("tool window", "y", tool_window_rect.top);
+			Console::write("ToolWIndow WM_DESTROY - geting window cords\n");
+            GetWindowRect(hwnd, &rect);
+            Console::write("ToolWIndow WM_DESTROY -saving settings\n");
+            settingsFile->setSetting("tool window", "x", rect.left);
+            settingsFile->setSetting("tool window", "y", rect.top);
             Console::write("ToolWIndow WM_DESTROY -freeing drawingobjects\n");
-            win->freeDrawingObjects();           
-            Console::write("ToolWIndow WM_DESTROY -removing from stickywman\n");            
+            win->freeDrawingObjects();
+            Console::write("ToolWIndow WM_DESTROY -removing from stickywman\n");
             stickyWindowManager.RemoveStickyWindow(win);
-            Console::write("ToolWIndow WM_DESTROY -done\n");          
-			              
+            Console::write("ToolWIndow WM_DESTROY -done\n");
             break;
-
     }
-    /* return 0 to indicate that we have processed the message */          
+    
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);
 }
