@@ -280,39 +280,39 @@ void loadFile() {
 }
 
 void closeFile() {
-    /* deallocate variables */
+    // deallocate variables
     Console::write("closeFile()...\n");
-
+    
     Console::write("deleting filename...\n");    
 	if (filename!=NULL)
         delete(filename);
     filename=NULL;
-
+    
     Console::write("deleting image handler...\n");    
 	if (image_handler)
         delete image_handler;
     image_handler=NULL;
-
-    Console::write("destroying tool window... toolwindow handle=%d\n",toolWindow.GetHandle());	
-	/* destroy tool window */
+    
+    // destroy tool window
+    Console::write("destroying tool window... toolwindow handle=%d\n",toolWindow.GetHandle());
     if (toolWindow.GetHandle()!=NULL)
         toolWindow.Destroy();
-
-    Console::write("hiding image window...\n");	    
-    /* hide image window */
+    
+    // hide image window
+    Console::write("hiding image window...\n");
     if (imageWindow.GetHandle()!=NULL)
         imageWindow.Hide();
-
-    Console::write("hiding roi window & deleting ROIs...\n");	    
-	/* hide roi window */
+    
+    // destroy the roi window
+    Console::write("destroying roi window & deleting ROIs...\n");
     if (roiWindow.GetHandle()!=NULL) {
-        roiWindow.Hide();
-        roiWindow.deleteAllROI();
+        roiWindow.Destroy();       // roiWindow.Hide(); seems to cause the window to alternate save positions
+        roiWindow.deleteAllROI();  // remove all the ROI from the list
     }
-
+    
     Console::write("disabling menu items...\n");	
-
-    /* disable menu items */
+    
+    // disable menu items
     EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,true);
     EnableMenuItem(overviewWindow.hMainMenu,IDM_TOOLSWINDOW,true);
     EnableMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,true);
@@ -320,7 +320,7 @@ void closeFile() {
     EnableMenuItem(overviewWindow.hMainMenu,IDM_CONTSWINDOW,true);    
     
     
-    /* repaint main window */
+    // repaint main window
     overviewWindow.overviewWindowDisplay.Repaint();
     
     Console::write("closeFile() done\n");

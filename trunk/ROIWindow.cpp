@@ -146,7 +146,7 @@ int ROIWindow::Create(HWND parent) {
 		237, 28, 28, GetHandle(),  (HMENU) 5,
 		Window::GetAppInstance(), NULL);
 	CreateTooltip(hPolyButton,"Polygon Selection Tool");
-		
+	
 	hPolyIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hPolyButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "poly.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
 	

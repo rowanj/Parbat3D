@@ -135,7 +135,7 @@ void ToolWindow::drawStatic(DRAWITEMSTRUCT *dis, HFONT hfont)
     len=strlen(str);
     
     SelectObject(dis->hDC,hTabPen);                                                             // set border
-    SelectObject(dis->hDC,hfont);                                                         // set font
+    SelectObject(dis->hDC,hfont);                                                               // set font
     SetTextColor(dis->hDC,0);                                                                   // set text colour to black
     SelectObject(dis->hDC,hTabBrush);                                                           // set background fill
     GetTextExtentPoint32(dis->hDC,str,len,&size);                                               // get size of string
@@ -144,22 +144,21 @@ void ToolWindow::drawStatic(DRAWITEMSTRUCT *dis, HFONT hfont)
 }
 
 /* draw a tab on the screen */
-void ToolWindow::drawTab(DRAWITEMSTRUCT *dis)
-{   
+void ToolWindow::drawTab(DRAWITEMSTRUCT *dis) {
     char *str;
     int len,x,y;
     SIZE size;  
     //GetWindowTextA(dis->hwndItem,(LPSTR)str,(int)255);
-
+    
     str=(char*)dis->itemData;
     len=strlen(str);
-   
+    
     /* set font (based on whether the tab is selected) */
     if (dis->itemState==ODS_SELECTED)
         SelectObject(dis->hDC,hBoldFont);
     else
         SelectObject(dis->hDC,hNormalFont);
-
+    
     SelectObject(dis->hDC,hTabPen);                                     /* set border style/colour */   
     SelectObject(dis->hDC,hTabBrush);                                   /* set background fill brush */    
     
@@ -167,7 +166,7 @@ void ToolWindow::drawTab(DRAWITEMSTRUCT *dis)
     GetTextExtentPoint32(dis->hDC,str,len,&size); 
     x=dis->rcItem.left+(dis->rcItem.right-dis->rcItem.left)/2-size.cx/2;
     y=dis->rcItem.top+(dis->rcItem.bottom-dis->rcItem.top)/2-size.cy/2;
-
+    
     /* display background rectangle & text on screen */
     Rectangle(dis->hDC,dis->rcItem.left,dis->rcItem.top,dis->rcItem.right,dis->rcItem.bottom);
     TextOut(dis->hDC,x,y,(char*)str,len);
