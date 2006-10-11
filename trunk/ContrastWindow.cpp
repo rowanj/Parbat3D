@@ -172,6 +172,8 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 		case WM_HSCROLL:
 			if (LOWORD(wParam) == TB_THUMBTRACK)
 	        {
+				//HIWORD(wParam)=pos
+				//lParam=hSlider of whatever
 				MessageBox( hwnd, (LPSTR) "My message", (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );
 			}
 			
