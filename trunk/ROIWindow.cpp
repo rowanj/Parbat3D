@@ -35,7 +35,7 @@ COLORREF ROIWindow::customColours[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int ROIWindow::Create(HWND parent) {
     RECT desktopRect;
     RECT rect;
-    int mx,my;
+    int mx, my;
     const int ROI_WINDOW_WIDTH=250;
     const int ROI_WINDOW_HEIGHT=300;
     
@@ -43,10 +43,10 @@ int ROIWindow::Create(HWND parent) {
     
     // get the stored window position
     mx = atoi(settingsFile->getSetting("roi window", "x").c_str());
-	my = atoi(settingsFile->getSetting("roi window", "y").c_str());
-	
-	// use the default position if there are now stored values or the values are offscreen
-	if (mx<=0 || mx>(desktopRect.right-50) || my<=0 || my>(desktopRect.bottom-50)) {
+    my = atoi(settingsFile->getSetting("roi window", "y").c_str());
+    
+    // use the default position if there are now stored values or the values are offscreen
+    if (mx<=0 || mx>(desktopRect.right-50) || my<=0 || my>(desktopRect.bottom-50)) {
         GetWindowRect(overviewWindow.GetHandle(),&rect);  // get Main Window Location for ROI window alignment
         mx = rect.left;
         my = rect.bottom + 30;
@@ -54,23 +54,23 @@ int ROIWindow::Create(HWND parent) {
     
     // create ROI window
     if (!CreateWin(0, "Parbat3D ROI Window", "Regions of Interest",
-	     WS_POPUP | WS_SYSMENU | WS_CAPTION | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-	     mx, my, 250, 300, parent, NULL))
-	    return false;
-	
+        WS_POPUP | WS_SYSMENU | WS_CAPTION | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+        mx, my, ROI_WINDOW_WIDTH, ROI_WINDOW_HEIGHT, parent, NULL))
+        return false;
+    
     prevProc=SetWindowProcedure(&WindowProcedure);
-
-
-	// Create scroll box 	
-	RECT rect2;
+    
+    
+    // Create scroll box 	
+    RECT rect2;
    	rect2.top=5;
    	rect2.left=5;
    	rect2.right=235;
    	rect2.bottom=227;                 	
-	ROIscrollBox.Create(GetHandle(),&rect2);
-
-	// Create listview control inside scroll box
-	GetClientRect(ROIscrollBox.GetHandle(),&rect);
+    ROIscrollBox.Create(GetHandle(),&rect2);
+    
+    // Create listview control inside scroll box
+    GetClientRect(ROIscrollBox.GetHandle(),&rect);
     hROIListBox = CreateWindowEx(0,WC_LISTVIEW, 
                                 NULL, 
                                 WS_CHILD | LVS_REPORT | LVS_EDITLABELS | WS_VISIBLE | LVS_NOCOLUMNHEADER | LVS_SINGLESEL | LVS_SORTASCENDING | LVS_SHOWSELALWAYS, 
@@ -82,55 +82,41 @@ int ROIWindow::Create(HWND parent) {
                                 (HMENU) 0, 
                                 Window::GetAppInstance(), 
                                 NULL); 	
-	ListView_SetExtendedListViewStyle(hROIListBox,LVS_EX_CHECKBOXES);
-	prevListViewProc=SetWindowProcedure(hROIListBox,&ROIListViewProcedure);
-	
-	LVCOLUMN lvc;                                
-	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM; 
-	lvc.iSubItem = 0;
-	lvc.pszText = "Show";
-	lvc.cx = rect.right-45;     // width of column in pixels
-	lvc.fmt = LVCFMT_CENTER; 
-	ListView_InsertColumn(hROIListBox, 0, &lvc);
-
-	lvc.iSubItem = 1;
-	lvc.pszText = "Colour";
-	lvc.cx = 20;     // width of column in pixels
-	lvc.fmt = LVCFMT_CENTER; 
-	ListView_InsertColumn(hROIListBox,2, &lvc);
-	
-	
-	// add ROI check boxes
-/*	int roiInList = regionsSet->get_regions_count();
-	vector<RoI> rList = regionsSet->get_regions();
-	RoI rCur;
-	hROITick=new HWND[roiInList];	
-    for (int i=0; i<roiInList; i++) {
-        rCur = rList.at(i);
-		hROITick[i] = CreateWindowEx( 0, "BUTTON",
-                      copyString(rCur.get_name().c_str()), 
-		              BS_AUTOCHECKBOX | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 10,
-		              10 + (20 * i), 100, 16, scrollBox.GetHandle(),NULL,
-		              Window::GetAppInstance(), NULL);
-	}*/
-	
-	//Create Open button
-	hOpenButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 5,
-		237, 28, 28, GetHandle(), (HMENU) 1,
-		Window::GetAppInstance(), NULL);
-	CreateTooltip(hOpenButton,"Open ROI Set");
-	
-	hOpenIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
-	SendMessage (hOpenButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "open.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
-	
-	//Create Save button
-	hSaveButton =CreateWindowEx( 0, "BUTTON", NULL, 
-		BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 38,
-		237, 28, 28, GetHandle(),  (HMENU) 2,
-		Window::GetAppInstance(), NULL);
-	CreateTooltip(hSaveButton,"Save ROI Set");
-		
+    ListView_SetExtendedListViewStyle(hROIListBox,LVS_EX_CHECKBOXES);
+    prevListViewProc=SetWindowProcedure(hROIListBox,&ROIListViewProcedure);
+    
+    LVCOLUMN lvc;                                
+    lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM; 
+    lvc.iSubItem = 0;
+    lvc.pszText = "Show";
+    lvc.cx = rect.right-45;                       // width of column in pixels
+    lvc.fmt = LVCFMT_CENTER; 
+    ListView_InsertColumn(hROIListBox, 0, &lvc);
+    
+    lvc.iSubItem = 1;
+    lvc.pszText = "Colour";
+    lvc.cx = 20;                                  // width of column in pixels
+    lvc.fmt = LVCFMT_CENTER; 
+    ListView_InsertColumn(hROIListBox,2, &lvc);
+    
+    
+    //Create Open button
+    hOpenButton =CreateWindowEx( 0, "BUTTON", NULL, 
+        BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 5,
+        237, 28, 28, GetHandle(), (HMENU) 1,
+        Window::GetAppInstance(), NULL);
+    CreateTooltip(hOpenButton,"Open ROI Set");
+    
+    hOpenIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
+    SendMessage (hOpenButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "open.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
+    
+    //Create Save button
+    hSaveButton =CreateWindowEx( 0, "BUTTON", NULL, 
+        BS_ICON | WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 38,
+        237, 28, 28, GetHandle(),  (HMENU) 2,
+        Window::GetAppInstance(), NULL);
+    CreateTooltip(hSaveButton,"Save ROI Set");
+    	
 	hSaveIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hSaveButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "save.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
 	
@@ -183,9 +169,8 @@ int ROIWindow::Create(HWND parent) {
 		
 	hSingleIcon=(HICON)LoadImage(NULL,IDI_EXCLAMATION,IMAGE_ICON,0,0,LR_SHARED);
 	SendMessage (hSingleButton, BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)LoadImage (Window::GetAppInstance(), "single.ico", IMAGE_ICON, 24, 24,LR_LOADFROMFILE));
-
-	
-	
+    
+    
 	// Tool Tips
 	/* CREATE A TOOLTIP WINDOW */
     hwndTT = CreateWindowEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, "tooltips_class32", "single point",
@@ -198,9 +183,6 @@ int ROIWindow::Create(HWND parent) {
         NULL,
         Window::GetAppInstance(),
         NULL);
-        
-
-        
     
     SetWindowPos(hwndTT,
         HWND_TOPMOST,
@@ -209,11 +191,11 @@ int ROIWindow::Create(HWND parent) {
         0,
         0,
         SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-
-
+    
+    
     /* GET COORDINATES OF THE MAIN CLIENT AREA */
     GetClientRect (hSingleButton, &rect);
-
+    
     /* INITIALIZE MEMBERS OF THE TOOLINFO STRUCTURE */
     /*
     ti.cbSize = sizeof(TOOLINFO);
@@ -230,29 +212,24 @@ int ROIWindow::Create(HWND parent) {
 
     /* SEND AN ADDTOOL MESSAGE TO THE TOOLTIP CONTROL WINDOW */
     //SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti);
-	
-	
-	
-	
+    
+    
     //ROIscrollBox.UpdateScrollBar();
-	
-	return true;
+    
+    return true;
 }
 
 // show colour dialog box allowing user to change an roi's colour
-void ROIWindow::ChangeROIColour(HWND hbutton)
-{
+void ROIWindow::ChangeROIColour (HWND hbutton) {
 	CHOOSECOLOR cc;
 	int r,g,b;	
 	int colour;	
 	ROI *roi;
 	int i;
-
+	
 	// find ROI object that is associated with the button
-	for (i=0;i<roiColourButtonList.size();i++)
-	{
-		if (roiColourButtonList.at(i)==hbutton)
-		{
+	for (i=0;i<roiColourButtonList.size();i++) {
+		if (roiColourButtonList.at(i)==hbutton) {
 			LVITEM item;
 			item.mask=LVIF_PARAM;
 			item.iItem=i;
@@ -273,8 +250,7 @@ void ROIWindow::ChangeROIColour(HWND hbutton)
 			cc.lCustData=0;
 			cc.lpfnHook=NULL;
 			cc.lpTemplateName=NULL;
-			if (ChooseColor(&cc)!=0)
-			{
+			if (ChooseColor(&cc)!=0) {
 				// save new colour
 				colour=cc.rgbResult;
 				r=colour&0xFF;
@@ -292,25 +268,20 @@ void ROIWindow::ChangeROIColour(HWND hbutton)
 			break;
 		}
 	}
-	
-	
 }
 
 // draw an ROI's colour button in its own colour
-void ROIWindow::DrawColourButton(LPDRAWITEMSTRUCT di)
-{
+void ROIWindow::DrawColourButton(LPDRAWITEMSTRUCT di) {
 	HBRUSH hbrush;
 	RECT rect;
 	ROI *roi;
 	int colour;
 	int r,g,b;	
 	int i;
-
+	
 	// find the ROI object that is associated with the colour button
-	for (i=0;i<roiColourButtonList.size();i++)
-	{
-		if (di->hwndItem==roiColourButtonList.at(i))
-		{
+	for (i=0;i<roiColourButtonList.size();i++) {
+		if (di->hwndItem==roiColourButtonList.at(i)) {
 			LVITEM item;
 			item.mask=LVIF_PARAM;
 			item.iItem=i;
@@ -333,15 +304,12 @@ void ROIWindow::DrawColourButton(LPDRAWITEMSTRUCT di)
 }
 
 /* handle events related to the list view control & its controls */
-LRESULT CALLBACK ROIWindow::ROIListViewProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
+LRESULT CALLBACK ROIWindow::ROIListViewProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	ROI *roi;
-	switch (message)
-	{
+	switch (message) {
 		// handle button clicks
 		case WM_COMMAND:
-			if (HIWORD(wParam)==BN_CLICKED)
-			{
+			if (HIWORD(wParam)==BN_CLICKED) {
 				ChangeROIColour((HWND)lParam);
 			}
 			break;
@@ -355,10 +323,8 @@ LRESULT CALLBACK ROIWindow::ROIListViewProcedure(HWND hwnd, UINT message, WPARAM
 }
 
 // handle list item changed notification
-void ROIWindow::OnListItemChanged(NMLISTVIEW* pnml)
-{
-	if ((pnml->uChanged&LVIF_STATE)!=0)		// check if state of item has changed
-	{
+void ROIWindow::OnListItemChanged (NMLISTVIEW* pnml) {
+	if ((pnml->uChanged&LVIF_STATE)!=0) {		// check if state of item has changed
 		// get roi object associated with item
 		ROI *roi;
 		LVITEM item;
@@ -369,11 +335,9 @@ void ROIWindow::OnListItemChanged(NMLISTVIEW* pnml)
 		roi=(ROI*)item.lParam;		
 		
 		// get check box state (1=unticked, 2=ticked)
-		int checkBoxState=(pnml->uNewState&LVIS_STATEIMAGEMASK)>>12;			
-	
-		switch (checkBoxState)
-		{
-			
+        int checkBoxState=(pnml->uNewState&LVIS_STATEIMAGEMASK)>>12;			
+        
+		switch (checkBoxState) {
 			case 2:
 				// show ROI
 				roi->set_active(true);
@@ -386,7 +350,6 @@ void ROIWindow::OnListItemChanged(NMLISTVIEW* pnml)
 				imageWindow.Repaint();
 				break;							
 		}
-	
 	}
 }
 
@@ -472,9 +435,8 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
                 win->newEntity(win, ROI_RECT);
             
             /* Create Single Point ROI Button */
-			if (LOWORD(wParam) == 7 && HIWORD(wParam) == BN_CLICKED) {
+			if (LOWORD(wParam) == 7 && HIWORD(wParam) == BN_CLICKED)
                 win->newEntity(win, ROI_POINT);
-            }
             
             // turn off the buttons if an entity is being created
             win->updateButtons(win);
@@ -485,7 +447,7 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
 		
 		
         case WM_SHOWWINDOW:
-            /* update window menu item depending on whether window is shown or hidden */
+            // update window menu item depending on whether window is shown or hidden
             if (wParam)  // shown
                 CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_CHECKED|MF_BYCOMMAND);
             else         // hidden
@@ -493,23 +455,24 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             return 0;
         
         
-        /* WM_CLOSE: system or user has requested to close the window/application */             
+        // WM_CLOSE: system or user has requested to close the window/application
         case WM_CLOSE:
-            /* don't destroy this window, but make it invisible */
+            // don't destroy this window, but make it invisible
             ShowWindow(hwnd,SW_HIDE);
             CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
             settingsFile->setSetting("roi window", "open", "0");  // keep closed on next image load
             return 0;
         
         
-        /* WM_DESTORY: system is destroying our window */
+        // WM_DESTORY: system is destroying our window
         case WM_DESTROY:
-            /* save the image window attributes */
+            // save the image window attributes
             GetWindowRect(hwnd, &rect);
             settingsFile->setSetting("roi window", "x", rect.left);
             settingsFile->setSetting("roi window", "y", rect.top);
             break;
     }
+    
     // call next window procedure in chain
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }
