@@ -68,13 +68,9 @@ int ImageWindow::Create(HWND parent)
 void ImageWindow::updateImageWindowTitle()
 {
     /* Display the file name & zoom level on the image window title bar */
-    sprintf(imageWindowTitle, "Image - %s (%.0f%%)", filename, image_handler->get_image_viewport()->get_zoom_level()*100.0);
+    sprintf(imageWindowTitle, "Image - %s (%.2f%%)", filename, image_handler->get_image_viewport()->get_zoom_level()*100.0);
     SetWindowText(GetHandle(), imageWindowTitle);
-/*    string leader = "Image - ";
-    string title  = makeMessage(leader,filename);
-    title+=makeString(" (",image_handler->get_image_viewport()->get_zoom_level()*100.0);
-    title+="%)";
-	SetWindowText(GetHandle(), (char*) title.c_str()); */
+
 }
 
 /* update image window's scroll bar display settings  */
@@ -265,7 +261,7 @@ void ImageWindow::scrollImage(bool vert, int amount) {
 
 
 /* zoom the image in/out */
-void ImageWindow::zoomImage(int nlevels)
+void ImageWindow::zoomImage(float nlevels)
 {
     float zoom=image_handler->get_image_viewport()->get_zoom_level();
     float increment = ((float)nlevels * zoom) / 50.0;
@@ -329,13 +325,19 @@ void ImageWindow::onKeyDown(int virtualKey)
 	// Zoom in
 	if (virtualKey == VK_PRIOR)
 	{
-		zoomImage(1);
+		if (shift_pressed)
+			zoomImage(0.1);
+		else
+			zoomImage(1);
 	}
 	
 	// zoom out
 	if (virtualKey == VK_NEXT)
 	{
-		zoomImage(-1);
+		if (shift_pressed)
+			zoomImage(-0.1);
+		else
+			zoomImage(-1);
 	}	
 }
 

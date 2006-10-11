@@ -22,7 +22,7 @@ class ProgressWindow:public Window {
         
         bool autoIncrement;
         
-   		CRITICAL_SECTION updating_progress_bar;
+   		static CRITICAL_SECTION updating_progress_bar;
         
 		static DWORD WINAPI ThreadMain(LPVOID lpParameter);
 		
@@ -37,6 +37,10 @@ class ProgressWindow:public Window {
         */
         ProgressWindow ();
         
+        /**
+        	Unallocates allocated memory
+        */
+        ~ProgressWindow();
         
         /**
             Create the progress bar window and sets up all the components that

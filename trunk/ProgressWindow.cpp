@@ -2,6 +2,9 @@
 
 #include "main.h"
 
+// static variables
+CRITICAL_SECTION ProgressWindow::updating_progress_bar;
+
 // setup variables
 ProgressWindow::ProgressWindow()
 {
@@ -9,6 +12,12 @@ ProgressWindow::ProgressWindow()
 	autoIncrement=false;
 	hProgressBar=NULL;
 	InitializeCriticalSection(&updating_progress_bar);	
+}
+
+// free any resources used
+ProgressWindow::~ProgressWindow()
+{
+	DeleteCriticalSection(&updating_progress_bar);
 }
 
 // create the progress window
@@ -110,10 +119,15 @@ LRESULT CALLBACK ProgressWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     
     switch (message) {  // handle the messages
     	case WM_TIMER:
-			if (win->autoIncrement)
-			{
-				win->increment(); // disabled for testing reasons
+			EnterCriticalSection(&updating_progress_bar);
+		    {
+				if (win->autoIncrement)
+				{
+					win->increment();
+				}
 			}
+			// allow other thread to update progress bar
+			LeaveCriticalSection(&updating_progress_bar);				
 			break;
     }
     
@@ -125,82 +139,90 @@ LRESULT CALLBACK ProgressWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 
 void ProgressWindow::start (int steps, bool auto_increment) {
 
-	start_count++;
+	// prevent main thread & progress window's thread doing this at same time
+	EnterCriticalSection(&updating_progress_bar);
+    {
+		start_count++;
+		
+		// don't do anything unless progress bar has been setup
+		if (hProgressBar==NULL)
+			return;
+		
+		if (start_count==1)
+		{
+			autoIncrement=auto_increment;
+			if (autoIncrement)
+				loop_at_end=true;
+			else
+				loop_at_end=false;
 	
-	// don't do anything unless progress bar has been setup
-	if (hProgressBar==NULL)
-		return;
+		    total_steps = steps;  // set the total number of steps in the bar
+		    current_steps = 0;    // initialise the current amount the bar has loaded
 	
-	if (start_count==1)
-	{
-		autoIncrement=auto_increment;
-		if (autoIncrement)
-			loop_at_end=true;
-		else
-			loop_at_end=false;
-
-	    total_steps = steps;  // set the total number of steps in the bar
-	    current_steps = 0;    // initialise the current amount the bar has loaded
-
-		// prevent main thread & progress window's thread doing this at same time
-		EnterCriticalSection(&updating_progress_bar);
-	    {
+	
 		    // sends a message to the progress bar to set the size and reset the position
 		    PostMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, steps));  // resize
 		    PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);              // reset position
+			    
+		    Show();               		// shows the window
+		 	mainWindow.DisableAll();	// disable all of the windows owned by the main thread		
 		}
-		// allow other thread to update progress bar
-	    LeaveCriticalSection(&updating_progress_bar);
 
-	    
-	    Show();               		// shows the window
-	 	mainWindow.DisableAll();	// disable all of the windows owned by the main thread		
 	}
+	// allow other thread to update progress bar
+	LeaveCriticalSection(&updating_progress_bar);
+	
 
 }
 
 
 void ProgressWindow::end () {
-	start_count--;
-
-	// don't do anything unless progress bar has been setup
-	if (hProgressBar==NULL)
-		return;
-
-	if (start_count==0)
-	{
-	 	mainWindow.EnableAll();	// re-enable all of the windows owned by the main thread		
-	 	progressWindow.Hide();	 				// hides the window
-	}	
+	// prevent main thread & progress window's thread doing this at same time
+	EnterCriticalSection(&updating_progress_bar);
+    {
+		start_count--;
+	
+		// don't do anything unless progress bar has been setup
+		if (hProgressBar==NULL)
+			return;
+	
+		if (start_count==0)
+		{
+		 	mainWindow.EnableAll();	// re-enable all of the windows owned by the main thread		
+		 	progressWindow.Hide();	 				// hides the window
+		}	
+	}
+	LeaveCriticalSection(&updating_progress_bar);
 }
 
 
 void ProgressWindow::reset () {
-	// don't do anything unless progress bar has been setup
-	if (hProgressBar==NULL)
-		return;
-
 	// prevent main thread & progress window's thread doing this at same time
 	EnterCriticalSection(&updating_progress_bar);
 	{
-	    current_steps = 0;
-	    PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);  // update the progress bar with the reset position
+
+		// don't do anything unless progress bar has been setup
+		if (hProgressBar==NULL)
+			return;
+	
+		    current_steps = 0;
+		    PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);  // update the progress bar with the reset position
 	}
 	// allow other thread to update progress bar
     LeaveCriticalSection(&updating_progress_bar);
 }
 
 void ProgressWindow::reset (int steps) {
-	// don't do anything unless progress bar has been setup
-	if (hProgressBar==NULL)
-		return;
-
-    total_steps = steps;
-    current_steps = 0;
-
 	// prevent main thread & progress window's thread doing this at same time
 	EnterCriticalSection(&updating_progress_bar);
     {
+		// don't do anything unless progress bar has been setup
+		if (hProgressBar==NULL)
+			return;
+	
+	    total_steps = steps;
+	    current_steps = 0;
+	
 	    // sends a message to the progress bar to set the size and reset the position
 	    PostMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, steps));  // resize
 	    PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) 0, 0);              // reset position
@@ -211,35 +233,37 @@ void ProgressWindow::reset (int steps) {
 
 
 void ProgressWindow::increment () {
-	// don't do anything unless progress bar has been setup
-	if (hProgressBar==NULL)
-		return;
-	
 	// prevent main thread & progress window's thread doing this at same time
 	EnterCriticalSection(&updating_progress_bar);
 	{	
-	    if (current_steps < total_steps)
-	        current_steps++;
-	    else {
-	        if (loop_at_end)
-	            current_steps = 0;
-	    }
-    
-	    // update the progress bar with the new value
-	    PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) current_steps, 0);
+
+		// don't do anything unless progress bar has been setup
+		if (hProgressBar==NULL)
+			return;
+		
+		if (current_steps < total_steps)
+		    current_steps++;
+		else {
+		    if (loop_at_end)
+		        current_steps = 0;
+		}
+		
+		// update the progress bar with the new value
+		PostMessage(hProgressBar, PBM_SETPOS, (WPARAM) current_steps, 0);
 	}	
 	// allow other thread update progress bar
     LeaveCriticalSection(&updating_progress_bar);
 }
 
 void ProgressWindow::increment (int steps) {
-	// don't do anything unless progress bar has been setup
-	if (hProgressBar==NULL)
-		return;
-
 	// prevent main thread & progress window's thread doing this at same time
 	EnterCriticalSection(&updating_progress_bar);
 	{
+
+		// don't do anything unless progress bar has been setup
+		if (hProgressBar==NULL)
+			return;
+	
 	    if (current_steps <= (total_steps-steps))
 	        current_steps += steps;
 	    else {

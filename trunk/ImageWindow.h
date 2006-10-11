@@ -21,7 +21,7 @@ class ImageWindow:public Window
         void scrollImageY(int scrollMsg);
         void scrollImage(bool vert, int amount);
         
-        void zoomImage(int nlevels);
+        void zoomImage(float nlevels);
     	void onKeyDown(int virtualKey);    
 };
 
