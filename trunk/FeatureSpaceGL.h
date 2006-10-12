@@ -7,7 +7,7 @@
 #include "PointsHash.h"
 #include <vector>
 
-#define USE_POINT_SPRITES 1
+#define USE_POINT_SPRITES 0
 #if USE_POINT_SPRITES
 #include <GL/glext.h>
 #endif
@@ -37,7 +37,10 @@ public:
 #if USE_POINT_SPRITES
 	void setup_point_sprites(void);
 #endif
-
+    GLfloat cam_yaw;
+    GLfloat cam_pitch; 
+    GLfloat cam_dolly;
+    
 private:
 	GLText* gl_text;
 	GLView* gl_view;
@@ -56,9 +59,7 @@ private:
 	static const GLfloat point_sprite_max_size = 30.0;
 #endif
     
-/*    GLfloat cam_yaw;
-    GLfloat cam_pitch; 
-    GLfloat cam_dolly; */
+
 //    GLfloat x_rotation;
     
     bool smooth;

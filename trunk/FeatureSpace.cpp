@@ -136,6 +136,12 @@ void FeatureSpace::getPixelData(void)
 							//add data at all points in rectangle to data lists
 							getRectData(currentEntity, currentROI);
 						}
+						else
+						{
+							Console::write("FS::GpixD\tCurrent type is POLY\n");
+							//add data at all points in rectangle to data lists
+							getPolygonData(currentEntity, currentROI);
+						}
 					}
 				}
 			}
@@ -310,7 +316,7 @@ void FeatureSpace::getRectData(ROIEntity* theEntity, ROI* theROI)
 // gathered, and x is a value between the pairs of x points stored for that y.
 // -----------------------------------------------------------------------------------------
 
-/*void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
+void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 {	
 	int totalPoints = 0;
 	int fx1, fx2, fy1, fy2;
@@ -331,7 +337,7 @@ void FeatureSpace::getRectData(ROIEntity* theEntity, ROI* theROI)
 		yoffset = miny;
 		vectorsize = (maxy - miny) + 1;
 		boundsCoords.resize(vectorsize, new list<int>);
-		pixCoords.resize(vectorsize, new list<int>);
+		//pixCoords.resize(vectorsize, new list<int>);
 		
 		//get the point coordinates for our boundary lines first
 		for (int i = 0; i < polyPoints.size() - 1; i++)
@@ -372,48 +378,80 @@ void FeatureSpace::getRectData(ROIEntity* theEntity, ROI* theROI)
 		
 		for(int tiley = starty; tiley <= endy; tiley+=tileSize)
 		{
+			Console::write("FS::GPD - Traversing tiles in row starting at %d\n", tiley);
 			for(int tilex = startx; tilex <= endx; tilex+=tileSize)
 			{
-				Console::write("FS::GPD - In tile starting at x %d, y %d\n", tilex, tiley);
+				int tileendx = tilex + tileSize;
+				int tileendy = tiley + tileSize;
 				
+				Console::write("FS::GPD - In tile starting at x %d, y %d\n", tilex, tiley);
+				Console::write("FS::GPD - Current tile bounds: x%d,y%d & x%d,y%d\n", tilex, tiley, tileendx, tileendy);
 				char* grabbedData = fsTileset->get_tile_RGB_LOD(tilex, tiley, band1, band2, band3);
 				
-				int LODyoffset = yoffset / LODfactor;
+				int loopstarty = max((tiley - yoffset), 0);
+				int loopendy = min(vectorsize, tileendy - yoffset);
+				assert(loopstarty >= 0);
+				assert(loopendy <= vectorsize);
 				
-				for (int i = 0; i < vectorsize; i++)
+				Console::write("FS::GPD - in this pass, starting from y%d, and going to y%d\n", loopstarty, loopendy);
+				
+				for (int stepy = loopstarty; stepy < loopendy; stepy++)
 				{
+					//Console::write("FS::GPD y is %d\n", stepy);
 					//iterators for our "point pairs"
-					if (boundsCoords[i]->size() > 1)
+					if (boundsCoords[stepy]->size() > 1)
 					{
-						list<int>::iterator j1 = boundsCoords[i]->begin();
+						list<int>::iterator j1 = boundsCoords[stepy]->begin();
 						list<int>::iterator j2 = j1;
 						//set our second point to the next point in the list
 						while(*j1 == *j2)
 						{
 							j2++;
 						}
-						if(j2 == boundsCoords[i]->end()) j2--;
+						if(j2 == boundsCoords[stepy]->end()) j2--;
 						
 						//loop until we reach the end of the point list
-						if ((*j1 == *j2) && (boundsCoords[i]->size() == 2))
+						if ((*j1 == *j2) && (boundsCoords[stepy]->size() == 2))
 						{
-							pushXPixel(*j1, i + yoffset);
-							totalPoints++;
+							int currentx = *j1;
+							if(currentx >= tilex && currentx <= tileendx)
+							{
+								//Console::write("FS::GPD - Getting binary point at x %d, y %d\n", currentx, (stepy + yoffset));
+								int offx = currentx % tileSize;
+								int offy = (stepy + yoffset) % tileSize;
+								int offset = (offy * tileSize * 3) + (offx * 3);
+								unsigned char b1 = (unsigned char)grabbedData[offset];
+								unsigned char b2 = (unsigned char)grabbedData[offset + 1];
+								unsigned char b3 = (unsigned char)grabbedData[offset + 2];
+								addToROIFSTable(b1, b2, b3);
+								totalPoints++;
+							}
 						}
 						else
 						{
 							while(true)
 							{
 		
-								for(int k = *j1; k <= *j2; k++)
+								for(int stepx = *j1; stepx <= *j2; stepx++)
 								{
-									pushXPixel(k, i + yoffset);
-									totalPoints++;
+									int currentx = stepx;
+									if(currentx >= tilex && currentx <= tileendx)
+									{
+										//Console::write("FS::GPD - Getting point at x %d, y %d\n", currentx, (stepy + yoffset));
+										int offx = currentx % tileSize;
+										int offy = (stepy + yoffset) % tileSize;
+										int offset = (offy * tileSize * 3) + (offx * 3);
+										unsigned char b1 = (unsigned char)grabbedData[offset];
+										unsigned char b2 = (unsigned char)grabbedData[offset + 1];
+										unsigned char b3 = (unsigned char)grabbedData[offset + 2];
+										addToROIFSTable(b1, b2, b3);
+										totalPoints++;
+									}
 								}
 								
 								//move j2 on to the next point in the list
 								j2++;
-								if(j2 == boundsCoords[i]->end()) //if we're at the end of the list, break
+								if(j2 == boundsCoords[stepy]->end()) //if we're at the end of the list, break
 								{
 									break;
 								}
@@ -421,7 +459,7 @@ void FeatureSpace::getRectData(ROIEntity* theEntity, ROI* theROI)
 								//move j2 on to the next point in the pair
 								j1 = j2;
 								j2++;
-								if(j2 == boundsCoords[i]->end()) //if we're at the end of the list, break
+								if(j2 == boundsCoords[stepy]->end()) //if we're at the end of the list, break
 								{
 									break;
 								}
@@ -430,8 +468,19 @@ void FeatureSpace::getRectData(ROIEntity* theEntity, ROI* theROI)
 					}
 					else //if (boundsCoords[i]->size() == 1)
 					{
-						pushXPixel(*boundsCoords[i]->begin(), i + yoffset);
-						totalPoints++;
+						int currentx = *boundsCoords[stepy]->begin();
+						if(currentx >= tilex && currentx <= tileendx)
+						{
+							//Console::write("FS::GPD - Getting single point at x %d, y %d\n", currentx, (stepy + yoffset));
+							int offx = currentx % tileSize;
+							int offy = (stepy + yoffset) % tileSize;
+							int offset = (offy * tileSize * 3) + (offx * 3);
+							unsigned char b1 = (unsigned char)grabbedData[offset];
+							unsigned char b2 = (unsigned char)grabbedData[offset + 1];
+							unsigned char b3 = (unsigned char)grabbedData[offset + 2];
+							addToROIFSTable(b1, b2, b3);
+							totalPoints++;
+						}
 					}
 				}
 				
@@ -452,20 +501,20 @@ void FeatureSpace::getRectData(ROIEntity* theEntity, ROI* theROI)
 	for (int i = 0; i < vectorsize; i++)
 	{
 		delete boundsCoords[i];
-		delete pixCoords[i];
+		//delete pixCoords[i];
 	}
 	time_end = GetTickCount();
 	Console::write("FS::GPD Time to clear vectors was %f seconds\n", (float)(time_end - time_start) / 1000.0);
 	
 	boundsCoords.clear();
-	pixCoords.clear();
+//	pixCoords.clear();
 	maxy = 0; 
 	miny = std::numeric_limits<int>::max();
 	yoffset = 0;
 	vectorsize = 0;
-}*/
+}
 
-void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
+/*void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 {	
 	int totalPoints = 0;
 	maxy = 0;
@@ -581,7 +630,7 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 	miny = std::numeric_limits<int>::max();
 	yoffset = 0;
 	vectorsize = 0;
-}
+}*/
 
 // -----------------------------------------------------------------------------------------
 // getPolygonVertices
@@ -603,8 +652,8 @@ void FeatureSpace::getPolygonVertices(ROIEntity* theEntity)
 	{
 		currentCoords = theCoords.at(i);
 		myPoint* thePoint = new myPoint;
-		thePoint->x = currentCoords.x;
-		thePoint->y = currentCoords.y;
+		thePoint->x = currentCoords.x / LODfactor;
+		thePoint->y = currentCoords.y / LODfactor;
 		polyPoints.push_back(*thePoint);
 		//Console::write("FS:GPV Poly point at X %d, Y %d\n", thePoint->x, thePoint->y);
 		
