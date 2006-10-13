@@ -16,3 +16,5 @@
 
 #define IDM_HELPCONTENTS    215
 #define IDM_HELPABOUT       218
+
+#define IDM_RESETWINPOS		219

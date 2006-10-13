@@ -22,7 +22,11 @@ class ImageWindow:public Window
         void scrollImage(bool vert, int amount);
         
         void zoomImage(float nlevels);
-    	void onKeyDown(int virtualKey);    
+    	void onKeyDown(int virtualKey);
+    	
+        
+        int getWidth ();
+        int getHeight ();
 };
 
 #endif

@@ -32,14 +32,15 @@ int OverviewWindow::Create(HWND parent) {
     mx = atoi(settingsFile->getSetting("overview window", "x").c_str());
 	my = atoi(settingsFile->getSetting("overview window", "y").c_str());
 	if ((mx < 0) || (mx > (rect.right-50)))
-        mx=imageRect.left-OverviewWindow::OVERVIEW_WINDOW_WIDTH;
+        mx=imageRect.left-OverviewWindow::WIDTH;
     
 	if ((my < 0) || (my > (rect.bottom-50)))
 		my=imageRect.top;
       
     /* Create overview window */
     if (!CreateWin(WS_EX_APPWINDOW, "Parbat3D Overview Window", "Parbat3D",
-		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, mx, my, OVERVIEW_WINDOW_WIDTH, 296,
+		WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX,
+        mx, my, WIDTH, HEIGHT,
 		parent, NULL))
         return false;
     prevProc=SetWindowProcedure(&OverviewWindow::WindowProcedure);
@@ -151,6 +152,28 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                         contrastWindow.Hide();
                         contrastAdvWindow.Hide();
                     return 0;
+                
+                
+                case IDM_RESETWINPOS:
+                    // overview window
+                    MoveWindow(overviewWindow.GetHandle(), 10, 10, overviewWindow.getWidth(), overviewWindow.getHeight(), true);
+                    
+                    // image window
+                    if (!(win->toggleMenuItemTick(win->hMainMenu, IDM_IMAGEWINDOW)))  // checks if window open (also changes menu checkbox selection)
+                        MoveWindow(imageWindow.GetHandle(), overviewWindow.getWidth()+10, 10, imageWindow.getWidth(), imageWindow.getHeight(), true);
+                    win->toggleMenuItemTick(win->hMainMenu, IDM_IMAGEWINDOW);         // changes selection back
+                    
+                    // roi window
+                    if (!(win->toggleMenuItemTick(win->hMainMenu, IDM_ROIWINDOW)))    // checks if window open (also changes menu checkbox selection)
+                        MoveWindow(roiWindow.GetHandle(), 10, overviewWindow.getHeight()+10, roiWindow.getWidth(), roiWindow.getHeight(), true);
+                    win->toggleMenuItemTick(win->hMainMenu, IDM_ROIWINDOW);           // changes selection back
+                    
+                    // tool window
+                    if (!(win->toggleMenuItemTick(win->hMainMenu,IDM_TOOLSWINDOW)))   // checks if window open (also changes menu checkbox selection)
+                        MoveWindow(toolWindow.GetHandle(), 10, overviewWindow.getHeight()+40, toolWindow.getWidth(), toolWindow.getHeight(), true);
+                    win->toggleMenuItemTick(win->hMainMenu,IDM_TOOLSWINDOW);          // changes selection back
+                    return 0;
+                
                 
                 case IDM_HELPCONTENTS:
 					 // get path to help folder
@@ -288,3 +311,11 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
 }
 
+
+int OverviewWindow::getWidth () {
+    return WIDTH;
+}
+
+int OverviewWindow::getHeight () {
+    return HEIGHT;
+}

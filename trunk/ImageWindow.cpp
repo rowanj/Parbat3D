@@ -33,8 +33,8 @@ int ImageWindow::Create(HWND parent)
 	mheight = atoi(settingsFile->getSetting("image window", "height").c_str());
 	if ((mx < 0) || (mx > (desktopRect.right-50)))
 	{
-        mx = (desktopRect.right /2) - ((IMAGE_WINDOW_WIDTH+OverviewWindow::OVERVIEW_WINDOW_WIDTH) /2);         /* default x position to center windows */
-	    mx+=OverviewWindow::OVERVIEW_WINDOW_WIDTH;                                                          /* leave room for overview window */
+        mx = (desktopRect.right /2) - ((IMAGE_WINDOW_WIDTH+OverviewWindow::WIDTH) /2);         /* default x position to center windows */
+	    mx+=OverviewWindow::WIDTH;                                                          /* leave room for overview window */
 	}
 	
 	if ((my < 0) || (my > (desktopRect.bottom-50)))
@@ -469,4 +469,17 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
     }
     
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);
+}
+
+        
+int ImageWindow::getWidth () {
+    RECT rect;
+    GetWindowRect(GetHandle(), &rect);
+    return (rect.right - rect.left);
+}
+
+int ImageWindow::getHeight () {
+    RECT rect;
+    GetWindowRect(GetHandle(), &rect);
+    return (rect.bottom - rect.top);
 }

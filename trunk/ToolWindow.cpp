@@ -47,7 +47,7 @@ int ToolWindow::Create(HWND)
     /* The class is registered, lets create the program*/
     if (!CreateWin(0, "Parbat3D Tool Window", "Tools",
            WS_POPUP+WS_CAPTION+WS_SYSMENU, mx, my,
-           250, 340, imageWindow.GetHandle(), NULL))
+           ToolWindow::WIDTH, ToolWindow::HEIGHT, imageWindow.GetHandle(), NULL))
         return false;
     setupDrawingObjects(GetHandle());
     prevProc=SetWindowProcedure(&ToolWindow::WindowProcedure);
@@ -331,4 +331,13 @@ LRESULT CALLBACK ToolWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
     }
     
     return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);
+}
+
+
+int ToolWindow::getWidth () {
+    return ToolWindow::WIDTH;
+}
+
+int ToolWindow::getHeight () {
+    return ToolWindow::HEIGHT;
 }

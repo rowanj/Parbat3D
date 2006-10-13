@@ -36,8 +36,8 @@ int ROIWindow::Create(HWND parent) {
     RECT desktopRect;
     RECT rect;
     int mx, my;
-    const int ROI_WINDOW_WIDTH=250;
-    const int ROI_WINDOW_HEIGHT=300;
+//    const int ROI_WINDOW_WIDTH=250;
+//    const int ROI_WINDOW_HEIGHT=300;
     
     GetWindowRect(hDesktop,&desktopRect);  // Get the width & height of the desktop window
     
@@ -55,7 +55,8 @@ int ROIWindow::Create(HWND parent) {
     // create ROI window
     if (!CreateWin(0, "Parbat3D ROI Window", "Regions of Interest",
         WS_POPUP | WS_SYSMENU | WS_CAPTION | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-        mx, my, ROI_WINDOW_WIDTH, ROI_WINDOW_HEIGHT, parent, NULL))
+        mx, my, ROIWindow::WIDTH, ROIWindow::HEIGHT,
+        parent, NULL))
         return false;
     
     prevProc=SetWindowProcedure(&WindowProcedure);
@@ -825,4 +826,13 @@ void ROIWindow::updateROIList (ROIWindow* win) {
     // re-paint windows to draw ROIs
     imageWindow.Repaint();
     roiWindow.Repaint();
+}
+
+
+int ROIWindow::getWidth () {
+    return ROIWindow::WIDTH;
+}
+
+int ROIWindow::getHeight () {
+    return ROIWindow::HEIGHT;
 }

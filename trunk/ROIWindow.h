@@ -10,6 +10,10 @@ class ROIWindow:public Window
     private:
         WNDPROC prevProc;
         static WNDPROC prevListViewProc;
+        
+        static const int WIDTH = 250;
+        static const int HEIGHT = 300;
+        
         HWND hBG;
         HWND *hROITick;
         HWND roiToolBar;
@@ -142,6 +146,10 @@ class ROIWindow:public Window
             that the entity is being added to.
         */
         void updateButtons (ROIWindow*);
+        
+        
+        int getWidth ();
+        int getHeight ();
 };
 
 #endif
