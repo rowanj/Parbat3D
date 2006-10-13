@@ -18,6 +18,13 @@
     font-style: normal;
     }
 
+  h4 {
+    font-family: verdana,arial;
+    font-weight: normal;
+    font-size: 12pt;
+    font-style: italic;
+    }
+
   /* default font */
   * { font-family: verdana,arial;
     font-size: 12pt;
