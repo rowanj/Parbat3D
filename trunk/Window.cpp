@@ -5,13 +5,13 @@
 #include "config.h"
 #include <commctrl.h>
 
-
+/* define static variables */
 WNDPROC Window::stPrevWindowProcedure=NULL;
 HINSTANCE Window::hInstance=NULL;
 HICON Window::hIcon=NULL;
 int Window::keyboardShortcutKeys[NUMBER_OF_SHORTCUTS];
 
-
+/* setup object variables */
 Window::Window()
 {
     hwindow=NULL;
@@ -21,12 +21,15 @@ Window::Window()
 	threadId=0;
 }
 
+/* setup static variables */
 void Window::Init(HINSTANCE hInst)
 {
     hInstance=hInst;
     hIcon=LoadIcon(hInst,MAKEINTRESOURCE(ID_MAIN_ICON));
 }
 
+// Display an error mesage as a message box, then exit
+// Copied from Microsoft's MSDN documentation
 void ErrorExit(LPTSTR lpszFunction) 
 { 
     LPVOID lpMsgBuf;
@@ -86,7 +89,7 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
         {
             ErrorExit("RegisterClassEx");
             Console::write("Window::CreateWin RegisterClassEx failed\n");            
-            return false;  //(may fail if already registered)
+            return false;
         }
 
         //DeleteObject(hbrush);
@@ -103,15 +106,11 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
     }
 
     // add "this" object pointer to hwindow's internal structure
-    SetWindowLong(hwindow,GWL_USERDATA,(int)this);
-    if (GetWindowObject(hwindow)!=this)
-        Console::write("Window::CreateWin this object not set properly\n");
+    SetWindowObject(hwindow,this);
+    assert (GetWindowObject(hwindow)==this);
 
     // create fonts
     HDC hdc=GetDC(GetHandle());
-    hNormalFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,400,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma    
-    hBoldFont=CreateFont(-MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma
-    hHeadingFont=CreateFont(-MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72),0,0,0,600,false,false,false,ANSI_CHARSET,OUT_CHARACTER_PRECIS,CLIP_CHARACTER_PRECIS,DEFAULT_QUALITY,FF_DONTCARE,"Tahoma"); //"MS Sans Serif" //Tahoma   
     hBackgroundBrush=(HBRUSH)GetClassLong(hwindow,GCL_HBRBACKGROUND);
     DeleteObject(hdc);
 
@@ -124,11 +123,14 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
         stPrevWindowProcedure=prevWindowProcedure;
     }
     
+    // record the id of the thread that ran this function
     threadId=::GetCurrentThreadId();
     
     return true;
 }
 
+// creates a simple window for testing
+// usually over-written by subclasses
 int Window::Create()
 {
     int r=CreateWin(0,"test class name","Parbat test win",WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX, 10,10,200,200,NULL,NULL);
@@ -138,21 +140,30 @@ int Window::Create()
 }
 
 
-
+/* Set the function that will a handle a window's messages/events.
+   Returns the address of the previous function.
+*/
 WNDPROC Window::SetWindowProcedure(WNDPROC newproc)
 {
     return (WNDPROC)SetWindowLongPtr(hwindow,GWLP_WNDPROC,(LONG)newproc);
 }
-
 
 WNDPROC Window::SetWindowProcedure(HWND hwnd,WNDPROC newproc)
 {
 	return (WNDPROC)SetWindowLongPtr(hwnd,GWLP_WNDPROC,(LONG)newproc);
 }
 
+// associate a Window object with a window
 void Window::SetWindowObject(HWND hwnd,Window* obj)
 {
-    SetWindowLong(hwnd,GWL_USERDATA,(long)obj);
+	SetProp(hwnd,"Parbat3D_Window",obj);
+}
+
+// get the Window object associated with a window
+Window* Window::GetWindowObject(HWND hwnd)
+{
+    Window* win=(Window*)GetProp(hwnd,"Parbat3D_Window");
+    return win;
 }
 
 // now same as SetFont, left here to prevent breaking old code that uses it
@@ -183,13 +194,8 @@ void Window::SetFont(HWND hwnd,int font)
 	DeleteObject(hdc);
 }
 
-Window* Window::GetWindowObject(HWND hwnd)
-{
-    Window* win=(Window*)GetWindowLong(hwnd,GWL_USERDATA);
-    return win;
-}
 
-// draw static text control in choosen font
+// draw static text control in default font
 void Window::drawStatic(DRAWITEMSTRUCT *dis)
 {   
     char str[255];
@@ -200,25 +206,12 @@ void Window::drawStatic(DRAWITEMSTRUCT *dis)
     GetWindowText(dis->hwndItem,(LPSTR)str,(int)255);
     len=strlen(str);
 
-   /* font=(int)GetWindowObject(dis->hwndItem);
-    HFONT hfont;
-    switch(font)
-    {
-        case STATIC_FONT_BOLD:
-            hfont=hBoldFont;
-            break;
-        case STATIC_FONT_HEADING:
-            hfont=hHeadingFont;
-            break;
-        default:
-            hfont=hNormalFont;
-    }
-    SelectObject(dis->hDC,hfont);*/
     SetTextColor(dis->hDC,0);                                                                   // set text colour to black
     TextOut(dis->hDC,dis->rcItem.left,dis->rcItem.top,(char*)str,len);                          // display text
 }
 
 // handle global shortcut key events
+// this is called by WindowProcedure
 void Window::OnKeyDown(int virtualKey)
 {
 	const char *helpPath; // Used for accessing the help folder
@@ -310,14 +303,17 @@ void Window::OnKeyDown(int virtualKey)
         
         // Misc ----------------------------------------------------------------
         
-        // set zoom level
+        // set zoom level (not implemented)
         case Window::KEY_SET_ZOOM_LEVEL:
 //            MessageBox(NULL, "Set zoom", "Parbat3D", MB_YESNO|MB_ICONQUESTION);
             break;
     }
 }
 
-
+/* General window event/message handler. 
+   This procedure receives messages for all windows created by CreateWin(..) (by default)
+   Any message handling that needs to occur for all windows is handled here (eg. global keyboard shortcuts)
+*/
 LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     unsigned int flags;
@@ -334,12 +330,14 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                 return 0;
                 
             case WM_DRAWITEM:
+				// draw an owner drawn static text control
                 if (((DRAWITEMSTRUCT*)lParam)->CtlType==ODT_STATIC)
                 {
                     win->drawStatic((DRAWITEMSTRUCT*)lParam);
                 }
                 return 0;
-				         
+
+			// handle moving other snapped windows when this one is dragged, if required
             case WM_NCLBUTTONDOWN:
                 switch(wParam)
                 {
@@ -348,20 +346,21 @@ LRESULT Window::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
                         break;
                 }
                 break;
+            case WM_MOVING:
+                stickyWindowManager.OnMoving(win,(RECT*)lParam);
+                return TRUE;
 
-				
+			// handle keyboard shortcuts				
 			case WM_KEYDOWN:
 				win->OnKeyDown(wParam);
 				break;
 			
-            case WM_MOVING:
-                stickyWindowManager.OnMoving(win,(RECT*)lParam);
-                return TRUE;
+			// free any resources used by window
             case WM_DESTROY: 
-                DeleteObject(win->hNormalFont);
-                DeleteObject(win->hBoldFont);      
-				DeleteObject(win->hHeadingFont);
-                win->hwindow=NULL;
+                //DeleteObject(win->hNormalFont);
+                //DeleteObject(win->hBoldFont);      
+				//DeleteObject(win->hHeadingFont);
+                win->hwindow=NULL;	// set window handle to invalid
                 break;
         }
     
@@ -455,7 +454,7 @@ void Window::setDefaultKeyboardShortcuts () {
     Window::keyboardShortcutKeys[Window::KEY_ROI_RECT] = 'S';
     Window::keyboardShortcutKeys[Window::KEY_ROI_POLY] = 'A';
     
-    Window::keyboardShortcutKeys[Window::KEY_SET_ZOOM_LEVEL] = 'Z';
+    //Window::keyboardShortcutKeys[Window::KEY_SET_ZOOM_LEVEL] = 'Z'; //not implemented
 }
 
 

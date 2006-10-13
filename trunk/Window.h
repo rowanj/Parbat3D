@@ -8,7 +8,9 @@
 #include <queue>
 using namespace std;
 
-
+/* Window class used for constructing & using object-based windows 
+   All of the main windows subclass this class
+*/
 class Window
 {
     private:
@@ -18,7 +20,7 @@ class Window
 	    HWND hwindow;                       // window handle
 	    static HINSTANCE hInstance;         // process's instance handle
 	    static HICON    hIcon;              // default icon
-	    HFONT hNormalFont,hBoldFont, hHeadingFont;        // fonts used for drawing static controls
+	    //HFONT hNormalFont,hBoldFont, hHeadingFont;        // fonts used for drawing static controls
 	    HBRUSH hBackgroundBrush;			// window's background brush used for painting background
 	    int zValue;							// window's Z-order value (for setting which windows appear in front or behind)
 	    HDWP hdwp_reorder;					// handle used for re-ordering windows
@@ -26,58 +28,95 @@ class Window
 	
 	    void drawStatic(DRAWITEMSTRUCT *dis); // draw static text control
 
+		/* General window event/message handler. 
+		   This procedure receives messages for all windows created by CreateWin(..) (by default)
+		   Any message handling that needs to occur for all windows is handled here (eg. global keyboard shortcuts)
+		*/
+	    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM); 
+	
+		/* handle global shortcut key events */
+	    void OnKeyDown(int virtualKey);			
+
     protected:
 	
-	    int CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,DWORD dwStyle,int x,int y,int nWidth,int nHeight,HWND hWndParent,HMENU hMenu);   
-			// create window, register window class (if required) & associated it with "this" object	    
-	
-	    static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM); // general window event/message handler    
-	
-	    void OnKeyDown(int virtualKey);			// handle global shortcut key events
-	    
+		/* Create a window, register window class (if required) & associated it with "this" window object 
+		   All subclasses that subclass the Window class call this function to create their windows.
+		*/
+	    int CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,DWORD dwStyle,int x,int y,int nWidth,int nHeight,HWND hWndParent,HMENU hMenu); 
+			    
     
     public:
+		/* Constructor */
 	    Window::Window();
 	    
-	    DWORD GetThreadId() {return threadId;}							// returns the id of the thread that created the window
+		/* Return the id of the thread that created this object's window */
+	    DWORD GetThreadId() {return threadId;}
 
-		//void SetZValue (unsigned int value) { };						// not implemented
-	
-	    inline HWND GetHandle() {return hwindow;};      /* get object's window handle */
-	    virtual int Create();        /* create this object's window - overwritten by subclasses */
-	   
-	    static void Init(HINSTANCE hInst);            /* called at startup to setup static variables */    
-	    static HINSTANCE GetAppInstance() {return hInstance;};
-	           
-	    WNDPROC SetWindowProcedure(WNDPROC);            /* return current window event/messeger handler & set new one */
-	    WNDPROC static SetWindowProcedure(HWND,WNDPROC); /* return current window event/messeger handler & set new one for a control */ 
-	
-	    static Window* GetWindowObject(HWND);           /* obtain "this" object from window handle */
-	    static void SetWindowObject(HWND,Window*);      /* associcate "this" object with window handle */
+		/* Get object's window handle */
+	    inline HWND GetHandle() {return hwindow;};
 	    
-	    static void SetStaticFont(HWND,int);      		/* now same as SetFont, left here to prevent breaking code */
+	    /* create this object's window - overwritten by subclasses */
+	    virtual int Create();        
+	   
+	    /* Setup static variables (called at started) */
+	    static void Init(HINSTANCE hInst);
+		
+		/* Return the application instance variable */         
+	    static HINSTANCE GetAppInstance() {return hInstance;};
+
+		/* Set the function that will a handle a window's messages/events.
+		   The address of the previous function is returned.
+		   The new function must pass certain messages on to the previous function so that the default 
+		   	 operation can be performed by the Windows API and/or Window::WindowProcedure
+		*/
+	    WNDPROC SetWindowProcedure(WNDPROC);            
+	    WNDPROC static SetWindowProcedure(HWND,WNDPROC);
+	
+		/* Obtain the Window object that is associated with a window */
+	    static Window* GetWindowObject(HWND);     
+		
+       /* Associcate a Window object with a window 
+	   	  This should usually only be called by CreateWin(..) */
+	    static void SetWindowObject(HWND,Window*);
+
+		/* Set the default font used when painting a window/control */
+	    static void SetFont(HWND,int);					
+	    static const int FONT_NORMAL=0;			// for normal plain text
+	    static const int FONT_BOLD=32453;   	// same size as NORMAL, but bold
+	    static const int FONT_HEADING=32454;    // a bit bigger than NORMAL, but also bold
+
+   		/* now same as SetFont, left here to prevent breaking code */	    
+	    static void SetStaticFont(HWND,int); 
 	    static const int STATIC_FONT_NORMAL=0;
 	    static const int STATIC_FONT_BOLD=32453;   
 	    static const int STATIC_FONT_HEADING=32454;       
 
-	    static void SetFont(HWND,int);					/* set font of a control */
-	    static const int FONT_NORMAL=0;
-	    static const int FONT_BOLD=32453;   
-	    static const int FONT_HEADING=32454;       
+		/* create a tooltip message when the user moves the mouse over a control */
+	    static void CreateTooltip (HWND hwnd,char *text); 
 	
-	    static void CreateTooltip (HWND hwnd,char *text);   // create a tooltip message when the user moves the mouse over a control
-	
-	    /* window api wrappers */
+	    /* destroy this window */
 	    void Destroy() {DestroyWindow(hwindow);};
+	    
+	    /* make this window visible */
 	    void Show() {ShowWindow(hwindow,SW_SHOW);};
+	    
+		/* make this window invisible */
 	    void Hide() {ShowWindow(hwindow,SW_HIDE);};    
+	    
+	    /* set the default cursor that is shown as mouse is moved over a window */
 	    void SetDefaultCursor(HCURSOR hcur) {SetClassLong(hwindow,GCL_HCURSOR,(long)hcur);};
+	    
+	    /* set the brush used to paint the background of a window */
 	    void SetBackgroundBrush(HBRUSH hbrush) {SetClassLong(hwindow,GCL_HBRBACKGROUND,(long)hbrush); hBackgroundBrush=hbrush;};
 	    static void SetBackgroundBrush(HWND hwin,HBRUSH hbrush) {SetClassLong(hwin,GCL_HBRBACKGROUND,(long)hbrush);};    
+	    
+	    /* cause a window to be re-drawn */
 	    void Repaint() {InvalidateRect(hwindow,0,false); UpdateWindow(hwindow);};
+	    
+	    /* return the handle of a particular window's parent window */
 	    static HWND GetParentHandle(HWND hwnd) {return (HWND)GetWindowLong(hwnd,GWL_HWNDPARENT);};	// Get Handle To Parent Window From a Handle To a Child Window 
         
-        
+        /* array used to store keyboard shortcuts */
         static const int NUMBER_OF_SHORTCUTS = 10;
         static int keyboardShortcutKeys[NUMBER_OF_SHORTCUTS];
         
@@ -102,6 +141,7 @@ class Window
             parameter should be one of the constant KEY_* values to indicate
             which shortcut to change. The second parameter should be the new key
             which will trigger the shortcut.
+            This has not yet been implemented for all shortcut keys.
         */
         static void setKeyboardShortcut (int key, int value);
         
