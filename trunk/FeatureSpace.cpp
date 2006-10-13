@@ -989,7 +989,7 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	prev_mouse_y=y;	
 }
 
-/* rotate the feature space */
+/* rotate the feature space 
 void FeatureSpace::Rotate(float yaw_amount, float pitch_amount)
 {
 		/*float cam_yaw = fsgl->cam_yaw;
@@ -1004,9 +1004,10 @@ void FeatureSpace::Rotate(float yaw_amount, float pitch_amount)
 		fsgl->cam_yaw = cam_yaw;
 		fsgl->cam_pitch = cam_pitch;
 		
-		glContainer->Repaint();	*/
+		glContainer->Repaint();	
 		
 }
+*/
 
 /* change the camera zoom level by a +/- amount */
 void FeatureSpace::ChangeCameraZoom(float amount)
@@ -1039,45 +1040,57 @@ void FeatureSpace::OnKeyPress(int virtualKey)
 		case VK_UP:
 			if (control_pressed)
 			{
-				Rotate(0, 5 * fsgl->rads_to_deg / 2.0);
+				//Rotate(0, 5 * fsgl->rads_to_deg / 2.0);
+				fsgl->rot_cam(0, 5);
 			}
 			else if (shift_pressed)
 			{
-				ChangeCameraZoom(-0.1);			
+				fsgl->translate_cam(0, -0.4);
 			}
-			//else
-			//	PanY(+0.1);
+			else
+				fsgl->translate_cam(0, -0.1);
 			break;
 			
 		case VK_DOWN:
 			if (control_pressed)
 			{
-				Rotate(0, -5 * fsgl->rads_to_deg / 2.0);
+				//Rotate(0, -5 * fsgl->rads_to_deg / 2.0);
+				fsgl->rot_cam(0, -5);
 			}
 			else if (shift_pressed)
 			{
-				ChangeCameraZoom(+0.1);
+				fsgl->translate_cam(0, 0.4);
 			}
-			//else
-			//	PanY(-0.1);
+			else
+				fsgl->translate_cam(0, 0.1);
 			break;
 			
 		case VK_LEFT:
 			if (control_pressed)
 			{
-				Rotate(5 * fsgl->rads_to_deg / 2.0, 0);
+				//Rotate(5 * fsgl->rads_to_deg / 2.0, 0);
+				fsgl->rot_cam(5, 0);
 			}
-			// else			
-			//	PanX(+0.1);
+			else if (shift_pressed)
+			{
+				fsgl->translate_cam(-0.4, 0);
+			}
+			else			
+				fsgl->translate_cam(-0.1, 0);
 			break;
 			
 		case VK_RIGHT:
 			if (control_pressed)
 			{
-				Rotate(-5 * fsgl->rads_to_deg / 2.0, 0);
-			}			
-			//else
-			//	PanX(-0.1);			
+				//Rotate(-5 * fsgl->rads_to_deg / 2.0, 0);
+				fsgl->rot_cam(-5, 0);
+			}	
+			else if (shift_pressed)
+			{
+				fsgl->translate_cam(0.4, 0);
+			}					
+			else
+				fsgl->translate_cam(0.1, 0);
 			break;
 			
 		case VK_PRIOR:	// page-up key
