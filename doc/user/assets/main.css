@@ -54,3 +54,33 @@
     font-style: italic;
     }
 
+  table {
+    border-color: #000000;
+    border-width: 1px 1px 1px 1px;
+    border-style: solid;
+	}
+	
+  th {
+	font: bold 16px verdana,arial;
+	text-transform: uppercase;
+	color: #000000;
+	border-left: 1px solid #000000;
+	border-right: 1px solid #000000;
+	border-bottom: 1px solid #000000;
+	border-top: 1px solid #000000;
+	text-align: left;
+	padding: 6px 6px 6px 12px;
+	background: #3399CC;
+	}
+	
+  td {
+	font: normal 12px verdana,arial;
+	color: #000000;
+	border-left: 1px solid #000000;
+	border-right: 1px solid #000000;
+	border-bottom: 1px solid #000000;
+	border-top: 1px solid #000000;
+	text-align: left;
+	padding: 6px 6px 6px 12px;
+	background: #66CCFF;
+	}
