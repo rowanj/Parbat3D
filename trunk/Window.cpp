@@ -310,6 +310,7 @@ void Window::OnKeyDown(int virtualKey)
     }
 }
 
+
 /* General window event/message handler. 
    This procedure receives messages for all windows created by CreateWin(..) (by default)
    Any message handling that needs to occur for all windows is handled here (eg. global keyboard shortcuts)

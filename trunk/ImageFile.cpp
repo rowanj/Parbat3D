@@ -163,7 +163,7 @@ Fill a buffer with raster data from the file, as specified.
 */
 void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* buffer, int outWidth, int outHeight)
 {
-	emptyOutMessageQueue();	// prevent program from entering "not-responding" state
+	//emptyOutMessageQueue();	// prevent program from entering "not-responding" state
 
 	int startTime = 0;
 	int endTime = 0;

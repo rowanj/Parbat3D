@@ -201,9 +201,10 @@ void emptyOutMessageQueue()
     while(PeekMessage(&messages, NULL, 0, 0, PM_REMOVE))
     {
         /* Translate keyboard events */
-        TranslateMessage(&messages);
+        //TranslateMessage(&messages);
         /* Send message to the associated window procedure */
-        DispatchMessage(&messages);
+        //DispatchMessage(&messages);
+        DefWindowProc(messages.hwnd,messages.message,messages.lParam,messages.wParam);
     }
 }
 
