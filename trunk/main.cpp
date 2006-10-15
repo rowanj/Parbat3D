@@ -193,6 +193,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
 }
 
 
+void emptyOutMessageQueue()
+{
+	MSG messages;
+	
+     /* Execute the message loop for every message that is waiting to be processed */
+    while(PeekMessage(&messages, NULL, 0, 0, PM_REMOVE))
+    {
+        /* Translate keyboard events */
+        TranslateMessage(&messages);
+        /* Send message to the associated window procedure */
+        DispatchMessage(&messages);
+    }
+}
 
 
 void orderWindows()

@@ -46,6 +46,6 @@ void loadFile();
 void closeFile();
 void orderWindows();
 void HandleWindowMessagesInBackground();
-
+void emptyOutMessageQueue();
 
 #endif

@@ -1,5 +1,6 @@
 #include "config.h"
 #include "ImageFile.h"
+#include "main.h"
 
 /*
 ImageFile
@@ -162,6 +163,8 @@ Fill a buffer with raster data from the file, as specified.
 */
 void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* buffer, int outWidth, int outHeight)
 {
+	emptyOutMessageQueue();	// prevent program from entering "not-responding" state
+
 	int startTime = 0;
 	int endTime = 0;
 	float elapsedTime = 0.0;
