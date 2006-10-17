@@ -59,13 +59,13 @@ void ProgressWindow::init()
     
     
     // Get Overview Window Location for Progress window alignment
-    GetWindowRect(overviewWindow.GetHandle(),&rect);
+    GetWindowRect(GetDesktopWindow(),&rect);
     
     // create prefs window
     int result;
-    result=CreateWin(0, "Parbat3D Progress Bar Window", "Loading",
+    result=CreateWin(0, "Parbat3D Progress Bar Window", "Parbat3D Loading...",
         WS_POPUP+WS_CAPTION,
-	    10, 10, //rect.left+50, rect.bottom-150,
+	    (rect.right-PROGRESS_WINDOW_WIDTH)/2, (rect.bottom-PROGRESS_WINDOW_HEIGHT)/2, //rect.left+50, rect.bottom-150,
         PROGRESS_WINDOW_WIDTH, PROGRESS_WINDOW_HEIGHT,
         mainWindow.GetHandle(), NULL);
     assert(result==true);
