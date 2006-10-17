@@ -240,22 +240,9 @@ void loadFile() {
         progressWindow.start(100,true);
         
         // load image & setup windows
-        int ih_status;
         assert(image_handler == NULL);
 	    image_handler = new ImageHandler::ImageHandler(overviewWindow.overviewWindowDisplay.GetHandle(), imageWindow.imageWindowDisplay.GetHandle(), ofn.lpstrFile, regionsSet);
 	    assert(image_handler != NULL);
-	    ih_status = image_handler->get_status();
-		if (ih_status > 0) {
-		   // An error occurred instantiaing the image handler class.
-		   MessageBox (NULL, image_handler->get_status_text() , "[error] Parbat3D :: ImageHandler", 0);
-		   /*  !! Clean-up, when this returns we should be in 'clean' state,
-               identical to initial startup */
-               delete image_handler;
-               image_handler = NULL;
-		   return;
-		} else if (ih_status < 0) { // Error occurred, but was non-fatal
-		   MessageBox (NULL, image_handler->get_status_text() , "[warning] Parbat3D :: ImageHandler", 0);
-		}
     	
         // update image window settings
         filename=copyString(image_handler->get_image_properties()->getFileName());

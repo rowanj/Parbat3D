@@ -2,16 +2,21 @@
 
 #include <cassert>
 
-#include "config.h"
-#include "console.h"
+// Enable this to include debugging
+#define DEBUG_IMAGE_HANDLER 1
 
-ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, ROISet *roisToOutline)
+#if DEBUG_IMAGE_HANDLER
+#include "console.h"
+#endif
+
+ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, ROISet *ROI_set)
 {
-	status = 0; // No error
-	status_text = "No error.";
+	#if DEBUG_IMAGE_HANDLER
+	Console::write("(II) Initializing image handler(%d, %d, %s)\n", overview_hwnd, image_hwnd, filename);
+	#endif
+	
 	brightness_value = 250;
 	contrast_value = 250;
-//	reset_brightness_contrast();
 	
 	// Check for lazily unspecified (NULL argument) parameters
 	assert(overview_hwnd != NULL);
@@ -35,7 +40,7 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, 
 		overview_gl = new OverviewGL(overview_hwnd, image_file, image_viewport);
 		assert(overview_gl != NULL);
 		image_gl = NULL;
-		image_gl = new ImageGL(image_hwnd, image_file, image_viewport, roisToOutline);
+		image_gl = new ImageGL(image_hwnd, image_file, image_viewport, ROI_set);
 		assert(image_gl != NULL);
 		
 		image_viewport->set_display_bands(1,2,3);
@@ -44,12 +49,16 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, 
 
 ImageHandler::~ImageHandler(void)
 {
+	#if DEBUG_IMAGE_HANDLER
 	Console::write("(II) ImageHandler shutting  down...\n");
+	#endif
 	delete image_viewport;
 	delete overview_gl;
 	delete image_gl;
 	delete image_file;
+	#if DEBUG_IMAGE_HANDLER
 	Console::write("(II) ImageHandler shutdown complete.\n");
+	#endif
 }
 
 void ImageHandler::redraw(void)
@@ -104,10 +113,6 @@ const char* ImageHandler::get_info_string(void)
     return image_file->getInfoString();
 }    
 
-int	ImageHandler::get_status(void) {return status;}
-const char* ImageHandler::get_status_text(void) {return status_text;}
-ImageViewport* ImageHandler::get_image_viewport(void) {return image_viewport;}
-
 // Should be given parameters between 1 and 500 (inclusive)
 void ImageHandler::set_brightness_contrast(int new_brightness, int new_contrast)
 {
@@ -133,7 +138,4 @@ void ImageHandler::reset_brightness_contrast(void)
 {
 	set_brightness_contrast(250,250);
 }
-
-ImageFile* ImageHandler::get_image_file(void) {return image_file;}
-
 

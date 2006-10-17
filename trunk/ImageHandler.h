@@ -18,7 +18,7 @@ class ImageHandler
 {
 public:
 	/* Class Operators */
-	ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, ROISet *roisToOutline);
+	ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, ROISet *ROI_set);
 	virtual ~ImageHandler(void);
 	
 	/* Data Operators */
@@ -29,8 +29,8 @@ public:
 	/* Window Operators */
 	void redraw(void);
 	void resize_image_window(void);
-	ImageViewport* get_image_viewport(void);
-	ImageFile* get_image_file(void);
+	ImageViewport* get_image_viewport(void) {return image_viewport;}
+	ImageFile* get_image_file(void) {return image_file;}
 	
 	// get pixel values from window co-ordinates
 	unsigned char* get_window_pixel_values(int x, int y); // remember to delete[]
@@ -38,12 +38,9 @@ public:
 	unsigned char* get_zoom_pixel_values(int x, int y); // remember to delete[]
     // get pixel values from absolute image coordinates (from displayed LOD)
     unsigned char* get_image_pixel_values(int x, int y); // remember to delete[]
-       
-    /* Status operators */
-	int get_status(void);
-	const char* get_status_text(void);
 
 	/* Contrast/brigtness */
+	// Valid parameters are between 1 and 500; default (normal) = 250
 	void set_brightness_contrast(int new_brightness, int new_contrast);
 	void get_brightness_contrast(int* brightness_return, int* contrast_return);
 	void reset_brightness_contrast(void);
@@ -58,14 +55,10 @@ private:
 	ImageViewport* image_viewport;
 	ImageGL* image_gl;
 	OverviewGL* overview_gl;
-
-	/* State variables */
-	int status;
-	const char* status_text;
 	
+	// Current state of brightness/contrast values
 	int contrast_value;
 	int brightness_value;
-	
 };
 
 #endif
