@@ -295,36 +295,34 @@ void loadFile() {
 
 void closeFile() {
     // deallocate variables
-    Console::write("closeFile()...\n");
-    
-    Console::write("deleting filename...\n");    
+
 	if (filename!=NULL)
         delete(filename);
     filename=NULL;
     
-    Console::write("deleting image handler...\n");    
 	if (image_handler)
         delete image_handler;
     image_handler=NULL;
     
     // destroy tool window
-    Console::write("destroying tool window... toolwindow handle=%d\n",toolWindow.GetHandle());
     if (toolWindow.GetHandle()!=NULL)
         toolWindow.Destroy();
     
     // hide image window
-    Console::write("hiding image window...\n");
     if (imageWindow.GetHandle()!=NULL)
         imageWindow.Hide();
     
     // destroy the roi window
-    Console::write("destroying roi window & deleting ROIs...\n");
     if (roiWindow.GetHandle()!=NULL) {
         roiWindow.Destroy();       // roiWindow.Hide(); seems to cause the window to alternate save positions
         roiWindow.deleteAllROI();  // remove all the ROI from the list
     }
     
-    Console::write("disabling menu items...\n");	
+    // destroy contrast window
+    if (contrastWindow.GetHandle()!=NULL) {
+		contrastWindow.Destroy();
+	}
+    
     
     // disable menu items
     EnableMenuItem(overviewWindow.hMainMenu,IDM_IMAGEWINDOW,true);
