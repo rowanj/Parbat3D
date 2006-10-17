@@ -14,7 +14,7 @@
 class ImageGL : public ViewportListener
 {
   public:
-	ImageGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* image_viewport_param, ROISet *roisToOutline);
+	ImageGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* image_viewport_param, ROISet *ROI_set);
 	virtual ~ImageGL(void);
 	
 	void resize_window(void);

@@ -1,3 +1,16 @@
+/*
+GLText
+Author: Rowan James <rowanjames@users.sourceforge.net>
+
+Simple C++ class for nicely drawing text into an OpenGL viewport.
+
+Known issues:
+* Coordinates not accurate in case of viewports that don't occupy either
+	the full viewport, or aren't flush against bottom edge.  Unsure why.
+* Currently supports Windows only.  Font-loading is platform specific.
+
+*/
+
 #ifndef GL_TEXT_H
 #define GL_TEXT_H
 

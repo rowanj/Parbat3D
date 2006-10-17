@@ -6,9 +6,9 @@
 #include "config.h"
 
 #define DEBUG_GL_TEXTURES 0
-#define DEBUG_GL 1
+#define DEBUG_GL 0
 
-ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* image_viewport_param, ROISet *roisToOutline)
+ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* image_viewport_param, ROISet *ROI_set)
 {
 	ImageProperties* image_properties;
 
@@ -18,7 +18,7 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 	assert (image_viewport_param != NULL);
 
 	/* Copy parameters to locals */
-	roiset=roisToOutline;
+	roiset=ROI_set;
 	viewport = image_viewport_param;
 	image_file = image_file_ptr;
 	/* Grab image properties from image_file */
