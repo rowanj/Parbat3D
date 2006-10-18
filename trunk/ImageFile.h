@@ -39,6 +39,7 @@ class ImageFile
 		int ifErr;
 		GDALDataset* ifDataset;
 		char* filename;
+		char* infoString;
 		ImageProperties* properties;
 		CoordinateInfo* coordInfo;
 		vector<BandInfo*> theBands; 

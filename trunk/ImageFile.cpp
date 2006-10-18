@@ -22,11 +22,11 @@ GDALDataset. Also registers all GDAL drivers, and gets info about
 the new dataset*/
 ImageFile::ImageFile(char* theFilename)
 {
-	int i;
-	string leader;
-	const char* message;
-	
-	filename = theFilename;
+	filename = new char[512];
+	infoString = new char[512];
+	strcpy(filename, theFilename);
+	Console::write("ImageFile::Constructor - Filename passed was %s\n", theFilename);
+	Console::write("ImageFile::Constructor - Filename copy result is %s\n", filename);
 	
 	GDALAllRegister();
 	
@@ -43,10 +43,18 @@ ImageFile::ImageFile(char* theFilename)
 		properties = new ImageProperties(ifDataset, filename);
 		coordInfo = new CoordinateInfo(ifDataset);
 		
-		for (i=0;i<properties->getNumBands();i++)
+		for (int i=0;i<properties->getNumBands();i++)
 		{
 			theBands.push_back(new BandInfo( (GDALRasterBand*) GDALGetRasterBand(ifDataset, i+1)));
 		}
+
+		sprintf(infoString, "Type: %s, X: %d, Y: %d, Bands: %d\n",
+				(char*)properties->getDriverLongName(),
+				properties->getWidth(),
+				properties->getHeight(),
+				properties->getNumBands());
+		
+		Console::write("ImageFile::Constructor - infoString is %s\n", infoString);
 	}
 }
 
@@ -77,6 +85,8 @@ ImageFile::~ImageFile(void)
 	{
 		delete theBands[i];
 	}
+	delete[] filename;
+	delete[] infoString;
 }
 
 /*
@@ -117,43 +127,7 @@ and the number of raster bands.
 */
 const char* ImageFile::getInfoString(void)
 {
-	const char* message1;
-	const char* message2;
-	string leader;
-	
-	if (ifDataset != NULL)
-	{
-		/*leader = "Driver: ";
-		message = makeMessage(leader, (char*) properties->getDriverName());
-		MessageBox (NULL, message, "Parbat3D :: ImageFile", 0);*/
-		
-		leader = "Type: ";
-		message1 = makeMessage(leader, (char*) properties->getDriverLongName());
-		
-		leader = ", X: ";
-		message2 = makeMessage(leader, properties->getWidth());
-		
-		message1 = catcstrings((char*) message1, (char*) message2);
-		
-		leader = ", Y: ";
-		message2 = makeMessage(leader, properties->getHeight());
-		
-		message1 = catcstrings((char*) message1, (char*) message2);
-		
-		leader = ", Bands: ";
-		message2 = makeMessage(leader, properties->getNumBands());
-		
-		message1 = catcstrings((char*) message1, (char*) message2);
-		
-		return message1;
-	}
-	else
-	{
-		#if DEBUG_IMAGE_FILE
-		Console::write("ImageFile - Cannot get info; dataset was not loaded!\n");
-		#endif
-		return NULL;
-	}
+	return (const char *)infoString;
 }
 
 /*
@@ -195,49 +169,10 @@ void ImageFile::getRasterData(int width, int height, int xpos, int ypos, char* b
 		#endif
 	}
 	else
-	{
-		char* xposstring;
-		char* yposstring;
-		char* heightstring;
-		char* widthstring;
-		char* outheightstring;
-		char* outwidthstring;
-		char* timeString;
-		char* finalstring;
-		
-		xposstring = (char*)inttocstring(xpos);
-		yposstring = (char*)inttocstring(ypos);
-		heightstring = (char*)inttocstring(height);
-		widthstring = (char*)inttocstring(width);
-		outheightstring = (char*)inttocstring(outHeight);
-		outwidthstring = (char*)inttocstring(outWidth);
-		timeString = (char*)floattocstring(elapsedTime);
-		
-		finalstring = (char*)catcstrings("ImageFile - Got data at location X = ", xposstring);
-		finalstring = (char*)catcstrings(finalstring, ", Y = ");
-		finalstring = (char*)catcstrings(finalstring, yposstring);
-		finalstring = (char*)catcstrings(finalstring, "\n");
-		Console::write(finalstring);
-		finalstring = (char*)catcstrings("ImageFile - Data width = ", widthstring);
-		finalstring = (char*)catcstrings(finalstring, ", height = ");
-		finalstring = (char*)catcstrings(finalstring, heightstring);
-		finalstring = (char*)catcstrings(finalstring, "\n");
-		Console::write(finalstring);
-		finalstring = (char*)catcstrings("ImageFile - Output width = ", outwidthstring);
-		finalstring = (char*)catcstrings(finalstring, ", output height = ");
-		finalstring = (char*)catcstrings(finalstring, outheightstring);
-		finalstring = (char*)catcstrings(finalstring, "\n");
-		Console::write(finalstring);
-		finalstring = (char*)catcstrings("ImageFile - Elapsed time was ", timeString);
-		finalstring = (char*)catcstrings(finalstring, " seconds\n\n");
-		Console::write(finalstring);
-		
-		delete(xposstring);
-		delete(yposstring);
-		delete(heightstring);
-		delete(widthstring);
-		delete(outheightstring);
-		delete(outwidthstring);
-		delete(finalstring);
+	{	
+		Console::write("ImageFile - Got data at location X = %d, Y = %d\n", xpos, ypos);
+		Console::write("ImageFile - Data width = %d, height = %d\n", width, height);
+		Console::write("ImageFile - Output width = %d, height = %d\n", outWidth, outHeight);
+		Console::write("ImageFile - Elapsed time was %f seconds\n\n", elapsedTime);
 	}
 }

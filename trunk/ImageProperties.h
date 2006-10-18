@@ -33,8 +33,9 @@ class ImageProperties
 		int width;
 		int height;
 		int numBands;
+		char* shortFileName;
 		const char* driverName;
 		const char* driverLongName;
-		const char* imageFileName;
+		char* imageFileName;
 };
 #endif
