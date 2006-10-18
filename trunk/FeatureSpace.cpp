@@ -368,6 +368,7 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 	int time_start, time_end;
 	
 	getPolygonVertices(theEntity);
+	assert(polyPoints.size() > 0);
 	
 	if (!polyPoints.empty())	//if we've got something to rasterise...
 	{
@@ -398,10 +399,10 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 		//get bounding rect
 		
 		//get our x and y in terms of the LOD
-		fx1 = minx / LODfactor;
-		fy1 = miny / LODfactor;
-		fx2 = maxx / LODfactor;
-		fy2 = maxy / LODfactor;
+		fx1 = minx;
+		fy1 = miny;
+		fx2 = maxx;
+		fy2 = maxy;
 		
 		Console::write("FS::GPD - Poly LOD bounds are x1 = %d, y1 = %d, x2 = %d, y2 = %d\n", fx1, fy1, fx2, fy2);
 		
@@ -688,9 +689,11 @@ void FeatureSpace::getPolygonVertices(ROIEntity* theEntity)
 	for(int i = 0; i < theCoords.size(); i++)
 	{
 		currentCoords = theCoords.at(i);
+		Console::write("FS::GetPolyPoints - coord %d = x %d, y %d\n", i, currentCoords.x, currentCoords.y);
 		myPoint* thePoint = new myPoint;
 		thePoint->x = currentCoords.x / LODfactor;
 		thePoint->y = currentCoords.y / LODfactor;
+		Console::write("FS::GetPolyPoints - LOD coord %d = x %d, y %d\n", i, thePoint->x, thePoint->y);
 		polyPoints.push_back(*thePoint);
 		//Console::write("FS:GPV Poly point at X %d, Y %d\n", thePoint->x, thePoint->y);
 		
@@ -700,6 +703,9 @@ void FeatureSpace::getPolygonVertices(ROIEntity* theEntity)
 		if (thePoint->x > maxx) maxx = thePoint->x;
 		if (thePoint->x < minx) minx = thePoint->x;
 	}
+	
+	Console::write("FS::GetPolyPoints - maxx = %d, minx = %d\n", maxx, minx);
+	Console::write("FS::GetPolyPoints - maxy = %d, miny = %d\n", maxy, miny);
 }
 
 // -----------------------------------------------------------------------------------------
