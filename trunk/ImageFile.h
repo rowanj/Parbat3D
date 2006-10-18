@@ -42,7 +42,7 @@ class ImageFile
 		char* infoString;
 		ImageProperties* properties;
 		CoordinateInfo* coordInfo;
-		vector<BandInfo*> theBands; 
+		vector<BandInfo*> theBands;
 };
 
 #endif

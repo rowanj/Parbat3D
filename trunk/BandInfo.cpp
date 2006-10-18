@@ -25,95 +25,19 @@ the colour interpretation name (if available), the X and Y block sizes and the
 minimum and maximum values in this band.
 */
 BandInfo::BandInfo(GDALRasterBand* theBand)
-{
-	#if DEBUG_BANDS
-	const char* message;
-	string leader;
-	#endif //DEBUG_BANDS
-	//GDALColorInterp theColourInterpretation;
-	
+{	
 	band = theBand;
 	
 	bandNumber = GDALGetBandNumber(theBand);
-	#if DEBUG_BANDS
-	leader = "BandInfo - Band Number: ";
-	message = makeMessage(leader, bandNumber);
-	Console::write((char*) message);
-	Console::write("\n");
-	#endif //DEBUG_BANDS
 	
-	rasterDataType = GDALGetDataTypeName(GDALGetRasterDataType(band));
-	#if DEBUG_BANDS
-	if (rasterDataType != NULL)
-	{
-		leader = "BandInfo - Raster Data Type: ";
-		message = makeMessage(leader, (char*) rasterDataType);
-		Console::write((char*) message);
-		Console::write("\n");
-	}
-	else
-	{
-		Console::write("BandInfo - No raster data type");
-		Console::write("\n");
-	}
-	#endif //DEBUG_BANDS
-
-	/*theColourInterpretation = GDALGetRasterColorInterpretation(band);
-	
-
-	if (theColourInterpretation > -1)
-	{
-		colourInterpretationName = GDALGetColorInterpretationName(theColourInterpretation);
-	}
-	else
-	{
-		colourInterpretationName = NULL;
-	}
-	
-	#if DEBUG_BANDS
-	if (colourInterpretationName != NULL)
-	{
-		leader = "BandInfo - Color Name: ";
-		message = makeMessage(leader, (char*) colourInterpretationName);
-		Console::write((char*) message);
-		Console::write("\n");
-	}
-	else
-	{
-		Console::write("BandInfo - No colour name");
-		Console::write("\n");
-	}
-	#endif //DEBUG_BANDS
-	*/
+	rasterDataType = new char[512];
+	strcpy(rasterDataType, GDALGetDataTypeName(GDALGetRasterDataType(band)));
 	
 	overviewCount = GDALGetOverviewCount(band);
-	#if DEBUG_BANDS
-	leader = "BandInfo - Overviews: ";
-	message = makeMessage(leader, overviewCount);
-	Console::write((char*) message);
-	Console::write("\n");
-	#endif //DEBUG_BANDS
 		
 	GDALGetBlockSize(band, &blockXSize, &blockYSize); 
 	adfMinMax[0] = GDALGetRasterMinimum(theBand, &bGotMin);
 	adfMinMax[1] = GDALGetRasterMaximum(theBand, &bGotMax);
-	
-	//This function takes many minutes for most files, so it's disabled
-	/*if( !(bGotMin && bGotMax) )
-	{
-		GDALComputeRasterMinMax(band, TRUE, adfMinMax);
-	}*/
-	
-	#if DEBUG_BANDS
-	leader = "BandInfo - Min value: ";
-	message = makeMessage(leader, adfMinMax[0]);
-	Console::write((char*) message);
-	Console::write("\n");
-	leader = "BandInfo - Max value: ";
-	message = makeMessage(leader, adfMinMax[1]);
-	Console::write((char*) message);
-	Console::write("\n");
-	#endif //DEBUG_BANDS
 }
 
 /*
@@ -123,18 +47,8 @@ Returns the raster data type of the band.
 */
 const char* BandInfo::getRasterDataType(void)
 {
-	return rasterDataType;
+	return (const char *)rasterDataType;
 }
-
-/*
-BandInfo::getColourInterpretationName
-
-Returns the colour interpretation name of the band.
-*/
-/*const char* BandInfo::getColourInterpretationName(void)
-{
-	return colourInterpretationName;
-}*/
 
 /*
 BandInfo::getDataMin
@@ -209,8 +123,9 @@ GDALRasterBand* BandInfo::getBand(void)
 /*
 BandInfo::~BandInfo
 
-Deconstructor; currently does nothing.
+Deconstructor
 */
 BandInfo::~BandInfo(void)
 {
+	delete[] rasterDataType;
 }

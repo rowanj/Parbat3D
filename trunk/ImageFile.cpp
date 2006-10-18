@@ -24,6 +24,7 @@ ImageFile::ImageFile(char* theFilename)
 {
 	filename = new char[512];
 	infoString = new char[512];
+	
 	strcpy(filename, theFilename);
 	Console::write("ImageFile::Constructor - Filename passed was %s\n", theFilename);
 	Console::write("ImageFile::Constructor - Filename copy result is %s\n", filename);
