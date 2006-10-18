@@ -160,9 +160,6 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 
                 
                 case IDM_RESETWINPOS:
-                    // imageWindow.GetHandle() - NULL if not created
-                    // (IsZoomed(hwnd)) - true if maximised
-                    // ShowWindow() - set maximised
                     
                     roix = overviewWindow.getWidth()+10;
                     roiy = 10;
@@ -233,7 +230,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 					return 0;
 		    }    
   	        return 0;
-        
+        //Code to be implemented for moving bounding box in overview window
         /*
         case WM_MOUSEMOVE:
             // get the current mouse position
@@ -295,22 +292,6 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
             
             mainWindow.DestroyAll();
 			
-			/* destroy all the windows that have been created */
-			/*
-            if (imageWindow.GetHandle()!=NULL)        // image
-                DestroyWindow(imageWindow.GetHandle());
-            if (roiWindow.GetHandle()!=NULL)          // ROI
-                DestroyWindow(roiWindow.GetHandle());
-			if (prefsWindow.GetHandle()!=NULL)        // preferences
-                DestroyWindow(prefsWindow.GetHandle());
-            if (contrastWindow.GetHandle()!=NULL)     // contrast (normal)
-                DestroyWindow(contrastWindow.GetHandle());
-            if (contrastAdvWindow.GetHandle()!=NULL)  // contrast (advanced)
-                DestroyWindow(contrastAdvWindow.GetHandle());
-			*/
-			
-            /* destroy this window */
-            //DestroyWindow( hwnd );
             return 0;
         
         

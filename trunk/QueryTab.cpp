@@ -44,12 +44,6 @@ int QueryTab::Create(HWND parent,RECT *parentRect)
 		const char* name;
 		// add band names to radio buttons
 		name = "";
-		//name = image_handler->get_band_info(i)->getColourInterpretationName();
-		
-		// If Colour name unknown change band name
-		//const char *altName ="No colour name";
-		//if (strcmp(name, "Unknown")==0)
-         // name = altName;
             
         // Add band number to band name
         //name = catcstrings( (char*) " - ", (char*) name);

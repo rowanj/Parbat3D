@@ -36,8 +36,6 @@ int ROIWindow::Create(HWND parent) {
     RECT desktopRect;
     RECT rect;
     int mx, my;
-//    const int ROI_WINDOW_WIDTH=250;
-//    const int ROI_WINDOW_HEIGHT=300;
     
     GetWindowRect(hDesktop,&desktopRect);  // Get the width & height of the desktop window
     
@@ -196,26 +194,6 @@ int ROIWindow::Create(HWND parent) {
     
     /* GET COORDINATES OF THE MAIN CLIENT AREA */
     GetClientRect (hSingleButton, &rect);
-    
-    /* INITIALIZE MEMBERS OF THE TOOLINFO STRUCTURE */
-    /*
-    ti.cbSize = sizeof(TOOLINFO);
-    ti.uFlags = TTF_SUBCLASS;
-    ti.hwnd = hwnd;
-    ti.hinst = ghThisInstance;
-    ti.uId = uid;
-    ti.lpszText = lptstr;
-        // ToolTip control will cover the whole window
-    ti.rect.left = rect.left;    
-    ti.rect.top = rect.top;
-    ti.rect.right = rect.right;
-    ti.rect.bottom = rect.bottom;
-
-    /* SEND AN ADDTOOL MESSAGE TO THE TOOLTIP CONTROL WINDOW */
-    //SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti);
-    
-    
-    //ROIscrollBox.UpdateScrollBar();
     
     return true;
 }

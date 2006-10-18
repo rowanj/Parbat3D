@@ -159,7 +159,6 @@ void FeatureTab::OnGenerateClicked(int lod, bool rois_only, int x, int y, int z)
     
     Console::write("FeatureTab::OnGenerateClicked\n");
     SendMessage(hgenerate,BM_SETCHECK,BST_CHECKED,0);       // make button appear pushed in
-    //FeatureSpace *fspace=new FeatureSpace(lod - 1,only_ROIs);
     FeatureSpace *fspace=new FeatureSpace(lod - 1,rois_only, x, y, z);
     SendMessage(hgenerate,BM_SETCHECK,BST_UNCHECKED,0);     // make button appear normal
 

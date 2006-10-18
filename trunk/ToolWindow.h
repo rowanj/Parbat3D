@@ -43,8 +43,6 @@ class ToolWindow:public Window {
         HFONT hBoldFont,hNormalFont,hHeadingFont;
         HBRUSH hTabBrush;
         HWND hToolWindowCurrentTabContainer;
-        //HWND hToolWindowQueryTabContainer;
-        //HWND hToolWindowImageTabContainer;
         
         int bands;
         

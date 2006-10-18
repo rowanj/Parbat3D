@@ -9,9 +9,6 @@ class OverviewWindow:public Window
     private:
         WNDPROC prevProc;
         
-        //bool moving_viewport;
-        //int prev_viewport_x, prev_viewport_y;
-        
     public:
         HMENU hMainMenu;
         DisplayWindow overviewWindowDisplay;

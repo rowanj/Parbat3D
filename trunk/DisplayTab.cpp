@@ -151,21 +151,7 @@ LRESULT CALLBACK DisplayTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 						b = i;
 				}
 
-	    		// Temporary message
-	    		//const char *butNum = "selected bands are: "; 
-				//butNum = catcstrings( (char*) butNum, (char*) inttocstring(r) );
-				//butNum = catcstrings( (char*) butNum, (char*) ", " );
-				//butNum = catcstrings( (char*) butNum, (char*) inttocstring(g) );
-				//butNum = catcstrings( (char*) butNum, (char*) ", " );
-				//butNum = catcstrings( (char*) butNum, (char*) inttocstring(b) );
-				//MessageBox( hwnd, (LPSTR) butNum,
-                  //  (LPSTR) szOverviewWindowClassName,
-        		//	MB_ICONINFORMATION | MB_OK );
-        		// #define DEBUG_IMAGE_HANDLER to see these values printed in console window.
-				
-				// !! Insert band numbers (bands start at 1, not 0) here. - Rowan
-				// 0 now equals none - Damian
-//            	if (image_handler) image_handler->set_bands(r,g,b);
+                // set image bands to display bands
                 assert(image_handler != NULL);
                 image_handler->get_image_viewport()->set_display_bands(r,g,b);
             }                

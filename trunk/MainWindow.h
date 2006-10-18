@@ -10,7 +10,6 @@ class MainWindow:public Window
 {
     private:
     WNDPROC prevProc;
-    //vector<Window*> windows;
     vector<HWND> savedWindows;
     vector<int> restoreStates;
     int *windowStates; 

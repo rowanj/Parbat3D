@@ -17,7 +17,6 @@ class PrefsWindow:public Window
     HWND cancelButton;
         
     public:
-    //DisplayWindow prefsWindowDisplay;
 
     int Create(HWND parent);
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);

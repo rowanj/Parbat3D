@@ -17,13 +17,11 @@ class ContrastAdvWindow:public Window
 	
 	HWND hAdvCSOKButton;
 	HWND hAdvCSCancelButton;
-	//HWND hAdvancedAdv;
 	
 	HWND hPreviewAdv;
 	
     
     public:
-    //DisplayWindow prefsWindowDisplay;
     HWND hPerChannelAdv;
 
     int Create(HWND parent);

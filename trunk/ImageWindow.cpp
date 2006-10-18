@@ -355,54 +355,15 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
     
     switch (message)                  /* handle the messages */
     {
-        /* WM_NCLBUTTONDOWN: mouse button was pressed down in a non client area of the window         
-        case WM_NCLBUTTONDOWN:
-
-            switch(wParam)
-            {
-                // HTCAPTION: mouse button was pressed down on the window title bar                             
-                case HTCAPTION:
-                    // get the mouse co-ords relative to the window
-                    SnappingWindow::getMouseWindowOffset(hwnd,(int)(short)LOWORD(lParam),(int)(short)HIWORD(lParam),&moveMouseOffset);               
-                    break;
-
-                // HTLEFT...HTBOTTOMRIGHT: mouse button was pressed down on the sizing border of window
-                case HTLEFT:
-                case HTRIGHT:
-                case HTTOP:
-                case HTBOTTOM:
-                case HTTOPLEFT:
-                case HTTOPRIGHT:
-                case HTBOTTOMLEFT:
-                case HTBOTTOMRIGHT:
-                    // record current window & mouse positions //
-                    GetWindowRect(hwnd,&sizeWindowPosition);
-                    sizeMousePosition.x=(int)(short)LOWORD(lParam);
-                    sizeMousePosition.y=(int)(short)HIWORD(lParam);                   
-                    break;                   
-            }
-
-            // also let windows handle this event
-            return CallWindowProc(win->prevProc,hwnd,message,wParam,lParam);    
-        */
-
         /* WM_SIZING: the window size is about to change */
         case WM_SIZING:
-
-            // set new window size based on position of mouse
-            //SnappingWindow::setNewWindowSize((RECT*)lParam,&sizeWindowPosition,&sizeMousePosition,(int)wParam);
 
             /* prevent window from being resized too small */
             if ( (((RECT*)lParam)->bottom) - (((RECT*)lParam)->top)  <100)
                 (((RECT*)lParam)->bottom) = (((RECT*)lParam)->top) + 100;
             if ( (((RECT*)lParam)->right) - (((RECT*)lParam)->left)  <100)
                 (((RECT*)lParam)->right) = (((RECT*)lParam)->left) + 100;
-            
-            /* snap the window to the edge of the desktop (if near it) */
-           // SnappingWindow::snapInsideWindowBySizing(hDesktop,(RECT*)lParam,(int)wParam);   
-                        
-            /* snap the window the main window (if near it) */
-            //SnappingWindow::snapWindowBySizing(overviewWindow.GetHandle(),(RECT*)lParam,(int)wParam);           
+         
             break;
 
         /* WM_SIZE: the window has been resized, minimized, or maximizsed, etc. */            
@@ -461,8 +422,7 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
             settingsFile->setSetting("image window", "y", image_window_rect.top);
             settingsFile->setSetting("image window", "width", (image_window_rect.right-image_window_rect.left));
             settingsFile->setSetting("image window", "height", (image_window_rect.bottom-image_window_rect.top));
-    //            settingsFile->setSetting("image window", "maximised", 0);
-    //            settingsFile->setSetting("image window", "snapped", 0);
+
             delete[] imageWindowTitle;
             break;
             
