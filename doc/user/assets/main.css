@@ -15,6 +15,15 @@
     margin-left: 3ex;
     }
 
+  p.indexlink {
+    background-color: EEEFFF;
+    padding: 0.5ex;
+    width: 18ex;
+    border-width: 1px;
+    border-color: #888;
+    border-style: solid;
+    }
+
   p { margin-left: 2ex; }
 
   pre { font-family: monaco, courier, monospace;
