@@ -4,7 +4,6 @@
 #include "config.h"
 #include <math.h>
 #include <cassert>
-#include "MathUtils.h"
 
 #define DEBUG_IMAGE_TILESET 0
 
@@ -20,22 +19,22 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	ImageProperties* image_properties;
 
 	assert(tex_size_param > 0);
-	
+
 	/* set instance variables */
 	LOD = level_of_detail;
 	image_file = file;
 	tex_size = tex_size_param;
 	cache_size = cache_size_param * (1024*1024);
-	
+
 	/* initialize state */
 	cache_fill = 0;
 	cache_hits = 0;
 	cache_misses = 0;
 	LOD_factor = 0;
-	
+
 	/* !! Needs to get actual sample size from ImageFile */
 	sample_size = 1;
-	
+
 	/* Grab a handle to the image properties object */
 	image_properties = image_file->getImageProperties();
 	/* Fill image properties */
@@ -43,7 +42,7 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	image_height = image_properties->getHeight();
 	num_bands = image_properties->getNumBands();
 		tile_memory_size = tex_size * tex_size * sample_size * num_bands;
-	
+
 	/* special case for overview window */
 	if (LOD == -1) {
 		columns = 1;
@@ -52,14 +51,15 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 		last_row_height = image_height;
 		while ( (last_column_width > tex_size) || (last_row_height > tex_size) ) {
 			last_column_width /= 2;
-			last_row_height /= 2;       
+			last_row_height /= 2;
 		}
 		LOD_width = last_column_width;
 		LOD_height = last_row_height;
 		tile_size = tex_size; /* must be non-zero */
 	} else {
 		/* (width in tiles is width/tiles rounded up) */
-		LOD_factor = MathUtils::ipow(2,LOD);
+//		LOD_factor = MathUtils::ipow(2,LOD);
+		LOD_factor = 1 << LOD;
 		tile_size = tex_size * LOD_factor;
 		LOD_width = image_width / LOD_factor;
 		LOD_height = image_height / LOD_factor;
@@ -95,7 +95,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	char* out_tile;
 	char message[256];
 	int pix, piy, size;
-	
+
 	/* Make room to put texture in */
 	size = tex_size * tex_size * 3;
 	out_tile = new char[size];
@@ -103,7 +103,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	Console::write("(II) ImageTileset::get_tile_RGB\n");
 	#endif
 	/* Check if tile is loaded, load if not */
-	
+
 	#if DEBUG_IMAGE_TILESET
 	sprintf(message, "(II) ImageTileset::get_tile_RGB - tile cache: hits=%d, misses=%d.\n", cache_hits, cache_misses);
 	Console::write(message);
@@ -111,20 +111,20 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	tile_index = this->load_tile(x,y);
 	tile = tiles[tile_index]->data;
 
-	
+
 
 	/* Prevent bug on single channel images */
 	if(band_R>num_bands) band_R = num_bands;
 	if(band_G>num_bands) band_G = num_bands;
 	if(band_B>num_bands) band_B = num_bands;
-	
+
 	/* Check for unused bands, and set min/max accordingly */
 	if(!band_R) band_R_min = 0;
 	if(!band_G) band_G_min = 0;
 	if(!band_B) band_B_min = 0;
-	
+
 	/* Convert color space */
- 
+
 	/* Convert band packing */
 	pix = 0;
 	piy = 0;
@@ -174,7 +174,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 			piy = piy + num_bands;
 		}
 	}
-	
+
 	/* return temporary tile */
 	return out_tile;
 }
@@ -202,7 +202,7 @@ int ImageTileSet::load_tile(int x, int y)
 	int oldest_tile = -1;
 
 	tile_memory_size = tex_size * tex_size * num_bands * sample_size;
-	
+
 	/* Calculate tile index */
 	tile_index_x = x/tile_size;
 	tile_index_y = y/tile_size;
@@ -211,12 +211,12 @@ int ImageTileSet::load_tile(int x, int y)
 	sprintf(buffer, "(II) ImageTileSet::load_tile(%d,%d) INDEX:%d (x_index %d, y_index %d)\n", x, y, tile_index, tile_index_x, tile_index_y);
 	Console::write(buffer);
 	#endif
-	
+
 	/* Quick hack to wrap out-of-bounds requests */
 	while (tile_index_x >= columns) tile_index_x--;
 	while (tile_index_y >= rows) tile_index_y--;
 	tile_index = (columns * tile_index_y) + tile_index_x;
-	
+
 	/* Load if not already */
 	{
 		int tile_check = 0;
@@ -272,7 +272,7 @@ int ImageTileSet::load_tile(int x, int y)
 				cache_fill = cache_fill - tile_memory_size;
 			}
 		}
-		
+
 		/* Adjust for border tiles */
 		if (tile_index_x == columns-1) {
 			tile_size_x = last_column_width;
@@ -285,10 +285,10 @@ int ImageTileSet::load_tile(int x, int y)
 			tile_size_y = tile_size;
 		}
 
-                                        
+
 		if (LOD!=-1) {
-			data_size_x = tile_size_x / MathUtils::ipow(2,LOD);
-			data_size_y = tile_size_y / MathUtils::ipow(2,LOD);
+			data_size_x = tile_size_x / LOD_factor;
+			data_size_y = tile_size_y / LOD_factor;
 			/* X & Y are now tile top-left position */
 			x = (x/tile_size) * tile_size;
 			y = (y/tile_size) * tile_size;
@@ -305,10 +305,10 @@ int ImageTileSet::load_tile(int x, int y)
 				align_tile(&(new_tile->data), tex_size, LOD_width, LOD_height);
 			}
 		}
-		
+
 		/* add index to list of allocated tiles */
 		tiles.push_back(new_tile);
-		
+
 		/* !! update cache */
 		return tiles.size() - 1;
 	}
@@ -327,14 +327,14 @@ unsigned char* ImageTileSet::get_pixel_values(int x, int y)
 		}
 		return return_values;
 	}
-	
+
 	tile_index = load_tile(x,y);
 	tile_data = (unsigned char*) tiles[tile_index]->data;
 
 
 	/* Find index in tile */
 	x = (x / LOD_factor) % tex_size;
-	y = (y / LOD_factor) % tex_size;	
+	y = (y / LOD_factor) % tex_size;
 
 	// !! will need to compensate for sample_size for multi-byte samples
 	pixel_start = (x*num_bands) + (y*tex_size*num_bands);
@@ -357,14 +357,14 @@ unsigned char* ImageTileSet::get_pixel_values_LOD(int x, int y)
 		}
 		return return_values;
 	}
-	
+
 	tile_index = load_tile(x * LOD_factor,y * LOD_factor);
 	tile_data = (unsigned char*) tiles[tile_index]->data;
 
 
 	/* Find index in tile */
 	x = x % tex_size;
-	y = y % tex_size;	
+	y = y % tex_size;
 
 	// !! will need to compensate for sample_size for multi-byte samples
 	pixel_start = (x*num_bands) + (y*tex_size*num_bands);
@@ -383,19 +383,19 @@ void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, i
     char* height_pad;       //our block of zeros to pad (height-wise)
     char* width_pad;        //our end-of-row padding block
     int height_pad_size, width_pad_size;    //the dimensions of our pads
-    
+
     int i;
-    
+
     int row_length = tile_dimension * num_bands * sample_size;   //how long is a row?
     int pad_row_length;     //the part of a row that's pad
     int data_row_length;    //the part of a row that's data
     char* copy_from_loc;    //our copy-from location pointer for memcpy
     char* copy_to_loc;      //our copy-to location pointer for memcpy
-    
+
     // Get the sizes of our pads (in pixels)
     height_pad_size = tile_dimension - data_height;
     width_pad_size = tile_dimension - data_width;
-    
+
     //if we need a height pad, make one of the appropriate size
     if (height_pad_size != 0)
     {
@@ -406,7 +406,7 @@ void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, i
             height_pad[i] = 0;
         }
     }
-    
+
     //if we need a width pad, make one of appropriate size
     if (width_pad_size != 0)
     {
@@ -418,18 +418,18 @@ void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, i
             width_pad[i] = 0;
         }
     }
-    
+
     data_row_length = data_width * num_bands * sample_size;  //our row data chunk, in bytes
-    
-    
+
+
     //allocate our working area to the same size as the actual tile
 //    temp_tile = (char*) malloc(tile_dimension * tile_dimension * num_bands * sample_size);
 	temp_tile = new char[tile_dimension * tile_dimension * num_bands * sample_size];
-    
+
     //set our locator pointers
     copy_from_loc = *tile;
     copy_to_loc = temp_tile;
-    
+
     if (data_row_length == row_length && height_pad_size > 0) //if we have no need for row padding
     {
         for (i = 0; i < data_height; i++)   //copy data_height rows of data
@@ -451,7 +451,7 @@ void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, i
             memcpy(copy_to_loc, copy_from_loc, data_row_length);
             copy_from_loc = copy_from_loc + data_row_length;
             copy_to_loc = copy_to_loc + data_row_length;
-            
+
             memcpy(copy_to_loc, width_pad, pad_row_length);
             copy_to_loc = copy_to_loc + pad_row_length;
         }
@@ -468,7 +468,7 @@ void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, i
             memcpy(copy_to_loc, copy_from_loc, data_row_length);
             copy_from_loc = copy_from_loc + data_row_length;
             copy_to_loc = copy_to_loc + data_row_length;
-            
+
             memcpy(copy_to_loc, width_pad, pad_row_length);
             copy_to_loc = copy_to_loc + pad_row_length;
         }
@@ -482,24 +482,24 @@ void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, i
             copy_to_loc = copy_to_loc + data_row_length;
         }
     }
-    
+
     //free the old tile block (could be bad otherwise)
 //    free(*tile);
 	delete[] *tile;
-    
+
     //...and free our pads
     if (height_pad_size != 0)
     {
 //        free(height_pad);
 		delete[] height_pad;
     }
-    
+
     if (width_pad_size != 0)
     {
 //        free(width_pad);
 		delete[] width_pad;
     }
-    
+
     //replace the old tile with the new one
     *tile = temp_tile;
 }

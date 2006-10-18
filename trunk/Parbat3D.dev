@@ -1,7 +1,7 @@
 [Project]
 FileName=Parbat3D.dev
 Name=Parbat3D
-UnitCount=92
+UnitCount=90
 Type=0
 Ver=1
 ObjFiles=
@@ -538,26 +538,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit52]
-FileName=MathUtils.cpp
-CompileCpp=1
-Folder=Utils
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit53]
-FileName=MathUtils.h
-CompileCpp=1
-Folder=Utils
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit54]
 FileName=rsrc.rc
 CompileCpp=1
 Folder=View_PKG
@@ -567,7 +547,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit55]
+[Unit53]
 FileName=PrefsWindow.cpp
 CompileCpp=1
 Folder=View_PKG/Window Classes
@@ -577,7 +557,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit56]
+[Unit54]
 FileName=PrefsWindow.h
 CompileCpp=1
 Folder=View_PKG/Window Classes
@@ -587,17 +567,17 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit57]
+[Unit55]
 FileName=resources.h
+CompileCpp=1
 Folder=View_PKG
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
-CompileCpp=1
 
-[Unit58]
+[Unit56]
 FileName=ScrollBox.h
 CompileCpp=1
 Folder=View_PKG
@@ -607,17 +587,17 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit59]
+[Unit57]
 FileName=ScrollBox.cpp
-CompileCpp=1
 Folder=View_PKG
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=1
 
-[Unit60]
+[Unit58]
 FileName=ROIFile.cpp
 CompileCpp=1
 Folder=ROI_PKG
@@ -627,7 +607,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit61]
+[Unit59]
 FileName=ROIFile.h
 CompileCpp=1
 Folder=ROI_PKG
@@ -637,7 +617,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit62]
+[Unit60]
 FileName=ToolTab.cpp
 CompileCpp=1
 Folder=View_PKG/Tab Classes
@@ -647,7 +627,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit63]
+[Unit61]
 FileName=ToolTab.h
 CompileCpp=1
 Folder=View_PKG/Tab Classes
@@ -657,7 +637,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit64]
+[Unit62]
 FileName=DisplayTab.h
 CompileCpp=1
 Folder=View_PKG/Tab Classes
@@ -667,7 +647,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit65]
+[Unit63]
 FileName=DisplayTab.cpp
 CompileCpp=1
 Folder=View_PKG/Tab Classes
@@ -677,7 +657,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit66]
+[Unit64]
 FileName=QueryTab.h
 CompileCpp=1
 Folder=View_PKG/Tab Classes
@@ -687,7 +667,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit67]
+[Unit65]
 FileName=QueryTab.cpp
 CompileCpp=1
 Folder=View_PKG/Tab Classes
@@ -697,7 +677,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit68]
+[Unit66]
 FileName=ImageTab.h
 CompileCpp=1
 Folder=View_PKG/Tab Classes
@@ -707,7 +687,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit69]
+[Unit67]
 FileName=ImageTab.cpp
 CompileCpp=1
 Folder=View_PKG/Tab Classes
@@ -717,7 +697,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit70]
+[Unit68]
 FileName=FeatureTab.cpp
 CompileCpp=1
 Folder=View_PKG/Tab Classes
@@ -727,7 +707,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit71]
+[Unit69]
 FileName=FeatureTab.h
 CompileCpp=1
 Folder=View_PKG/Tab Classes
@@ -737,7 +717,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit72]
+[Unit70]
 FileName=StickyWindowManager.cpp
 CompileCpp=1
 Folder=View_PKG
@@ -747,7 +727,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit73]
+[Unit71]
 FileName=StickyWindowManager.h
 CompileCpp=1
 Folder=View_PKG
@@ -757,7 +737,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit74]
+[Unit72]
 FileName=BatchIniFile.cpp
 CompileCpp=1
 Folder=Settings_PKG
@@ -767,7 +747,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit75]
+[Unit73]
 FileName=BatchIniFile.h
 CompileCpp=1
 Folder=Settings_PKG
@@ -777,7 +757,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit76]
+[Unit74]
 FileName=FeatureSpace.cpp
 CompileCpp=1
 Folder=Feature_Space_PKG
@@ -787,10 +767,30 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit78]
+[Unit75]
+FileName=FeatureSpace.h
+CompileCpp=1
+Folder=Feature_Space_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit76]
 FileName=ROISet.h
 CompileCpp=1
 Folder=ROI_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit78]
+FileName=GLContainer.h
+CompileCpp=1
+Folder=Feature_Space_PKG
 Compile=1
 Link=1
 Priority=1000
@@ -808,16 +808,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit77]
-FileName=FeatureSpace.h
-CompileCpp=1
-Folder=Feature_Space_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit79]
 FileName=GLContainer.cpp
 CompileCpp=1
 Folder=Feature_Space_PKG
@@ -827,17 +817,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit80]
-FileName=GLContainer.h
-CompileCpp=1
-Folder=Feature_Space_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit81]
+[Unit79]
 FileName=ContrastWindow.cpp
 CompileCpp=1
 Folder=View_PKG/Window Classes
@@ -847,7 +827,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit82]
+[Unit80]
 FileName=ContrastWindow.h
 CompileCpp=1
 Folder=View_PKG/Window Classes
@@ -857,10 +837,30 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit83]
+[Unit81]
 FileName=main.cpp
 CompileCpp=1
 Folder=View_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit82]
+FileName=ContrastAdvWindow.h
+CompileCpp=1
+Folder=View_PKG/Window Classes
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit83]
+FileName=ContrastAdvWindow.cpp
+CompileCpp=1
+Folder=View_PKG/Window Classes
 Compile=1
 Link=1
 Priority=1000
@@ -878,26 +878,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit84]
-FileName=ContrastAdvWindow.h
-CompileCpp=1
-Folder=View_PKG/Window Classes
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit85]
-FileName=ContrastAdvWindow.cpp
-CompileCpp=1
-Folder=View_PKG/Window Classes
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit86]
 FileName=GLText.cpp
 CompileCpp=1
 Folder=Image_Manipulation_PKG/OpenGL
@@ -907,7 +887,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit87]
+[Unit85]
 FileName=GLText.h
 CompileCpp=1
 Folder=Image_Manipulation_PKG/OpenGL
@@ -917,17 +897,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit89]
-FileName=FeatureSpaceGL.cpp
-CompileCpp=1
-Folder=Feature_Space_PKG
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit88]
+[Unit86]
 FileName=FeatureSpaceGL.h
 CompileCpp=1
 Folder=Feature_Space_PKG
@@ -937,10 +907,40 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit90]
+[Unit87]
+FileName=FeatureSpaceGL.cpp
+CompileCpp=1
+Folder=Feature_Space_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit89]
+FileName=ProgressWindow.cpp
+CompileCpp=1
+Folder=View_PKG/Window Classes
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit88]
 FileName=PointsHash.h
 CompileCpp=1
 Folder=Feature_Space_PKG
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit90]
+FileName=ProgressWindow.h
+CompileCpp=1
+Folder=View_PKG/Window Classes
 Compile=1
 Link=1
 Priority=1000
