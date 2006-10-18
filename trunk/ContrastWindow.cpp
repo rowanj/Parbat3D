@@ -155,6 +155,14 @@ int ContrastWindow::Create(HWND parent)
 
     return true;
 }
+void ContrastWindow::resetSliders()
+{
+    //reset slider positions
+    SendMessage(hBrightnessTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) brightnessCancel);
+    SendMessage(hContrastTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) contrastCancel);
+}
+
+
 
 /* handle events related to the main window */
 LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -171,7 +179,7 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
         // Track bar moved
         case WM_HSCROLL:
         {
-            // If preview is checked update image on the fly
+            // If preview is checked, update image on the fly
             LRESULT state = SendMessageA(win->hPreview, BM_GETCHECK, 0, 0);
             if(state==BST_CHECKED)
             {
@@ -239,9 +247,8 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
 			if (LOWORD(wParam) == 2 && HIWORD(wParam) == BN_CLICKED)
 	        {
 	            //reset slider positions
-				SendMessage(win->hBrightnessTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) win->brightnessCancel);
-		        SendMessage(win->hContrastTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) win->contrastCancel);
-			
+	            win->resetSliders();
+				
 	            /* don't destroy this window, but make it invisible */
 	            ShowWindow(hwnd,SW_HIDE);
 			}
@@ -274,9 +281,8 @@ LRESULT CALLBACK ContrastWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
         case WM_CLOSE:
 			
             //reset slider positions
-			SendMessage(win->hBrightnessTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) win->brightnessCancel);
-            SendMessage(win->hContrastTrackbar, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) win->contrastCancel);
-			
+            win->resetSliders();
+            
             /* don't destroy this window, but make it invisible */
             ShowWindow(hwnd,SW_HIDE);
             return 0;

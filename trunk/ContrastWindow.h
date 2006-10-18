@@ -7,8 +7,7 @@ class ContrastWindow:public Window
 {
     private:
     WNDPROC prevProc;
-    HWND hBrightnessTrackbar;
-	HWND hContrastTrackbar;
+    
 	HWND hCSOKButton;
 	HWND hCSCancelButton;
 	HWND hPreview;
@@ -18,8 +17,11 @@ class ContrastWindow:public Window
    	
     public:
     HWND hPerChannel;
+    HWND hBrightnessTrackbar;
+	HWND hContrastTrackbar;
 
     int Create(HWND parent);
+    void ContrastWindow::resetSliders();
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 };
 

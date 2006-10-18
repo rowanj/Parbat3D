@@ -154,6 +154,8 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                     else
                         contrastWindow.Hide();
                         contrastAdvWindow.Hide();
+                        //reset sliders
+                        contrastWindow.resetSliders();
                     return 0;
                 
                 
