@@ -15,6 +15,11 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, 
 	Console::write("(II) Initializing image handler(%d, %d, %s)\n", overview_hwnd, image_hwnd, filename);
 	#endif
 	
+	// Initialize class variables
+	image_properties = NULL;			
+	image_viewport = NULL;
+	overview_gl = NULL;
+	image_gl = NULL;
 	brightness_value = 250;
 	contrast_value = 250;
 	
@@ -22,28 +27,31 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, 
 	assert(overview_hwnd != NULL);
 	assert(image_hwnd != NULL);
 	assert(filename != NULL);
-				
+
 	// Initialize image file (could be threaded)
 	image_file = new ImageFile(filename);
 	assert(image_file != NULL);
+	assert(image_file->getImageProperties() != NULL);
 	// !! If image_file worked...
+	if (image_file->getImageProperties() != NULL)
 	{
-		image_properties = NULL;
 		image_properties = image_file->getImageProperties();
 		assert(image_properties != NULL);
-		image_viewport = NULL;
+		
 		image_viewport = new ImageViewport(image_properties);
 		assert(image_viewport != NULL);
 
 		/* Initialize viewports */
-		overview_gl = NULL;
 		overview_gl = new OverviewGL(overview_hwnd, image_file, image_viewport);
 		assert(overview_gl != NULL);
-		image_gl = NULL;
+
 		image_gl = new ImageGL(image_hwnd, image_file, image_viewport, ROI_set);
 		assert(image_gl != NULL);
 		
 		image_viewport->set_display_bands(1,2,3);
+	} else {
+		delete image_file;
+		image_file = NULL;
 	}
 }
 
@@ -66,9 +74,10 @@ void ImageHandler::redraw(void)
 	image_viewport->notify_viewport_listeners();
 }
 
+// Return the current ImageProperties object
+// Should be NULL for invalid image
 ImageProperties* ImageHandler::get_image_properties(void)
 {
-	assert(image_properties != NULL);
 	return image_properties;
 }
 

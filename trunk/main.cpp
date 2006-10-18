@@ -243,6 +243,12 @@ void loadFile() {
         assert(image_handler == NULL);
 	    image_handler = new ImageHandler::ImageHandler(overviewWindow.overviewWindowDisplay.GetHandle(), imageWindow.imageWindowDisplay.GetHandle(), ofn.lpstrFile, regionsSet);
 	    assert(image_handler != NULL);
+	    if (image_handler->get_image_properties() == NULL) {
+			// We've hit an un-openable file
+			closeFile();
+			// !! todo: stop the progress bar
+			return;
+		}
     	
         // update image window settings
         filename=copyString(image_handler->get_image_properties()->getFileName());
