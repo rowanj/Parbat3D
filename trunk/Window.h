@@ -20,7 +20,6 @@ class Window
 	    HWND hwindow;                       // window handle
 	    static HINSTANCE hInstance;         // process's instance handle
 	    static HICON    hIcon;              // default icon
-	    //HFONT hNormalFont,hBoldFont, hHeadingFont;        // fonts used for drawing static controls
 	    HBRUSH hBackgroundBrush;			// window's background brush used for painting background
 	    int zValue;							// window's Z-order value (for setting which windows appear in front or behind)
 	    HDWP hdwp_reorder;					// handle used for re-ordering windows

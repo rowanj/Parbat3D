@@ -972,8 +972,8 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	}
 	if ((virtualKeys&MK_RBUTTON) && (virtualKeys&MK_LBUTTON))
 	{
-		float nx = (float)x_diff/10.0;
-		float ny = (float)y_diff/10.0;
+		float nx = (float)x_diff/50.0;
+		float ny = (float)y_diff/50.0;
 		fsgl->translate_cam(nx, ny);
 	} 
 	// check if left & right mouse button is down
@@ -1010,7 +1010,8 @@ void FeatureSpace::Rotate(float yaw_amount, float pitch_amount)
 /* change the camera zoom level by a +/- amount */
 void FeatureSpace::ChangeCameraZoom(float amount)
 {
-/* 		float cam_dolly = fsgl->cam_dolly;
+	fsgl->zoom_cam(amount);
+		/*float cam_dolly = fsgl->cam_dolly;
 		
 		cam_dolly+=amount;
 		if (cam_dolly < 0.1) cam_dolly = 0.1;
@@ -1043,10 +1044,10 @@ void FeatureSpace::OnKeyPress(int virtualKey)
 			}
 			else if (shift_pressed)
 			{
-				fsgl->translate_cam(0, -0.4);
+				fsgl->translate_cam(0, 0.1);
 			}
 			else
-				fsgl->translate_cam(0, -0.1);
+				fsgl->translate_cam(0, 0.01);
 			break;
 			
 		case VK_DOWN:
@@ -1057,10 +1058,10 @@ void FeatureSpace::OnKeyPress(int virtualKey)
 			}
 			else if (shift_pressed)
 			{
-				fsgl->translate_cam(0, 0.4);
+				fsgl->translate_cam(0, -0.1);
 			}
 			else
-				fsgl->translate_cam(0, 0.1);
+				fsgl->translate_cam(0, -0.01);
 			break;
 			
 		case VK_LEFT:
@@ -1071,10 +1072,10 @@ void FeatureSpace::OnKeyPress(int virtualKey)
 			}
 			else if (shift_pressed)
 			{
-				fsgl->translate_cam(-0.4, 0);
+				fsgl->translate_cam(0.1, 0);
 			}
 			else			
-				fsgl->translate_cam(-0.1, 0);
+				fsgl->translate_cam(0.01, 0);
 			break;
 			
 		case VK_RIGHT:
@@ -1085,10 +1086,10 @@ void FeatureSpace::OnKeyPress(int virtualKey)
 			}	
 			else if (shift_pressed)
 			{
-				fsgl->translate_cam(0.4, 0);
+				fsgl->translate_cam(-0.1, 0);
 			}					
 			else
-				fsgl->translate_cam(0.1, 0);
+				fsgl->translate_cam(-0.01, 0);
 			break;
 			
 		case VK_PRIOR:	// page-up key

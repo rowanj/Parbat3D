@@ -21,6 +21,12 @@ FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_
 	cam_pitch = 0.0;
 	cam_dolly = -2.5; /* */
 	
+	cam_xrot=0;
+	cam_yrot=0;
+	cam_xpan=0;
+	cam_ypan=0;
+	cam_zoom=0;
+	
 	band1 = band1_arg;
 	band2 = band2_arg;
 	band3 = band3_arg;
@@ -384,14 +390,43 @@ void FeatureSpaceGL::add_points(points_hash_t points_hash, unsigned char red, un
 
 void FeatureSpaceGL::translate_cam(float x, float y)
 {
+	cam_xpan+=x;
+	cam_ypan+=y;
+	
 	Console::write("translate_cam(%f,%f);\n", x, y);
 	gl_view->make_current();
 	glPushAttrib(GL_MATRIX_MODE);
+	glMatrixMode(GL_MODELVIEW);
+	glTranslatef(0.5,0.5,0.5);
+	glRotatef(-cam_xrot, 0.0, 0.0, 1.0);
+	glTranslatef(x, 0, 0);
+	glRotatef(cam_xrot, 0.0, 0.0, 1.0);
+	glTranslatef(-0.5,-0.5,-0.5);
+	
 	glMatrixMode(GL_PROJECTION);
-	glTranslatef(x, 0.0, -y);
+	glRotatef(-cam_yrot, 1.0, 0.0, 0.0);	
+	glTranslatef(0.0, 0.0, -y);
+	glRotatef(cam_yrot, 1.0, 0.0, 0.0);	
 	glPopAttrib();
 	draw();
 }
+
+void FeatureSpaceGL::zoom_cam(float diff)
+{
+	cam_zoom+=diff;
+	
+	gl_view->make_current();
+	glPushAttrib(GL_MATRIX_MODE);
+	glMatrixMode(GL_MODELVIEW);
+
+	glMatrixMode(GL_PROJECTION);
+	glRotatef(-cam_yrot, 1.0, 0.0, 0.0);	
+	glTranslatef(0,diff,0);
+	glRotatef(cam_yrot, 1.0, 0.0, 0.0);		
+	glPopAttrib();
+	draw();
+}	
+
 void FeatureSpaceGL::rot_cam(int x_diff, int y_diff)
 {
 		/* float cam_yaw = fsgl->cam_yaw;
@@ -405,6 +440,9 @@ void FeatureSpaceGL::rot_cam(int x_diff, int y_diff)
 		
 		fsgl->cam_yaw = cam_yaw;
 		fsgl->cam_pitch = cam_pitch; */
+	cam_xrot+=x_diff;
+	cam_yrot+=y_diff;
+	
 	gl_view->make_current();
 	glPushAttrib(GL_MATRIX_MODE);
 	glMatrixMode(GL_MODELVIEW);

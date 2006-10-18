@@ -24,6 +24,7 @@ public:
 	void translate_cam(float x, float y);
 	void dolly_cam(float diff);
 	void rot_cam(int x_diff, int y_diff);
+	void zoom_cam(float diff);
     
     int granularity;
         
@@ -40,6 +41,11 @@ public:
     GLfloat cam_yaw;
     GLfloat cam_pitch; 
     GLfloat cam_dolly;
+    GLfloat cam_xrot;
+    GLfloat cam_yrot;
+    GLfloat cam_xpan;
+    GLfloat	cam_ypan;
+    GLfloat cam_zoom;
     
 private:
 	GLText* gl_text;
