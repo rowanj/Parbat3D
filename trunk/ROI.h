@@ -15,7 +15,8 @@ extern const char* ROI_POLY;   // consist of 3 or more coords
 
 
 /**
-    Used to store a position of a point in an Region of Interest entity.
+    Coords are used to store the position in an image of a point in an Region of
+    Interest entity.
 */
 struct coords {
     int x;  // x-axis or horizontal position
@@ -24,50 +25,87 @@ struct coords {
 
 
 /**
-    Regions of Interest are made up of a list of entities. The entity stores its
-    type and the points that make it up.
+    An ROIEntity stores a single entity of a Region of Interest. The entity
+    stores its type and the coords that it consists of. The type indicates what
+    shape the entity is, such as a point, rectangle or polygon. The number of
+    coords in the vector is related to the type of entity. A point will have 1
+    coord, a rectangle will have 2 and a polygon will have 3 or more.
 */
 class ROIEntity {
     public:
         const char* type;       // the type of the entity (POINT, RECT, POLY)
         vector<coords> points;  // the list of coords that make up the entity
         
+        
+        /**
+            Returns the number of coords in the vector. This can be used when
+            traversing the coords vector.
+        */
         int point_count () {
             return points.size();
         }
         
+        
+        /**
+            Sets the type of the entity from a string that contains the
+            appropriate name. This is used when reading Regions of Interest from
+            a file. The data read from the file is in string form and this
+            function converts that string back to the right type.
+        */
         void set_type (string s) {
             if (s=="POINT") type = ROI_POINT;
             else if (s=="RECT") type = ROI_RECT;
             else type = ROI_POLY;
         }
         
-        const char* get_type() {return type;}
         
-        vector<coords> get_points() {return points;}        
+        /**
+            Returns the type of entity. The returned value can be compared to
+            global variables ROI_POINT, ROI_RECT and ROI_POLY to find out what
+            it is. The type returned is a const char* so it is easy to convert
+            to a string to store in a file.
+        */
+        const char* get_type() {
+            return type;
+        }
+        
+        
+        /**
+            Returns the vector of coords that makes up the entity.
+        */
+        vector<coords> get_points() {
+            return points;
+        }
 };
 
 
 /**
-    A Region of Interest has a colour, a name and a list of entities.
+    ROI stores all the information to do with a Region of Interest. This
+    includes its colour, name and a vector of entities that is consists of.
 */
 class ROI {
     private:
-        bool active;  // make not be used - remove later if this is the case
-        int colour_red;               // RGB colour values of the ROI
+        bool active;                  // true if the ROI is visible, false if it is not
+        
+        int colour_red;               // RGB colour values of the ROI (0-255)
         int colour_green;
         int colour_blue;
+        
         string name;                  // name to identify the ROI
+        
         vector<ROIEntity*> entities;  // entities that make up this ROI
+        
         
     public:
         /**
-            Creates Regions of Interest with default colour (black).
+            Creates a Region of Interest that is visible, has no name and is set
+            to the default colour (grey).
         */
         ROI (void);
         
         /**
-            Default destructor - does nothing.
+            Destructor clears the vector of all the entities that make up this
+            Region of Interest.
         */
         ~ROI (void);
         
@@ -87,12 +125,12 @@ class ROI {
         /**
             Sets whether the ROI is currently active
         */
-        void set_active (bool isActive) {active=isActive;}
+        void set_active (bool isActive) { active = isActive; }
         
         /**
             Returns whether the ROI is currently active
         */
-        bool get_active (void) {return active;}
+        bool get_active (void) { return active; }
         
         
         /**

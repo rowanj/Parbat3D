@@ -17,6 +17,7 @@ ROI::ROI (void) {
 }
 
 ROI::~ROI (void) {
+    entities.clear();
 }
 
 

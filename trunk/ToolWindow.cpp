@@ -35,15 +35,15 @@ int ToolWindow::Create(HWND)
     /* Get the stored window position or use defaults if there's a problem */
     mx = atoi(settingsFile->getSetting("tool window", "x").c_str());
 	my = atoi(settingsFile->getSetting("tool window", "y").c_str());
-	if ((mx < 0) || (mx > (desktopRect.right-50)))
-	{
-        mx = overviewRect.left;						// set default x position based on poisition of overview window
+	
+	if ((mx <= 0) || (mx > (desktopRect.right-50))) {
+        mx = overviewRect.left;         // set default x position based on poisition of overview window
 	}
-	if ((my < 0) || (my > (desktopRect.bottom-50)))
-	{
-        my = overviewRect.bottom;					// set default y position based on poisition of overview window
+	
+	if ((my <= 0) || (my > (desktopRect.bottom-50))) {
+        my = overviewRect.bottom + 29;  // set default y position based on poisition of overview window
 	}
-   
+    
     /* The class is registered, lets create the program*/
     if (!CreateWin(0, "Parbat3D Tool Window", "Tools",
            WS_POPUP+WS_CAPTION+WS_SYSMENU, mx, my,
@@ -51,11 +51,11 @@ int ToolWindow::Create(HWND)
         return false;
     setupDrawingObjects(GetHandle());
     prevProc=SetWindowProcedure(&ToolWindow::WindowProcedure);
-
     
-    stickyWindowManager.AddStickyWindow(this);  // make the window stick to others    
-
-    /* get width & height of tool window's client area (ie. inside window's border) */
+    
+    stickyWindowManager.AddStickyWindow(this);  // make the window stick to others
+    
+    // get width & height of tool window's client area (ie. inside window's border)
     RECT rect;
     GetClientRect(GetHandle(),&rect);
 

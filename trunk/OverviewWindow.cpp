@@ -27,14 +27,14 @@ int OverviewWindow::Create(HWND parent) {
     
     /* get co-ords of image window */
     GetWindowRect(imageWindow.GetHandle(),&imageRect);
-
+    
     /* Get the stored window position or use defaults if there's a problem */
     mx = atoi(settingsFile->getSetting("overview window", "x").c_str());
 	my = atoi(settingsFile->getSetting("overview window", "y").c_str());
-	if ((mx < 0) || (mx > (rect.right-50)))
+	if ((mx <= 0) || (mx > (rect.right-50)))
         mx=imageRect.left-OverviewWindow::WIDTH;
     
-	if ((my < 0) || (my > (rect.bottom-50)))
+	if ((my <= 0) || (my > (rect.bottom-50)))
 		my=imageRect.top;
       
     /* Create overview window */
@@ -134,10 +134,10 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 case IDM_ROIWINDOW:
                     if (win->toggleMenuItemTick(win->hMainMenu,IDM_ROIWINDOW)) {
                         roiWindow.Show();
-                        settingsFile->setSetting("roi window", "open", "1");  // have open on next image load
+                        settingsFile->setSetting("roi window", "open", "yes");  // have open on next image load
                     } else {
                         roiWindow.Hide();
-                        settingsFile->setSetting("roi window", "open", "0");  // keep closed on next image load
+                        settingsFile->setSetting("roi window", "open", "no");   // keep closed on next image load
                     }
                     return 0;
                 
@@ -177,7 +177,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                             roix = 10;
                             roiy = overviewWindow.getHeight()+10;
                             toolx = 10;
-                            tooly = overviewWindow.getHeight()+40;
+                            tooly = overviewWindow.getHeight()+39;
                         }
                     }
                     
@@ -186,8 +186,10 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                         MoveWindow(roiWindow.GetHandle(), roix, roiy, roiWindow.getWidth(), roiWindow.getHeight(), true);
                     
                     // tool window
-                    if (toolWindow.GetHandle() != NULL)
+                    if (toolWindow.GetHandle() != NULL) {
                         MoveWindow(toolWindow.GetHandle(), toolx, tooly, toolWindow.getWidth(), toolWindow.getHeight(), true);
+                        BringWindowToTop(toolWindow.GetHandle());
+                    }
                     return 0;
                 
                 

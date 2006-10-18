@@ -14,64 +14,66 @@
 
 char* imageWindowTitle;
 
-int ImageWindow::Create(HWND parent)
-{
-    
+int ImageWindow::Create(HWND parent) {
     RECT desktopRect;
-    int mx,my,mwidth,mheight;
-    const int IMAGE_WINDOW_WIDTH=700;
-    const int IMAGE_WINDOW_HEIGHT=600;
+    int mx, my, mwidth, mheight;
+    const int IMAGE_WINDOW_WIDTH = 700;
+    const int IMAGE_WINDOW_HEIGHT = 665;
     imageWindowTitle = new char[256];
-
+    
     /* Get the width & height of the desktop window */
     GetWindowRect(hDesktop,&desktopRect);
-
+    
     /* Get the stored window position or use defaults if there's a problem */
     mx = atoi(settingsFile->getSetting("image window", "x").c_str());
-	my = atoi(settingsFile->getSetting("image window", "y").c_str());
-	mwidth = atoi(settingsFile->getSetting("image window", "width").c_str());
-	mheight = atoi(settingsFile->getSetting("image window", "height").c_str());
-	if ((mx < 0) || (mx > (desktopRect.right-50)))
-	{
-        mx = (desktopRect.right /2) - ((IMAGE_WINDOW_WIDTH+OverviewWindow::WIDTH) /2);         /* default x position to center windows */
-	    mx+=OverviewWindow::WIDTH;                                                          /* leave room for overview window */
-	}
+    my = atoi(settingsFile->getSetting("image window", "y").c_str());
+    mwidth = atoi(settingsFile->getSetting("image window", "width").c_str());
+    mheight = atoi(settingsFile->getSetting("image window", "height").c_str());
+    
+    if ((mx <= 0) || (mx > (desktopRect.right-50))) {
+        mx = (desktopRect.right /2) - ((IMAGE_WINDOW_WIDTH+OverviewWindow::WIDTH) /2);  // default x position to center windows
+        mx += OverviewWindow::WIDTH;                             // leave room for overview window
+    }
+    
+    if ((my <= 0) || (my > (desktopRect.bottom-50))) {
+        my = (desktopRect.bottom /2) - (IMAGE_WINDOW_HEIGHT/2);  // default y position to center windows
+    }
+    
+    // use defaults if window size is too small
+    if (mwidth <= 50)                   // check width
+        mwidth = IMAGE_WINDOW_WIDTH;
+    if (mheight <= 50)                  // check height
+        mheight = IMAGE_WINDOW_HEIGHT;
 	
-	if ((my < 0) || (my > (desktopRect.bottom-50)))
-	{
-        my = (desktopRect.bottom /2) - (IMAGE_WINDOW_HEIGHT/2);                                 /* default y position to center windows */
-	}
-
 	// if image window is too big to fit on screen, set it to the default size
-	if ((mwidth>desktopRect.right)||(mheight>desktopRect.bottom))
-	{
+	if ((mwidth>desktopRect.right)||(mheight>desktopRect.bottom)) {
 		mwidth=IMAGE_WINDOW_WIDTH;
 		mheight=IMAGE_WINDOW_HEIGHT;		
 	}
-
+	
     /* create image window */
     if (!CreateWin(0, "Parbat3D Image Window", "Image Window",
 	     WS_POPUP+WS_SYSMENU+WS_CAPTION+WS_MAXIMIZEBOX+WS_VSCROLL+WS_HSCROLL+WS_SIZEBOX,
 	     mx, my, mwidth, mheight, parent, NULL))
 	    return false;
-
+	
     prevProc=SetWindowProcedure(&WindowProcedure);
-
-
-    /* create a child window that will be used by OpenGL */
+    
+    
+    // create a child window that will be used by OpenGL
     imageWindowDisplay.Create(GetHandle());
 	
     return true;
 }
 
+
 /* display image information in image window's title bar */
-void ImageWindow::updateImageWindowTitle()
-{
+void ImageWindow::updateImageWindowTitle() {
     /* Display the file name & zoom level on the image window title bar */
     sprintf(imageWindowTitle, "Image - %s (%.2f%%)", filename, image_handler->get_image_viewport()->get_zoom_level()*100.0);
     SetWindowText(GetHandle(), imageWindowTitle);
-
 }
+
 
 /* update image window's scroll bar display settings  */
 void ImageWindow::updateImageScrollbar()

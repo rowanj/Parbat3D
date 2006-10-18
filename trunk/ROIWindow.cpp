@@ -49,7 +49,7 @@ int ROIWindow::Create(HWND parent) {
     if (mx<=0 || mx>(desktopRect.right-50) || my<=0 || my>(desktopRect.bottom-50)) {
         GetWindowRect(overviewWindow.GetHandle(),&rect);  // get Main Window Location for ROI window alignment
         mx = rect.left;
-        my = rect.bottom + 30;
+        my = rect.bottom;
     }
     
     // create ROI window
@@ -461,7 +461,7 @@ LRESULT CALLBACK ROIWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wPar
             // don't destroy this window, but make it invisible
             ShowWindow(hwnd,SW_HIDE);
             CheckMenuItem(overviewWindow.hMainMenu,IDM_ROIWINDOW,MF_UNCHECKED|MF_BYCOMMAND);
-            settingsFile->setSetting("roi window", "open", "0");  // keep closed on next image load
+            settingsFile->setSetting("roi window", "open", "no");  // keep closed on next image load
             return 0;
         
         

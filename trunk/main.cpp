@@ -259,8 +259,12 @@ void loadFile() {
         // show tool & image windows
         toolWindow.Show();
         imageWindow.Show();
-        if (atoi(settingsFile->getSetting("roi window", "open").c_str()) == 1)
-            roiWindow.Show();
+        roiWindow.Show();
+        if (settingsFile->getSetting("roi window", "open") == "no")
+            roiWindow.Hide();
+        
+        // make sure the tool window is in front of the ROI window
+        BringWindowToTop(toolWindow.GetHandle());
         
         // update opengl displays
         overviewWindow.Repaint();
