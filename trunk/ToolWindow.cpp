@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <Commctrl.h>
+
 #include "Window.h"
 #include "ScrollBox.h"
 #include "ToolWindow.h"
@@ -15,24 +16,23 @@
 #include "config.h"
 
 
-/* create tool window */
-int ToolWindow::Create(HWND)
-{
-    TCITEM tie;  /* datastructure for tabs */
+// create tool window
+int ToolWindow::Create(HWND) {
+    TCITEM tie;                     // datastructure for tabs
     RECT overviewRect,desktopRect;
-    int mx,my;
-
+    int mx, my;
+    
     const int SCROLLBAR_WIDTH=13;
     const int SCROLLBAR_TOP=25;
 
   
-    /* Get Main Window Location for image window alignment*/
+    // Get Main Window Location for image window alignment
     GetWindowRect(overviewWindow.GetHandle(),&overviewRect);
     
-    /* Get the width & height of the desktop window */
+    // Get the width & height of the desktop window
     GetWindowRect(hDesktop,&desktopRect);
-
-    /* Get the stored window position or use defaults if there's a problem */
+    
+    // Get the stored window position or use defaults if there's a problem
     mx = atoi(settingsFile->getSetting("tool window", "x").c_str());
 	my = atoi(settingsFile->getSetting("tool window", "y").c_str());
 	
@@ -64,23 +64,23 @@ int ToolWindow::Create(HWND)
 		WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | TCS_OWNERDRAWFIXED, 0, 0,
 		rect.right, rect.bottom, GetHandle(), NULL, Window::GetAppInstance(), NULL);
 
-    /* force Windows to send us messages/events related to the tab control */
+    // force Windows to send us messages/events related to the tab control
     SetWindowObject(hToolWindowTabControl,(Window*)this);
     oldTabControlProc=(WNDPROC)SetWindowLong(hToolWindowTabControl,GWL_WNDPROC,(long)&ToolWindowTabControlProcedure);
 
-    /* add tabs to list */
+    // add tabs to list
     tabs.push_back(&displayTab);
     tabs.push_back(&queryTab);
     tabs.push_back(&imageTab);  
     tabs.push_back(&featureTab);      
   
-    /* get size of tab control's client area (the area inside the tab control) */
+    // get size of tab control's client area (the area inside the tab control)
     GetClientRect(hToolWindowTabControl,&rect);   
 
-	/* Assign number of image bands to global variable */
+	// Assign number of image bands to global variable
     bands = image_handler->get_image_properties()->getNumBands() + 1;
 
-    /* calculate the width & height for our tab container windows */
+    // calculate the width & height for our tab container windows
     const int SPACING_FOR_TAB_HEIGHT=30;    /* the height of the tabs + a bit of spacing */
     const int SPACING_FOR_BOARDER=5;        /* left & right margain + spacing for tab control's borders */
     rect.left=SPACING_FOR_BOARDER; /**** new ****/
@@ -88,8 +88,7 @@ int ToolWindow::Create(HWND)
     rect.bottom-=SPACING_FOR_TAB_HEIGHT+SPACING_FOR_BOARDER;
     rect.right-=SPACING_FOR_BOARDER+SPACING_FOR_BOARDER;
     
-    /* create tab & tab containers */
-
+    // create tab & tab containers
     for (int i=0;i<tabs.size();i++)
     {
         ToolTab *tab=tabs.at(i);

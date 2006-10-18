@@ -19,6 +19,7 @@ void ROIFile::close () {
 
 
 /* Set ************************************************************************/
+
 void ROIFile::saveSetToFile (string filename, ROISet* rs, bool append) {
     openFile.open(filename);
     saveSetToFile(rs, append);
@@ -68,6 +69,7 @@ ROISet* ROIFile::loadSetFromFile () {
 
 
 /* Region *********************************************************************/
+
 void ROIFile::saveRegionToFile (string filename, ROI* roi) {
     openFile.open(filename);
     saveRegionToFile(roi);

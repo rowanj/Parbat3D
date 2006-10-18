@@ -29,6 +29,7 @@ class ROISet {
         
         
 /* Entities *******************************************************************/
+        
         /**
             Creates a new shape that will be part of the Region of Interest. The
             parameter passed in specifies what type of shape it will be - POINT,
@@ -83,6 +84,7 @@ class ROISet {
         
         
 /* Regions Of Interest ********************************************************/
+        
         /**
             Creates a new Region of Interest with a unique name. If there is a
             region that is currently be worked on, it is replaced by the new
@@ -109,10 +111,9 @@ class ROISet {
         */
         ROI* set_current (string);
         
-
-        
         
 /* Set ************************************************************************/
+        
         /**
             Adds the specified Region of Interest to the set. If the second
             parameter is set to true then if an existing Region of Interest has

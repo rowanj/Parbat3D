@@ -20,6 +20,7 @@ ROISet::~ROISet (void) {
 
 
 /* Entities *******************************************************************/
+
 void ROISet::new_entity (const char* t) {
     if (current_entity!=NULL) delete current_entity;
     current_entity = new ROIEntity();
@@ -50,7 +51,6 @@ void ROISet::backtrack (void) {
         p = &(current_entity->points);
         if (p->size()>1)
             p->pop_back();
-//            p->erase(p->end()-2, p->end()-1);
         else
             finish_entity(false);
     }
@@ -95,6 +95,7 @@ ROIEntity* ROISet::get_current_entity() {
 }
 
 /* Regions Of Interest ********************************************************/
+
 ROI* ROISet::new_region (void) {
     // get unique name
     int listSize = regions.size();
@@ -138,6 +139,7 @@ ROI* ROISet::set_current (string c) {
 
 
 /* Set ************************************************************************/
+
 void ROISet::add_region_to_set (ROI* roi, bool replace) {
     string name = roi->get_name();
     
