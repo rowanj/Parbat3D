@@ -170,15 +170,19 @@ void FeatureSpace::getPixelData(void)
 // Get entire image into ROI
 void FeatureSpace::getImageData(void)
 {
-	int ncols = fsTileset->get_columns();
-	int nrows = fsTileset->get_rows();
+	int lastcol = fsTileset->get_columns() - 1;
+	int lastrow = fsTileset->get_rows() - 1;
+	int lastcoldatawidth = fsTileset->get_last_column_width() / LODfactor;
+	int lastrowdataheight = fsTileset->get_last_row_height() / LODfactor;
 	unsigned char* tile;
 //	const unsigned char top_clip = 250;
 //	const unsigned char bottom_clip = 5;
 
-	for (int row = 0; row < nrows; row++) {
-		for (int col = 0; col < ncols; col++) {
+	// For all non-last-row non-last-column tiles
+	for (int row = 0; row < lastrow; row++) {
+		for (int col = 0; col < lastcol; col++) {
 			tile = (unsigned char*) fsTileset->get_tile_RGB_LOD(col * tileSize, row * tileSize, band1, band2, band3);
+			// Add every point
 			for (int pos = 0; pos < tileSize * tileSize * 3; pos = pos + 3) {
 //				if (tile[pos] < top_clip && tile[pos+1] < top_clip && tile[pos+2] < top_clip &&
 //				    tile[pos] > bottom_clip && tile[pos+1] > bottom_clip && tile[pos+2] > bottom_clip) {
@@ -189,6 +193,41 @@ void FeatureSpace::getImageData(void)
 			delete[] tile;
 		}
 	}
+	
+	// For the last column
+	for (int row = 0; row < lastrow; row++) {
+		tile = (unsigned char*) fsTileset->get_tile_RGB_LOD(lastcol * tileSize, row * tileSize, band1, band2, band3);
+		for(int y = 0; y < tileSize; y++) {
+			for(int x = 0; x < lastcoldatawidth; x++) {
+				int pos = (y * tileSize + x) * 3;
+				addToImageFSTable(tile[pos], tile[pos+1], tile[pos+2]);
+				numberPoints++;
+			}
+		}
+		delete[] tile;
+	}
+	// For the last row
+	for (int col = 0; col < lastcol; col++) {
+		tile = (unsigned char*) fsTileset->get_tile_RGB_LOD(col * tileSize, lastrow * tileSize, band1, band2, band3);
+		for(int y = 0; y < lastrowdataheight; y++) {
+			for(int x = 0; x < tileSize; x++) {
+				int pos = (y * tileSize + x) * 3;
+				addToImageFSTable(tile[pos], tile[pos+1], tile[pos+2]);
+				numberPoints++;
+			}
+		}
+		delete[] tile;
+	}
+	// For the last tile
+	tile = (unsigned char*) fsTileset->get_tile_RGB_LOD(lastcol * tileSize, lastrow * tileSize, band1, band2, band3);
+	for(int y = 0; y < lastcoldatawidth; y++) {
+		for(int x = 0; x < lastrowdataheight; x++) {
+			int pos = (y * tileSize + x) * 3;
+			addToImageFSTable(tile[pos], tile[pos+1], tile[pos+2]);
+			numberPoints++;
+		}
+	}
+	delete[] tile;
 }
 
 // -----------------------------------------------------------------------------------------
@@ -895,8 +934,12 @@ void FeatureSpace::addToImageFSTable(unsigned char b1, unsigned char b2, unsigne
 void FeatureSpace::addToROIFSTable(unsigned char b1, unsigned char b2, unsigned char b3)
 {
 	unsigned int hash = catForHash(b1, b2, b3);
-	fsROIPoints[hash]++;
-	fsImagePoints.erase(hash);
+	if (onlyROIs) {
+       	fsROIPoints[hash]++;
+	} else {
+		fsROIPoints[hash] += fsImagePoints[hash];
+		fsImagePoints.erase(hash);
+	}
 }
 
 

@@ -19,12 +19,14 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	ImageProperties* image_properties;
 
 	assert(tex_size_param > 0);
+	assert(file != NULL);
+	assert(level_of_detail > -2);
 
 	/* set instance variables */
 	LOD = level_of_detail;
 	image_file = file;
 	tex_size = tex_size_param;
-	cache_size = cache_size_param * (1024*1024);
+	cache_size = max(cache_size_param, 4) * (1024*1024);
 
 	/* initialize state */
 	cache_fill = 0;
@@ -32,7 +34,7 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	cache_misses = 0;
 	LOD_factor = 0;
 
-	/* !! Needs to get actual sample size from ImageFile */
+	/* !! Needs to get actual sample size from ImageFile for multi-byte support */
 	sample_size = 1;
 
 	/* Grab a handle to the image properties object */

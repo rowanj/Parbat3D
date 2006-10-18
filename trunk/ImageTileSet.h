@@ -27,6 +27,9 @@ public:
 	int get_LOD_factor(void) {return LOD_factor;}
 	int get_tile_image_size(void) {return tile_size;}
 	
+	int get_last_column_width(void) {return last_column_width;}
+	int get_last_row_height(void) {return last_row_height;}
+	
 	int get_texture_size(void);
 	int get_columns(void);
 	int get_rows(void);
