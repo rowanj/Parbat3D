@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Parbat 3D Reference Manual: Text File Format</title>
+  <link rel="stylesheet" href="assets/main.css" type="text/css">
+</head>
+
+
+<body>
+<h1>Compiling Parbat3D</h1>
+
+
+<p>
+Parbat 3D is developed using Bloodshed Dev-C++
+</p>
+
+<h2>Obtaining the Source</h2>
+<p>
+The development source tree for parbat is publically available from own SubVersion repository at:<br />
+https://svn.sourceforge.net/svnroot/parbat/trunk
+</p>
+<p>
+In order to download the latest version of the source code, you will need to obtain an SVN client, such as <a href="http://tortoisesvn.tigris.org/">TortiseSVN</a> and follow its instructions to download from the above URL.
+</p>
+
+<h2>Setting up your Development Environment</h2>
+<p>
+To compile from source, you will need to have the GDAL libraries and headers installed.  You can obtain these as a ZIP archive from the developer package on the <a href="http://sourceforge.net/projects/parbat">SourceForge.net file release system</a>.
+</p>
+
+<p>
+You will need to un-pack the archived directory into the top level of the Parbat3D source tree.
+</p>
+
+<p>
+In order to compile your software you will also need to a copy of the Bloodshed <a href="http://www.bloodshed.net/devcpp.html">Dev-C++ IDE</a>. This document will describe how to compile using version 4.9.9.2.
+</p>
+
+
+<h2>Setting up your Runtime Environment</h2>
+
+<p>
+In order to actually run the compiled executable, you will need to unzip the DLL runtime archive from our <a href="http://sourceforge.net/projects/parbat">SourceForge.net file release system</a> into the directory you have the copiled executable in (by default, the top-level build directory).
+</p>
+
+<p>
+We have taken great care to package all the required libraries, although we may have missed one or two, if you have any further library problems at run-time, please post in our support forums.
+</p>
+
+<h2>Compiling The Source Code</h2>
+<p>
+Once you have setup your development and runtime environments and downloaded the source code, open the project file parbat3d.dev in Dev-C++. The parbat3d.dev file should be located in the 
+top level of the Parbat3D source tree.
+</p>
+<p>
+Once the Parbat3D project file has been opened, click on 'Compile & Run' from the 'Execute' menu within Dev-C++.
+</p>
+
+</body>
+</html>
