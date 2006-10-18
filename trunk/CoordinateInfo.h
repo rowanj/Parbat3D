@@ -11,9 +11,7 @@
 
 #include "config.h"
 #include <string>
-#if PLATFORM_W32
 #include <windows.h>
-#endif
 
 class CoordinateInfo
 {

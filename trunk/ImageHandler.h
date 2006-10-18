@@ -2,17 +2,13 @@
 #define _IMAGE_HANDLER_H
 
 #include <string>
-#if PLATFORM_W32
 #include <windows.h>
-#endif
 
 #include "ImageFile.h"
 #include "ImageProperties.h"
 #include "OverviewGL.h"
 #include "ImageGL.h"
 #include "ImageViewport.h"
-
-#include "config.h"
 
 class ImageHandler
 {

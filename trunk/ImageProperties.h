@@ -13,9 +13,8 @@
 #include "console.h"
 #include <string>
 #include <iostream>
-#if PLATFORM_W32
+
 #include <windows.h>
-#endif
 
 
 class ImageProperties
