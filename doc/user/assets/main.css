@@ -3,10 +3,16 @@
     font-weight: bold;
     font-family: arial, "lucida grande", helvetica, sans-serif;
     color: #005A9C;
-    background-color: white;
-    padding-bottom: 10px;
-    border-bottom-width: 1px;
-    border-bottom-style: dotted;
+    background-color: EEEFFF;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-width: 1px;
+    border-color: #888;
+    border-style: solid;
+    }
+
+  img {
+    margin-left: 3ex;
     }
 
   p { margin-left: 2ex; }
