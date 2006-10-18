@@ -273,7 +273,7 @@ void Window::OnKeyDown(int virtualKey)
 		// help ----------------------------------------------------------------
         case Window::KEY_HELP:
             // get path to help folder
-            helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");
+            helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.html");
             
             // launch default browser
             ShellExecute(NULL, "open", helpPath, NULL, "help", SW_SHOWNORMAL);

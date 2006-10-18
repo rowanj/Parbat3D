@@ -194,7 +194,7 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 
                 case IDM_HELPCONTENTS:
 					 // get path to help folder
-                     helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.htm");
+                     helpPath = catcstrings( (char*) modulePath, (char*) "\\help\\index.html");
 
 				     // launch default browser
                      ShellExecute(NULL, "open", helpPath, NULL, "help", SW_SHOWNORMAL);
