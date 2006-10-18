@@ -61,6 +61,8 @@ LRESULT CALLBACK DisplayWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM 
             if (image_handler) {
                 /* Re-size OpenGL stuff */
                 image_handler->resize_image_window();
+       			/* update title bar text incase zoom level changes */
+ 	           imageWindow.updateImageWindowTitle();
             } else {
                 /* re-position message */
                 GetClientRect(hwnd,&rect);

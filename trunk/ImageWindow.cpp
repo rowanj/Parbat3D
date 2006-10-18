@@ -413,6 +413,7 @@ LRESULT CALLBACK ImageWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM wP
             /* update scroll bar settings */
             if (image_handler)
                 win->updateImageScrollbar();
+
             return 0;
            
         case WM_SHOWWINDOW:
