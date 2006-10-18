@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Parbat 3D Reference Manual: Text File Format</title>
+  <link rel="stylesheet" href="assets/main.css" type="text/css">
+</head>
+
+
+<body>
+<h2>View Package</h2>
+
+
+<p>The view package contains the main source files for handling the graphical user interface and communicating with the Microsoft Windows API. It consists of a class for each main window, a class for each tab in the tool window, a class to handle snapping the main windows together and some other general windowing classes.</p>
+
+<h3>Windows</h3>
+<h4>sfdsdfsreg</h4>
+<p>
+Each of the main windows have their own class that is subclassed from a general Window class. 
+</p>
+<p>
+The Window class handles generating each main window through the Windows API and associates them with their own c++ object. This allows static event handlers to directly access the main window objects and their variables.
+</p>
+
+There is a message handler in the Window class which handles all events for all of the main windows by default. The main functions of this handler is handling the global shortcut keys and  snapping and moving snapped windows (through the sticky window manager).
+
+The class has been written in a way that allows multiple message handlers to process messages in a chain. Each of the main windows use this feature to process some of their own events, while allowing the Window class to process everything else. The majority of the messages that the main windows process are passed on to Window class. The messages that are not processed by the Window class are then passed onto the Window API to perform the default operation.
+
+</p>
+
+<h4>Overview Window</h4>
+<p>
+The overview window
+</p>
+
+<h4>Image Window</h4>
+<p>
+</p>
+
+
+<h4>Tools Window</h4>
+<p>
+</p>
+
+
+<h4>Overview Window</h4>
+<p>
+</p>
+
+
+<h4>Contrast Stretch Window</h4>
+<p>
+</p>
+
+<h4>Preferences Window</h4>
+<p>
+</p>
+
+
+<h3>Tabs</h3>
+<h4>Tool Window Tabs</h4>
+<p>
+</p>
+
+<h3>Other Classes</h3>
+<h4>Sticky Window Manager</h4>
+<p>
+</p>
+
+<h4>Display Window</h4>
+<p>
+</p>
+
+
+</body>
+</html>
