@@ -86,6 +86,9 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
     static RECT rect;  // for general use
     int mx, my;        // mouse position
     
+    int roix, roiy;    // coords of ROI window
+    int toolx, tooly;  // coords of tool window
+    
     OverviewWindow* win = (OverviewWindow*) Window::GetWindowObject(hwnd);
     
     
@@ -155,23 +158,36 @@ LRESULT CALLBACK OverviewWindow::WindowProcedure(HWND hwnd, UINT message, WPARAM
                 
                 
                 case IDM_RESETWINPOS:
+                    // imageWindow.GetHandle() - NULL if not created
+                    // (IsZoomed(hwnd)) - true if maximised
+                    // ShowWindow() - set maximised
+                    
+                    roix = overviewWindow.getWidth()+10;
+                    roiy = 10;
+                    toolx = 10;
+                    tooly = overviewWindow.getHeight()+10;
+                    
                     // overview window
                     MoveWindow(overviewWindow.GetHandle(), 10, 10, overviewWindow.getWidth(), overviewWindow.getHeight(), true);
                     
                     // image window
-                    if (!(win->toggleMenuItemTick(win->hMainMenu, IDM_IMAGEWINDOW)))  // checks if window open (also changes menu checkbox selection)
-                        MoveWindow(imageWindow.GetHandle(), overviewWindow.getWidth()+10, 10, imageWindow.getWidth(), imageWindow.getHeight(), true);
-                    win->toggleMenuItemTick(win->hMainMenu, IDM_IMAGEWINDOW);         // changes selection back
+                    if (imageWindow.GetHandle() != NULL) {
+                        if (!IsZoomed(imageWindow.GetHandle())) {
+                            MoveWindow(imageWindow.GetHandle(), overviewWindow.getWidth()+10, 10, imageWindow.getWidth(), imageWindow.getHeight(), true);
+                            roix = 10;
+                            roiy = overviewWindow.getHeight()+10;
+                            toolx = 10;
+                            tooly = overviewWindow.getHeight()+40;
+                        }
+                    }
                     
                     // roi window
-                    if (!(win->toggleMenuItemTick(win->hMainMenu, IDM_ROIWINDOW)))    // checks if window open (also changes menu checkbox selection)
-                        MoveWindow(roiWindow.GetHandle(), 10, overviewWindow.getHeight()+10, roiWindow.getWidth(), roiWindow.getHeight(), true);
-                    win->toggleMenuItemTick(win->hMainMenu, IDM_ROIWINDOW);           // changes selection back
+                    if (roiWindow.GetHandle() != NULL)
+                        MoveWindow(roiWindow.GetHandle(), roix, roiy, roiWindow.getWidth(), roiWindow.getHeight(), true);
                     
                     // tool window
-                    if (!(win->toggleMenuItemTick(win->hMainMenu,IDM_TOOLSWINDOW)))   // checks if window open (also changes menu checkbox selection)
-                        MoveWindow(toolWindow.GetHandle(), 10, overviewWindow.getHeight()+40, toolWindow.getWidth(), toolWindow.getHeight(), true);
-                    win->toggleMenuItemTick(win->hMainMenu,IDM_TOOLSWINDOW);          // changes selection back
+                    if (toolWindow.GetHandle() != NULL)
+                        MoveWindow(toolWindow.GetHandle(), toolx, tooly, toolWindow.getWidth(), toolWindow.getHeight(), true);
                     return 0;
                 
                 
