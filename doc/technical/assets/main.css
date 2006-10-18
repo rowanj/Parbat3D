@@ -11,6 +11,8 @@
 
   p { margin-left: 2ex; }
 
+  em { font-weight: bold }
+
   pre { font-family: monaco, courier, monospace;
     border-width: 1px;
     border-color: #888;
