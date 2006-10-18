@@ -1,56 +1,101 @@
 
-  h1 { font-size: 24pt;
+  h1 { font-size: 20pt;
     font-weight: bold;
-    font-family: verdana,arial;
+    font-family: arial, "lucida grande", helvetica, sans-serif;
+    color: #005A9C;
+    background-color: white;
     padding-bottom: 10px;
     border-bottom-width: 1px;
     border-bottom-style: dotted;
     }
 
-  h2 { font-family: verdana,arial;
-    font-size: 18pt;
+  p { margin-left: 2ex; }
+
+  pre { font-family: monaco, courier, monospace;
+    border-width: 1px;
+    border-color: #888;
+    border-style: solid;
+    margin-left: 3ex;
+    margin-right: 3ex;
+    padding: 1ex;
+    }
+
+  h2 { font-family: arial, "lucida grande", helvetica, sans-serif;
+    color: #005A9C;
+    background-color: white;
+    font-size: 16pt;
     font-weight: bold;
     }
 
-  h3 { font-family: verdana,arial;
+  h3 { font-family: arial, "lucida grande", helvetica, sans-serif;
     font-weight: bold;
+    color: #005A9C;
+    background-color: white;
     font-size: 12pt;
     font-style: normal;
     }
 
   h4 {
-    font-family: verdana,arial;
+    font-family: arial, "lucida grande", helvetica, sans-serif;
     font-weight: normal;
+    color: #005A9C;
+    background-color: white;
     font-size: 12pt;
     font-style: italic;
     }
 
+  table {
+    font-family: monaco, courier, monospace;
+    margin-left: 3ex;
+    margin-right: 3ex;
+    }
+  
+  td {
+    border: 1px;
+    border-color: #888;
+    border-style: solid;
+    padding: 0.5ex;
+    }
+  
+  th {
+    font-weight: bold;
+    padding-top: 1ex;
+    }
+
   /* default font */
-  * { font-family: verdana,arial;
+  * { font-family: arial, "lucida grande", helvetica, sans-serif;
     font-size: 12pt;
     font-weight: normal;
     font-style: normal;
     }
 
   /* styles for Table Of Contents */
-  ol.h1 { font-family: verdana,arial;
-    font-size: 24pt;
+  ol.h1 { font-family: arial, "lucida grande", helvetica, sans-serif;
+    font-size: 20pt;
+    color: #005A9C;
+    background-color: white;
     font-weight: bold;
     }
 
-  ol.h2 { font-family: verdana,arial;
-    font-size: 18pt;
+  ol.h2 { font-family: arial, "lucida grande", helvetica, sans-serif;
+    font-size: 16pt;
+    color: #005A9C;
+    background-color: white;
     font-weight: bold;
     }
 
-  ol.h2 li { font-family: verdana,arial;
-    font-size: 18pt;
+  ol.h2 li { font-family: arial, "lucida grande", helvetica, sans-serif;
+    font-size: 16pt;
+    color: #005A9C;
+    background-color: white;
     font-weight: bold;
     }
 
-  ol.h3 li { font-family: verdana,arial;
+  ol.h3 li { font-family: arial, "lucida grande", helvetica, sans-serif;
     font-size: 14pt;
     font-weight: bold;
+    color: #005A9C;
+    background-color: white;
     font-style: italic;
     }
 

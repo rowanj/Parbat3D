@@ -19,12 +19,12 @@
 
 <h3>Sections</h3>
 <p>Each section in the file contains similar information grouped under a common heading. The start of a section is defined by a line that contains the name of the section inside square brackets. An example of a section definition is the shown on the following line:
-<p>[SectionName]</p>
+<pre>[SectionName]</pre>
 <p>The section name may contain any standard characters from the ASCII character set, including letters, numbers, spaces, full stops and even square brackets. The only character not allowed is the new line character. Not printable characters are not recommended for use but are still allowed. The following section names are all legitimate:<p>
-<p>[section name]
-<br/>[SECTION-nAmE]
-<br/>[.a5_]
-<br/>[ ]</p>
+<pre>[section name]
+[SECTION-nAmE]
+[.a5_]
+[ ]</pre>
 
 <h4>Restrictions</h4>
 <p>The only restrictions that are placed on the section names are as follows.</p>
@@ -39,12 +39,12 @@
 
 <h2>Keys and Data</h2>
 <p>The actual information in the file is stored in key and data combinations. Each piece of data has a corresponding key that is used to identify it. Because the key is used for identification it must be unique in the section. The key and data are on a single line and are separated by an equals (=) sign. Everything before the equals sign is considered to be the key and everything after is considered to be the data. An example of a key-data combination definition is the shown on the following line:</p>
-<p>key=data</p>
+<pre>key=data</pre>
 <p>Examples of legitimate key and data combinations are as follows.</p>
-<p>field=value
-<br/>a string=yet another piece of pointless data
-<br/>numbers=2,3,42,3.14
-<br/>_this_=.one,"seven"</p>
+<pre>field=value
+a string=yet another piece of pointless data
+numbers=2,3,42,3.14
+_this_=.one,"seven"</pre>
 
 <h4>Key Restrictions</h4>
 <ul>
@@ -66,13 +66,13 @@
 <h2>Settings</h2>
 <p>Various settings in Parbat3D are preserved by saving and loading them to and from a settings file. The settings are divided into groups (such a windows, preferences, keyboard shortcuts, etc) and each one of these groups is turned into a section heading. The name of the setting is used as the key and the actual setting becomes the data. The following is a example</p>
 <p>To save the position of the overview window, the overview window would be used as the group and each axis that the window is position on (x, y) becomes a key. The actual positions become the data. The way this data would be stored is the shown on the following lines:</p>
-<p>[overview window]
-<br/>x=200
-<br/>y=50</p>
+<pre>[overview window]
+x=200
+y=50</pre>
 
 <h3>Location of the File</h3>
 <p>To allow different users to have their own settings, the file is stored in their Application Data folder. An example path to the settings file is shown below. This example considers that the user is logged onto the computer using an account called "User".</p>
-<p>C:\Documents and Settings\User\Application Data\Imagery\Parbat3D\settings.ini</p>
+<pre>C:\Documents and Settings\User\Application Data\Imagery\Parbat3D\settings.ini</pre>
 
 <h3>Settings</h3>
 <p>Here is a list of the settings that are saved as they would be seen in the settings.ini file. Next to each setting is an explanation of what the setting is used for</p>
@@ -131,16 +131,16 @@
 
 <h4>Count</h4>
 <p>The number of ROIs is stored under the key "count". If there are 3 ROIs in the set then the count will read as follows:</p>
-<p>count=3</p>
+<pre>count=3</pre>
 
 <h4>Names</h4>
 <p>All the names of the ROIs are stored as data under different keys. The key to each ROI name starts with "ROI " and then has a number to uniquely identify it. The numbering of ROIs starts at 0 and will end at a number one less than the total count. If the 3rd ROI name (called "trees" for example) was going to be stored it would have the format "ROI 2=trees".</p>
 <p>An example of how this section would look in the file is as follows. This set has 3 ROIs called "trees", "water" and "buildings".</p>
-<p>[ROI List]
-<br/>count=3
-<br/>ROI 0=trees
-<br/>ROI 1=water
-<br/>ROI 2=buildings</p>
+<pre>[ROI List]
+count=3
+ROI 0=trees
+ROI 1=water
+ROI 2=buildings</pre>
 
 
 <h3>Region of Interest</h3>
@@ -154,44 +154,44 @@
 <p>Each entity has a type that is stored under the key "entity n type=", where n represents the number of the ROI. If the 4th entity was rectangular, its type would be stored as "entity 3 type=RECT".</p>
 <h4>Points</h4>
 <p>Each entity is made up of a number of points. A POINT entity only needs 1 point, a RECT requires 2 points (top-left and bottom-right) and a POLY can have any number of points, but requires at least 3. The total number of points in the entity are stored in the following format:</p>
-<p>entity n points=p</p>
+<pre>entity n points=p</pre>
 <p>Where n is the entity number and p is the total number of points. Each point is represented by the following line:</p>
-<p>entity n point p=x y</p>
+<pre>entity n point p=x y</pre>
 <p>Where n is the entity number, p is the point number and x and y make up the position that the point is at in the image. Depending on how many points were specified in the entity that will correspond to the number of lines that are needed in the file.</p>
 
 <h3>Example</h3>
 <p>The following is an example of the contents of an ROI text file. The following set contains 2 ROIs, called water and grass. Water is coloured blue and grass is coloured green. The water ROI has a single POLY entity with 4 points. The grass ROI has 3 entities - a POINT, a RECT and a POLY with 3 points.</p>
 
-<p>[ROI List]
-<br/>count=2
-<br/>ROI 0=water
-<br/>ROI 1=grass</p>
+<pre>[ROI List]
+count=2
+ROI 0=water
+ROI 1=grass
 
-<p>[water]
-<br/>colour=0 0 255
-<br/>entities=1
-<br/>entity 0 type=POLY
-<br/>entity 0 points=4
-<br/>entity 0 point 0=117 419
-<br/>entity 0 point 1=255 213
-<br/>entity 0 point 2=443 345
-<br/>entity 0 point 3=279 505</p>
+[water]
+colour=0 0 255
+entities=1
+entity 0 type=POLY
+entity 0 points=4
+entity 0 point 0=117 419
+entity 0 point 1=255 213
+entity 0 point 2=443 345
+entity 0 point 3=279 505
 
-<p>[grass]
-<br/>colour=0 255 0
-<br/>entities=3
-<br/>entity 0 type=RECT
-<br/>entity 0 points=2
-<br/>entity 0 point 0=79 221
-<br/>entity 0 point 1=211 408
-<br/>entity 1 type=POINT
-<br/>entity 1 points=1
-<br/>entity 1 point 0=79 221
-<br/>entity 2 type=POLY
-<br/>entity 2 points=4
-<br/>entity 2 point 0=23 42
-<br/>entity 2 point 1=214 2
-<br/>entity 2 point 1=703 33</p>
+[grass]
+colour=0 255 0
+entities=3
+entity 0 type=RECT
+entity 0 points=2
+entity 0 point 0=79 221
+entity 0 point 1=211 408
+entity 1 type=POINT
+entity 1 points=1
+entity 1 point 0=79 221
+entity 2 type=POLY
+entity 2 points=4
+entity 2 point 0=23 42
+entity 2 point 1=214 2
+entity 2 point 1=703 33</pre>
 
 </body>
 </html>
