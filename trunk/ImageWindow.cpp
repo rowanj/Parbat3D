@@ -268,7 +268,7 @@ void ImageWindow::zoomImage(float nlevels)
     float zoom=image_handler->get_image_viewport()->get_zoom_level();
     float increment = ((float)nlevels * zoom) / 50.0;
 
-    Console::write("zoomImage() nlevels=%d, increment=%f, new_zoom=%f\n", nlevels, increment, zoom);
+    //Console::write("zoomImage() nlevels=%d, increment=%f, new_zoom=%f\n", nlevels, increment, zoom);
     image_handler->get_image_viewport()->set_zoom_level(zoom+increment);
 
     updateImageWindowTitle();
