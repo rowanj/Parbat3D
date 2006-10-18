@@ -28,8 +28,6 @@ void sleep(unsigned int mseconds) {
     while (goal > clock());
 }
 
-
-
 // create & display new feature space window
 FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
     theLOD = LOD;
@@ -95,7 +93,7 @@ void FeatureSpace::getPixelData(void)
 	LODwidth = fsTileset->get_LOD_width();
 	LODheight = fsTileset->get_LOD_height();
 	
-	getImageData(); // Populate fsAllPoints, as
+	if (!onlyROIs) getImageData(); // Populate fsAllPoints, as
 	
 	Console::write("FS::GpixD\tLOD factor is %d\n", LODfactor);
 
@@ -143,15 +141,15 @@ void FeatureSpace::getPixelData(void)
 							getPolygonData(currentEntity, currentROI);
 						}
 					}
+					int red, green, blue;
+					currentROI->get_colour(&red, &green, &blue);
+					fsgl->add_points(fsROIPoints, red, green, blue);
 				}
 			}
 			else
 			{
 				Console::write("FS::GpixD\tthe entities set is empty\n");	
 			}
-			int red, green, blue;
-			currentROI->get_colour(&red, &green, &blue);
-			fsgl->add_points(fsROIPoints, red, green, blue);
 		}
 		fsROIPoints.clear(); // Clear the ROI hash
 	}
@@ -161,7 +159,7 @@ void FeatureSpace::getPixelData(void)
 	}
 	#endif // ENABLE_ROI_POINTS
 	
-	fsgl->add_points(fsImagePoints, 255, 255, 255);
+	if (!onlyROIs) fsgl->add_points(fsImagePoints, 255, 255, 255);
 	fsImagePoints.clear();
 
 	delete fsTileset;

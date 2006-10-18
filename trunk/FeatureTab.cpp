@@ -154,14 +154,13 @@ int FeatureTab::Create(HWND parent,RECT *parentRect)
     //return true;
 }
 
-void FeatureTab::OnGenerateClicked(int lod, int x, int y, int z)
+void FeatureTab::OnGenerateClicked(int lod, bool rois_only, int x, int y, int z)
 {
-    int only_ROIs=false;  /* todo: change to get actual values */
     
     Console::write("FeatureTab::OnGenerateClicked\n");
     SendMessage(hgenerate,BM_SETCHECK,BST_CHECKED,0);       // make button appear pushed in
     //FeatureSpace *fspace=new FeatureSpace(lod - 1,only_ROIs);
-    FeatureSpace *fspace=new FeatureSpace(lod - 1,only_ROIs, x, y, z);
+    FeatureSpace *fspace=new FeatureSpace(lod - 1,rois_only, x, y, z);
     SendMessage(hgenerate,BM_SETCHECK,BST_UNCHECKED,0);     // make button appear normal
 
     // remove all mouse messages from the queue (prevent user from clicking on generate while one was being generated)
@@ -220,13 +219,10 @@ LRESULT CALLBACK FeatureTab::WindowProcedure(HWND hwnd, UINT message, WPARAM wPa
 					if(state==BST_CHECKED)
 						z = i;
 				}
-				LRESULT state = SendMessageA(win->hROIOnly, BM_GETCHECK, 0, 0);
-				if(state==BST_CHECKED)
-					MessageBox( hwnd, (LPSTR) "ROI only Checkbox selected", (LPSTR) "ROI Checked", MB_ICONINFORMATION | MB_OK );
-
+				LRESULT rois_only_state = SendMessageA(win->hROIOnly, BM_GETCHECK, 0, 0);
 				
             DWORD GranState = SendMessageA(win->hTrackbar, TBM_GETPOS, 0, 0);
-            win->OnGenerateClicked((int)GranState, x, y, z);
+            win->OnGenerateClicked((int)GranState, (rois_only_state==BST_CHECKED), x, y, z);
             
             
 			//MessageBox( hwnd, (LPSTR) makeMessage("GranState:",(int)GranState), (LPSTR) "Title", MB_ICONINFORMATION | MB_OK );

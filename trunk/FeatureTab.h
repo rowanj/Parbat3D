@@ -15,7 +15,7 @@ class FeatureTab:public ToolTab
         HWND *zRadiobuttons;
         HWND hROIOnly;
         HWND htitle;
-        void OnGenerateClicked(int lod,int x, int y, int z);
+        void OnGenerateClicked(int lod, bool rois_only, int x, int y, int z);
         void OnUserMessage();
         static int guessPoints(int slider_pos);
     public:
