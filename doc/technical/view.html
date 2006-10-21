@@ -2,73 +2,91 @@
 <html>
 <head>
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-  <title>Parbat 3D Reference Manual: Text File Format</title>
+  <title>Parbat 3D Reference Manual: View</title>
   <link rel="stylesheet" href="assets/main.css" type="text/css">
 </head>
 
 
 <body>
-<h2>View Package</h2>
-
-
-<p>The view package contains the main source files for handling the graphical user interface and communicating with the Microsoft Windows API. It consists of a class for each main window, a class for each tab in the tool window, a class to handle snapping the main windows together and some other general windowing classes.</p>
+<h2>View</h2>
+<p>The View package consists of a group of source files that are responsible for displaying windows, handling events and 
+interfacing with the Windows API. It also handles starting and quiting the application, which includes constructing and 
+deconstructing objects from the other packages as they are required. Each of the main windows have been seperated into 
+their own class, which extends from a general Window class that contains most of the common functionality.
 
 <h3>Windows</h3>
-<h4>sfdsdfsreg</h4>
+<h4>The General Window Class</h4>
 <p>
-Each of the main windows have their own class that is subclassed from a general Window class. 
+The Window class is resposible for creating the main windows through the Windows API and associating them with their own 
+c++ objects. It also contains code to handle certain events that are common between all of the main windows (see Event Handling). 
+These common events include global key shortcuts, sticking and dragging windows around the screen and destroying windows. Some 
+simple functions are also included to wrap around the Window API.
+</p>
+
+<h4>Main Window</h4>
+<p>
+The Main Window is an off-screen window that is not visible to the users. All of the other windows are "owned" by this window. 
+Its purpose was to be used as the window that appears in the taskbar, that will automatically minimize and restore the other
+windows as required. This has now been acheived in a better way, by showing the Overview window in the taskbar instead.
 </p>
 <p>
-The Window class handles generating each main window through the Windows API and associates them with their own c++ object. This allows static event handlers to directly access the main window objects and their variables.
-</p>
-
-There is a message handler in the Window class which handles all events for all of the main windows by default. The main functions of this handler is handling the global shortcut keys and  snapping and moving snapped windows (through the sticky window manager).
-
-The class has been written in a way that allows multiple message handlers to process messages in a chain. Each of the main windows use this feature to process some of their own events, while allowing the Window class to process everything else. The majority of the messages that the main windows process are passed on to Window class. The messages that are not processed by the Window class are then passed onto the Window API to perform the default operation.
-
+The main purpose of the Main Window now is to hide, show, enable and disable all of the other windows when required.
 </p>
 
 <h4>Overview Window</h4>
 <p>
-The overview window
+The Overview Window is considered to the user to be the "main window" of the application. It is the only window that appears 
+when the program starts up. The job of the overview window is to show an overview of the image that is currently open (if there is 
+one) and to provide the main functions of the program to the user through the use of a menu bar. Apart from the Feature Space 
+Windows, it is the only window that can be minimized to the task bar. Minimizing and restoring this window minimizes and 
+restores the remaining windows that do not appear on the task bar. The overview of the image is displayed using the Display 
+Window class.
 </p>
 
 <h4>Image Window</h4>
 <p>
+The Image Window is a resizable window that displays the currently loaded image. It handles navigating and zooming the image by 
+both keyboard shortcuts and scrollbars. The image is displayed inside the window using the Display Window class.
 </p>
-
 
 <h4>Tools Window</h4>
 <p>
 </p>
 
-
-<h4>Overview Window</h4>
+<h4>Feature Space Window</h4>
 <p>
 </p>
 
+<h4>Preference Window</h4>
+<p>
+</p>
 
 <h4>Contrast Stretch Window</h4>
 <p>
 </p>
 
-<h4>Preferences Window</h4>
-<p>
-</p>
-
-
-<h3>Tabs</h3>
-<h4>Tool Window Tabs</h4>
-<p>
-</p>
-
-<h3>Other Classes</h3>
-<h4>Sticky Window Manager</h4>
+<h3>Other GUI Components</h3>
+<h4>Scroll Box</h4>
 <p>
 </p>
 
 <h4>Display Window</h4>
 <p>
+</p>
+
+<h4>Tabs</h4>
+<p>
+</p>
+
+
+<h3>Event Handling</h3>
+<p>
+
+</p>
+
+<h3>Sticky/Snapping Windows</h3>
+<p>
+
 </p>
 
 
