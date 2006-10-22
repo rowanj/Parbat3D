@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Parbat 3D Reference Manual: Source - Image Manipulation PKG</title>
+  <link rel="stylesheet" href="assets/main.css" type="text/css">
+</head>
+
+
+<body>
+<h1>Source - Image Manipulation PKG</h1>
+<p class="indexlink"><a href="index.html">Back to Contents</a></p>
+
+<hr />
+
+<h2>ImageHandler</h2>
+<p>
+The ImageHandler class conceptually provides a state wrapper for all classes that relate directly to the currently open image.
+</p>
+
+<p>
+This was to provide abstraction from global variables, such that concurrent instances could be created, allowing for multiple files to be open at a time without special provision.
+</p>
+
+
+<hr />
+<h2>OpenGL Classes</h2>
+<p>
+This sub-section contains classes that deal directly with, or support the OpenGL routines that run the display of image, overview, and text data within the program.
+</p>
+
+<h3>GLText</h3>
+<p>
+GLText provides a wrapper to system-specific font functions, and OpenGL transforms required to draw text in a sensible manner to arbitrary screen positions.
+</p>
+
+<h3>GLView</h3>
+<p>
+GLView is a wrapper to system-dependant functions relating to creation, destruction, and maintainence of an OpenGL context.
+</p>
+
+<h3>ImageGL</h3>
+<p>
+This class manages the functions required to draw the image in the main image window, along with Regions of Interest and tile/texture maintainence and tracking.
+</p>
+
+<p>
+Also provided is a simplified interface for adjusting the contrast and brightness of the image displayed (without affecting the data used for pixel operations or feature space generation).
+</p>
+
+<h3>OverviewGL</h3>
+<p>
+This class manages the display of the graphics in the overview window, including the main window bounds highlight, used to visualise the current viewport in the overall image.
+</p>
+
+<p>
+It also provides an interface for adjusting the displayed brightness/contrast (see: ImageGL).
+</p>
+
+<hr />
+<h2>Support Classes</h2>
+
+<h3>ImageTileSet</h3>
+<p>
+ImageTileSet provides decoding and caching of image tiles as requested, as well as information for translation between image and Level of Detail coordinates, and data about the current level of detail.
+</p>
+
+<p>
+Tiles may be requested either in image or LOD coordinates, with up to 3 image bands packed in the order specified.
+</p>
+
+<p>
+Conceptually, it may be possible to implement look-ahead caching and/or multi-threading in the cache system herein; which may be one of the largest possible performance increases attainable in this implementation.
+</p>
+
+<h3>ImageViewport</h3>
+<p>
+This class provides consistency for manipulations of the viewport between ImageGL and OverviewGL.
+</p>
+
+<p>
+It also helps abstract viewport, zoom, and image coordinates.
+</p>
+
+<h3>ViewportListner</h3>
+<p>
+Abstract class that provides a regular interface for classes that wish to be notified about viewport or band events.
+</p>
+
+<p>
+Currently inherited only by ImageGL and OverviewGL.
+</p>
+
+
+<hr />
+
+<p class="indexlink"><a href="index.html">Back to Contents</a></p>
+
+
+
+</body>
+</html>
