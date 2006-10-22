@@ -18,6 +18,7 @@
 Parbat 3D is developed using Bloodshed Dev-C++
 </p>
 
+<a name="obtaining"></a>
 <h2>Obtaining the Source</h2>
 <p>
 The development source tree for parbat is publically available from own SubVersion repository at:<br />
@@ -41,6 +42,7 @@ In order to compile your software you will also need to a copy of the Bloodshed 
 </p>
 
 
+<a name="runtime"></a>
 <h2>Setting up your Runtime Environment</h2>
 
 <p>
@@ -51,6 +53,7 @@ In order to actually run the compiled executable, you will need to unzip the DLL
 We have taken great care to package all the required libraries, although we may have missed one or two, if you have any further library problems at run-time, please post in our support forums.
 </p>
 
+<a name="compiling"></a>
 <h2>Compiling The Source Code</h2>
 <p>
 Once you have setup your development and runtime environments and downloaded the source code, open the project file parbat3d.dev in Dev-C++. The parbat3d.dev file should be located in the 
@@ -58,6 +61,226 @@ top level of the Parbat3D source tree.
 </p>
 <p>
 Once the Parbat3D project file has been opened, click on 'Compile & Run' from the 'Execute' menu within Dev-C++.
+</p>
+
+<a name="sourcefiles"></a>
+<h2>List Of Source Files</h2>
+<p>
+The following is a list of source files that are contained in the repository (at the time this document was written):
+</p>
+<p>
+<pre>
+AUTHORS.txt
+BandInfo.cpp
+BandInfo.h
+BatchIniFile.cpp
+BatchIniFile.h
+ChangeLog.txt
+config.h
+console.cpp
+console.h
+ContrastAdvWindow.cpp
+ContrastAdvWindow.h
+ContrastWindow.cpp
+ContrastWindow.h
+CoordinateInfo.cpp
+CoordinateInfo.h
+COPYING.txt
+DisplayTab.cpp
+DisplayTab.h
+DisplayWindow.cpp
+DisplayWindow.h
+FeatureSpace.cpp
+FeatureSpace.h
+FeatureSpaceGL.cpp
+FeatureSpaceGL.h
+FeatureTab.cpp
+FeatureTab.h
+GLContainer.cpp
+GLContainer.h
+GLText.cpp
+GLText.h
+GLView.cpp
+GLView.h
+ImageFile.cpp
+ImageFile.h
+ImageGL.cpp
+ImageGL.h
+ImageHandler.cpp
+ImageHandler.h
+ImageProperties.cpp
+ImageProperties.h
+ImageTab.cpp
+ImageTab.h
+ImageTileSet.cpp
+ImageTileSet.h
+ImageViewport.cpp
+ImageViewport.h
+ImageWindow.cpp
+ImageWindow.h
+IniFile.cpp
+IniFile.h
+main.cpp
+main.h
+MainWindow.cpp
+MainWindow.h
+Makefile.win
+OverviewGL.cpp
+OverviewGL.h
+OverviewWindow.cpp
+OverviewWindow.h
+Parbat3D.dev
+parbat3D.exe.manifest
+Parbat3D.ico
+Parbat3D_private.h
+Parbat3D_private.rc
+PointsHash.h
+point_texture.c
+PrefsWindow.cpp
+PrefsWindow.h
+ProgressWindow.cpp
+ProgressWindow.h
+QueryTab.cpp
+QueryTab.h
+resources.h
+ROI.cpp
+ROI.h
+ROIFile.cpp
+ROIFile.h
+ROISet.cpp
+ROISet.h
+ROIWindow.cpp
+ROIWindow.h
+rsrc.rc
+ScrollBox.cpp
+ScrollBox.h
+Settings.cpp
+Settings.h
+StickyWindowManager.cpp
+StickyWindowManager.h
+StringUtils.cpp
+StringUtils.h
+TestUtils.cpp
+TestUtils.h
+ToolTab.cpp
+ToolTab.h
+ToolWindow.cpp
+ToolWindow.h
+ViewportListener.cpp
+ViewportListener.h
+Window.cpp
+Window.h
+</pre>
+</p>
+
+<p>
+The following is a list of the files contained within required the GDAL folder (at the time this document as written)
+</p>
+
+<p>
+GDAL/include/
+<pre>
+cpl_config.h
+cpl_conv.h
+cpl_csv.h
+cpl_error.h
+cpl_list.h
+cpl_minixml.h
+cpl_multiproc.h
+cpl_odbc.h
+cpl_port.h
+cpl_serv.h
+cpl_string.h
+cpl_vsi.h
+cpl_vsi_private.h
+cpl_win32ce_api.h
+cpl_wince.h
+defs.h
+emess.h
+epsg_datum.inc
+epsg_ellipse.inc
+epsg_gcs.inc
+epsg_pcs.inc
+epsg_pm.inc
+epsg_proj.inc
+epsg_units.inc
+epsg_vertcs.inc
+gdal.h
+gdaljp2metadata.h
+gdalwarper.h
+gdal_alg.h
+gdal_frmts.h
+gdal_pam.h
+gdal_priv.h
+gdal_rat.h
+gdal_version.h
+geocent.h
+geodesic.h
+geokeys.h
+geokeys.inc
+geometryidl.h
+geonames.h
+geos_c.h
+geotiff.h
+geotiffio.h
+geovalues.h
+geo_config.h
+geo_ctrans.inc
+geo_keyp.h
+geo_normalize.h
+geo_tiffp.h
+gvgcpfit.h
+nad_list.h
+ogrsf_frmts.h
+ogr_api.h
+ogr_attrind.h
+ogr_core.h
+ogr_feature.h
+ogr_featurestyle.h
+ogr_geometry.h
+ogr_geos.h
+ogr_p.h
+ogr_spatialref.h
+ogr_srs_api.h
+oledbgis.h
+oledb_sup.h
+org_proj4_Projections.h
+pj_list.h
+projects.h
+proj_api.h
+sfcdatasource.h
+sfcenumerator.h
+sfclsid.h
+sfcschemarowsets.h
+sfctable.h
+sfiiddef.h
+spatialreferenceidl.h
+swq.h
+t4.h
+thinplatespline.h
+tiff.h
+tiffconf.h
+tiffio.h
+tiffiop.h
+tiffvers.h
+tif_config.h
+tif_dir.h
+tif_fax3.h
+tif_predict.h
+uvcode.h
+</pre>
+</p>
+
+<p>
+GDAL/lib/
+<pre>
+gdal_i.lib
+geos_i.lib
+geotiff.lib
+geotiff_i.lib
+libtiff_i.lib
+proj_i.lib
+</pre>
 </p>
 
 <hr />
