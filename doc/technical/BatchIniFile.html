@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Parbat 3D Reference Manual: BatchIniFile class</title>
+  <link rel="stylesheet" href="assets/main.css" type="text/css">
+</head>
+
+
+<body>
+
+<h1>BatchIniFile class</h1>
+<p>Extends the iniFile class to allow for data to be sent to or read from the file in blocks (batch requests). This reduces the amount of file accesses and speeds up the actions. Sections of the file are stored in a buffer which can be read from or written to. This class is especially useful for code that is going to read an entire section in one go such a Region of Interest files.</p>
+
+
+<h2>Private Variables</h2>
+
+
+<h3>string *contentBuffer</h3>
+<p>This is the buffer that is used to store a section of the file temporarily, while actions are carried out on it.</p>
+
+
+<h2>Public Methods</h2>
+
+
+<h3>string getBuffer ()</h3>
+<p>Returns the entire buffer string to the caller. It is not a generally useful call but it does allow the user to handle all reads that they may want to perform on the section.</p>
+
+<h3>void clearBuffer ()</h3>
+<p>Empties the buffer of all its data. This is called when the user is done with one section and wants to start with another. After this call the buffer will be reduced to a blank string.</p>
+
+<h3>void updateBuffer (string key, string data)</h3>
+<p>This is similar to the update method in the iniFile class. It will add a new key and data combination to the section or update an old one if it exists. Because the buffer stores only one section at a time, the section name does not have to be given in the call as it is with the iniFile update().</p>
+
+<h3>void writeBufferToSection (string section)</h3>
+<p>Writes the buffer to the section that is given as the parameter. If the section already exists then all data in that section is removed first and then the new data is added to the section.</p>
+
+<h3>void writeBufferToSection (string section, bool keep_previous)</h3>
+<p>Writes the buffer to a specified section but allows the previous data to be kept. If the second parameter is true then the previous data is kept, if it is false then it is removed. Duplicate data is not checked so if a there is already a key in the section that has the same name as the new data there will be 2 keys in the section after the call. When the file is read the old data will be returned because it will be higher in the section. Using this call and keeping the previous data should be used with caution.</p>
+
+<h3>string readSectionContent (string section)</h3>
+<p>Reads a section from the open file and stores it in the buffer. Once this call has been made then the section can be accessed through the buffer instead of having to access the file each time. The new buffer contents are also returned in case the user wants to perform their own reading of the file and only use this buffer for writing.</p>
+
+<h3>string readFromBuffer (string key)</h3>
+<p>Returns a value at the specified key from the buffer. The value is found in the buffer by using the key that was given as the parameter. If the key does not exist in the buffer then a blank string is returned.</p>
+
+</body>
+</html>

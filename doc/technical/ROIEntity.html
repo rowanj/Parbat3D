@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Parbat 3D Reference Manual: ROIEntity class</title>
+  <link rel="stylesheet" href="assets/main.css" type="text/css">
+</head>
+
+
+<body>
+
+<h1>ROIEntity class</h1>
+<p>ROIEntity objects are used to store each of the shapes that make up a Region of Interest. Each entity stores the type of shape and all the coords that it consists of. All the variables and methods in the ROIEntity class are public but are only ever accessed by the ROI class. The definition of the ROIEntity class is stored in the file ROI.h because it is only ever used by the ROI class.</p>
+
+
+<h2>Variables</h2>
+
+
+<h3>const char* type</h3>
+<p>This is the type of shape that the entity will be. The possible shapes are points, rectangles and polygons. The type determine how the coords in the vector are interpreted. For point entities, there will only be 1 coord in the vector. For rectangle entities, the vector will have 2 coords, one for each of the opposite corners of the rectangle. Polygon entities will be made up of as many coords as it takes to define the shape.</p>
+
+<h3>vector<coords> points</h3>
+<p>This is the list of all the points that make up the shape. Each item in the vector is an x and y coordinate of a point in the shape. The number of points in this list is dependant on the type (as mentioned above) and also how many points are defined by the user. The order of items in the vector are only important with polygonal entities, in which the order of points determines how the polygon will be drawn (which coords are connected).</p>
+
+
+<h2>Methods</h2>
+
+<h3>int point_count ()</h3>
+<p>This returns the total number of points in the points vector. The numbering starts at 1, so if the entity has 2 coords (like for rectangles) the number returned will be 2.</p>
+
+<h3>void set_type (string type_str)</h3>
+<p>Sets the type of the entity from a string that contains the appropriate name. This is used when reading Regions of Interest from a file. The data read from the file is in string form and this function converts that string back to the correct form used when comparing types.</p>
+
+<h3>const char* get_type ()</h3>
+<p>Returns the type of entity. The returned value can be compared to global variables ROI_POINT, ROI_RECT and ROI_POLY to find out what it is. The type returned is a const char* so it is easy to convert to a string to store in a file. This method is not really necessary since the type is a public variable, but it is included in case the variable becomes private in future.</p>
+
+<h3>vector<coords> get_points()</h3>
+<p>Returns the vector of coords that makes up the entity. Just like get_type(), this method is not really necessary because the vector is also public but it is here for possible future changes.</p>
+</body>
+</html>

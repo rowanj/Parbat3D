@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Parbat 3D Reference Manual: ROI class</title>
+  <link rel="stylesheet" href="assets/main.css" type="text/css">
+</head>
+
+
+<body>
+
+<h1>ROI class</h1>
+<p>The ROI class stores all the information to do with a Region of Interest. This includes its colour, name and a vector of entities that is consists of.</p>
+
+
+<h2>Private Variables</h2>
+
+
+<h3>bool active</h3>
+<p>The active boolean is used to determine if a Region of Interest is visible on screen. If it is set to true then the Region of Interest will be visible, but if it is false the Region of Interest will not be shown. It is also used to determine if the Region of Interest will be shown in the feature space. Regions of Interest that have their active boolean set to false will not be coloured in the feature space.</p>
+
+<h3>int colour_red, colour_green, colour_blue</h3>
+<p>These three integers are used to represent the red, green and blue colour intensities that are combined to represent the colour of the Region of Interest. Each value must be in the range of 0 to 255.</p>
+
+<h3>string name</h3>
+<p>The name of the Region of Interest is stored in this string. The name that is used has no restrictions on it from this classes point of view, but there are some restrictions imposed by other classes, as is mentioned in the Region of Interest section of the user manual.</p>
+
+<h3>vector<ROIEntity*> entities</h3>
+<p>This vector stores pointers to all of the entities that make up this Region of Interest.</p>
+
+
+<h2>Public Methods</h2>
+
+
+<h3>ROI (void)</h3>
+<p>Creates a Region of Interest that is visible, has no name and is set to the default colour (grey).</p>
+
+<h3>~ROI (void)</h3>
+<p>Destructor clears the vector of all the entities that make up this Region of Interest.</p>
+
+<h3>void set_name (string new_name)</h3>
+<p>Sets the name of the Region of Interest. The name that is passed in as a paramter will not be checked if it is valid. This means that the responsibility of ensuring that the name is legitimate is placed on the class that is implementing this, such as ROISet.</p>
+
+<h3>string get_name (void)</h3>
+<p>Returns the name of this Region of Interest. The returned value will be whatever is stored in the name string.</p>
+
+<h3>void set_active (bool isActive)</h3>
+<p>Sets whether this Region of Interest is currently active. The boolean value passed in will be set to the active variable.</p>
+
+<h3>bool get_active (void)</h3>
+<p>Returns whether the ROI is currently active. This method just returns the active boolean.</p>
+
+<h3>void set_colour (int red, int green, int blue)</h3>
+<p>Sets the colour of this Region of Interest based on red, green and blue values that are passed in. Each of the parameters will be set to colour_red, colour_green and colour_blue as appropriate. The values are not checked to see if they are in range so the caller should ensure that legitimate values are used.</p>
+
+<h3>void set_color (int red, int green, int blue)</h3>
+<p>Does the exactly same a set_colour() but is included to allow for American spelling.</p>
+
+<h3>void get_colour (int* red, int* green, int* blue)</h3>
+<p>Allows the user to get the 3 colours that make up this Region of Interest by sending in pointers they want the values to be set to. Each of the values stored in colour_red, colour_green and colour_blue will be set to the pointers.</p>
+
+<h3>void get_color (int* red, int* green, int* blue)</h3>
+<p>Does the exactly same a get_colour() but is included to allow for American spelling.</p>
+
+<h3>void add_entity (ROIEntity* entity)</h3>
+<p>Adds an entity to this Region of Interest. There are no checks performed on the entity that is passed in as a parameter so the caller must ensure that it is valid. The pointer to the entity will be added to the end of the vector.</p>
+
+<h3>vector<ROIEntity*> ROI::get_entities (void)</h3>
+<p>Returns the vector consisting of all the entities that make up this Region of Interest.</p>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Parbat 3D Reference Manual: iniFile class</title>
+  <link rel="stylesheet" href="assets/main.css" type="text/css">
+</head>
+
+
+<body>
+
+<h1>iniFile class</h1>
+<p>Handles access to ini files. Once a file name has been specified in the constructor, you can parse (search) the file for values, read values or update values. The update function can also be used to add values to the file.</p>
+
+
+<h2>Protected Variables</h2>
+
+
+<h3>bool gotFileName</h3>
+<p>This is true if a filename has been specified. It is checked in each method before any actions are performed to make sure that a file can be accessed. It is set in the open(string) and close() methods. If it is set to false then the methods will do nothing when called.</p>
+
+<h3>string fileName</h3>
+<p>This stores the name of the file that is accessed by each of the methods.</p>
+
+
+<h2>Protected Methods</h2>
+
+
+<h3>string getKeyFromLine (string line)</h3>
+<p>This method returns the key part of an ini file line. The parameter given is a line that was read from a file. The string must be in the form below to operate properly.</p>
+<pre>key=data</pre>
+<p>All the characters before the '=' sign will be return in a new string.</p>
+
+<h3>string getDataFromLine (string line)</h3>
+<p>This method is similar to getKeyFromLine() but instead of returning the key of the line, it returns the data or value part of the line. As with the other method, its input must be in the form below.
+<pre>key=data</pre>
+
+<h3>int sectionStartsAt (string section)</h3>
+<p>This method is used to return the line number in the file of where the section starts. The parameter must be the name of the section as it appears in the file, but without the opening and closing braces ([ and ]). So if the user wants to know which where the section "[overview window]" starts they would make the call below.</p>
+<pre>int line_number = myfile.sectionStartsAt("overview window");</pre>
+<p>The number returned is the line at which the section occurs. The numbering starts at 1. So if the above code was used (trying to the overview window section) on the file below, the number returned would be 5.</p>
+<pre>[settings]
+cache size=10
+textures=512
+
+[overview window]
+x=100
+y=100</pre>
+
+
+<h2>Public Methods</h2>
+
+
+<h3>void open (string filename)</h3>
+<p>This opens the file ready for other methods to use. The parameter is the full name of the file including the extension. It should be the first call made after the file is created.</p>
+
+<h3>void close ()</h3>
+<p>After all actions on the file have been done then close() should be called to end access to the file. If it is called and the file must be accessed again, then open(string) will need to be called again.</p>
+
+<h3>string getFileName ()</h3>
+<p>This returns the name of the file that is being accessed. This string is whatever was passed in to the open() method. If close() has been called then the string returned will be blank.</p>
+
+<h3>bool parse (string section, string key)</h3>
+<p>This searches the file to find the a key from a specific section. If the key is found then true is returned otherwise it is false. The first parameter is the section and the second is the key</p>
+
+<h3>string read (string section, string key)</h3>
+<p>This returns the value (data) from the key in a section. The first parameter is the section name and the second is the key. If the section doesn't exist or the key is not in the section, then a blank string is returned.</p>
+
+<h3>void update (string section, string key, string data)</h3>
+<p>This writes a key and data combination to a file. The first parameter is the section name, the second is the key and the third is the data to put into the specified key. If the key already exists then the old data is replaced by the data that was passed in. If the key or section doesn't exist, it will be created with the data as the value.</p>
+
+<h3>bool sectionExists (string section)</h3>
+<p>Returns true if the section exists in the file. The section name is the title of the section without the square braces.</p>
+
+<h3>void removeSection (string section)</h3>
+<p>Removes the entire section (and all its data) from the file. This will remove all the key and data combinations in a section and then remove the section heading. It should be used with caution as entire sections of the file can be removed without warning.</p>
+
+<h3>void removeSection (string section, bool keep_title)</h3>
+<p>This works in the same was as the removeSection stated above but allows the option of leaving the section title. The first parameter is the section name and the second is a boolean value that specifies if the title should be removed. If it is set to true then the title will be kept but if it is false it will be removed. This allows the position of the section in the file to be maintained even when all its data is removed.</p>
+
+<h3>void clearFileContents ()</h3>
+<p>This empties the entire contents of the file, leaving a blank file. All sections, keys and data will be lost so it should be used with caution.</p>
+
+</body>
+</html>
