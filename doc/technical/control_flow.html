@@ -13,9 +13,42 @@
 
 <hr />
 
+<h2>Initialization</h2>
+<p>
+Upon startup, the flow of control of the program starts off procedurally as all native Windows programs, with the WinMain method.  In this package, this method is located in main.cpp</p>
 
-<h2>General Operation Order</h2>
+<p>
+The WinMain method proceeds to initialize the program windows, contained within Object-Oriented wrapper classes found in the View package.
+</p>
 
+<pre>main.cpp
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nFunsterStil)</pre>
+
+
+<h2>Initial State</h2>
+<p>
+Once the above method has run it's course, it returns the flow of control to the Windows API, leaving the open Overview Window to listen for program events.
+</p>
+
+<h2>Opening a File</h2>
+<p>
+If the Open item in the File menu of the Overview window is selected, the global loadFile method is called, which opens a file selection dialog.
+</p>
+
+<pre>main.cpp
+void loadFile(void)</pre>
+
+<p>
+Upon selection of a file, the image, tools, and region of interest windows are created, and the global image_handler object variable is instantiated with the name of the file to be created.
+</p>
+
+<pre>ImageHandler.cpp
+ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, ROISet *ROI_set)
+</pre>
+
+<p>
+The ImageHandler, during instantiation will create ImageGL and OverviewGL instances for the
+</p>
 
 <hr />
 
