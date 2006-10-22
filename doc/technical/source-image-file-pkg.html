@@ -8,18 +8,28 @@
 
 
 <body>
-<h1>Source - Utils</h1>
+<h1>Source - Image File PKG</h1>
 <p class="indexlink"><a href="index.html">Back to Contents</a></p>
 
 <hr />
 
-<h2>console</h2>
-<p><em>console</em> is used to output debugging information to a Win32 console. It is not an object, but rather a series of calls to the Win32 API.</p>
-<p><em>Console::write</em> accepts C standard output formatting (cstdio).</p>
-<h2>StringUtils</h2>
-<p><em>StringUtils</em> is a series of trivial functions to concatenate C strings for use in Win32 API MessageBox calls. They are mostly historical, due to <em>console</em>, but are sometimes called by older code.</p>
-<h2>TestUtils</h2>
-<p><em>TestUtils</em> contains a single function, attemptRasterCall. It was a testbed method used to verify if GDAL was working correctly. It is no longer used.</p>
+<h2>BandInfo</h2>
+<p>BandInfo store all the information that GDAL returns about a given raster band. It requires a GDALRasterBand as an argument to its constructor. It has functions to return all different sorts of info, including the band itself.</p>
+<p>Theoretically, bands in GDAL may have special metadata attached to them, but so far I have not been successful in reading anything other than the basic information.</p>
+<p>BandInfo stores and returns the following: minimum data value, maximum data value, raster block x and y dimensions, the number of overviews, the band number and, finally, the band object itself.</p>
+<h2>CoordinateInfo</h2>
+<p>GDAL has the capability to read and interpret geospatial coordinate transform data from files. Parbat3D will read this data as well, but it currently does not use it.</p>
+<p>This class simply stores an array of 6 doubles, but does not return them.</p>
+<p>It is expected that this class will be extended in the future.</p>
+<h2>ImageFile</h2>
+<p>ImageFile is the IO workhorse of Parbat3D, but is actually quite simple. Most of the effort in making this work was through the trial and error of getting GDAL to link.</p>
+<p>ImageFile takes a filename as an argument and contains (upon loading the file metadata) an object of class ImageProperties (see below), an STL vector of object of type BandInfo (see above), an object of type CoordinateInfo (see above), a filename (not strictly necessary), a GDALDataset pointer and an info string.</p>
+<p>Apart from methods returning these various data objects, ImageFile has one major method: getRasterData. This method uses GDAL to read the actual pixel data from the file. It is currently flawed in that it only reads 8 bit (single byte) image depths. This can be changed easily, but would require major retooling of other sections of Parbat3D.</p>
+<p>It is expected that this will be done at some point in the future.</p>
+<h2>ImageProperties</h2>
+<p>ImageProperties stores all relevant properties of a given image file.</p>
+<p>The properties are the width and height of the image, the number of bands, the driver name, the full driver name (a somewat longer and more accurate string), and the file name.</p>
+<p>ImageProperties takes a file name (as a pointer to an array of characters) and a GDALDataset pointer as its arguments.</p>
 <hr />
 
 <p class="indexlink"><a href="index.html">Back to Contents</a></p>
