@@ -1,8 +1,16 @@
+/*
+ PointsHash.h
+ Seperates include files, structure definitions (for comparison argument)
+ and typedefs for the hash table format used by FeatureSpace and FeatureSpaceGL.
+
+ This was placed in a seperate header to isolate errors while porting sample
+ code and finalizing the definition.
+ */
+
 #ifndef POINTS_HASH_H
 #define POINTS_HASH_H
 
 #include <ext/hash_map>
-//#include <ext/hash_fun.h>
 
 using namespace __gnu_cxx;
 
