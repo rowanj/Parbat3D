@@ -28,8 +28,27 @@ This package provides the central ImageFile and ImageProperties classes from whi
 </p>
 
 <h2>Image Manipulation PKG</h2>
+<p>
+The Image Manipulation PKG provides the top-level abstraction of the image, it's loading, display, and navigation to the View PKG.
+</p>
+
+<p>
+The ImageHandler class provides a wrapper for each instance a file is opened or closed, allowing the allocation and cleanup of system resources to be modularized and contained.
+</p>
+
+<h3>OpenGL</h3>
+<p>
+This sub-group contains classes that abstract the manipulation of the graphics hardware sub-system available at runtime, such that higher level classes can operate using logical data-related calls like set_zoom, and set_image_x/set_image_y.
+</p>
+
+<h3>Support</h3>
+<p>
+This sub-group contains data managment and coordinate tracking code.
+</p>
+
 <h2>Region of Interest PKG</h2>
 <h2>Settings PKG</h2>
+<h2>Utils</h2>
 <h2>View PKG</h2>
 <hr />
 
