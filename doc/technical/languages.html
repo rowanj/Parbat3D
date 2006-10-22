@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Parbat 3D Reference Manual: Languages</title>
+  <link rel="stylesheet" href="assets/main.css" type="text/css">
+</head>
+
+
+<body>
+<h1>Languages</h1>
+<p class="indexlink"><a href="index.html">Back to Contents</a></p>
+
+<hr />
+
+<p>Parbat3D makes use of several programming languages and APIs. </p>
+<h2>C++ and the C++ Standard Template Library</h2>
+<p>Parbat3D is written in C++. It uses standard C++ syntax and calling methods, expect in the following areas:</p>
+<ul>
+	<li>Some GDAL calls have been written as C function calls rather than C++, even though GDAL supports this. This is due to linking problems with MinGW/Dev-C++. There is no loss of functionality due to this, in so far as we use GDAL.</li>
+	<li>The Feature Space class uses a deprecated header, <em>hashmap</em>. This header is a part of SGI's additions to the STL, and has been merged into other parts of the STL. This should be able to be changed with little effort, but is currently not an issue.</li>
+</ul>
+<p>C++ and the STL are documented via the various standards bodies (ANSI, ISO, etc). This author recommends <a href="http://www.oreilly.com/">O'Reilly technical volumes.</a></p>
+<h2>OpenGL</h2>
+<p>Standard OpenGL language calls have been used as far as possible. Window supports an older implementation of the OpenGL standard, and some features have been accessed via driver-specific extensions. Some graphics hardware may not work as expected with some Parbat3D functionality, but most ATi/nVidia chipsets should work fine.</p><p>Intel Shared Graphics has a known performance issue with smooth points; these should not be used.</p>
+<p>OpenGL is documented on the <a href="www.opengl.org">OpenGL website.</a></p>
+<h2>Win32</h2>
+<p>Parbat3D uses the Win32 API. This is mostly contained in the View package and the Settings package, which directly interface with the OS for windowing and disk IO.</p>
+<p>Documentation on the Win32 API can be found at <a href="http://msdn2.microsoft.com/en-us/default.aspx">Microsoft's Developer website.</a></p>
+<h2>GDAL</h2>
+<p>Parbat3D leverages the power of the Geospatial Data Abstraction Library (GDAL). It is used for all image file disk IO.</p>
+<p>GDAL is documented <a href="http://www.remotesensing.org/gdal/">here</a>.</p>
+<hr />
+
+<p class="indexlink"><a href="index.html">Back to Contents</a></p>
+
+
+
+</body>
+</html>
