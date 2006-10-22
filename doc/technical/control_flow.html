@@ -47,7 +47,91 @@ ImageHandler::ImageHandler(HWND overview_hwnd, HWND image_hwnd, char* filename, 
 </pre>
 
 <p>
-The ImageHandler, during instantiation will create ImageGL and OverviewGL instances for the
+The ImageHandler, during instantiation will create ImageFile, ImageViewport, ImageGL, and OverviewGL instances for the image.
+</p>
+
+<p>
+The ImageFile object opens the file via calls to the GDAL library, and begins to process metadata such as the number of bands, and overall dimensions.
+</p>
+
+<p>
+The ImageGL and OverviewGL register themselves with the ImageViewport to receive notify_bands() and notify_viewport() events, such that they can update their displays accordingly on such events.
+</p>
+
+<p>
+The ImageViewport initializes itself with the parameters of the image attainable from the ImageFile->ImageProperties object, and sets a default viewport status.
+</p>
+
+<p>
+The ImageViewport will maintain a minimum zoom level for the image, being the larger of 50%, or the scale at which the image fits exactly to the window, plus a small fraction.
+</p>
+
+<p>
+The OverviewGL class opens an ImageTileSet at Level of Detail -1 (special case) for display in the overview window, and draws the bounding box of the ImageViewport over it.
+</p>
+
+<p>
+The ImageGL class will always draw using textures from an ImageTileSet at Level of Detail such that the resolution is higher than that which would exactly fill the screen, pixel-to-pixel; to the point that each tile is drawn at half of its original size, whereat the loaded textures are overwritten with those from an ImageTileSet at lower resolution.
+</p>
+
+<h2>Navigation</h2>
+<p>
+During use, as the ImageWindow recieves mouse and keyboard use, it calls the correct methods in ImageViewport to update the position or scale accordingly.
+</p>
+
+<p>
+The ImageViewport ensures that all translations between screen, image, and zoom coordinates are accurate and up-to-date, before notifying all classes inheriting ViewportLister that have registered to recieve notify_viewport() events.
+</p>
+
+<h2>Band Switching</h2>
+<p>
+If the tool window receives notification that the user has selected to engage a different set of bands for display, it calls the ImageViewport exposed by ImageHandler, which in turn calls all registered listeners' notify_bands() method.
+</p>
+
+<h2>Brightness and Contrast Adjustment</h2>
+<p>
+Upon successful close, or adjustment while preview is enabled in the ContrastBrightnessWindow, the current ImageHandler object is called with parameters to adjust the brightness and contrast of the displayed image accordingly.
+</p>
+
+<p>
+The actual function of this method, is to calculate parameters more usable internally than those given by the sliders, and to call the (nearly identical) adjustment methods in the image's OverviewGL and ImageGL with such parameters.
+</p>
+
+<p>
+These methods scale and translate the OpenGL color matrix and re-load the displayed textures to adjust the brightness and contrast of the displayed image without affecting the data currently kept in the ImageTileSet.
+</p>
+
+<h2>Feature Space Creation</h2>
+<p>
+To create a FeatureSpace, the class must be instantiated with the paramters specified in the ToolWindow's FeatureSpaceTab.
+</p>
+
+<p>
+A FeatureSpaceGL class is created, which initializes via another instance of GLView an OpenGL context.
+</p>
+
+<p>
+The FeatureSpace class creates an ImageTileSet at the correct level of detail, and (unless only_ROIs was enabled) accumulates all image points, before it traverses the ROISet for active Regions of Interest.
+</p>
+
+<p>
+For each entity within an active region, the point coordinates are scaled by LOD_factor, and all points within that region are accumulated into a hash table.
+</p>
+
+<p>
+The hash table is then sent to FeatureSpaceGL, along with the colour the points are to be drawn in.
+</p>
+
+<p>
+When FeatureSpaceGL::add_points() is called, the hash table give is traversed to calculate the average density of points.  Then a new OpenGL display list is generated, which is populated with each point in the hash table, the opacity of which will be scaled linearly, such that the minimum is 0.1, the median 0.55, and the maximum 1.0.
+</p>
+
+<p>
+The display list is then pushed to the end of a vector, such that each may be called in-turn.
+</p>
+
+<p>
+Once all regions have been calculated, and all lists generated, control of the Feature Space falls to the GLContainer object, which listens for mouse and keyboard events to pan, rotate, and zoom within the feature space.
 </p>
 
 <hr />

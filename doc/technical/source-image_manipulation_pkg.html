@@ -66,6 +66,18 @@ ImageTileSet provides decoding and caching of image tiles as requested, as well 
 </p>
 
 <p>
+An ImageTileSet must be created with a Level of Detail parameter.  For each increment above 0, the overall dimensions of the image at that LOD is one half of the previous.
+</p>
+
+<p>
+A tile set is conceptually a grid of rows by columns, where each tile is tex_size in dimensions (square).
+</p>
+
+<p>
+In the last row, and last column, the amount of image data will not represent the entire tile.  Data within a tile is padded with zeroes, such that the image data still fills top-left alligned quadrant (row-major).
+</p>
+
+<p>
 Tiles may be requested either in image or LOD coordinates, with up to 3 image bands packed in the order specified.
 </p>
 
