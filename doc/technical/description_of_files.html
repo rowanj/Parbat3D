@@ -1,0 +1,867 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Parbat 3D Reference Manual: Text File Format</title>
+
+
+  <link rel="stylesheet" href="assets/main.css" type="text/css">
+
+</head>
+
+
+<body>
+
+<h1>Appendix A - Description Of Source Files</h1>
+
+<p class="indexlink"><a href="index.html">Back
+to Contents</a></p>
+
+<hr>
+<p>The following is a breif description of all source files that are in
+the repositry (at the time this document was written). For more
+information about the source files, please see the relevent parts of
+this document.
+</p>
+
+<p>
+<table width="100%">
+
+  <tbody>
+
+    <tr>
+
+      <td>AUTHORS.txt</td>
+
+      <td> A description of the authors that have worked on the
+project.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>BandInfo.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>BandInfo.h</td>
+
+      <td> A header file for BandInfo.cpp.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>BatchIniFile.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>BatchIniFile.h</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ChangeLog.txt</td>
+
+      <td> A log of the changes that have been made to the
+repositry.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>config.h</td>
+
+      <td> A set of configuration settings that effect the way
+the source is compiled.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>console.cpp</td>
+
+      <td> A class used to display debug output on a console
+window.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>console.h</td>
+
+      <td> A header file for console.cpp.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ContrastAdvWindow.cpp</td>
+
+      <td> An advanced contrast stretch window - not complemently
+implemented.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ContrastAdvWindow.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ContrastWindow.cpp</td>
+
+      <td> A class that displays a contrast stretch window.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ContrastWindow.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>CoordinateInfo.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>CoordinateInfo.h</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>COPYING.txt</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>DisplayTab.cpp</td>
+
+      <td> A class which displays the display settings in the
+tool window.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>DisplayTab.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>DisplayWindow.cpp</td>
+
+      <td> A class which creates a window that OpenGL can draw to.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>DisplayWindow.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>FeatureSpace.cpp</td>
+
+      <td> A class which displays a feature space window.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>FeatureSpace.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>FeatureSpaceGL.cpp</td>
+
+      <td> A class which handles the OpenGL content of a feature
+space window.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>FeatureSpaceGL.h</td>
+
+      <td>A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>FeatureTab.cpp</td>
+
+      <td>A class which displays the feature space tab and
+handles its events.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>FeatureTab.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>GLContainer.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>GLContainer.h</td>
+
+      <td>A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>GLText.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>GLText.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>GLView.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>GLView.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageFile.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageFile.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageGL.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageGL.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageHandler.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageHandler.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageProperties.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageProperties.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageTab.cpp</td>
+
+      <td>A class which displays the image tab of the tool window
+and handles updating its content.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageTab.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageTileSet.cpp</td>
+
+      <td>A class which handles the set of tiles that are used
+when displaying an image.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageTileSet.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageViewport.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageViewport.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageWindow.cpp</td>
+
+      <td>A class which displays the image window and handles its
+events.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ImageWindow.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>IniFile.cpp</td>
+
+      <td>A file which handles reading and writing to the
+settings file.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>IniFile.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>main.cpp</td>
+
+      <td>The main source file of the application. Includes
+startup
+code, global variables and handles constructing and deconstructing
+required objects when loading or closing an image.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>main.h</td>
+
+      <td> A header file for the above file.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>MainWindow.cpp</td>
+
+      <td>A class which handles showing, hiding, enabling and
+disabling all of the main windows.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>MainWindow.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>OverviewGL.cpp</td>
+
+      <td>A class which handles the OpenGL content for the
+overview window.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>OverviewGL.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>OverviewWindow.cpp</td>
+
+      <td>A class which shows the overview window and handles its
+events.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>OverviewWindow.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>Parbat3D.dev</td>
+
+      <td>The Dev-c++ project file for the application.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>parbat3D.exe.manifest</td>
+
+      <td>A file which describes which version of Common Controls
+to use.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>Parbat3D.ico</td>
+
+      <td>The main icon for the application.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>Parbat3D_private.h</td>
+
+      <td>A file which includes all of the resources for the
+application. </td>
+
+    </tr>
+
+    <tr>
+
+      <td>Parbat3D_private.rc</td>
+
+      <td>A file which defines all of the resources for the
+application. </td>
+
+    </tr>
+
+    <tr>
+
+      <td>PointsHash.h</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>point_texture.c</td>
+
+      <td></td>
+
+    </tr>
+
+    <tr>
+
+      <td>PrefsWindow.cpp</td>
+
+      <td>A class which displays the preferences window and
+updates the settings.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>PrefsWindow.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ProgressWindow.cpp</td>
+
+      <td>A class which displays the loading progress bar.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ProgressWindow.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>QueryTab.cpp</td>
+
+      <td>A class which displays the query tab and handles
+updating its contents.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>QueryTab.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>resources.h</td>
+
+      <td>A file which defines IDs of resources.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ROI.cpp</td>
+
+      <td>A class which is used to store an ROI.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ROI.h</td>
+
+      <td>A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ROIFile.cpp</td>
+
+      <td>A class which handles reading and writing to an ROI
+file.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ROIFile.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ROISet.cpp</td>
+
+      <td>A class which is used to store a set of ROIs.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ROISet.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ROIWindow.cpp</td>
+
+      <td>A class which creates the ROI Window and handles its
+events.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ROIWindow.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>rsrc.rc</td>
+
+      <td>A file which defines the application's resources - eg.
+menu bar and icons.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ScrollBox.cpp</td>
+
+      <td>A class which creates an automatically scrolling box.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ScrollBox.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>Settings.cpp</td>
+
+      <td>A class which handles reading and writing settings to
+the settings file.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>Settings.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>StickyWindowManager.cpp</td>
+
+      <td>A class which handles snapping windows together and
+moving connected windows.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>StickyWindowManager.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>StringUtils.cpp</td>
+
+      <td>&nbsp;A class that contains some string handling
+utilities.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>StringUtils.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>TestUtils.cpp</td>
+
+      <td>A class that contains some testing utilities.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>TestUtils.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ToolTab.cpp</td>
+
+      <td>A general class which creates a tab that can be
+displayed in the tool window.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ToolTab.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ToolWindow.cpp</td>
+
+      <td>A class which creates the tool window and handles
+switching between tabs.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ToolWindow.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ViewportListener.cpp</td>
+
+      <td>&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td>ViewportListener.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>Window.cpp</td>
+
+      <td>A class which creates windows, handles their messages
+and interfaces with the Windows API.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>Window.h</td>
+
+      <td> A header file for the above class.</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+</p>
+
+<hr>
+<p class="indexlink"><a href="index.html">Back
+to Contents</a></p>
+
+</body>
+</html>
