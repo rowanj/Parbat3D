@@ -1,158 +1,230 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+
+  
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
+  
   <title>Parbat 3D Reference Manual: View</title>
   <link rel="stylesheet" href="assets/main.css" type="text/css">
 </head>
 
 
 <body>
+
 <h1>View</h1>
+
 <p class="indexlink"><a href="index.html">Back to Contents</a></p>
 
-<hr />
+
+<hr>
 
 <h2>View</h2>
+
 <p>The View package consists of a group of source files that are responsible for displaying windows, handling events and 
 interfacing with the Windows API. It also handles starting and quiting the application, which includes constructing and 
 deconstructing objects from the other packages as they are required. Each of the main windows have been seperated into 
 their own class, which extends from a general Window class that contains most of the common functionality.
 </p>
 
+
 <h2>Main</h2>
+
 <p>
 The main.cpp file contains the standard Windows startup execution function that is known as WinMain. This function creates and 
 displays the inital windows and begins to process events through a message loop (see Event Handling). The main file also 
-handles constructing a destroying the main objects that are required when starting the application, quiting the application, 
+handles constructing and destroying the main objects that are required when starting the application, quiting the application, 
 loading an image and closing an image.
 </p>
 
+
 <h2>Windows</h2>
+
 <h3>The General Window Class</h3>
-<p>
-The Window class is resposible for creating the main windows through the Windows API and associating them with their own 
-c++ objects. It also contains code to handle certain events that are common between all of the main windows (see Event Handling). 
-These common events include global key shortcuts, sticking and dragging windows around the screen and destroying windows. Some 
-simple functions are also included to wrap around the Window API.
+
+<p>The Window class is resposible for creating the windows through the
+Windows API and associating them with their own c++ objects. It also
+contains code to handle certain events that are common between all of
+the windows (see Event Handling). These common events include global
+key shortcuts, snapping windows together and dragging them around the
+screen and destroying windows. Some simple functions are also included
+to wrap around the Window API.
 </p>
 
+
 <h3>Main Window</h3>
-<p>
-The Main Window is an off-screen window that is not visible to the users. All of the other windows are either directly or indirectly "owned" 
-by this window. Its purpose was to be used as the window that appears in the taskbar, that will automatically minimize and restore the other
-windows as required. This has now been acheived in a better way, by showing the Overview window in the taskbar instead.
+
+<p>The Main Window is an off-screen window that is not visible to the
+user. All of the other windows are either directly or indirectly
+"owned" by this window. Its purpose was to be used as the window that
+appears in the taskbar, that will automatically minimize and restore
+the other
+windows when required. This has now been acheived in a better way, by
+showing the Overview window in the taskbar instead.
 </p>
+
 <p>
 The main purpose of the Main Window now is to hide, show, enable and disable all of the other windows when required.
 </p>
 
+
 <h3>Overview Window</h3>
-<p>
-The Overview Window is considered to be the "main window" of the application according to the user. It is the only window that appears 
-when the program starts up. The job of the overview window is to show an overview of the image that is currently open (if there is 
-one) and to provide the main functions of the program to the user through the use of a menu bar. Apart from the Feature Space 
-Windows, it is the only window that can be minimized to the task bar. Minimizing and restoring this window minimizes and 
-restores the remaining windows that do not appear on the task bar. The overview of the image is displayed using the Display 
+
+<p>The Overview Window is considered to be the "main window" of the
+application according to the user. It is the only window that appears
+when the program starts up. The job of the overview window is to show
+an overview of the image that is currently open (if there is one) and
+to provide the main functions of the program to the user through the
+use of a menu bar. Apart from the Feature Space Windows, it is the only
+window that can be minimized to the task bar. Minimizing and restoring
+this window also minimizes and restores the remaining windows that do
+not appear on the task bar. The overview of the image is displayed
+using the Display Window class.
+</p>
+
+
+<h3>Image Window</h3>
+
+<p>The Image Window is a resizable window that displays the currently
+loaded image at the current zoom level and position. It handles
+navigating and zooming the image by both keyboard shortcuts and
+scrollbars. The image is displayed inside the window using the Display
 Window class.
 </p>
 
-<h3>Image Window</h3>
-<p>
-The Image Window is a resizable window that displays the currently loaded image. It handles navigating and zooming the image by 
-both keyboard shortcuts and scrollbars. The image is displayed inside the window using the Display Window class.
+<p>The other main windows are created with the image window set as the
+"owner". This causes them to always stay in front of the image window,
+allowing it to be maximized while still being able to access the other
+windows.
 </p>
-<p>
-The other main windows are created with the image window set as the "owner". This causes them stay in front of it of the image window, allowing it
- to be maximized while still being able to access the other windows.
-</p>
+
 
 <h3>Tools Window</h3>
-<p>
-The Tools Window contains multiple tabs that consist of useable tools for the user. It handles creating the tab objects, 
-storing them in a list and showing them one at a time as the user switches between them.
-</p>
-<p>
-Each of different tabs in the tool window have their own seperate class which is based on a general ToolTab class. This ToolTab 
-class handles constructing a child window for each of the tabs that can be used by the Tool Window.
+
+<p>The Tools Window contains multiple tabs that consist of useable
+tools for the user. It handles creating the different tabs and
+switching between them.
 </p>
 
+<p>
+Each of different tabs in the tool window have their own seperate class which is based on a general ToolTab class. This ToolTab 
+class handles constructing a child window for each of the tabs that can be displayed by the Tool Window.
+</p>
+
+
 <h3>Preference Window</h3>
+
 <p>
 The Preferences Window contains controls that allow the user to change the preferences. It handles the events associated with 
 these controls and saves them to the settings file.
 </p>
 
+
 <h3>Contrast Stretch Window</h3>
+
 <p>
 The Constrast Strech Window consists of slider controls and buttons that enable the user to change the contrast of the 
 image that is currently displayed. It handles the events generated from these controls and updates the Overview and Image 
 window displays.
 </p>
 
+
 <h2>Other GUI Components</h2>
+
 <h3>Scroll Box</h3>
-<p>
-The ScrollBox class is an implementation of a child window that allows the user to scroll its contents vertically. It automatically 
-shows and hides scrollbars as required and moves its own child windows up and down as the user scrolls.
+
+<p>The ScrollBox class is an implementation of a child window that
+allows the user to scroll its contents vertically. It automatically
+shows and hides scrollbars as required and moves its own child windows
+up and down as the user scrolls.
 </p>
+
 
 <h3>Display Window</h3>
-<p>
-The DisplayWindow class is a child window that is used for displaying OpenGL content within a window. This window is used by both 
-the Overview and Image windows as a area to which the OpenGL library can draw to. It also handles certain events 
-associated with the OpenGL display, such as moving and clicking the mouse over the Image window (querying and creating ROIs) and 
-redrawing the display if it is resized.
+
+<p>The DisplayWindow class creates a child window that is used for
+displaying OpenGL content within a window. This class is used by both
+the Overview and Image windows to create an area to which the OpenGL
+library can draw into. It also handles certain events associated with
+the OpenGL display, such as moving and clicking the mouse over the
+Image window (querying and creating ROIs) and redrawing the display
+when it is resized.
 </p>
+
 
 <h3>Sticky Window Manager</h3>
-<p>
-The StickyWindowManager class is resposbile for allowing the main windows to snap and move around the screen together. It stores 
-a list of windows that are allowed to snap together and allows them to be registered and unregistered at any time. The Window class
-calls functions in the StickyWindowManager whenever a window is dragged.
+
+<p>The StickyWindowManager class is resposible for allowing the main
+windows to snap together. It stores a list of windows that are allowed
+to snap together and allows them to be registered and unregistered at
+any time. The Window class
+calls functions in the StickyWindowManager whenever a window is
+dragged.
 </p>
-<p>
-Everytime a window is being dragged by the user, the sticky window manager first checks to see if it is registered. If it is in its list, it then 
-checks to see if it is physically close to any of the other registered windows, or the Overview window. If the window is close to another 
-then it is moved towards it.
+
+<p>Everytime a window is being dragged by the user, the sticky window
+manager first checks to see if it is registered. If it is in its list,
+it then checks to see if it is physically close to any of the other
+registered windows, or the Overview window. If the window is close to
+another then it is moved towards it.
 </p>
-<p>
-When the Overview window is being dragged by the user, the sticky window manager works out which windows are either directly or indirectly 
-connected to it. It then moves the connected windows by the same amount as the Overview window, so that they appear to move with it.
+
+<p>When the Overview window is being dragged by the user, the sticky
+window manager works out which windows are connected to it, both
+directly and indirectly. It then moves the connected windows by the
+same amount as the Overview window, so that they appear to move with
+it.
 </p>
+
 
 <h2>Event Handling</h2>
-<p>
-All of the events that are generated by the windows are passed to the application in the form of messages. These messages are retreived 
-by a message loop in the WinMain function and passed to a static processing function that is called a Window Procedure.
+
+<p>All of the events that are generated by the windows are passed to
+the application in the form of messages. These messages are retreived
+by a message loop in the WinMain function and passed to a static
+processing function known as a Window Procedure.
 </p>
 
-<p>The Window class has been written in a way that allows these static Window Procedures to obtain the pointer to a c++ object that is 
-associated with the the window that is receiving the event. This allows the Window Procedures to access the members of a window object 
-when an event occurs.
+
+<p>The Window class has been written in a way that allows these static
+Window Procedures to obtain the pointer to a c++ object that is
+associated with the the window that is receiving the event. This allows
+the Window Procedures to access the members of a window object when an
+event occurs.
 </p>
 
-<p>
-The default Window Procedure for each of the main windows is set to Window::WindowProcedure. This procedure checks for some events 
-that are common to all windows, such as global shortcut keys and passes any unprocessed message through to the Windows API so that 
-it can perform the default operation.
+
+<p>The default Window Procedure for each of the main windows is set to
+Window::WindowProcedure. This procedure checks for some events that are
+common to all of the windows, such as global shortcut keys and passes
+any unprocessed message through to the Windows API to perform the
+default operation.
 </p>
 
-<p>
-The Windows API has been written to allow multiple Window Procedures to be chained together. The Window class uses this feature to 
-enable the main windows to handle certain events that they care about, such as a button click, while still being able pass the 
-remaining messages onto the general Window::WindowProcedure. The main windows do this by calling Window::SetWindowProcedure, which 
-returns the address of the previous Window Procedure in the chain.
+
+<p>The Windows API has been written to allow multiple Window Procedures
+to be chained together. The Window class uses this feature to enable
+the main windows to handle certain events that they care about, such as
+a button click, while still being able pass the remaining messages onto
+the general Window::WindowProcedure. The main windows do this by
+calling Window::SetWindowProcedure, which returns the address of the
+previous Window Procedure in the chain.
 </p>
 
-<p>
-The majority of the messages that are processed by the windows are still forwarded on to the next procedure in the chain. This is to 
-enable both the general window procedure and the Windows API to handle the messages if it is required.
+
+<p>The majority of the messages that are processed by the windows own
+window procedures are still forwarded on to the next procedure in the
+chain. This is to enable both the general window procedure and the
+Windows API to handle the message if it is required.
 </p>
 
-<hr />
+
+<hr>
 
 <p class="indexlink"><a href="index.html">Back to Contents</a></p>
+
 
 
 </body>
