@@ -13,8 +13,52 @@
 
 <hr />
 
+<h2>FeatureSpace</h2>
+<p>
+Once instantiated, this class prepares the data to be displayed for a feature space.
+</p>
 
+<p>
+It uses the current ROISet to pull out the points to be displayed in the scatter plot, and a local instance of ImageTileSet to get the values of the appropriate bands from the image.
+</p>
 
+<p>
+Of the ROISet, it loads all entities of all *active* ROIs.
+</p>
+
+<p>
+For each complete ROI, it accumulates the occurences of each combination of point values into a hash table; before calling FeatureSpaceGL to add those points to those to be displayed.
+</p>
+
+<hr />
+<h2>FeatureSpaceGL</h2>
+<p>
+This class controls the actual display drawing via OpenGL of the points in the hash tables passed to it by FeatureSpace.
+</p>
+
+<p>
+For each table passed to it, it creates an OpenGL display list of vertex points, the opacity of which is weighted around the average the point densities in that hash table.
+</p>
+
+<p>
+There is partial support for displaying points as textured sprites, as well as scaling point size according to distance from the camera.
+</p>
+
+<hr />
+<h2>GLContainer</h2>
+<p>
+Isolates event handling code interactions with Window class (see: View PKG) from FeatureSpace
+</p>
+
+<hr />
+<h3>PointsHash.h</h3>
+<p>
+Seperates include files, structure definitions (for comparison argument) and typedefs for the hash table format used by FeatureSpace and FeatureSpaceGL.
+</p>
+
+<p>
+This was placed in a seperate header to isolate errors while porting sample code and finalizing the definition.
+</p>
 
 <hr />
 
