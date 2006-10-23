@@ -2,53 +2,31 @@
 <html>
 <head>
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-  <title>Parbat 3D Reference Manual: settings class</title>
+  <title>Parbat 3D Reference Manual: Source - Settings PKG</title>
   <link rel="stylesheet" href="assets/main.css" type="text/css">
 </head>
 
 
 <body>
+<h1>Source - Settings PKG</h1>
 
-<h1>settings class</h1>
+<p class="indexlink"><a href="index.html">Back to Contents</a></p>
+<hr />
+
+<h2>iniFile</h2>
+<p>This class handles access to ini files. Once a file name has been specified in the constructor, you can parse (search for), read or update values. The update function is used to add new values or update existing values in the file.</p>
+
+
+<hr />
+<h2>BatchIniFile</h2>
+<p>Extends the iniFile class to allow for data to be sent to or read from the file in blocks (batch requests). This reduces the amount of file accesses and speeds up the actions. Sections of the file are stored in a buffer which can be read from or written to. This class is especially useful for code that is going to read an entire section in one go such a Region of Interest files.</p>
+
+<hr />
+<h2>settings</h2>
 <p>Allows settings to be saved to and retrieved from an ini file. Access to the file is handled by an iniFile class.</p>
 
-
-<h2>Private Variables</h2>
-
-
-<h3>iniFile openFile</h3>
-<p>A reference to the ini file, all the file operations go through this.</p>
-
-
-<h2>Public Methods</h2>
-
-
-<h3>settings (string s)</h3>
-<p>This is the only constructor for the setting class. It creates a new settings object that can be used to load and save settings to a file. The parameter passed in is the name of the file (including its extension) that is going to be used to store the settings.</p>
-
-<h3>virtual ~settings ()</h3>
-<p>The destructor cleans up the file access by closing the file.</p>
-
-<h3>void open (string filename)</h3>
-<p>This allows a new file to be set as the settings file. It would not generally be used because the settings file will not change but it is here just to allow this to be done without creating an entirely new settings object. The parameter is the name of the file to be used as the new settings file.</p>
-
-<h3>string getSetting (string section, string key)</h3>
-<p>This returns the value of a setting from the file. The first parameter is the section name and the second is the key. Usually the section name will be the name of a group of similar settings, such as "overview window" for all settings to do with the overview window. The key is the specific setting, such as "x position". The string returned is the data that resides at the given key. If the setting is not already in the file then a blank string is returned.</p>
-
-<h3>string getSetting (string section, string key, string defaultSetting)</h3>
-<p>This works in exactly the same way as the other getSetting() but instead of returning a blank string if the setting does not already exist, the third parameter will be returned. This default setting will also be stored in the file.</p>
-
-<h3>int getSettingi (string section, string key)</h3>
-<p>This is also similar to the other getSetting() but is used specifically when the user knows that the data returned will be an integer value. If the data read is not an integer value then 0 will be returned instead.</p>
-
-<h3>int getSettingi (string section, string key, int defaultSetting)</h3>
-<p>This will return an integer data item from the file but if it does not already exist then the default value (third parameter) will be stored in the file and also returned.</p>
-
-<h3>void setSetting (string section, string key, string data)</h3>
-<p>This is used for storing settings in the file. The parameters are the usual section-key-data combination that are used in ini files. If the key already exists in the file then it will be updated to this new value that was passed in.</p>
-
-<h3>void setSetting (string, string, int)</h3>
-<p>This is used for adding integer settings to a file. Since the file can only be updated using strings, the integer is first converted into a string using a stringstream, and then this string will be added to the file. This works in the same way as the other setSetting() in that if the key already exists in the file it will be replaced with the parameter passed in.</p>
+<hr />
+<p class="indexlink"><a href="index.html">Back to Contents</a></p>
 
 </body>
 </html>
