@@ -1,7 +1,7 @@
 #ifndef _CONSOLE_H
 #define _CONSOLE_H
 
-#define USE_CONSOLE 1
+#define USE_CONSOLE 0
 
 #include <Windows.h>
 #include <string>
