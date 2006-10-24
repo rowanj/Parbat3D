@@ -68,6 +68,7 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
     {
 	    GLint max_texture_size;
 		int user_texture_size = settingsFile->getSettingi("preferences","texsize",512);
+		if (user_texture_size == 0) user_texture_size = 512;
 		{
 			int order = -1;
 			/* Prevent use of absurdly low values */
