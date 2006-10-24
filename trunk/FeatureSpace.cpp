@@ -1017,32 +1017,25 @@ void FeatureSpace::OnGLContainerMouseMove(int virtualKeys,int x,int y)
 	// checked if left mouse button is down
 	if ((virtualKeys&MK_LBUTTON) && !(virtualKeys&MK_RBUTTON))
 	{
-		fsgl->rot_cam(x_diff, y_diff);
+		fsgl->rot_cam(x_diff * 0.8f, y_diff * 0.5f);
 	}
-	if ((virtualKeys&MK_RBUTTON) && (virtualKeys&MK_LBUTTON))
-	{
-		float nx = (float)x_diff/50.0;
-		float ny = (float)y_diff/50.0;
-		fsgl->translate_cam(nx, ny);
-	} 
-	// check if left & right mouse button is down
+	// if right mouse button down
 	if ((virtualKeys&MK_RBUTTON) && !(virtualKeys&MK_LBUTTON))
 	{
-		ChangeCameraZoom(y_diff * 0.001);
+		float nx = (float)x_diff/250.0;
+		float ny = (float)y_diff/250.0;
+		fsgl->translate_cam(nx, -ny);
+	} 
+	// check both mouse buttons down
+	if ((virtualKeys&MK_RBUTTON) && (virtualKeys&MK_LBUTTON))
+	{
+		fsgl->zoom_cam((float)y_diff / 100.0f);
 	}
 	
 	// Operations are cumulative, so re-set distance
 	prev_mouse_x=x;
 	prev_mouse_y=y;	
 }
-
-
-/* change the camera zoom level by a +/- amount */
-void FeatureSpace::ChangeCameraZoom(float amount)
-{
-	fsgl->zoom_cam(amount);
-}
-
 
 
 // handle key presses on the feature space window
@@ -1114,11 +1107,11 @@ void FeatureSpace::OnKeyPress(int virtualKey)
 			break;
 			
 		case VK_PRIOR:	// page-up key
-			ChangeCameraZoom(-0.1);
+			fsgl->zoom_cam(0.1f);
 			break;
 			
 		case VK_NEXT:	// page-down key
-			ChangeCameraZoom(+0.1);
+			fsgl->zoom_cam(-0.1f);
 			break;
 
 		case VK_SPACE:

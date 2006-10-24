@@ -89,7 +89,6 @@ class FeatureSpace:public Window, public GLContainerHandler
 		void OnKeyPress(int virtualKey);						// handle key presses
 		void OnGLContainerLeftMouseDown(int x,int y);			// handle left mouse button down event
 		void OnGLContainerMouseMove(int vKeys,int x,int y);		// handle mouse move event
-		void ChangeCameraZoom(float amount);
 		void PanX(float amount);
 		void PanY(float amount);
 		void Rotate(float yaw_amount, float pitch_amount);
