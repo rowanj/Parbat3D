@@ -175,6 +175,7 @@ void FeatureSpace::getImageData(void)
 	int lastcoldatawidth = fsTileset->get_last_column_width() / LODfactor;
 	int lastrowdataheight = fsTileset->get_last_row_height() / LODfactor;
 	unsigned char* tile;
+	// We can clip data, to avoid some bad files skewing data averages
 //	const unsigned char top_clip = 250;
 //	const unsigned char bottom_clip = 5;
 
@@ -551,124 +552,6 @@ void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
 	yoffset = 0;
 	vectorsize = 0;
 }
-
-/*void FeatureSpace::getPolygonData(ROIEntity* theEntity, ROI* theROI)
-{	
-	int totalPoints = 0;
-	maxy = 0;
-	miny = std::numeric_limits<int>::max();
-	yoffset = 0;
-	vectorsize = 0;
-	
-	int time_start, time_end;
-	
-	getPolygonVertices(theEntity);
-	
-	if (!polyPoints.empty())	//if we've got something to rasterise...
-	{
-		yoffset = miny;
-		vectorsize = (maxy - miny) + 1;
-		boundsCoords.resize(vectorsize, new list<int>);
-		pixCoords.resize(vectorsize, new list<int>);
-		
-		//get the point coordinates for our boundary lines first
-		for (int i = 0; i < polyPoints.size() - 1; i++)
-		{
-			generateBoundaryLine(polyPoints[i].x, polyPoints[i].y, polyPoints[i+1].x, polyPoints[i+1].y);
-		}
-		generateBoundaryLine(polyPoints[polyPoints.size()-1].x, polyPoints[polyPoints.size()-1].y, polyPoints[0].x, polyPoints[0].y);
-		
-		//sort our resultant lists
-		int sortstart = GetTickCount();
-		for (int i = 0; i < vectorsize; i++)
-		{
-			boundsCoords[i]->sort();
-		}
-		int sortend = GetTickCount();
-		Console::write("FS::GPD Time to sort lists was %f seconds\n\n", (float)(sortend - sortstart) / 1000.0);
-		
-		//get the point coordinates for all points between those lines, if size not odd
-		time_start = GetTickCount();
-		for (int i = 0; i < vectorsize; i++)
-		{
-			//iterators for our "point pairs"
-			if (boundsCoords[i]->size() > 1)
-			{
-				list<int>::iterator j1 = boundsCoords[i]->begin();
-				list<int>::iterator j2 = j1;
-				//set our second point to the next point in the list
-				while(*j1 == *j2)
-				{
-					j2++;
-				}
-				if(j2 == boundsCoords[i]->end()) j2--;
-				
-				//loop until we reach the end of the point list
-				if ((*j1 == *j2) && (boundsCoords[i]->size() == 2))
-				{
-					pushXPixel(*j1, i + yoffset);
-					totalPoints++;
-				}
-				else
-				{
-					while(true)
-					{
-
-						for(int k = *j1; k <= *j2; k++)
-						{
-							pushXPixel(k, i + yoffset);
-							totalPoints++;
-						}
-						
-						//move j2 on to the next point in the list
-						j2++;
-						if(j2 == boundsCoords[i]->end()) //if we're at the end of the list, break
-						{
-							break;
-						}
-						//otherwise, set j1 to be the next point as well, and
-						//move j2 on to the next point in the pair
-						j1 = j2;
-						j2++;
-						if(j2 == boundsCoords[i]->end()) //if we're at the end of the list, break
-						{
-							break;
-						}
-					}
-				}
-			}
-			else //if (boundsCoords[i]->size() == 1)
-			{
-				pushXPixel(*boundsCoords[i]->begin(), i + yoffset);
-				totalPoints++;
-			}
-		}
-		time_end = GetTickCount();
-		Console::write("FS::GPD Time to draw points between pairs was %f seconds\n", (float)(time_end - time_start) / 1000.0);
-	}
-	
-	//write the resultant array
-	Console::write("FS::GPD -- Total points in poly = %d\n", totalPoints);
-	
-	//push the values for this data to our lists of values -- TO DO
-	
-	//we're finished -- clear our data for the next run
-	time_start = GetTickCount();
-	for (int i = 0; i < vectorsize; i++)
-	{
-		delete boundsCoords[i];
-		delete pixCoords[i];
-	}
-	time_end = GetTickCount();
-	Console::write("FS::GPD Time to clear vectors was %f seconds\n", (float)(time_end - time_start) / 1000.0);
-	
-	boundsCoords.clear();
-	pixCoords.clear();
-	maxy = 0; 
-	miny = std::numeric_limits<int>::max();
-	yoffset = 0;
-	vectorsize = 0;
-}*/
 
 // -----------------------------------------------------------------------------------------
 // getPolygonVertices

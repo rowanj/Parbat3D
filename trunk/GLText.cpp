@@ -22,6 +22,7 @@ GLText::GLText(GLView* gl_view_arg, const char* font_arg, int size_arg)
 	green = 1.0;
 	blue = 1.0;
 	
+	/* !! Windows platform specific font generation */
 	h_font = CreateFont(-size, // +ve values indicate cell height, -ve indicates character height
 						0,			// font width (0 = use default)
 						0, 0,		// angles of escapement and orientation

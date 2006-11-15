@@ -5,6 +5,7 @@
 
 #if USE_POINT_SPRITES
 #include "point_texture.c"
+// Workaround for broken GLext header on Cygwin
 #define GL_POINT_SPRITE_ARB               0x8861
 #define GL_COORD_REPLACE_ARB              0x8862
 PFNGLPOINTPARAMETERFARBPROC  glPointParameterfARB  = NULL;
@@ -322,6 +323,9 @@ void FeatureSpaceGL::add_points(points_hash_t points_hash, unsigned char red, un
 {
 	Console::write("FeatureSpaceGL::add_points(size = %d, r = %d, g = %d, b = %d\n",
 	        points_hash.size(), red, green, blue);
+	/* We sub-divide hash tables into several lists, as some graphics hardware
+	 (notably Intel chipsets) seemingly takes geometrically longer to compile
+	 vertex-heavy display lists. */
 	const unsigned int points_per_list = 5000;
 	// How many new display lists do we need?
 	unsigned int new_lists_count = (points_hash.size()/points_per_list) + 1;

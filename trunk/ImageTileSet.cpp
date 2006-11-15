@@ -7,8 +7,31 @@
 
 #define DEBUG_IMAGE_TILESET 0
 
-/* NB: tex_size is size of tile in memory,
-	tile_size is size of tile on image */
+/* ImageTileSet
+This class handles requests for image tiles and per-pixel values.
+Tiles are packed three-bands per tile, requested by band index, starting at 1.
+If the 0 band is requested, all packed bytes for that band are 0.
+Decoded tiles are cached, up to the point cache_size_param MB are occupied.
+
+level_of_detail controls the scaling of data as decoded (low-resolution
+decoding is used to speed processing and reduce memory footprint, especially at
+very low zoom levels.
+The image is effectively scaled down by 1:2^LOD
+i.e.
+LOD 0 = 1:1
+LOD 1 = 1:2 (1/4 image area)
+LOD 2 = 1:4 (1/16 image area)
+LOD 3 = 1:8	(1/64 image area)
+
+LOD -1 is a special case where the image is scaled by /2 sucessively until it
+fits in a single tile.
+*/
+
+/* Implementation notes:
+	tex_size is dimension of each tile in memory,
+	tile_size is size of each tile in image pixels
+	cache tiles are 1-dimensional packed-byte arrays containing n bands
+*/
 
 ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_param, int cache_size_param)
 {
@@ -20,12 +43,13 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 
 	assert(tex_size_param > 0);
 	assert(file != NULL);
-	assert(level_of_detail > -2);
+	assert(level_of_detail >= -1);
 
 	/* set instance variables */
 	LOD = level_of_detail;
 	image_file = file;
 	tex_size = tex_size_param;
+	// Enforce cache size minimum of 4MB
 	cache_size = max(cache_size_param, 4) * (1024*1024);
 
 	/* initialize state */
@@ -34,7 +58,8 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	cache_misses = 0;
 	LOD_factor = 0;
 
-	/* !! Needs to get actual sample size from ImageFile for multi-byte support */
+	// !! Needs to get actual sample size from ImageFile for multi-byte band
+	//	support
 	sample_size = 1;
 
 	/* Grab a handle to the image properties object */
@@ -45,7 +70,8 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	num_bands = image_properties->getNumBands();
 		tile_memory_size = tex_size * tex_size * sample_size * num_bands;
 
-	/* special case for overview window */
+	// special case for overview window
+	//	scale entire image to one tile
 	if (LOD == -1) {
 		columns = 1;
 		rows = 1;
@@ -57,11 +83,10 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 		}
 		LOD_width = last_column_width;
 		LOD_height = last_row_height;
-		tile_size = tex_size; /* must be non-zero */
+		tile_size = tex_size; // avoid div by 0
 	} else {
 		/* (width in tiles is width/tiles rounded up) */
-//		LOD_factor = MathUtils::ipow(2,LOD);
-		LOD_factor = 1 << LOD;
+		LOD_factor = 1 << LOD; // Divisor we use to translate coords
 		tile_size = tex_size * LOD_factor;
 		LOD_width = image_width / LOD_factor;
 		LOD_height = image_height / LOD_factor;
@@ -90,6 +115,7 @@ ImageTileSet::~ImageTileSet(void)
 
 char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_B)
 {
+	// Minimum/maximum values calculated in case of future need
 	int band_R_min = 255, band_G_min = 255, band_B_min = 255;
 	int band_R_max = 0, band_G_max = 0, band_B_max = 0;
 	int tile_index;
@@ -101,11 +127,8 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	/* Make room to put texture in */
 	size = tex_size * tex_size * 3;
 	out_tile = new char[size];
-	#if DEBUG_IMAGE_TILESET
-	Console::write("(II) ImageTileset::get_tile_RGB\n");
-	#endif
-	/* Check if tile is loaded, load if not */
 
+	/* Check if tile is loaded, load if not */
 	#if DEBUG_IMAGE_TILESET
 	sprintf(message, "(II) ImageTileset::get_tile_RGB - tile cache: hits=%d, misses=%d.\n", cache_hits, cache_misses);
 	Console::write(message);
@@ -125,7 +148,7 @@ char* ImageTileSet::get_tile_RGB(int x, int y, int band_R, int band_G, int band_
 	if(!band_G) band_G_min = 0;
 	if(!band_B) band_B_min = 0;
 
-	/* Convert color space */
+	/* !! Convert non- 8-bit bands. */
 
 	/* Convert band packing */
 	pix = 0;
@@ -210,8 +233,7 @@ int ImageTileSet::load_tile(int x, int y)
 	tile_index_y = y/tile_size;
 	tile_index = (columns * tile_index_y) + tile_index_x;
 	#if DEBUG_IMAGE_TILESET
-	sprintf(buffer, "(II) ImageTileSet::load_tile(%d,%d) INDEX:%d (x_index %d, y_index %d)\n", x, y, tile_index, tile_index_x, tile_index_y);
-	Console::write(buffer);
+	Console::write("(II) ImageTileSet::load_tile(%d,%d) INDEX:%d (x_index %d, y_index %d)\n", x, y, tile_index, tile_index_x, tile_index_y);
 	#endif
 
 	/* Quick hack to wrap out-of-bounds requests */
@@ -230,6 +252,7 @@ int ImageTileSet::load_tile(int x, int y)
 			tiles[tile_check]->age++;
 			int tile_check_age = tiles[tile_check]->age;
 			if (tile_check_age > oldest_age) {
+				// These values are used for LRU caching
 				oldest_tile = tile_check;
 				oldest_age = tile_check_age;
 			}
@@ -257,7 +280,7 @@ int ImageTileSet::load_tile(int x, int y)
 		cache_fill = cache_fill + tile_memory_size;
 		if (cache_fill > cache_size) {
 			if (tiles.size() > 0) {
-				/* This is the cache dropping algorithm */
+				/* This is the actual cache dropping algorithm */
 #if FALSE
 				/* FIFO */
 				delete[] tiles[0]->data; /* Delete data */
@@ -288,7 +311,15 @@ int ImageTileSet::load_tile(int x, int y)
 		}
 
 
-		if (LOD!=-1) {
+		if (LOD==-1) {
+			// Special case for overview LOD
+			data_size_x = tex_size;
+			data_size_y = tex_size;
+			image_file->getRasterData(image_width, image_height, 0, 0, new_tile->data, LOD_width, LOD_height);
+			if (!((LOD_height == tex_size) && (LOD_width == tex_size))) {
+				align_tile(&(new_tile->data), tex_size, LOD_width, LOD_height);
+			}
+		} else {
 			data_size_x = tile_size_x / LOD_factor;
 			data_size_y = tile_size_y / LOD_factor;
 			/* X & Y are now tile top-left position */
@@ -298,13 +329,6 @@ int ImageTileSet::load_tile(int x, int y)
 			/* Shuffle data for edge tiles */
 			if (!((tile_size_y == tile_size) && (tile_size_x == tile_size))) {
 				align_tile(&(new_tile->data), tex_size, data_size_x, data_size_y);
-			}
-		} else {
-			data_size_x = tex_size;
-			data_size_y = tex_size;
-			image_file->getRasterData(image_width, image_height, 0, 0, new_tile->data, LOD_width, LOD_height);
-			if (!((LOD_height == tex_size) && (LOD_width == tex_size))) {
-				align_tile(&(new_tile->data), tex_size, LOD_width, LOD_height);
 			}
 		}
 
@@ -323,6 +347,7 @@ unsigned char* ImageTileSet::get_pixel_values(int x, int y)
 	int tile_index, pixel_start;
 	unsigned char* tile_data;
 
+	// Return 0 array for out-of-bounds tiles
 	if ((x >= image_width) || (y >= image_height) || (x < 0) || (y < 0)) {
 		for (short tmp = 0; tmp < num_bands; tmp++) {
 			return_values[tmp] = 0;
@@ -330,6 +355,7 @@ unsigned char* ImageTileSet::get_pixel_values(int x, int y)
 		return return_values;
 	}
 
+	// Get our tile
 	tile_index = load_tile(x,y);
 	tile_data = (unsigned char*) tiles[tile_index]->data;
 
@@ -352,7 +378,8 @@ unsigned char* ImageTileSet::get_pixel_values_LOD(int x, int y)
 	unsigned char* return_values = new unsigned char[num_bands];
 	int tile_index, pixel_start;
 	unsigned char* tile_data;
-
+	
+	// Return 0 array for out-of-bounds queries
 	if ((x >= LOD_width) || (y >= LOD_height) || (x < 0) || (y < 0)) {
 		for (short tmp = 0; tmp < num_bands; tmp++) {
 			return_values[tmp] = 0;
@@ -360,6 +387,7 @@ unsigned char* ImageTileSet::get_pixel_values_LOD(int x, int y)
 		return return_values;
 	}
 
+	// Get our tile
 	tile_index = load_tile(x * LOD_factor,y * LOD_factor);
 	tile_data = (unsigned char*) tiles[tile_index]->data;
 
@@ -368,7 +396,7 @@ unsigned char* ImageTileSet::get_pixel_values_LOD(int x, int y)
 	x = x % tex_size;
 	y = y % tex_size;
 
-	// !! will need to compensate for sample_size for multi-byte samples
+	// !! will need to compensate for sample_size for multi-byte bands
 	pixel_start = (x*num_bands) + (y*tex_size*num_bands);
 //	return_values[2] = pixel_start;
 	for (short tmp = 0; tmp < num_bands; tmp++) {
@@ -379,6 +407,8 @@ unsigned char* ImageTileSet::get_pixel_values_LOD(int x, int y)
 }
 
 /* !! tile_dimension will always be tex_size */
+// Pack data for boundary tiles into correct alignment for texturing.
+// Credit to Dafydd Williams
 void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, int data_height)
 {
     char* temp_tile;        //our working space
@@ -486,7 +516,6 @@ void ImageTileSet::align_tile(char** tile, int tile_dimension, int data_width, i
     }
 
     //free the old tile block (could be bad otherwise)
-//    free(*tile);
 	delete[] *tile;
 
     //...and free our pads
