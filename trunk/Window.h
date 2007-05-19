@@ -46,7 +46,7 @@ class Window
     
     public:
 		/* Constructor */
-	    Window::Window();
+	    Window();
 	    
 		/* Return the id of the thread that created this object's window */
 	    DWORD GetThreadId() {return threadId;}

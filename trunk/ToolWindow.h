@@ -25,9 +25,9 @@ class ToolWindow:public Window {
         void updateToolWindowScrollbar();
         void scrollToolWindow(int msg);
         HWND hToolWindowTabControl;
-        HWND ToolWindow::hToolWindowImageTabHeading;
-        HWND ToolWindow::hToolWindowQueryTabHeading;
-        HWND ToolWindow::hToolWindowScrollBar;
+        HWND hToolWindowImageTabHeading;
+        HWND hToolWindowQueryTabHeading;
+        HWND hToolWindowScrollBar;
         void freeDrawingObjects();       
         
         static const int WIDTH = 250;

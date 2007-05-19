@@ -21,7 +21,7 @@ class ContrastWindow:public Window
 	HWND hContrastTrackbar;
 
     int Create(HWND parent);
-    void ContrastWindow::resetSliders();
+    void resetSliders();
     static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 };
 

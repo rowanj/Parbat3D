@@ -14,9 +14,9 @@ class MainWindow:public Window
     vector<int> restoreStates;
     int *windowStates; 
     
-    static BOOL CALLBACK MainWindow::SaveAndHideWindow(HWND hwnd, LPARAM lparam);
-	static BOOL CALLBACK MainWindow::EnableWindowCallback(HWND hwnd,LPARAM lparam);
-	static BOOL CALLBACK MainWindow::DisableWindowCallback(HWND hwnd,LPARAM lparam);
+    static BOOL CALLBACK SaveAndHideWindow(HWND hwnd, LPARAM lparam);
+	static BOOL CALLBACK EnableWindowCallback(HWND hwnd,LPARAM lparam);
+	static BOOL CALLBACK DisableWindowCallback(HWND hwnd,LPARAM lparam);
        
     public:
     virtual int Create();        
