@@ -246,7 +246,7 @@ int ImageTileSet::load_tile(int x, int y)
 		int tile_check = 0;
 		int cached_tile = -1;
 		int oldest_age = -1;
-		/* traverse tile vector */
+		/* traverse tile list */
 		while (tile_check < tiles.size()) {
 			/* increment tile age */
 			tiles[tile_check]->age++;
@@ -289,7 +289,7 @@ int ImageTileSet::load_tile(int x, int y)
 #else
 				/* LRU */
 				delete[] tiles[oldest_tile]->data; /* Delete data */
-				vector<tile_t*>::iterator cacheIterator = tiles.begin();
+				list<tile_t*>::iterator cacheIterator = tiles.begin();
 				cacheIterator+=oldest_tile;
 				delete tiles.at(oldest_tile);
 				tiles.erase(cacheIterator);
