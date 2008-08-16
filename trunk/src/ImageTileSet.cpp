@@ -289,7 +289,7 @@ int ImageTileSet::load_tile(int x, int y)
 #else
 				/* LRU */
 				delete[] tiles[oldest_tile]->data; /* Delete data */
-				list<tile_t*>::iterator cacheIterator = tiles.begin();
+				deque<tile_t*>::iterator cacheIterator = tiles.begin();
 				cacheIterator+=oldest_tile;
 				delete tiles.at(oldest_tile);
 				tiles.erase(cacheIterator);

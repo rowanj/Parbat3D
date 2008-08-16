@@ -2,7 +2,7 @@
 #define _IMAGE_TILE_SET_H
 
 #include "ImageFile.h"
-#include <vector>
+#include <deque>
 #include <sys/types.h>
 
 typedef struct tile_t {
@@ -68,7 +68,7 @@ private:
 	int tex_size, tile_memory_size;
 
 	/* This stores the actual tile information */
-	list<tile_t*> tiles;
+	std::deque<tile_t*> tiles;
 };
 
 #endif
