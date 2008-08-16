@@ -1,0 +1,7 @@
+style=java
+brackets=linux
+indent=tab=4
+indent-preprocessor
+indent-switches
+indent-cases
+indent-labels
