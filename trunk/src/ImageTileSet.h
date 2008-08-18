@@ -2,8 +2,6 @@
 #define _IMAGE_TILE_SET_H
 
 #include "ImageFile.h"
-#include <deque>
-#include <sys/types.h>
 
 typedef struct tile_t {
 	int tile_index;

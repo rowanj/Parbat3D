@@ -1,8 +1,6 @@
 #ifndef _PARBAT_PROGRESS_WINDOW_H
 #define _PARBAT_PROGRESS_WINDOW_H
 
-#include <Windows.h>
-
 #include "Window.h"
 
 

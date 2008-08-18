@@ -1,10 +1,7 @@
 #ifndef _PARBAT_STICKYWINDOWMANAGER_H
 #define _PARBAT_STICKYWINDOWMANAGER_H
 
-#include <vector>
 #include "Window.h"
-#include <Windows.h>
-using namespace std;
 
 class StickyWindowManager
 {
@@ -13,9 +10,9 @@ class StickyWindowManager
     POINT prevMousePosition;                        // mouse position at last call to OnMoving or BeginMoving
     POINT origMousePosition;                        // mouse position at last call to BeginMoving
     Window *controller;
-    vector<Window*> stickyWindows;
-    vector<Window*> snappedWindows;
-    vector<Window*> nonSnappedWindows;
+    std::vector<Window*> stickyWindows;
+    std::vector<Window*> snappedWindows;
+    std::vector<Window*> nonSnappedWindows;
     RECT prevWindowPosition,origWindowPosition;
 
     int moveToInsideOfWindow(HWND snapToWin,RECT *rect);

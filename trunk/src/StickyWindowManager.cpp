@@ -1,11 +1,11 @@
+#include "PchApp.h"
+
+#include "StickyWindowManager.h"
 
 #include "Window.h"
-#include "StickyWindowManager.h"
 #include "console.h"
 #include "config.h"
 #include "main.h"
-#include <queue>
-#include <vector>
 
 using namespace std;
 

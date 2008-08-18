@@ -1,9 +1,10 @@
+#include "PchApp.h"
+
 #include "ImageTileSet.h"
+
+#include "config.h"
 #include "ImageProperties.h"
 #include "console.h"
-#include "config.h"
-#include <math.h>
-#include <cassert>
 
 #define DEBUG_IMAGE_TILESET 0
 
@@ -50,7 +51,7 @@ ImageTileSet::ImageTileSet(int level_of_detail, ImageFile* file, int tex_size_pa
 	image_file = file;
 	tex_size = tex_size_param;
 	// Enforce cache size minimum of 4MB
-	cache_size = max(cache_size_param, 4) * (1024*1024);
+	cache_size = std::max(cache_size_param, 4) * (1024*1024);
 
 	/* initialize state */
 	cache_fill = 0;
@@ -289,7 +290,7 @@ int ImageTileSet::load_tile(int x, int y)
 #else
 				/* LRU */
 				delete[] tiles[oldest_tile]->data; /* Delete data */
-				deque<tile_t*>::iterator cacheIterator = tiles.begin();
+				std::deque<tile_t*>::iterator cacheIterator = tiles.begin();
 				cacheIterator+=oldest_tile;
 				delete tiles.at(oldest_tile);
 				tiles.erase(cacheIterator);

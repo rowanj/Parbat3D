@@ -4,11 +4,6 @@
 #include "IniFile.h"
 #include "StringUtils.h"
 
-#include <fstream>
-
-using namespace std;
-
-
 /**
     Extends the iniFile class to allow for data to be sent to or read from the
     file in blocks (batch requests). This reduces the amount of file accesses

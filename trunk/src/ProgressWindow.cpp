@@ -1,3 +1,5 @@
+#include "PchApp.h"
+
 #include "ProgressWindow.h"
 
 #include "main.h"

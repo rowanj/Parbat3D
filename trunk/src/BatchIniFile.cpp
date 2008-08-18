@@ -1,3 +1,5 @@
+#include "PchApp.h"
+
 #include "BatchIniFile.h"
 
 using namespace std;

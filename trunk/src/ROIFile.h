@@ -1,17 +1,10 @@
 #ifndef _ROI_FILE_H
 #define _ROI_FILE_H
 
-#include <vector>
-#include <string>
-#include <sstream>
-
 #include "BatchIniFile.h"
 #include "ROI.h"
 #include "ROISet.h"
 #include "StringUtils.h"
-
-using namespace std;
-
 
 class ROIFile {
     private:

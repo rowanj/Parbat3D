@@ -1,10 +1,6 @@
 #ifndef _GL_VIEW_H
 #define _GL_VIEW_H
 
-#include <windows.h>
-#include <gl/gl.h>
-#include <gl/glu.h>
-
 class GLView
 {
 public:

@@ -1,20 +1,6 @@
 #ifndef _IMAGE_PROPERTIES_H
 #define _IMAGE_PROPERTIES_H
-#include <iosfwd>
-#include <cstdio>
-#include <math.h>
 
-#define CPL_STDCALL __stdcall
-#define CPL_DISABLE_STDCALL 1
-#include <gdal_priv.h>
-
-#include "config.h"
-#include "StringUtils.h"
-#include "console.h"
-#include <string>
-#include <iostream>
-
-#include <windows.h>
 
 
 class ImageProperties

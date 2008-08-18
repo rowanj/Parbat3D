@@ -16,7 +16,4 @@
 
 #define TMP_WAIT_FOR_KEYPRESS_ON_CLOSE 0 //wait for user to press a key in console window before closing on/off
 
-#define _WIN32_IE 0x0600    // project compatible with comctrl32.dll up to v6.0
-                            // required in order to use certain common controls functions & constants
-
 #endif

@@ -1,14 +1,12 @@
-#include <Windows.h>
-#include <math.h>
+#include "PchApp.h"
+
 #include "main.h"
 #include "Window.h"
 #include "FeatureSpace.h"
 #include "GLContainer.h"
 #include "Config.h"
 #include "Console.h"
-#include <gl/gl.h>
-#include <gl/glu.h>
-#include <commctrl.h>
+
 
 #define POLYDATA_DEBUG 0
 #define ENABLE_ROI_POINTS 1

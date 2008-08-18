@@ -3,10 +3,6 @@
 
 #define USE_CONSOLE 0
 
-#include <Windows.h>
-#include <string>
-#include <stdarg.h>
-
 typedef unsigned int uint;
 
 class Console

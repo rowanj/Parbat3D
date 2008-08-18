@@ -8,9 +8,6 @@
 #include "ImageViewport.h"
 #include "ROISet.h"
 
-#include <queue>
-#include <vector>
-
 class ImageGL : public ViewportListener
 {
   public:

@@ -1,12 +1,14 @@
-#include <Windows.h>
+#include "PchApp.h"
+
+#include "FeatureTab.h"
+
+#include "Config.h"
+
 #include "Window.h"
 #include "main.h"
 #include "ScrollBox.h"
 #include "ToolTab.h"
-#include "FeatureTab.h"
-#include "Config.h"
 #include "ToolWindow.h"
-#include <commctrl.h>
 #include "Console.h"
 #include "ImageProperties.h"
 

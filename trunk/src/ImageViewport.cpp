@@ -1,6 +1,10 @@
+#include "PchApp.h"
+
 #include "ImageViewport.h"
+
 #include "console.h"
-#include <cassert>
+
+using namespace std;
 
 ImageViewport::ImageViewport(ImageProperties* image_properties)
 {

@@ -10,9 +10,8 @@
 #ifndef POINTS_HASH_H
 #define POINTS_HASH_H
 
-#include <ext/hash_map>
-
 using namespace __gnu_cxx;
+#include <ext/hash_map>
 
 struct eqUnsignedInt
 {

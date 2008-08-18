@@ -1,13 +1,6 @@
 #ifndef _STRING_UTILS_H
 #define _STRING_UTILS_H
 
-using namespace std;
-#include <cstdio>
-#include <cstring>
-#include <sstream>
-#include <string>
-#include <iostream>
-
 /*This simple file contains utils to perform some tricky operations between
 C++ strings and C strings (and ints) that were giving me the heebies for
 about 4 hours today.

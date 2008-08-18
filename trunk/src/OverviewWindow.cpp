@@ -1,6 +1,8 @@
-#include <Windows.h>
-#include "main.h"
+#include "PchApp.h"
+
 #include "OverviewWindow.h"
+
+#include "main.h"
 #include "ImageWindow.h"
 #include "ToolWindow.h"
 #include "DisplayWindow.h"

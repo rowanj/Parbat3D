@@ -1,9 +1,6 @@
 #ifndef _IMAGE_HANDLER_H
 #define _IMAGE_HANDLER_H
 
-#include <string>
-#include <windows.h>
-
 #include "ImageFile.h"
 #include "ImageProperties.h"
 #include "OverviewGL.h"

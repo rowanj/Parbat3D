@@ -1,5 +1,12 @@
-#include "config.h"
+#include "PchApp.h"
+
 #include "ImageProperties.h"
+
+#include "config.h"
+
+#include "console.h"
+#include "StringUtils.h"
+
 
 
 ImageProperties::ImageProperties(GDALDataset* dataset, const std::string& filename) :

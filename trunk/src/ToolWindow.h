@@ -1,15 +1,12 @@
 #ifndef _PARBAT_TOOLWINDOW_H
 #define _PARBAT_TOOLWINDOW_H
 
-#include <vector>
 #include "ScrollBox.h"
 #include "ToolTab.h"
 #include "DisplayTab.h"
 #include "QueryTab.h"
 #include "ImageTab.h"
 #include "FeatureTab.h"
-
-using namespace std;
 
 class ToolWindow:public Window {
     private:
@@ -35,7 +32,7 @@ class ToolWindow:public Window {
         
         
     public:
-        vector<ToolTab*> tabs;
+        std::vector<ToolTab*> tabs;
         DisplayTab displayTab;                
         QueryTab queryTab;     
         ImageTab imageTab;   

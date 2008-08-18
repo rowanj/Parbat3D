@@ -1,11 +1,9 @@
 #ifndef FEATURE_SPACE_GL_H
 #define FEATURE_SPACE_GL_H
 
-#include <math.h>
 #include "GLText.h"
 #include "GLView.h"
 #include "PointsHash.h"
-#include <vector>
 
 #define USE_POINT_SPRITES 1
 #if USE_POINT_SPRITES

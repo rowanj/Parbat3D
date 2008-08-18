@@ -1,8 +1,10 @@
-#include <Windows.h>
+#include "PchApp.h"
+
+#include "config.h"
+
 #include "main.h"
 #include "Window.h"
 #include "ScrollBox.h"
-#include "config.h"
 
 /* create scrollable window as a child of another window, with rect set to top-left & bottom-right corners of parent window */
 int ScrollBox::Create(HWND parentHandle,RECT *rect)

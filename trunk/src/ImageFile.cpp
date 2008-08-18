@@ -1,5 +1,9 @@
-#include "config.h"
+#include "PchApp.h"
+
 #include "ImageFile.h"
+
+#include "config.h"
+
 #include "main.h"
 
 /*

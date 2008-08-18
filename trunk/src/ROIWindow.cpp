@@ -1,8 +1,8 @@
-#include "config.h"
-#include <Windows.h>
-#include <Commctrl.h>
-#include <vector>
+#include "PchApp.h"
 
+#include "ROIWindow.h"
+
+#include "config.h"
 
 #include "console.h"
 #include "main.h"
@@ -15,7 +15,6 @@
 #include "ROI.h"
 #include "ROISet.h"
 #include "ROIFile.h"
-#include "ROIWindow.h"
 #include "Settings.h"
 #include "ScrollBox.h"
 #include "StringUtils.h"

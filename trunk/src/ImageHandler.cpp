@@ -1,6 +1,6 @@
-#include "ImageHandler.h"
+#include "PchApp.h"
 
-#include <cassert>
+#include "ImageHandler.h"
 
 // Enable this to include debugging
 #define DEBUG_IMAGE_HANDLER 1

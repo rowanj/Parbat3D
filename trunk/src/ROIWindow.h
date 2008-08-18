@@ -1,9 +1,9 @@
 #ifndef _PARBAT_ROIWINDOW_H
 #define _PARBAT_ROIWINDOW_H
 
-#include <vector>
 #include "Window.h"
-#include <Commctrl.h>
+
+#include "ROI.h"
 
 class ROIWindow:public Window
 {
@@ -38,7 +38,7 @@ class ROIWindow:public Window
         
         HWND hwndTT;
                 
-        static vector<HWND> roiColourButtonList;
+        static std::vector<HWND> roiColourButtonList;
         
         static COLORREF customColours[];
         

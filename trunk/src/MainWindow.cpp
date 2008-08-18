@@ -1,12 +1,13 @@
-#define WINVER 0x0500
-#include <Windows.h>
+#include "PchApp.h"
+
+#include "MainWindow.h"
+
 #include "main.h"
 #include "ImageWindow.h"
 #include "OverviewWindow.h"
 #include "ToolWindow.h"
 #include "ROIWindow.h"
 #include "Window.h"
-#include "MainWindow.h"
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Main Window Functions */

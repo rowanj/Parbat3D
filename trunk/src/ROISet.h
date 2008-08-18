@@ -1,15 +1,11 @@
 #ifndef _ROISET_H
 #define _ROISET_H
 
-#include <vector>
-#include <string>
-
 #include "ROI.h"
-
 
 class ROISet {
     private:
-        vector<ROI*> regions;       // the set of all Regions of Interest
+        std::vector<ROI*> regions;       // the set of all Regions of Interest
         ROI* current_region;        // the Region of Interest currently being worked on
         ROIEntity* current_entity;  // the shape currently being worked on
         bool editingEntity;         // true if currently creating an entity
@@ -137,7 +133,7 @@ class ROISet {
         /**
             Returns a vector of all the Regions of Interest.
         */
-        vector<ROI*> get_regions (void);
+        std::vector<ROI*> get_regions (void);
         
         
         /**

@@ -1,8 +1,9 @@
-#include "config.h"
-#include "console.h"
+#include "PchApp.h"
+
 #include "GLView.h"
 
-#include <cassert>
+#include "config.h"
+#include "console.h"
 
 // pfd structure aproximated from public domain code at nehe.gamedev.net
 static	PIXELFORMATDESCRIPTOR gl_pfd={	// pfd Tells Windows How We Want Things To Be

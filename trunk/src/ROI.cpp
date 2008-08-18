@@ -1,3 +1,5 @@
+#include "PchApp.h"
+
 #include "ROI.h"
 
 using namespace std;

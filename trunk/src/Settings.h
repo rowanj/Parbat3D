@@ -1,11 +1,7 @@
 #ifndef _SETTINGS_H
 #define _SETTINGS_H
 
-#include <sstream>
-
 #include "IniFile.h"
-
-using namespace std;
 
 /**
     Allows settings to be saved to and retrieved from an ini file. Access to the

@@ -1,6 +1,8 @@
+#include "PchApp.h"
+
 #include "OverviewGL.h"
+
 #include "console.h"
-#include <cassert>
 
 #define DEBUG_GL 0
 
@@ -79,13 +81,13 @@ OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* i
 	glLoadIdentity();
 		
 	/* Scale such that image fills overview window in largest dimension */
-	scalefactor_tile = (GLfloat)texture_size / (GLfloat) max(LOD_width,LOD_height);
+	scalefactor_tile = (GLfloat)texture_size / (GLfloat) std::max(LOD_width,LOD_height);
 	glScalef(scalefactor_tile, scalefactor_tile, scalefactor_tile);
 	
 	/* !! Translate into middle of screen */
 
 	/* Find scale factor for lines */
-	scalefactor_lines = 1.0 / (GLfloat) max(image_width, image_height);
+	scalefactor_lines = 1.0 / (GLfloat) std::max(image_width, image_height);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);	
 }
 

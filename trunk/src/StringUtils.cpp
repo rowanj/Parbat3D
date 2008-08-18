@@ -1,6 +1,6 @@
-#include "StringUtils.h"
+#include "PchApp.h"
 
-#include <sstream>
+#include "StringUtils.h"
 
 
 const char* makeMessage(std::string leader, double input)
@@ -158,7 +158,7 @@ char* copyString(const char *oldstr)
 
 int stringToInt (std::string str) {
     int v;
-    stringstream ss;
+    std::stringstream ss;
     ss << str;
     ss >> v;
     return v;
@@ -166,7 +166,7 @@ int stringToInt (std::string str) {
 
 int stringToInt (char* str) {
     int v;
-    stringstream ss;
+    std::stringstream ss;
     ss << str;
     ss >> v;
     return v;

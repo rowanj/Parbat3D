@@ -1,8 +1,8 @@
+#include "PchApp.h"
+
 #include "GLText.h"
 
-#include <stdio.h>
-#include <Windows.h>
-#include <cassert>
+#include <stdarg.h>
 
 GLText::GLText(GLView* gl_view_arg, const char* font_arg, int size_arg)
 {

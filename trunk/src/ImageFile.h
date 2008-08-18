@@ -1,26 +1,9 @@
 #ifndef _IMAGE_FILE_H
 #define _IMAGE_FILE_H
 
-#include <iosfwd>
-#include <cstdio>
-#include <cstring>
-#include <sstream>
-#include <string>
-#include <iostream>
-#include <vector>
-#include <math.h>
-
-#define CPL_STDCALL __stdcall
-#define CPL_DISABLE_STDCALL 1
-
-#include <gdal_priv.h>
-
-
 #include "ImageProperties.h"
 #include "CoordinateInfo.h"
 #include "BandInfo.h"
-#include "StringUtils.h"
-#include <windows.h>
 
 using std::vector;
 

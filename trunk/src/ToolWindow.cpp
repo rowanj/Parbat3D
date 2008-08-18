@@ -1,9 +1,11 @@
-#include <Windows.h>
-#include <Commctrl.h>
+#include "PchApp.h"
+
+#include "config.h"
+
+#include "ToolWindow.h"
 
 #include "Window.h"
 #include "ScrollBox.h"
-#include "ToolWindow.h"
 #include "main.h"
 #include "OverviewWindow.h"
 #include "ImageWindow.h"
@@ -13,7 +15,6 @@
 #include "QueryTab.h"
 #include "ImageTab.h"
 #include "FeatureTab.h"
-#include "config.h"
 
 
 // create tool window

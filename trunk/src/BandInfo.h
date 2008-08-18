@@ -1,21 +1,6 @@
 #ifndef _BAND_INFO_H
 #define _BAND_INFO_H
 
-#include <iosfwd>
-#include <cstdio>
-#include <math.h>
-
-#define CPL_STDCALL __stdcall
-#define CPL_DISABLE_STDCALL 1
-#include <gdal_priv.h>
-
-#include "config.h"
-#include <string>
-#include "StringUtils.h"
-
-#include "console.h"
-#include <windows.h>
-
 class BandInfo
 {
 	public:

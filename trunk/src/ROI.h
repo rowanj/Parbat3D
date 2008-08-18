@@ -1,12 +1,6 @@
 #ifndef _ROI_H
 #define _ROI_H
 
-#include <vector>
-#include <string>
-
-using namespace std;
-
-
 // these represent the different types of entities that can be created
 extern const char* ROI_NONE;   // not an ROI (used for checking if one is being edited)
 extern const char* ROI_POINT;  // consist of a single coord
@@ -34,7 +28,7 @@ struct coords {
 class ROIEntity {
     public:
         const char* type;       // the type of the entity (POINT, RECT, POLY)
-        vector<coords> points;  // the list of coords that make up the entity
+        std::vector<coords> points;  // the list of coords that make up the entity
         
         
         /**
@@ -73,7 +67,7 @@ class ROIEntity {
         /**
             Returns the vector of coords that makes up the entity.
         */
-        vector<coords> get_points() {
+        std::vector<coords> get_points() {
             return points;
         }
 };
@@ -93,7 +87,7 @@ class ROI {
         
         string name;                  // name to identify the ROI
         
-        vector<ROIEntity*> entities;  // entities that make up this ROI
+        std::vector<ROIEntity*> entities;  // entities that make up this ROI
         
         
     public:
@@ -167,7 +161,7 @@ class ROI {
             Returns a vector consisting of all the entities that make up this
             Region of Interest.
         */
-        vector<ROIEntity*> get_entities (void);
+        std::vector<ROIEntity*> get_entities (void);
 };
 
 #endif

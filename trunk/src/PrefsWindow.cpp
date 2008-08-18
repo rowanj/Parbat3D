@@ -1,12 +1,10 @@
-#include <Windows.h>
+#include "PchApp.h"
+
+#include "PrefsWindow.h"
+
 #include "main.h"
 #include "Window.h"
-#include "PrefsWindow.h"
 #include "Settings.h"
-#include <string>
-#include <cstdio>
-#include <iostream>
-#include <cstring>
 
 /* ------------------------------------------------------------------------------------------------------------------------ */
 /* Prefs Window Functions */

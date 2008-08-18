@@ -1,4 +1,9 @@
-#include <Windows.h>
+#include "PchApp.h"
+
+#include "ImageWindow.h"
+
+#include "config.h"
+
 #include "console.h"
 #include "main.h"
 #include "OverviewWindow.h"
@@ -7,10 +12,8 @@
 #include "ToolWindow.h"
 #include "Settings.h"
 #include "ImageHandler.h"
-#include "ImageWindow.h"
 #include "ImageViewport.h"
 
-#include "config.h"
 
 char* imageWindowTitle;
 

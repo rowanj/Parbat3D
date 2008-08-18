@@ -2,16 +2,13 @@
 #define _PARBAT_MAINWINDOW_H
 
 #include "Window.h"
-#include <vector>
-
-using namespace std;
 
 class MainWindow:public Window
 {
     private:
     WNDPROC prevProc;
-    vector<HWND> savedWindows;
-    vector<int> restoreStates;
+    std::vector<HWND> savedWindows;
+    std::vector<int> restoreStates;
     int *windowStates; 
     
     static BOOL CALLBACK SaveAndHideWindow(HWND hwnd, LPARAM lparam);

@@ -1,17 +1,15 @@
+#include "PchApp.h"
+
+#include "main.h"
+
 #include "config.h"
-#include <Windows.h>
-#include <Commctrl.h>
-#include <iostream>
-#include <cassert>
-#include "window.h"
 
 #include "ImageProperties.h"
 #include "BandInfo.h"
 #include "StringUtils.h"
 #include "console.h"
 
-#include "main.h"
-
+#include "window.h"
 #include "MainWindow.h"
 #include "ImageWindow.h"
 #include "OverviewWindow.h"

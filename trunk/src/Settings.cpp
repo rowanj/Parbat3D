@@ -1,3 +1,5 @@
+#include "PchApp.h"
+
 #include "Settings.h"
 
 using namespace std;

@@ -1,10 +1,13 @@
-#include <Windows.h>
+#include "PchApp.h"
+
+#include "DisplayTab.h"
+
+#include "Config.h"
+
 #include "Window.h"
 #include "main.h"
 #include "ScrollBox.h"
 #include "ToolTab.h"
-#include "DisplayTab.h"
-#include "Config.h"
 #include "ToolWindow.h"
 
 ScrollBox hDScrollBox;

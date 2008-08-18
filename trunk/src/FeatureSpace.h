@@ -1,8 +1,6 @@
 #ifndef _PARBAT_FeatureSpace_H
 #define _PARBAT_FeatureSpace_H
 
-#include <list>
-#include <vector>
 #include "console.h"
 #include "Window.h"
 #include "GLContainer.h"
@@ -35,15 +33,15 @@ class FeatureSpace:public Window, public GLContainerHandler
         static const int FEATURE_WINDOW_HEIGHT;
         static const int TOOLBAR_HEIGHT;
         
-        vector<list<int>*> boundsCoords;
-        vector<list<int>*> pixCoords;
+        std::vector<std::list<int>*> boundsCoords;
+        std::vector<std::list<int>*> pixCoords;
 		int maxy; 
 		int miny;
 		int maxx;
 		int minx;
 		int yoffset;
 		int vectorsize;
-		vector<myPoint> polyPoints;
+		std::vector<myPoint> polyPoints;
 		ImageTileSet* fsTileset;
 		points_hash_t fsImagePoints;
 		points_hash_t fsROIPoints;

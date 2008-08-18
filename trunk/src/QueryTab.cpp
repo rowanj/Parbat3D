@@ -1,9 +1,11 @@
-#include <Windows.h>
+#include "PchApp.h"
+
+#include "QueryTab.h"
+
 #include "Window.h"
 #include "main.h"
 #include "ScrollBox.h"
 #include "ToolTab.h"
-#include "QueryTab.h"
 #include "Config.h"
 #include "ToolWindow.h"
 

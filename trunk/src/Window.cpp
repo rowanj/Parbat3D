@@ -1,8 +1,14 @@
+#include "PchApp.h"
+
 #include "Window.h"
+
+#include "config.h"
+
 #include "Console.h"
 #include "resources.h"
 #include "main.h"
-#include "config.h"
+#include "console.h"
+
 #include <commctrl.h>
 
 /* define static variables */

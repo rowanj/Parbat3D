@@ -1,10 +1,6 @@
 #ifndef _INI_FILE_H
 #define _INI_FILE_H
 
-#include <fstream>
-
-using namespace std;
-
 /**
     Handles access to ini files. Once a file name has been specified in the
     constructor, you can parse (search) the file for values, read values or

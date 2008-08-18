@@ -1,13 +1,10 @@
-#include <Windows.h>
+#include "PchApp.h"
+
+#include "ContrastWindow.h"
+
 #include "main.h"
 #include "Window.h"
-#include "ContrastWindow.h"
 #include "Settings.h"
-#include <string>
-#include <cstdio>
-#include <iostream>
-#include <cstring>
-#include <commctrl.h>
 #include "OverviewWindow.h"
 
  

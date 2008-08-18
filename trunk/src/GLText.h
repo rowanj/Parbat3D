@@ -16,8 +16,6 @@ Known issues:
 
 #include "GLView.h"
 
-#include <stdarg.h>
-
 class GLText {
 public:
 	GLText(GLView* gl_view_arg, const char* font_arg, int size_arg);

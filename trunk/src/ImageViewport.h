@@ -3,8 +3,6 @@
 
 #include "ImageProperties.h"
 #include "ViewportListener.h"
-#include <vector>
-
 
 class ImageViewport
 {
@@ -47,7 +45,7 @@ public:
 	
 private:
 	/* Listeners */
-	vector<ViewportListener*> listeners;
+	std::vector<ViewportListener*> listeners;
 	
 	/* Local variables */
     float zoom_level;

@@ -1,12 +1,15 @@
+#include "PchApp.h"
+
 #include "ImageGL.h"
-#include "Settings.h"
-#include <stdlib.h>
-#include <cassert>
-#include "console.h"
+
 #include "config.h"
+#include "Settings.h"
+#include "console.h"
 
 #define DEBUG_GL_TEXTURES 0
 #define DEBUG_GL 0
+
+using namespace std;
 
 ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* image_viewport_param, ROISet *ROI_set)
 {
@@ -79,7 +82,7 @@ ImageGL::ImageGL(HWND window_hwnd, ImageFile* image_file_ptr, ImageViewport* ima
 				user_texture_size = user_texture_size>>1;
 				order++;
 			}
-			user_texture_size = int(round(pow(2,order)));
+			user_texture_size = int(round(pow(2.0f, order)));
 			Console::write("(II) User texture size (rounded) = %d\n", user_texture_size);
 		}
 	    glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint*) &max_texture_size);

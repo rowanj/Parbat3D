@@ -1,7 +1,9 @@
+#include "PchApp.h"
+
 #include "FeatureSpaceGL.h"
-#include <cassert>
+
 #include "console.h"
-#include <mmsystem.h>
+#include <mmsystem.h> // multimedia system - can we do without this?
 
 #if USE_POINT_SPRITES
 #include "point_texture.c"

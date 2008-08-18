@@ -1,3 +1,5 @@
+#include "PchApp.h"
+
 #include "TestUtils.h"
 
 void attemptRasterCall(ImageFile* theFile)

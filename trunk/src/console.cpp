@@ -1,10 +1,8 @@
+#include "PchApp.h"
+
 #include "console.h"
 
 #if USE_CONSOLE
-#include <Windows.h>
-#include <string>
-#include <stdlib.h>
-#include <stdio.h>
 
 
 using namespace std;

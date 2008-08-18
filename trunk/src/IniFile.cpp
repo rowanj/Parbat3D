@@ -1,3 +1,5 @@
+#include "PchApp.h"
+
 #include "IniFile.h"
 
 using namespace std;

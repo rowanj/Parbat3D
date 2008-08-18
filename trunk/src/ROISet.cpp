@@ -1,3 +1,5 @@
+#include "PchApp.h"
+
 #include "ROISet.h"
 
 #include "StringUtils.h"

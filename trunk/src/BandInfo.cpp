@@ -1,6 +1,10 @@
-#include "config.h"
+#include "PchApp.h"
 
 #include "BandInfo.h"
+
+#include "config.h"
+#include "StringUtils.h"
+#include "console.h"
 
 /*
 BandInfo

@@ -1,13 +1,6 @@
 #ifndef _PARBAT_WINDOW_H
 #define _PARBAT_WINDOW_H
 
-
-#include "config.h"
-#include "console.h"
-#include <Windows.h>
-#include <queue>
-using namespace std;
-
 /* Window class used for constructing & using object-based windows 
    All of the main windows subclass this class
 */

@@ -1,6 +1,9 @@
 #ifndef _PARBAT_TOOLTAB_H
 #define _PARBAT_TOOLTAB_H
 
+#include "Window.h"
+
+#include "ScrollBox.h"
 
 class ToolTab:public Window
 {
