@@ -117,7 +117,7 @@ unsigned char* ImageHandler::get_window_pixel_values(int x, int y)
 	return image_gl->get_pixel_values(ix,iy);
 }
 
-const char* ImageHandler::get_info_string(void)
+string ImageHandler::get_info_string(void)
 {
     return image_file->getInfoString();
 }    

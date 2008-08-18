@@ -251,7 +251,7 @@ void loadFile() {
 		}
     	
         // update image window settings
-        filename=copyString(image_handler->get_image_properties()->getFileName());
+        filename=copyString(image_handler->get_image_properties()->getFileName().c_str());
                     
         imageWindow.updateImageWindowTitle();              
         imageWindow.updateImageScrollbar();      

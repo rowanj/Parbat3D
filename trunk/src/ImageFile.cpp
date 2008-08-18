@@ -20,19 +20,13 @@ ImageFile::ImageFile
 Constructor for ImageFile. Takes a filename, and instantiates a new
 GDALDataset. Also registers all GDAL drivers, and gets info about
 the new dataset*/
-ImageFile::ImageFile(char* theFilename)
+ImageFile::ImageFile(const std::string& theFilename) :
+	filename(theFilename)
 {
-	filename = new char[512];
-	infoString = new char[512];
-	
-	strcpy(filename, theFilename);
-	Console::write("ImageFile::Constructor - Filename passed was %s\n", theFilename);
-	Console::write("ImageFile::Constructor - Filename copy result is %s\n", filename);
-	
 	GDALAllRegister();
 	
 	ifErr = 0;
-	ifDataset = (GDALDataset *) GDALOpen(filename , GA_ReadOnly);
+	ifDataset = (GDALDataset *) GDALOpen(filename.c_str() , GA_ReadOnly);
 	
 	if (ifDataset == NULL) //if we've not got a valid file
 	{
@@ -49,13 +43,14 @@ ImageFile::ImageFile(char* theFilename)
 			theBands.push_back(new BandInfo( (GDALRasterBand*) GDALGetRasterBand(ifDataset, i+1)));
 		}
 
-		sprintf(infoString, "Type: %s, X: %d, Y: %d, Bands: %d\n",
+		/*sprintf(infoString, "Type: %s, X: %d, Y: %d, Bands: %d\n",
 				(char*)properties->getDriverLongName(),
 				properties->getWidth(),
 				properties->getHeight(),
-				properties->getNumBands());
+				properties->getNumBands());*/
+		infoString = "Type: ";
+		infoString += properties->getDriverLongName();
 		
-		Console::write("ImageFile::Constructor - infoString is %s\n", infoString);
 	}
 }
 
@@ -86,8 +81,6 @@ ImageFile::~ImageFile(void)
 	{
 		delete theBands[i];
 	}
-	delete[] filename;
-	delete[] infoString;
 }
 
 /*
@@ -126,9 +119,9 @@ ImageFile::getInfoString
 Prints some basic info about the dataset: driver, driver long name, x size, y size
 and the number of raster bands.
 */
-const char* ImageFile::getInfoString(void)
+std::string ImageFile::getInfoString(void)
 {
-	return (const char *)infoString;
+	return infoString;
 }
 
 /*

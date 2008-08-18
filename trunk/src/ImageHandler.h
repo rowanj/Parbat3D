@@ -20,7 +20,7 @@ public:
 	/* Data Operators */
 	ImageProperties* get_image_properties(void);
 	BandInfo* get_band_info(int band_number);
-	const char* get_info_string(void);
+	string get_info_string(void);
 	
 	/* Window Operators */
 	void redraw(void);

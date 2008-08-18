@@ -27,19 +27,19 @@ using std::vector;
 class ImageFile
 {
 	public:
-		ImageFile(char* theFilename);
+		ImageFile(const std::string& theFilename);
 		int getifErr(void);
 		virtual ~ImageFile(void);
 		ImageProperties* getImageProperties(void);
 		BandInfo* getBandInfo(int bandNumber);
-		const char* getInfoString(void);
+		std::string getInfoString(void);
 		void getRasterData(int width, int height, int xpos, int ypos, char* buffer, int outWidth, int outHeight);
 		
 	private:
 		int ifErr;
 		GDALDataset* ifDataset;
-		char* filename;
-		char* infoString;
+		std::string filename;
+		std::string infoString;
 		ImageProperties* properties;
 		CoordinateInfo* coordInfo;
 		vector<BandInfo*> theBands;
