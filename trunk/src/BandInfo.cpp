@@ -30,8 +30,7 @@ BandInfo::BandInfo(GDALRasterBand* theBand)
 	
 	bandNumber = GDALGetBandNumber(theBand);
 	
-	rasterDataType = new char[512];
-	strcpy(rasterDataType, GDALGetDataTypeName(GDALGetRasterDataType(band)));
+	rasterDataType = GDALGetDataTypeName(GDALGetRasterDataType(band));
 	
 	overviewCount = GDALGetOverviewCount(band);
 		
@@ -45,9 +44,9 @@ BandInfo::getRasterDataType
 
 Returns the raster data type of the band.
 */
-const char* BandInfo::getRasterDataType(void)
+std::string BandInfo::getRasterDataType(void)
 {
-	return (const char *)rasterDataType;
+	return rasterDataType;
 }
 
 /*
@@ -120,12 +119,3 @@ GDALRasterBand* BandInfo::getBand(void)
 	return band;	
 }
 
-/*
-BandInfo::~BandInfo
-
-Deconstructor
-*/
-BandInfo::~BandInfo(void)
-{
-	delete[] rasterDataType;
-}

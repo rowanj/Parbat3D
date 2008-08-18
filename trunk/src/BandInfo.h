@@ -20,7 +20,7 @@ class BandInfo
 {
 	public:
 		BandInfo(GDALRasterBand* theBand);
-		const char* getRasterDataType(void);
+		std::string getRasterDataType(void);
 		double getDataMin(void);
 		double getDataMax(void);
 		int getBlockXSize(void);
@@ -28,10 +28,9 @@ class BandInfo
 		int getOverviewCount(void);
 		int getBandNumber(void);
 		GDALRasterBand* getBand(void);
-		virtual ~BandInfo(void);
 		
 	private:
-		char* rasterDataType;
+		std::string rasterDataType;
 		int bandNumber;
 		int overviewCount;
 		int blockXSize;
