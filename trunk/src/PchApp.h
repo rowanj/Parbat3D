@@ -37,8 +37,8 @@ using std::string;
 #include <deque>
 
 // OpenGL
-#include <gl/gl.h>
-#include <gl/glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 // And Win32-API
 #define WINVER 0x0500
@@ -50,7 +50,7 @@ using std::string;
 // And GDAL
 #define CPL_STDCALL __stdcall
 #define CPL_DISABLE_STDCALL 1
-#include <gdal_priv.h>
+#include <gdal/gdal_priv.h>
 
 
 #endif // include guard
