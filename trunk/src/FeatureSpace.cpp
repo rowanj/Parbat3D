@@ -4,9 +4,8 @@
 #include "Window.h"
 #include "FeatureSpace.h"
 #include "GLContainer.h"
-#include "Config.h"
-#include "Console.h"
-
+#include "config.h"
+#include "console.h"
 
 #define POLYDATA_DEBUG 0
 #define ENABLE_ROI_POINTS 1
@@ -18,13 +17,6 @@ const int FeatureSpace::FEATURE_WINDOW_HEIGHT=550;      // inital height of feat
 const int FeatureSpace::TOOLBAR_HEIGHT=30;              // height of toolbar area at bottom of window
 
 extern ROISet *regionsSet;
-
-// timer used for testing
-#include <time.h>   
-void sleep(unsigned int mseconds) {
-    clock_t goal = mseconds + clock();
-    while (goal > clock());
-}
 
 // create & display new feature space window
 FeatureSpace::FeatureSpace(int LOD, bool only_ROIs, int b1, int b2, int b3) {
