@@ -26,8 +26,8 @@ public:
     
     int granularity;
         
-   	static const float degs_to_rad = 180.0 / M_PI;
-	static const float rads_to_deg = 1.0 / (180 / M_PI);
+    static const float degs_to_rad;
+    static const float rads_to_deg;
 
 	void add_points(points_hash_t points_hash,
 			unsigned char red, unsigned char green, unsigned char blue);
@@ -53,7 +53,7 @@ private:
     vector<GLuint> points_lists;
 #if USE_POINT_SPRITES
 	GLuint points_texture_id;
-	static const GLfloat point_sprite_max_size = 30.0;
+	static const GLfloat point_sprite_max_size;
 #endif
     
 

@@ -17,6 +17,11 @@ PFNGLPOINTPARAMETERFVARBPROC glPointParameterfvARB = NULL;
 #define FS_USE_MIPMAPS 1
 #define FS_USE_EXTRA_VIEWPORTS 0
 
+const float FeatureSpaceGL::degs_to_rad = 180.0 / M_PI;
+const float FeatureSpaceGL::rads_to_deg = 1.0 / (180 / M_PI);
+const GLfloat FeatureSpaceGL::point_sprite_max_size = 30.0;
+
+
 FeatureSpaceGL::FeatureSpaceGL(HWND hwnd, int LOD_arg, int band1_arg, int band2_arg, int band3_arg)
 {
 	// Set initial camera position
