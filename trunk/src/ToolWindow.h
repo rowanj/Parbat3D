@@ -13,7 +13,7 @@ class ToolWindow:public Window {
         WNDPROC prevProc;
         HPEN hTabPen;
         WNDPROC oldTabControlProc,oldDisplayTabContainerProc,oldQueryTabContainerProc,oldImageTabContainerProc,oldScrollBarContainerProc;
-        char szToolWindowClassName[];
+        char* szToolWindowClassName;
         void draw(DRAWITEMSTRUCT *dis, HFONT hfont);
         void drawTab(DRAWITEMSTRUCT *dis);
         void measureTab(MEASUREITEMSTRUCT *mis);
