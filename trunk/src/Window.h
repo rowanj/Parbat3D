@@ -1,6 +1,11 @@
 #ifndef _PARBAT_WINDOW_H
 #define _PARBAT_WINDOW_H
 
+// WINE fixes
+#define GCL_HCURSOR (-12)
+#define GCL_HBRBACKGROUND (-10)
+#define GWL_HWNDPARENT (-8)
+
 /* Window class used for constructing & using object-based windows 
    All of the main windows subclass this class
 */
@@ -40,6 +45,7 @@ class Window
     public:
 		/* Constructor */
 	    Window();
+	    virtual ~Window() {};
 	    
 		/* Return the id of the thread that created this object's window */
 	    DWORD GetThreadId() {return threadId;}
@@ -99,7 +105,7 @@ class Window
 	    void SetDefaultCursor(HCURSOR hcur) {SetClassLong(hwindow,GCL_HCURSOR,(long)hcur);};
 	    
 	    /* set the brush used to paint the background of a window */
-	    void SetBackgroundBrush(HBRUSH hbrush) {SetClassLong(hwindow,GCL_HBRBACKGROUND,(long)hbrush); hBackgroundBrush=hbrush;};
+	    void SetBackgroundBrush(HBRUSH hbrush) {SetClassLong(hwindow, GCL_HBRBACKGROUND,(long)hbrush); hBackgroundBrush=hbrush;};
 	    static void SetBackgroundBrush(HWND hwin,HBRUSH hbrush) {SetClassLong(hwin,GCL_HBRBACKGROUND,(long)hbrush);};    
 	    
 	    /* cause a window to be re-drawn */
