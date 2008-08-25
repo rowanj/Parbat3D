@@ -2,7 +2,7 @@
 
 #include "ToolTab.h"
 
-#include "Config.h"
+#include "config.h"
 
 #include "Window.h"
 #include "main.h"
