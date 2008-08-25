@@ -9,7 +9,7 @@
 #include "StringUtils.h"
 #include "console.h"
 
-#include "window.h"
+#include "Window.h"
 #include "MainWindow.h"
 #include "ImageWindow.h"
 #include "OverviewWindow.h"
@@ -22,6 +22,8 @@
 #include "ProgressWindow.h"
 
 #include "ROISet.h"
+
+#include <commdlg.h>
 
 using namespace std;
 
