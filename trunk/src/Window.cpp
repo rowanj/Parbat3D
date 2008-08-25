@@ -4,12 +4,11 @@
 
 #include "config.h"
 
-#include "Console.h"
 #include "resources.h"
 #include "main.h"
 #include "console.h"
 
-#include <commctrl.h>
+#include <shellapi.h>
 
 /* define static variables */
 WNDPROC Window::stPrevWindowProcedure=NULL;
@@ -123,9 +122,9 @@ int Window::CreateWin(DWORD dwExStyle,LPCTSTR lpClassName,LPCTSTR lpWindowName,D
     // set window procedure
     prevWindowProcedure=NULL;
     stPrevWindowProcedure=NULL;
-    if (GetWindowLongPtr(hwindow,GWLP_WNDPROC)!=(LONG)&Window::WindowProcedure)
+    if (GetWindowLongPtr(hwindow,GWLP_WNDPROC) != reinterpret_cast<uintptr_t>(&Window::WindowProcedure))
     {
-        prevWindowProcedure=(WNDPROC)SetWindowLongPtr(hwindow,GWLP_WNDPROC,(LONG)&Window::WindowProcedure);
+        prevWindowProcedure=(WNDPROC)SetWindowLongPtr(hwindow,GWLP_WNDPROC,reinterpret_cast<uintptr_t>(&Window::WindowProcedure));
         stPrevWindowProcedure=prevWindowProcedure;
     }
     
@@ -151,12 +150,12 @@ int Window::Create()
 */
 WNDPROC Window::SetWindowProcedure(WNDPROC newproc)
 {
-    return (WNDPROC)SetWindowLongPtr(hwindow,GWLP_WNDPROC,(LONG)newproc);
+  return (WNDPROC)SetWindowLongPtr(hwindow,GWLP_WNDPROC,reinterpret_cast<uintptr_t>(newproc));
 }
 
 WNDPROC Window::SetWindowProcedure(HWND hwnd,WNDPROC newproc)
 {
-	return (WNDPROC)SetWindowLongPtr(hwnd,GWLP_WNDPROC,(LONG)newproc);
+  return (WNDPROC)SetWindowLongPtr(hwnd,GWLP_WNDPROC,reinterpret_cast<uintptr_t>(newproc));
 }
 
 // associate a Window object with a window
