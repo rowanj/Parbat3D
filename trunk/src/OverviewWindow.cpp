@@ -12,6 +12,7 @@
 #include "PrefsWindow.h"
 #include "ContrastWindow.h"
 
+#include <shellapi.h>
 
 // Used for accessing the help folder
 const char *helpPath;
