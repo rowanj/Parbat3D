@@ -16,6 +16,7 @@
 #include "ImageTab.h"
 #include "FeatureTab.h"
 
+#define GWL_WNDPROC (-4)
 
 // create tool window
 int ToolWindow::Create(HWND) {
@@ -95,7 +96,7 @@ int ToolWindow::Create(HWND) {
         ToolTab *tab=tabs.at(i);
         tie.mask=TCIF_TEXT+TCIF_PARAM;;
         tie.pszText=tab->GetTabName();
-        tie.lParam=(DWORD)tie.pszText;
+        tie.lParam=(LPARAM)tie.pszText;
         TabCtrl_InsertItem(hToolWindowTabControl, i, &tie);
         tab->Create(hToolWindowTabControl,&rect);
         tab->Hide();
