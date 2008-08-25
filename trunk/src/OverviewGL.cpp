@@ -4,6 +4,8 @@
 
 #include "console.h"
 
+#include <shellapi.h>
+
 #define DEBUG_GL 0
 
 OverviewGL::OverviewGL(HWND window_hwnd, ImageFile* image_file, ImageViewport* image_viewport_param)
