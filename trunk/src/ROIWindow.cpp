@@ -20,6 +20,8 @@
 #include "StringUtils.h"
 
 
+#include <commdlg.h>
+
 ScrollBox ROIscrollBox;
 
 vector<HWND> ROIWindow::roiColourButtonList;
@@ -464,7 +466,7 @@ int ROIWindow::getROICheckedCount () {
     
     // find how many ROIs are selected
     for (i=0; i<items_in_list; i++) {
-        if (ListView_GetCheckState(hROIListBox, i))
+      if (ListView_GetItemState(hROIListBox, i, 0))
             checked++;
     }
     
@@ -575,7 +577,7 @@ void ROIWindow::addNewRoiToList(ROI *rCur,int newId)
 	MoveWindow(hROIListBox,0,0,rect.right-rect.left,newListViewHeight,true);
 	
 	// make the ROI active as soon as it is created
-	ListView_SetCheckState(hROIListBox, newId, true);  // make its checkbox selected
+	ListView_SetItemState(hROIListBox, newId, true, 0);  // make its checkbox selected
 	rCur->set_active(true);                            // set the actual ROI to active
 	
 	// select the ROI that was just created so new entities will be added to it
