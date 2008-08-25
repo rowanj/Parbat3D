@@ -6,7 +6,7 @@
 #include "main.h"
 #include "ScrollBox.h"
 #include "ToolTab.h"
-#include "Config.h"
+#include "config.h"
 #include "ToolWindow.h"
 
 ScrollBox hQScrollBox;
