@@ -29,6 +29,9 @@ using std::string;
 #include <fstream>
 #include <sys/types.h>
 
+#include <limits>
+#include <algorithm>
+
 
 // C++ standard containers
 #include <vector>
@@ -44,7 +47,8 @@ using std::string;
 #define WINVER 0x0500
 #define _WIN32_IE 0x600
 #define _WIN32_WINNT 0x501
-#include <Windows.h>
+#define NOMINMAX
+#include <windows.h>
 #include <commctrl.h>
 
 // And GDAL
