@@ -2,14 +2,14 @@
 
 #include "FeatureTab.h"
 
-#include "Config.h"
+#include "config.h"
 
 #include "Window.h"
 #include "main.h"
 #include "ScrollBox.h"
 #include "ToolTab.h"
 #include "ToolWindow.h"
-#include "Console.h"
+#include "console.h"
 #include "ImageProperties.h"
 
 ScrollBox hFSScrollBox;

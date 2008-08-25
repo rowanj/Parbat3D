@@ -3,7 +3,7 @@
 #include "main.h"
 #include "Window.h"
 #include "GLContainer.h"
-#include "Config.h"
+#include "config.h"
 #include "console.h"
 
 
