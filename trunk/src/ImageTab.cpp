@@ -2,7 +2,7 @@
 
 #include "ImageTab.h"
 
-#include "Config.h"
+#include "config.h"
 
 #include "Window.h"
 #include "main.h"
@@ -20,12 +20,13 @@ int ImageTab::Create(HWND parent,RECT *parentRect)
 {
     ToolTab::Create(parent,parentRect);
     
+    const int iNumItems = 5;
 	/* add the image property information under the image tab */
 	ImageProperties* ip=image_handler->get_image_properties();
 	string leader;
-	int ipItems=5;
-	string n[ipItems];
-	string v[ipItems];
+	int ipItems= iNumItems;
+	string n[iNumItems];
+	string v[iNumItems];
 	
 	/* If the filename is too long to be displayed, truncate it.
 	Later on, a roll-over tooltip should be implemented to bring
