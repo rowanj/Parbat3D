@@ -43,6 +43,8 @@ int DisplayWindow::Create(HWND hparent) {
     GetClientRect(GetHandle(),&rect);
     textPos.x=(rect.right-rect.left)/2 - textSize.cx/2;
     textPos.y=(rect.bottom-rect.top)/2 - textSize.cy/2;
+
+    return 0; // ?! is this right/necessary
 }
 
 
