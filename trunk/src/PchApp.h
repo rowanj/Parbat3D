@@ -47,14 +47,14 @@ using std::string;
 #define WINVER 0x0500
 #define _WIN32_IE 0x600
 #define _WIN32_WINNT 0x501
-#define NOMINMAX
+//#define NOMINMAX
 #include <windows.h>
 #include <commctrl.h>
 
 // And GDAL
-#define CPL_STDCALL __stdcall
-#define CPL_DISABLE_STDCALL 1
-#include <gdal/gdal_priv.h>
+//#define CPL_STDCALL __stdcall
+//#define CPL_DISABLE_STDCALL 1
+#include <gdal_priv.h>
 
 
 #endif // include guard
