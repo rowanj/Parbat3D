@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Parbat3D" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="build\Parbat3D" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build\objects" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wfatal-errors" />
+					<Add option="-g" />
+					<Add directory="C:\Dev-Cpp\fwtools\include" />
+				</Compiler>
+				<Linker>
+					<Add directory="C:\Dev-Cpp\fwtools\lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="build\Parbat3D" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build\objects" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-Wfatal-errors" />
+					<Add directory="C:\Dev-Cpp\fwtools\include" />
+				</Compiler>
+				<Linker>
+					<Add directory="C:\Dev-Cpp\fwtools\lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Linker>
+			<Add library="comctl32" />
+			<Add library="opengl32" />
+			<Add library="glu32" />
+			<Add library="gdal_i" />
+		</Linker>
+		<Unit filename="BandInfo.cpp" />
+		<Unit filename="BandInfo.h" />
+		<Unit filename="BatchIniFile.cpp" />
+		<Unit filename="BatchIniFile.h" />
+		<Unit filename="ContrastAdvWindow.cpp" />
+		<Unit filename="ContrastAdvWindow.h" />
+		<Unit filename="ContrastWindow.cpp" />
+		<Unit filename="ContrastWindow.h" />
+		<Unit filename="CoordinateInfo.cpp" />
+		<Unit filename="CoordinateInfo.h" />
+		<Unit filename="DisplayTab.cpp" />
+		<Unit filename="DisplayTab.h" />
+		<Unit filename="DisplayWindow.cpp" />
+		<Unit filename="DisplayWindow.h" />
+		<Unit filename="FeatureSpace.cpp" />
+		<Unit filename="FeatureSpace.h" />
+		<Unit filename="FeatureSpaceGL.cpp" />
+		<Unit filename="FeatureSpaceGL.h" />
+		<Unit filename="FeatureTab.cpp" />
+		<Unit filename="FeatureTab.h" />
+		<Unit filename="GLContainer.cpp" />
+		<Unit filename="GLContainer.h" />
+		<Unit filename="GLText.cpp" />
+		<Unit filename="GLText.h" />
+		<Unit filename="GLView.cpp" />
+		<Unit filename="GLView.h" />
+		<Unit filename="ImageFile.cpp" />
+		<Unit filename="ImageFile.h" />
+		<Unit filename="ImageGL.cpp" />
+		<Unit filename="ImageGL.h" />
+		<Unit filename="ImageHandler.cpp" />
+		<Unit filename="ImageHandler.h" />
+		<Unit filename="ImageProperties.cpp" />
+		<Unit filename="ImageProperties.h" />
+		<Unit filename="ImageTab.cpp" />
+		<Unit filename="ImageTab.h" />
+		<Unit filename="ImageTileSet.cpp" />
+		<Unit filename="ImageTileSet.h" />
+		<Unit filename="ImageViewport.cpp" />
+		<Unit filename="ImageViewport.h" />
+		<Unit filename="ImageWindow.cpp" />
+		<Unit filename="ImageWindow.h" />
+		<Unit filename="IniFile.cpp" />
+		<Unit filename="IniFile.h" />
+		<Unit filename="MainWindow.cpp" />
+		<Unit filename="MainWindow.h" />
+		<Unit filename="OverviewGL.cpp" />
+		<Unit filename="OverviewGL.h" />
+		<Unit filename="OverviewWindow.cpp" />
+		<Unit filename="OverviewWindow.h" />
+		<Unit filename="PchApp.h" />
+		<Unit filename="PointsHash.h" />
+		<Unit filename="PrefsWindow.cpp" />
+		<Unit filename="PrefsWindow.h" />
+		<Unit filename="ProgressWindow.cpp" />
+		<Unit filename="ProgressWindow.h" />
+		<Unit filename="QueryTab.cpp" />
+		<Unit filename="QueryTab.h" />
+		<Unit filename="ROI.cpp" />
+		<Unit filename="ROI.h" />
+		<Unit filename="ROIFile.cpp" />
+		<Unit filename="ROIFile.h" />
+		<Unit filename="ROISet.cpp" />
+		<Unit filename="ROISet.h" />
+		<Unit filename="ROIWindow.cpp" />
+		<Unit filename="ROIWindow.h" />
+		<Unit filename="ScrollBox.cpp" />
+		<Unit filename="ScrollBox.h" />
+		<Unit filename="Settings.cpp" />
+		<Unit filename="Settings.h" />
+		<Unit filename="StickyWindowManager.cpp" />
+		<Unit filename="StickyWindowManager.h" />
+		<Unit filename="StringUtils.cpp" />
+		<Unit filename="StringUtils.h" />
+		<Unit filename="TestUtils.cpp" />
+		<Unit filename="TestUtils.h" />
+		<Unit filename="ToolTab.cpp" />
+		<Unit filename="ToolTab.h" />
+		<Unit filename="ToolWindow.cpp" />
+		<Unit filename="ToolWindow.h" />
+		<Unit filename="ViewportListener.cpp" />
+		<Unit filename="ViewportListener.h" />
+		<Unit filename="Window.cpp" />
+		<Unit filename="Window.h" />
+		<Unit filename="config.h" />
+		<Unit filename="console.cpp" />
+		<Unit filename="console.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="main.h" />
+		<Unit filename="resources.h" />
+		<Unit filename="rsrc.rc">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
