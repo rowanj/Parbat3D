@@ -19,8 +19,8 @@ class FeatureTab:public ToolTab
         void OnUserMessage();
         static int guessPoints(int slider_pos);
     public:
-        char* GetTabName() {return "Feature";};
-        char* GetTabHeading() {return "Feature Space";};
+        const char* GetTabName() {return "Feature";};
+        const char* GetTabHeading() {return "Feature Space";};
         int GetContainerHeight();   
         int Create(HWND parent,RECT *parentRect);
         static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);    

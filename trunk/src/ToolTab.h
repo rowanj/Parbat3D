@@ -13,8 +13,8 @@ class ToolTab:public Window
     public:
         HWND hHeading;        
         virtual int Create(HWND parent,RECT *parentRect);
-        virtual char* GetTabName() {return NULL;};
-        virtual char* GetTabHeading() {return NULL;};
+        virtual const char* GetTabName() {return NULL;};
+        virtual const char* GetTabHeading() {return NULL;};
         virtual int GetContainerHeight() {return 0;};
         static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);    
 };

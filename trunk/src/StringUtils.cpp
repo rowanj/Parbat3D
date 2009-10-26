@@ -101,7 +101,7 @@ std::string makeString(std::string leader, char* input)
 	return buffer;
 }
 
-const char* catcstrings(char* input1, char* input2)
+const char* catcstrings(const char* input1, const char* input2)
 {
 	std::string sinput1, sinput2;
 	std::string buffer;

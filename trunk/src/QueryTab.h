@@ -11,8 +11,8 @@ class QueryTab:public ToolTab
        HWND *imageBandValues;
        HWND cursorXPos, cursorYPos;
         
-        char* GetTabName() {return "Query";};
-        char* GetTabHeading() {return "Band Values";};
+        const char* GetTabName() {return "Query";};
+        const char* GetTabHeading() {return "Band Values";};
         int GetContainerHeight();   
         int Create(HWND parent,RECT *parentRect);
         static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);  

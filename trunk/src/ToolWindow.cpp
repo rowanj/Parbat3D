@@ -95,7 +95,7 @@ int ToolWindow::Create(HWND) {
     {
         ToolTab *tab=tabs.at(i);
         tie.mask=TCIF_TEXT+TCIF_PARAM;;
-        tie.pszText=tab->GetTabName();
+        tie.pszText=const_cast<char*>(tab->GetTabName());
         tie.lParam=(LPARAM)tie.pszText;
         TabCtrl_InsertItem(hToolWindowTabControl, i, &tie);
         tab->Create(hToolWindowTabControl,&rect);

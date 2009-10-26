@@ -24,7 +24,7 @@ const char* makeMessage(std::string leader, char* input);
 std::string makeString(std::string leader, char* input);
 std::string makeString(std::string leader, int input);
 std::string makeString(std::string leader, double input);
-const char* catcstrings(char* input1, char* input2);
+const char* catcstrings(const char* input1, const char* input2);
 const char* inttocstring(int input);
 const char* floattocstring(float input);
 char* copyString(const char *oldstr);

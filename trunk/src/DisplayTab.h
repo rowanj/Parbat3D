@@ -13,8 +13,8 @@ class DisplayTab:public ToolTab
         HWND *greenRadiobuttons;
         HWND *blueRadiobuttons;
     public:
-        char* GetTabName() {return "Display";};
-        char* GetTabHeading() {return "Channel Selection";};
+        const char* GetTabName() {return "Display";};
+        const char* GetTabHeading() {return "Channel Selection";};
         int GetContainerHeight();   
         int Create(HWND parent,RECT *parentRect);
         static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);    

@@ -54,7 +54,7 @@ using std::string;
 // And GDAL
 //#define CPL_STDCALL __stdcall
 //#define CPL_DISABLE_STDCALL 1
-#include <gdal_priv.h>
+#include <gdal/gdal_priv.h>
 
 
 #endif // include guard

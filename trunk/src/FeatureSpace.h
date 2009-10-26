@@ -9,17 +9,17 @@
 #include "ROIFile.h"
 #include "ROIWindow.h"
 #include "ImageTileSet.h"
-#include "PointsHash.h"
 #include "FeatureSpaceGL.h"
+#include "PointsHash.h"
 
 #define PIX_COORDS 1
 #define BOUNDS_COORDS 2
 
-typedef struct myPoint
+typedef struct
 {
 	int x;
 	int y;
-};
+} myPoint;
 
 class FeatureSpace:public Window, public GLContainerHandler
 {

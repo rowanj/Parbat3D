@@ -8,8 +8,8 @@ class ImageTab:public ToolTab
     private:
         WNDPROC prevProc;
     public:
-        char* GetTabName() {return "Image";};
-        char* GetTabHeading() {return "Image Properties";};
+        const char* GetTabName() {return "Image";};
+        const char* GetTabHeading() {return "Image Properties";};
         int GetContainerHeight();   
         int Create(HWND parent,RECT *parentRect);
         static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);    
