@@ -13,12 +13,12 @@ EXES                  = parbat.exe
 CEXTRA                =
 CXXEXTRA              =
 RCEXTRA               =
-DEFINES               =-DNOMINMAX
+DEFINES               =-DNOMINMAX -DWINE_NOWINSOCK -DNOCRYPT
 INCLUDE_PATH          = -I.
 DLL_PATH              =
 DLL_IMPORTS           =
 LIBRARY_PATH          =
-LIBRARIES             =-lGL -lGLU -lgdal -lcomctl32
+LIBRARIES             =-lGL -lGLU -lgdal -lcomctl32 -lopengl32
 
 
 ### parbat.exe sources and settings
