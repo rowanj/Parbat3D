@@ -148,11 +148,11 @@ const char* floattocstring(float input)
 
 char* copyString(const char *oldstr)
 {
-    char *newstr;
-    int str_length=strlen(oldstr);
-    newstr=new char[str_length+1];
-    strcpy(newstr,(char*)oldstr);
-    return newstr;
+  assert(oldstr != NULL);
+  std::string strOriginal(oldstr);
+  char* pszReturn = new char[strOriginal.length() + 1];
+  strcpy(pszReturn, strOriginal.c_str());
+  return pszReturn;
 }
 
 
