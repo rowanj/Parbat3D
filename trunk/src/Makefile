@@ -11,7 +11,7 @@ EXES                  = parbat.exe
 ### Common settings
 
 CEXTRA                =
-CXXEXTRA              =
+CXXEXTRA              =-ggdb
 RCEXTRA               =
 DEFINES               =-DNOMINMAX -DWINE_NOWINSOCK -DNOCRYPT
 INCLUDE_PATH          = -I.
@@ -110,6 +110,9 @@ all: $(SUBDIRS) $(DLLS:%=%.so) $(EXES:%=%.so)
 $(SUBDIRS): dummy
 	@cd $@ && $(MAKE)
 
+PchApp.h.gch: PchApp.h
+	$(CXX) -c $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) -o $@ $<
+
 # Implicit rules
 
 .SUFFIXES: .cpp .rc .res
@@ -127,9 +130,12 @@ DEFINCL = $(INCLUDE_PATH) $(DEFINES) $(OPTIONS)
 .rc.res:
 	$(RC) $(RCFLAGS) $(RCEXTRA) $(DEFINCL) -fo$@ $<
 
+.h.gch:
+	$(CXX) -c $(CXXFLAGS) $(CXXEXTRA) $(DEFINCL) -o $@ $<
+
 # Rules for cleaning
 
-CLEAN_FILES     = y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
+CLEAN_FILES     = PchApp.h.gch y.tab.c y.tab.h lex.yy.c core *.orig *.rej \
                   \\\#*\\\# *~ *% .\\\#*
 
 clean:: $(SUBDIRS:%=%/__clean__) $(EXTRASUBDIRS:%=%/__clean__)
@@ -145,7 +151,7 @@ $(EXTRASUBDIRS:%=%/__clean__): dummy
 ### Target specific build rules
 DEFLIB = $(LIBRARY_PATH) $(LIBRARIES) $(DLL_PATH) $(DLL_IMPORTS:%=-l%)
 
-$(parbat_exe_MODULE).so: $(parbat_exe_OBJS)
+$(parbat_exe_MODULE).so: PchApp.h.gch $(parbat_exe_OBJS)
 	$(CXX) $(parbat_exe_LDFLAGS) -o $@ $(parbat_exe_OBJS) $(parbat_exe_LIBRARY_PATH) $(DEFLIB) $(parbat_exe_DLLS:%=-l%) $(parbat_exe_LIBRARIES:%=-l%)
 
 
