@@ -1,0 +1,1 @@
+winemaker --nomsvcrt --wine64 .
