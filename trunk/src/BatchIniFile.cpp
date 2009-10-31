@@ -30,7 +30,7 @@ void BatchIniFile::updateBuffer (string key, string data) {
             newContentBuffer->append(toAdd.c_str());
             dataUpdated = true;
         } else {
-            if (line!="") newContentBuffer->append(line);
+	  if (string("") != line) newContentBuffer->append(line);
             newContentBuffer->append("\n");
         }
         

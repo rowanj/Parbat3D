@@ -1,11 +1,11 @@
 PROGRAM=Parbat
 CXX=wineg++
-CXXFLAGS=-c -Wall -O2 -DWINE_NOWINSOCK -DNOCRYPT
-CXXFLAGS+=-I/usr/include/wine/windows
+CXXFLAGS=-c -Wall -O2 -DWINE_NOWINSOCK -DNOCRYPT -DNOMINMAX
+CXXFLAGS+=
 
-LDFLAGS=-L/usr/lib/wine
-LDFLAGS+=-lcomdlg32 -lshell32 -lkernel32 -luser32 -ladvapi32
-CXXANDLDFLAGS=-ggdb -mwindows -m32
+LDFLAGS=
+LDFLAGS+=-lcomdlg32 -lshell32 -lkernel32 -luser32 -ladvapi32 -lGL -lGLU -lgdal -luser32 -lcomctl32
+CXXANDLDFLAGS=-ggdb -mwindows -Wno-deprecated
 
 # Core files
 SOURCES=BandInfo.cpp \
@@ -59,8 +59,6 @@ all: $(SOURCES) $(PROGRAM)
 
 $(PROGRAM): $(OBJECTS)
 	$(CXX) $(CXXANDLDFLAGS) $(LDFLAGS) $(OBJECTS) -o $@
-	cp -f $(PROGRAM) $(PROGRAM)D
-	strip --strip-all $(PROGRAM)
 
 %.o: %.cpp PchApp.h.gch
 	$(CXX) $(CXXANDLDFLAGS) $(CXXFLAGS) $< -o $@
@@ -77,6 +75,7 @@ clean:
 distclean: clean
 	@rm -f -v $(PROGRAM)
 	@rm -f -v $(PROGRAM)D
+	@rm -f -v *.so
 
 run: $(PROGRAM)
 	$(RUN_ENVIRONMENT) ./$(PROGRAM) $(RUN_ARGUMENTS)
