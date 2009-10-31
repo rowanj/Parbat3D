@@ -98,12 +98,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszArgum
     //string settings_path (catcstrings(modulePath, "\\settings.ini"));  // store in build folder
     
     // create the directory in Application Data if it doesn't already exist
-    char* team_dir = copyString(catcstrings(copyString(getenv("APPDATA")), "\\Imagery"));
-    CreateDirectory(team_dir, NULL);
-    char* prog_dir = copyString(catcstrings(team_dir, "\\Parbat3D"));
-    CreateDirectory(prog_dir, NULL);
-    
-    string settings_path (catcstrings(prog_dir, "\\settings.ini"));  // store in App Data folder
+    string settings_path = "settings.ini";
+    if (getenv("APPDATA") != NULL) {
+      char* team_dir = copyString(catcstrings(copyString(getenv("APPDATA")), "\\Imagery"));
+      CreateDirectory(team_dir, NULL);
+      char* prog_dir = copyString(catcstrings(team_dir, "\\Parbat3D"));
+
+      CreateDirectory(prog_dir, NULL);
+      
+      settings_path =  catcstrings(prog_dir, "\\settings.ini");  // store in App Data folder
+    }
     settingsFile = new settings(settings_path);
     
     regionsSet = new ROISet();
