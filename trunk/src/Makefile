@@ -11,14 +11,14 @@ EXES                  = parbat.exe
 ### Common settings
 
 CEXTRA                =
-CXXEXTRA              =-ggdb
+CXXEXTRA              =-fshort-wchar -ggdb  `pkg-config gtkmm-2.4 --cflags` -Wno-deprecated -fPIC
 RCEXTRA               =
-DEFINES               =-DNOMINMAX -DWINE_NOWINSOCK -DNOCRYPT
-INCLUDE_PATH          = -I.
+DEFINES               =-DNOMINMAX -DWINE_NOWINSOCK -DNOCRYPT -DWINE_UNICODE_NATIVE -D_REENTRANT -D__WINE__
+INCLUDE_PATH          = -I. -I/usr/include/wine/windows
 DLL_PATH              =
 DLL_IMPORTS           =
 LIBRARY_PATH          =
-LIBRARIES             =-lGL -lGLU -lgdal -lcomctl32 -lopengl32
+LIBRARIES             =-lGL -lGLU -lgdal -lcomctl32 -lopengl32 `pkg-config gtkmm-2.4 --libs`
 
 
 ### parbat.exe sources and settings
@@ -94,8 +94,8 @@ RC_SRCS               = $(parbat_exe_RC_SRCS)
 
 ### Tools
 
-CC = winegcc
-CXX = wineg++
+CC = gcc
+CXX = g++
 RC = wrc
 
 

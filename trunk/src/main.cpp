@@ -222,6 +222,15 @@ void orderWindows()
 }    
 
 void loadFile() {
+#ifdef __WINE__
+  Gtk::FileChooserDialog dialog("Please choose a file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+  dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+  Gtk::FileFilter filter_text;
+  filter_text.set_name("All files");
+  filter_text.add_mime_type("*");
+  dialog.add_filter(filter_text);
+  dialog.run();
+#else
     OPENFILENAME ofn;
     char szFileName[MAX_PATH] = "";
     
@@ -292,6 +301,7 @@ void loadFile() {
         // stops the progress bar (hides the window)
         progressWindow.end();
     }
+#endif
 }
 
 void closeFile() {
